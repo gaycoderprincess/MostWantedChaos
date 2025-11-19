@@ -2,14 +2,19 @@ uint8_t* GetRaceNumLaps() {
 	auto race = GRaceStatus::fObj;
 	if (!race) return nullptr;
 	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return nullptr;
+	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return nullptr;
 	auto index = race->mRaceParms->mIndex;
 	if (!index) {
-		return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, 0xEBDC165, 0);
+		return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
 	}
 	return &index->mNumLaps;
 }
 
-class Effect_RemoveLapProgress : public ChaosEffect {
+int GetLocalPlayerCurrentLap() {
+	return GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted;
+}
+
+/*class Effect_RemoveLapProgress : public ChaosEffect {
 public:
 	Effect_RemoveLapProgress() : ChaosEffect() {
 		sName = "Revert Progress By A Lap";
@@ -24,7 +29,7 @@ public:
 		return GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted > 0;
 	}
 	virtual bool IsConditionallyAvailable() { return true; }
-} E_RemoveLapProgress;
+} E_RemoveLapProgress;*/
 
 class Effect_RemoveLap : public ChaosEffect {
 public:
@@ -34,11 +39,12 @@ public:
 
 	virtual void InitFunction() {
 		(*GetRaceNumLaps())--;
+		ERestartRace::Create();
 	}
 	virtual bool IsAvailable() {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps < 2) return false;
-		return true;
+		return GetLocalPlayerCurrentLap() <= 0;
 	}
 	virtual bool IsConditionallyAvailable() { return true; }
 } E_RemoveLap;
@@ -51,11 +57,12 @@ public:
 
 	virtual void InitFunction() {
 		(*GetRaceNumLaps())++;
+		ERestartRace::Create();
 	}
 	virtual bool IsAvailable() {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
-		return true;
+		return GetLocalPlayerCurrentLap() <= 0;
 	}
 	virtual bool IsConditionallyAvailable() { return true; }
 } E_AddLap;
@@ -70,11 +77,27 @@ public:
 		auto laps = GetRaceNumLaps();
 		(*laps) += 3;
 		if (*laps > 10) *laps = 10;
+		ERestartRace::Create();
 	}
 	virtual bool IsAvailable() {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
-		return true;
+		return GetLocalPlayerCurrentLap() <= 0;
 	}
 	virtual bool IsConditionallyAvailable() { return true; }
 } E_Add3Laps;
+
+class Effect_RestartRace : public ChaosEffect {
+public:
+	Effect_RestartRace() : ChaosEffect() {
+		sName = "Restart Race";
+	}
+
+	virtual void InitFunction() {
+		ERestartRace::Create();
+	}
+	virtual bool IsAvailable() {
+		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;
+	}
+	virtual bool IsConditionallyAvailable() { return true; }
+} E_RestartRace;

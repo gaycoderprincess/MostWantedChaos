@@ -194,4 +194,5 @@ public:
 			ply->SetAiControl(false);
 		}
 	}
+	virtual bool HasTimer() { return true; }
 } E_AutoDrive;

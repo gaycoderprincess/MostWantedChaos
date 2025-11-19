@@ -32,8 +32,10 @@ void ChaosLoop() {
 		effect.OnTick(gTimer.fDeltaTime);
 	}
 
+	float y = 0;
 	for (auto& effect : aRunningEffects) {
-		effect.Draw(&effect - &aRunningEffects[0]);
+		effect.Draw(y);
+		y += 1 - effect.GetOffscreenPercentage();
 	}
 
 	while (RunningEffectsCleanup()) {}

@@ -45,7 +45,13 @@ public:
 		return pEffect && pEffect->HasTimer();
 	}
 
-	void Draw(int y) const {
+	float GetOffscreenPercentage() const {
+		if (fActiveTimer < 0.5) return std::lerp(1, 0, easeInOutQuart(fActiveTimer * 2));
+		else if (fTimer < 0.5) return std::lerp(1, 0, easeInOutQuart(fTimer * 2));
+		return 0;
+	}
+
+	void Draw(float y) const {
 		if (!IsActive()) return;
 
 		auto x = fEffectX;

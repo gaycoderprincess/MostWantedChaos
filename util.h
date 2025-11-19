@@ -69,5 +69,5 @@ inline float TOKMH(float mps) { return mps * 3.6; }
 float* GetMaxHeat() {
 	auto race = GRaceStatus::fObj;
 	if (!race) return nullptr;
-	return (float*)Attrib::Instance::GetAttributePointer(&race->mRaceBin->mBinRecord, 0xE8C24416, 0);
+	return (float*)Attrib::Instance::GetAttributePointer(&race->mRaceBin->mBinRecord, Attrib::StringHash32("MaxOpenWorldHeat"), 0);
 }

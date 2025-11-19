@@ -8,6 +8,7 @@ public:
 	virtual void TickFunction() {
 		DrawRectangle(0, 1, 0, 1, {0,0,0,255});
 	}
+	virtual bool HasTimer() { return true; }
 } E_Blind;
 
 class Effect_PortraitMode : public ChaosEffect {
@@ -20,6 +21,7 @@ public:
 		DrawRectangle(0, 0.25, 0, 1, {0,0,0,255});
 		DrawRectangle(0.75, 1, 0, 1, {0,0,0,255});
 	}
+	virtual bool HasTimer() { return true; }
 	virtual bool RunInMenus() { return true; }
 } E_PortraitMode;
 
@@ -33,5 +35,6 @@ public:
 		DrawRectangle(0, 1, 0, 0.1, {0,0,0,255});
 		DrawRectangle(0, 1, 0.9, 1, {0,0,0,255});
 	}
+	virtual bool HasTimer() { return true; }
 	virtual bool RunInMenus() { return true; }
 } E_WidescreenMode;
