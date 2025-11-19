@@ -10,6 +10,24 @@ uint8_t* GetRaceNumLaps() {
 	return &index->mNumLaps;
 }
 
+void SetRaceNumLaps(int lapCount) {
+	auto race = GRaceStatus::fObj;
+	if (!race) return;
+	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return;
+	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
+	if (auto index = race->mRaceParms->mIndex) {
+		index->mNumLaps = lapCount;
+	}
+	else {
+		auto pLaps = (uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+		if (pLaps) *pLaps = lapCount;
+		if (auto parent = race->mRaceParms->mRaceRecord->mCollection->mParent) {
+			pLaps = (uint32_t*)Attrib::Collection::GetData(parent, Attrib::StringHash32("NumLaps"), 0);
+			if (pLaps) *pLaps = lapCount;
+		}
+	}
+}
+
 int GetLocalPlayerCurrentLap() {
 	return GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted;
 }
@@ -38,8 +56,8 @@ public:
 	}
 
 	virtual void InitFunction() {
-		(*GetRaceNumLaps())--;
-		ERestartRace::Create();
+		SetRaceNumLaps((*GetRaceNumLaps())-1);
+		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
 	virtual bool IsAvailable() {
 		auto laps = GetRaceNumLaps();
@@ -56,8 +74,8 @@ public:
 	}
 
 	virtual void InitFunction() {
-		(*GetRaceNumLaps())++;
-		ERestartRace::Create();
+		SetRaceNumLaps((*GetRaceNumLaps())+1);
+		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
 	virtual bool IsAvailable() {
 		auto laps = GetRaceNumLaps();
@@ -74,10 +92,11 @@ public:
 	}
 
 	virtual void InitFunction() {
-		auto laps = GetRaceNumLaps();
-		(*laps) += 3;
-		if (*laps > 10) *laps = 10;
-		ERestartRace::Create();
+		auto laps = *GetRaceNumLaps();
+		laps += 3;
+		if (laps > 10) laps = 10;
+		SetRaceNumLaps(laps);
+		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
 	virtual bool IsAvailable() {
 		auto laps = GetRaceNumLaps();
@@ -94,7 +113,7 @@ public:
 	}
 
 	virtual void InitFunction() {
-		ERestartRace::Create();
+		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
 	virtual bool IsAvailable() {
 		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;

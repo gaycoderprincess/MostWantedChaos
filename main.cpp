@@ -9,6 +9,14 @@
 
 #include "include/chloemenulib.h"
 
+std::vector<void(*)()> aMainLoopFunctions;
+void MainLoop() {
+	for (auto& func : aMainLoopFunctions) {
+		func();
+	}
+	aMainLoopFunctions.clear();
+}
+
 #include "d3dhook.h"
 #include "util.h"
 #include "chaoseffect.h"
@@ -72,6 +80,13 @@ void ChaosModMenu() {
 		DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
 		DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
 		DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
+		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms) {
+			DrawMenuOption(std::format("Race Hash: {:X}", Attrib::Instance::GetCollection(GRaceStatus::fObj->mRaceParms->mRaceRecord)));
+			if (auto parent = GRaceStatus::fObj->mRaceParms->mRaceRecord->mCollection->mParent) {
+				DrawMenuOption(std::format("Parent Hash: {:X}", parent->mKey));
+			}
+			DrawMenuOption(std::format("Event ID: {}", GRaceParameters::GetEventID(GRaceStatus::fObj->mRaceParms)));
+		}
 		if (DrawMenuOption("Set Standard HUD")) {
 			ply->SetHud(PHT_STANDARD);
 		}
@@ -84,6 +99,26 @@ void ChaosModMenu() {
 	}
 
 	ChloeMenuLib::EndMenu();
+}
+
+// fixes a crash when totaling your car after quitting from a race
+// in this case GRacerInfo is valid, mRaceParms is not
+void __thiscall TotalVehicleFixed(GRacerInfo* pThis) {
+	if (!GRaceStatus::fObj->mRaceParms) return;
+	GRacerInfo::TotalVehicle(pThis);
+}
+void __thiscall BlowEngineFixed(GRacerInfo* pThis) {
+	if (!GRaceStatus::fObj->mRaceParms) return;
+	GRacerInfo::BlowEngine(pThis);
+}
+
+// fixes a crash when hitting objects using a player-driven AI car
+// the result of this function is not null checked at 4F0E70
+EAX_CarState* GetClosestPlayerCarFixed(bVector3* a1) {
+	if (auto car = GetClosestPlayerCar(a1)) return car;
+	static EAX_CarState temp;
+	memset(&temp,0,sizeof(temp));
+	return &temp;
 }
 
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
@@ -102,11 +137,17 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			ChloeMenuLib::RegisterMenu("test", &ChaosModMenu);
 
+			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63C093, &TotalVehicleFixed);
+			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63839A, &BlowEngineFixed);
+			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x4F0E70, &GetClosestPlayerCarFixed);
+
 			NyaHooks::PlaceD3DHooks();
 			NyaHooks::aEndSceneFuncs.push_back(D3DHookMain);
 			NyaHooks::aD3DResetFuncs.push_back(OnD3DReset);
 			NyaHooks::PlaceWndProcHook();
 			NyaHooks::aWndProcFuncs.push_back(WndProcHook);
+			NyaHooks::PlaceWorldServiceHook();
+			NyaHooks::aWorldServiceFuncs.push_back(MainLoop);
 			NyaHooks::PlaceInputBlockerHook();
 		} break;
 		default:

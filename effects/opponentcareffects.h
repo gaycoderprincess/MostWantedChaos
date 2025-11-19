@@ -28,6 +28,22 @@ public:
 	}
 } E_BlowEngineOpponents;
 
+class Effect_BlowEngineOpponents1 : public EffectBase_OpponentConditional {
+public:
+	Effect_BlowEngineOpponents1() : EffectBase_OpponentConditional() {
+		sName = "Blow One Opponent's Engine";
+	}
+
+	virtual void InitFunction() {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		int i = rand() % list.size();
+		auto racer = list[i];
+		auto engine = racer->mCOMObject->Find<IEngineDamage>();
+		if (!engine) return;
+		engine->Sabotage(1);
+	}
+} E_BlowEngineOpponents1;
+
 class Effect_LaunchCarFwdOpponents : public EffectBase_OpponentConditional {
 public:
 	Effect_LaunchCarFwdOpponents() : EffectBase_OpponentConditional() {
