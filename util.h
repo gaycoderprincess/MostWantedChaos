@@ -1,3 +1,11 @@
+void WriteLog(const std::string& str) {
+	static auto file = std::ofstream("NFSMWChaos_gcp.log");
+
+	file << str;
+	file << "\n";
+	file.flush();
+}
+
 void DisableKeyboardInput(bool disable) {
 	NyaHooks::bInputsBlocked = disable;
 }
@@ -137,4 +145,36 @@ FECustomizationRecord CreateRandomCustomizations(uint32_t carModel) {
 	RideInfo::SetRandomPaint(&info);
 	FECustomizationRecord::WriteRideIntoRecord(&record, &info);
 	return record;
+}
+
+FECarRecord* GetCurrentCareerCar() {
+	auto id = FEDatabase->mUserProfile->TheCareerSettings.CurrentCar;
+	if (id < 0) return nullptr;
+	if (id >= 200) return nullptr;
+	return &FEDatabase->mUserProfile->PlayersCarStable.CarTable[id];
+}
+
+FECarRecord* GetRandomCareerCar() {
+	std::vector<FECarRecord*> records;
+	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	for (auto& car : cars->CarTable) {
+		if (car.Handle == 0xFFFFFFFF) continue;
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(cars, car.CareerHandle);
+		auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(cars, car.Customization);
+		if (!career) continue;
+		if (!customization) continue;
+		records.push_back(&car);
+	}
+	if (records.empty()) return nullptr;
+	return records[rand()%records.size()];
+}
+
+bool HasPinkSlip(uint32_t model) {
+	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	for (auto& car : cars->CarTable) {
+		if (car.FilterBits != 0xF0042) continue;
+		if (car.VehicleKey != model) continue;
+		return true;
+	}
+	return false;
 }

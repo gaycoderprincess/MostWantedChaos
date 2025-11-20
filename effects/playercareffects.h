@@ -1,18 +1,3 @@
-class EffectBase_PlayerCarHasNitro : public ChaosEffect {
-public:
-	EffectBase_PlayerCarHasNitro() : ChaosEffect() {
-		sName = "(EFFECT BASE) Player Has Nitro";
-	}
-
-	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerEngine()) {
-			return ply->HasNOS();
-		}
-		return false;
-	}
-	bool IsConditionallyAvailable() override { return true; }
-};
-
 class Effect_StopCar : public ChaosEffect {
 public:
 	Effect_StopCar() : ChaosEffect() {
@@ -584,6 +569,43 @@ public:
 } E_ResetImmune;
 
 float CarMagnetForce = 3;
+void DoCarMagnet(IVehicle* source, double delta) {
+	auto cars = GetActiveVehicles();
+	for (auto& car : cars) {
+		if (car == source) continue;
+		auto otherCar = car->mCOMObject->Find<IRigidBody>();
+		if (!otherCar) continue;
+
+		auto v = source->GetPosition();
+		auto c = otherCar->GetPosition();
+		auto vel = *otherCar->GetLinearVelocity();
+		vel.x += (v->x - c->x) * CarMagnetForce * delta;
+		vel.y += (v->y - c->y) * CarMagnetForce * delta;
+		vel.z += (v->z - c->z) * CarMagnetForce * delta;
+		otherCar->SetLinearVelocity(&vel);
+	}
+}
+
+void DoCarForcefield(IVehicle* source) {
+	auto cars = GetActiveVehicles();
+	for (auto& car : cars) {
+		if (car == source) continue;
+		auto otherCar = car->mCOMObject->Find<IRigidBody>();
+		if (!otherCar) continue;
+
+		auto v = (NyaVec3*)source->GetPosition();
+		auto c = (NyaVec3*)otherCar->GetPosition();
+		if ((*v - *c).length() < 15) {
+			auto dir = (*c - *v);
+			dir.Normalize();
+			dir *= 15;
+			auto newPos = *v;
+			newPos += dir;
+			otherCar->SetPosition((UMath::Vector3*)&newPos);
+		}
+	}
+}
+
 class Effect_CarMagnet : public ChaosEffect {
 public:
 	Effect_CarMagnet() : ChaosEffect() {
@@ -591,21 +613,7 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		auto playerCar = GetLocalPlayerVehicle();
-		auto cars = GetActiveVehicles();
-		for (auto& car : cars) {
-			if (car == playerCar) continue;
-			auto otherCar = car->mCOMObject->Find<IRigidBody>();
-			if (!otherCar) continue;
-
-			auto v = playerCar->GetPosition();
-			auto c = otherCar->GetPosition();
-			auto vel = *otherCar->GetLinearVelocity();
-			vel.x += (v->x - c->x) * CarMagnetForce * delta;
-			vel.y += (v->y - c->y) * CarMagnetForce * delta;
-			vel.z += (v->z - c->z) * CarMagnetForce * delta;
-			otherCar->SetLinearVelocity(&vel);
-		}
+		DoCarMagnet(GetLocalPlayerVehicle(), delta);
 	}
 	bool HasTimer() override { return true; }
 } E_CarMagnet;
@@ -618,24 +626,7 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		auto playerCar = GetLocalPlayerVehicle();
-		auto cars = GetActiveVehicles();
-		for (auto& car : cars) {
-			if (car == playerCar) continue;
-			auto otherCar = car->mCOMObject->Find<IRigidBody>();
-			if (!otherCar) continue;
-
-			auto v = (NyaVec3*)playerCar->GetPosition();
-			auto c = (NyaVec3*)otherCar->GetPosition();
-			if ((*v - *c).length() < 15) {
-				auto dir = (*c - *v);
-				dir.Normalize();
-				dir *= 15;
-				auto newPos = *v;
-				newPos += dir;
-				otherCar->SetPosition((UMath::Vector3*)&newPos);
-			}
-		}
+		DoCarForcefield(GetLocalPlayerVehicle());
 	}
 	bool HasTimer() override { return true; }
 } E_CarForcefield;
@@ -654,3 +645,48 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_NoInput;
+
+class Effect_PlayerCarGear1 : public ChaosEffect {
+public:
+	Effect_PlayerCarGear1() : ChaosEffect() {
+		sName = "Force Player To Gear 1";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
+			if (ply->GetGear() != G_FIRST) ply->Shift(G_FIRST);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarGear1;
+
+class Effect_PlayerCarGearTop : public ChaosEffect {
+public:
+	Effect_PlayerCarGearTop() : ChaosEffect() {
+		sName = "Force Player To Top Gear";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
+			if (ply->GetGear() != ply->GetTopGear()) ply->Shift(ply->GetTopGear());
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarGearTop;
+
+class Effect_PlayerCarGearR : public ChaosEffect {
+public:
+	Effect_PlayerCarGearR() : ChaosEffect() {
+		sName = "Force Player To Reverse Gear";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
+			if (ply->GetGear() != G_REVERSE) ply->Shift(G_REVERSE);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarGearR;

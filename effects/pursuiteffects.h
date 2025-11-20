@@ -1,19 +1,3 @@
-class EffectBase_PursuitConditional : public ChaosEffect {
-public:
-
-	EffectBase_PursuitConditional() : ChaosEffect() {
-		sName = "(EFFECT BASE) Pursuit Conditional";
-	}
-
-	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-			return ply->IsBeingPursued();
-		}
-		return false;
-	}
-	bool IsConditionallyAvailable() override { return true; }
-};
-
 /*class Effect_SpawnCop : public ChaosEffect {
 public:
 	Effect_SpawnCop() : ChaosEffect() {
@@ -143,3 +127,19 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_NoCops;
+
+class Effect_NoHidingSpots : public EffectBase_PursuitConditional {
+public:
+	Effect_NoHidingSpots() : EffectBase_PursuitConditional() {
+		sName = "Disable Hiding Spots";
+		fTimerLength = 120;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x429949, 0xEB);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x429949, 0x74);
+	}
+	bool HasTimer() override { return true; }
+} E_NoHidingSpots;

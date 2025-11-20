@@ -1,3 +1,4 @@
+class ChaosEffectInstance;
 class ChaosEffect {
 public:
 	const char* sName;
@@ -5,6 +6,7 @@ public:
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;
 	uint32_t IncompatibilityGroup = 0;
+	ChaosEffectInstance* EffectInstance;
 
 	static inline std::vector<ChaosEffect*> aEffects;
 
@@ -31,6 +33,7 @@ float fEffectSpacing = 0.045;
 class ChaosEffectInstance {
 public:
 	ChaosEffect* pEffect = nullptr;
+	const char* sNameToDisplay = nullptr;
 	double fActiveTimer = 0;
 	double fTimer = 0;
 	double fTimeConditionMet = 3;
@@ -49,6 +52,11 @@ public:
 		return pEffect && pEffect->HasTimer();
 	}
 
+	const char* GetName() const {
+		if (sNameToDisplay) return sNameToDisplay;
+		return pEffect->sName;
+	}
+
 	float GetOffscreenPercentage() const {
 		if (fActiveTimer < 0.5) return std::lerp(1, 0, easeInOutQuart(fActiveTimer * 2));
 		else if (fTimer < 0.5) return std::lerp(1, 0, easeInOutQuart(fTimer * 2));
@@ -64,7 +72,7 @@ public:
 		x *= GetAspectRatioInv();
 		x = 1 - x;
 
-		std::string str = pEffect->sName;
+		std::string str = GetName();
 		if (HasTimer()) {
 			str += std::format(" ({})", (int)fTimer);
 		}
@@ -84,10 +92,12 @@ public:
 		DrawString(data, str);
 	}
 
-	void OnTick(double delta) {
+	void OnTick(double delta, bool inMenu) {
 		if (!pEffect) {
-			fTimer -= delta;
-			fActiveTimer += delta;
+			if (!inMenu) {
+				fTimer -= delta;
+				fActiveTimer += delta;
+			}
 			return;
 		}
 
@@ -106,19 +116,23 @@ public:
 			}
 		}
 
+		pEffect->EffectInstance = this;
 		if (bFirstFrame) {
 			pEffect->InitFunction();
 			bFirstFrame = false;
 		}
 
-		if (fTimer > 0 && fTimer - delta <= 0) {
-			pEffect->DeinitFunction();
+		if (!inMenu) {
+			if (fTimer > 0 && fTimer - delta <= 0) {
+				pEffect->DeinitFunction();
+			}
+			fTimer -= delta;
+			fActiveTimer += delta;
 		}
-		fTimer -= delta;
-		fActiveTimer += delta;
 		if (IsActive()) {
 			pEffect->TickFunction(delta);
 		}
+		pEffect->EffectInstance = nullptr;
 	}
 };
 static inline std::vector<ChaosEffectInstance> aRunningEffects;
@@ -175,6 +189,7 @@ bool RunningEffectsCleanup() {
 	return false;
 }
 
+#include "effects/effectbases.h"
 #include "effects/basiceffects.h"
 #include "effects/playercareffects.h"
 #include "effects/opponentcareffects.h"

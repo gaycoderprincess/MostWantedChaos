@@ -1,7 +1,7 @@
 class Effect_OpponentsRazor : public ChaosEffect {
 public:
 	Effect_OpponentsRazor() : ChaosEffect() {
-		sName = "All New Opponents Are BMWs";
+		sName = "New Opponents Are BMWs";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
 	}
@@ -20,7 +20,7 @@ public:
 class Effect_OpponentsGolf : public ChaosEffect {
 public:
 	Effect_OpponentsGolf() : ChaosEffect() {
-		sName = "All New Opponents Are Golfs";
+		sName = "New Opponents Are Golfs";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
 	}
@@ -39,7 +39,7 @@ public:
 class Effect_OpponentsPlayer : public ChaosEffect {
 public:
 	Effect_OpponentsPlayer() : ChaosEffect() {
-		sName = "All New Opponents Copy Your Car";
+		sName = "New Opponents Copy Your Car";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
 	}
@@ -53,10 +53,27 @@ public:
 	bool HasTimer() override { return true; }
 } E_OpponentsPlayer;
 
+class Effect_OpponentsPlayerRandom : public ChaosEffect {
+public:
+	Effect_OpponentsPlayerRandom() : ChaosEffect() {
+		sName = "New Opponents Steal Your Cars";
+		fTimerLength = 240;
+		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
+	}
+
+	void TickFunction(double delta) override {
+		OpponentPlayerCarRandom = true;
+	}
+	void DeinitFunction() override {
+		OpponentPlayerCarRandom = false;
+	}
+	bool HasTimer() override { return true; }
+} E_OpponentsPlayerRandom;
+
 class Effect_OpponentsJunkman : public ChaosEffect {
 public:
 	Effect_OpponentsJunkman() : ChaosEffect() {
-		sName = "All New Opponents Are Junkman";
+		sName = "New Opponents Are Junkman";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_tune");
 	}
@@ -104,9 +121,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_AllTrafficTruck;*/
 
-class Effect_PlayerCarTrafPizza : public ChaosEffect {
+class Effect_PlayerCarTrafPizza : public EffectBase_TriggerInMenu {
 public:
-	Effect_PlayerCarTrafPizza() : ChaosEffect() {
+	Effect_PlayerCarTrafPizza() : EffectBase_TriggerInMenu() {
 		sName = "Spawn As TRAFPIZZA";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("player_car_model");
@@ -119,11 +136,4 @@ public:
 		ForcedPlayerVehicle = 0;
 	}
 	bool HasTimer() override { return true; }
-
-	// runs in menus to trigger the 3 second available cooldown, this way it'll only be visible once you spawn into the world again
-	bool RunInMenus() override { return true; }
-	bool IsAvailable() override {
-		return TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-	}
-	bool IsConditionallyAvailable() override { return true; }
 } E_PlayerCarTrafPizza;

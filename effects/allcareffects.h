@@ -1,16 +1,3 @@
-class EffectBase_ActiveCarsConditional : public ChaosEffect {
-public:
-	
-	EffectBase_ActiveCarsConditional() : ChaosEffect() {
-		sName = "(EFFECT BASE) Active Cars Conditional";
-	}
-
-	bool IsAvailable() override {
-		return GetActiveVehicles().size() > 1;
-	}
-	bool IsConditionallyAvailable() override { return true; }
-};
-
 class Effect_DestroyRandomCar : public EffectBase_ActiveCarsConditional {
 public:
 	Effect_DestroyRandomCar() : EffectBase_ActiveCarsConditional() {
@@ -100,7 +87,7 @@ public:
 	IVehicle* pRandomCar = nullptr;
 
 	Effect_CarMagnetRandom() : EffectBase_ActiveCarsConditional() {
-		sName = "Car Magnet On Random Car";
+		sName = "Magnet On Random Car";
 		fTimerLength = 15;
 	}
 
@@ -118,21 +105,35 @@ public:
 			return;
 		}
 
-		auto playerCar = pRandomCar;
-		auto cars = GetActiveVehicles();
-		for (auto& car : cars) {
-			if (car == playerCar) continue;
-			auto otherCar = car->mCOMObject->Find<IRigidBody>();
-			if (!otherCar) continue;
-
-			auto v = playerCar->GetPosition();
-			auto c = otherCar->GetPosition();
-			auto vel = *otherCar->GetLinearVelocity();
-			vel.x += (v->x - c->x) * CarMagnetForce * delta;
-			vel.y += (v->y - c->y) * CarMagnetForce * delta;
-			vel.z += (v->z - c->z) * CarMagnetForce * delta;
-			otherCar->SetLinearVelocity(&vel);
-		}
+		DoCarMagnet(pRandomCar, delta);
 	}
 	bool HasTimer() override { return true; }
 } E_CarMagnetRandom;
+
+class Effect_CarForcefieldRandom : public EffectBase_ActiveCarsConditional {
+public:
+	IVehicle* pRandomCar = nullptr;
+
+	Effect_CarForcefieldRandom() : EffectBase_ActiveCarsConditional() {
+		sName = "Forcefield On Random Car";
+		fTimerLength = 60;
+	}
+
+	void GenerateRandomCar() {
+		auto cars = GetActiveVehicles();
+		pRandomCar = cars[rand()%cars.size()];
+	}
+
+	void InitFunction() override {
+		GenerateRandomCar();
+	}
+	void TickFunction(double delta) override {
+		if (!IsVehicleValidAndActive(pRandomCar)) {
+			GenerateRandomCar();
+			return;
+		}
+
+		DoCarForcefield(pRandomCar);
+	}
+	bool HasTimer() override { return true; }
+} E_CarForcefieldRandom;

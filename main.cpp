@@ -40,6 +40,7 @@ bool OpponentsFullyTuned = false;
 bool RandomizePlayerTuning = false;
 bool RandomizeOpponentTuning = false;
 bool OpponentPlayerCar = false;
+bool OpponentPlayerCarRandom = false;
 uint32_t PlayerCarModel;
 FECustomizationRecord PlayerCarCustomizations;
 
@@ -84,6 +85,20 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 			*vehicle->customization = PlayerCarCustomizations;
 			vehicle->matched = nullptr;
 		}
+		if (OpponentPlayerCarRandom) {
+			if (auto car = GetRandomCareerCar()) {
+				vehicle->carType = car->VehicleKey;
+				vehicle->customization = new FECustomizationRecord;
+				*vehicle->customization = *FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization);
+				vehicle->matched = nullptr;
+			}
+			else {
+				vehicle->carType = PlayerCarModel;
+				vehicle->customization = new FECustomizationRecord;
+				*vehicle->customization = PlayerCarCustomizations;
+				vehicle->matched = nullptr;
+			}
+		}
 		if (OpponentsFullyTuned) {
 			if (!vehicle->matched) vehicle->matched = new Physics::Info::Performance;
 			vehicle->matched->Acceleration = 100;
@@ -114,14 +129,14 @@ void ChaosLoop() {
 	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || FEManager::mPauseRequest) {
 		for (auto& effect : aRunningEffects) {
 			if (!effect.pEffect->RunInMenus()) continue;
-			effect.OnTick(gTimer.fDeltaTime);
+			effect.OnTick(gTimer.fDeltaTime, true);
 		}
 		return;
 	}
 
 	// run effects first, then draw the chaos HUD over top
 	for (auto& effect : aRunningEffects) {
-		effect.OnTick(gTimer.fDeltaTime);
+		effect.OnTick(gTimer.fDeltaTime, false);
 	}
 
 	float y = 0;
@@ -153,6 +168,16 @@ void ChaosModMenu() {
 	
 	QuickValueEditor("CarMagnetForce", CarMagnetForce);
 
+	if (DrawMenuOption("Dump Effect List")) {
+		std::ofstream fout("cwoee_effects.txt", std::ios::out);
+		if (fout.is_open()) {
+			for (auto& effect : ChaosEffect::aEffects) {
+				fout << effect->sName;
+				fout << "\n";
+			}
+		}
+	}
+
 	//QuickValueEditor("fEffectX", fEffectX);
 	//QuickValueEditor("fEffectY", fEffectY);
 	//QuickValueEditor("fEffectSize", fEffectSize);
@@ -167,7 +192,7 @@ void ChaosModMenu() {
 		ChloeMenuLib::EndMenu();
 	}
 	for (auto& effect : aRunningEffects) {
-		DrawMenuOption(std::format("{} - {:.2f} {}", effect.pEffect->sName, effect.fTimer, effect.IsActive()));
+		DrawMenuOption(std::format("{} - {:.2f} {}", effect.GetName(), effect.fTimer, effect.IsActive()));
 	}
 
 	if (auto ply = GetLocalPlayer()) {
@@ -187,13 +212,7 @@ void ChaosModMenu() {
 		DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
 		DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
 		DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
-
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
-			auto modelName = car->GetVehicleName();
-			DrawMenuOption(std::format("{} - active {} loading {}", modelName, car->IsActive(), car->IsLoading()));
-		}
+		DrawMenuOption(std::format("Player Car: {}", FEDatabase->mUserProfile->TheCareerSettings.CurrentCar));
 	}
 	else {
 		DrawMenuOption("Local player not found");
@@ -209,6 +228,8 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				MessageBoxA(nullptr, "Unsupported game version! Make sure you're using v1.3 (.exe size of 6029312 bytes)", "nya?!~", MB_ICONERROR);
 				return TRUE;
 			}
+
+			srand(time(0));
 
 			auto configName = "NFSMWChaos_gcp.toml";
 			if (std::filesystem::exists(configName)) {

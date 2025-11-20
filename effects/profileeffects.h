@@ -112,3 +112,161 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool HasTimer() override { return true; }
 } E_AutoTrans;
+
+class Effect_PlayerCarRandomTuning : public EffectBase_TriggerInMenu {
+public:
+	Effect_PlayerCarRandomTuning() : EffectBase_TriggerInMenu() {
+		sName = "Randomly Tune Active Career Car";
+	}
+
+	void InitFunction() override {
+		auto car = GetCurrentCareerCar();
+		if (!car) return;
+		auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization);
+		if (!customization) return;
+		auto random = CreateRandomCustomizations(car->VehicleKey);
+		memcpy(customization->InstalledPartIndices, random.InstalledPartIndices, sizeof(random.InstalledPartIndices));
+	}
+} E_PlayerCarRandomTuning;
+
+class Effect_PlayerCarImpoundStrike : public EffectBase_TriggerInMenu {
+public:
+	Effect_PlayerCarImpoundStrike() : EffectBase_TriggerInMenu() {
+		sName = "Add A Strike To Active Career Car";
+	}
+
+	void InitFunction() override {
+		auto car = GetCurrentCareerCar();
+		if (!car) return;
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		if (!career) return;
+		career->TheImpoundData.mTimesBusted++;
+	}
+} E_PlayerCarImpoundStrike;
+
+class Effect_PlayerCarImpoundMarker : public EffectBase_TriggerInMenu {
+public:
+	Effect_PlayerCarImpoundMarker() : EffectBase_TriggerInMenu() {
+		sName = "Add An Extra Marker To Active Career Car";
+	}
+
+	void InitFunction() override {
+		auto car = GetCurrentCareerCar();
+		if (!car) return;
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		if (!career) return;
+		career->TheImpoundData.mMaxBusted++;
+	}
+} E_PlayerCarImpoundMarker;
+
+class Effect_AddRandomMarker : public ChaosEffect {
+public:
+	Effect_AddRandomMarker() : ChaosEffect() {
+		sName = "Add A Random Marker";
+	}
+
+	void InitFunction() override {
+		struct tMarker {
+			std::string name;
+			int type;
+		};
+		std::vector<tMarker> markers = {
+				{"Junkman Brakes", FEMarkerManager::MARKER_BRAKES},
+				{"Junkman Engine", FEMarkerManager::MARKER_ENGINE},
+				{"Junkman Nitrous", FEMarkerManager::MARKER_NOS},
+				{"Junkman Supercharger", FEMarkerManager::MARKER_INDUCTION},
+				{"Junkman Suspension", FEMarkerManager::MARKER_CHASSIS},
+				{"Junkman Tires", FEMarkerManager::MARKER_TIRES},
+				{"Junkman Transmission", FEMarkerManager::MARKER_TRANSMISSION},
+				{"Special Body", FEMarkerManager::MARKER_BODY},
+				{"Special Hood", FEMarkerManager::MARKER_HOOD},
+				{"Special Spoiler", FEMarkerManager::MARKER_SPOILER},
+				{"Special Rims", FEMarkerManager::MARKER_RIMS},
+				{"Special Roof Scoop", FEMarkerManager::MARKER_ROOF_SCOOP},
+				//{"Special Gauge", FEMarkerManager::MARKER_CUSTOM_HUD},
+				//{"Special Vinyl", FEMarkerManager::MARKER_VINYL},
+				//{"Special Decal", FEMarkerManager::MARKER_DECAL},
+				//{"Special Paint", FEMarkerManager::MARKER_PAINT},
+				{"Get Out of Jail Free", FEMarkerManager::MARKER_GET_OUT_OF_JAIL},
+				{"Cash Reward $50000", FEMarkerManager::MARKER_CASH},
+				{"Add Impound Box", FEMarkerManager::MARKER_ADD_IMPOUND_BOX},
+				{"Release Car from Impound", FEMarkerManager::MARKER_IMPOUND_RELEASE},
+		};
+
+		struct tPinkSlip {
+			const char* name;
+			const char* preset;
+			const char* carType;
+		};
+		tPinkSlip blacklistRides[] = {
+				{"Razor", "E3_DEMO_BMW", "bmwm3gtre46"},
+				{"Bull", "BL2", "slr"},
+				{"Ronnie", "BL3", "db9"},
+				{"JV", "BL4", "viper"},
+				{"Webster", "BL5", "corvette"},
+				{"Ming", "BL6", "gallardo"},
+				{"Kaze", "BL7", "clk500"},
+				{"Jewels", "BL8", nullptr},//"mustanggt"},
+				{"Earl", "BL9", "caymans"},
+				{"Baron", "BL10", ""},
+				{"Big Lou", "BL11", "eclipsegt"},
+				{"Izzy", "BL12", "rx8"},
+				{"Vic", "BL13", nullptr},//"supra"},
+				{"Taz", "BL14", "is300"},
+				{"Sonny", "BL15", "gti"},
+				{"Razor - Mustang", "RAZORMUSTANG", nullptr},//"mustanggt"},
+				{"Ronnie - Supra", "DDAYSUPRA", nullptr},//"supra"},
+		};
+
+		std::vector<tPinkSlip> unearnedPinkSlips;
+		for (auto& ride : blacklistRides) {
+			if (!ride.carType || !HasPinkSlip(Attrib::StringHash32(ride.carType))) {
+				unearnedPinkSlips.push_back(ride);
+			}
+		}
+
+		if (!unearnedPinkSlips.empty() && FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) < 25) {
+			markers.push_back({"Pink Slip", FEMarkerManager::MARKER_PINK_SLIP});
+			WriteLog("added pinkslip option");
+		}
+		else {
+			WriteLog(std::format("unearned pinkslip count {}, career car count {}", unearnedPinkSlips.size(), FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable)));
+		}
+
+		tMarker selectedMarker = markers[rand()%markers.size()];
+
+		WriteLog(std::format("selected marker {}", selectedMarker.name));
+
+		auto effectName = new char[64];
+		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
+		EffectInstance->sNameToDisplay = effectName;
+		if (selectedMarker.type == FEMarkerManager::MARKER_CASH) {
+			FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 50000;
+		}
+		else if (selectedMarker.type == FEMarkerManager::MARKER_PINK_SLIP) {
+			auto ride = unearnedPinkSlips[rand() % unearnedPinkSlips.size()];
+			uint32_t rideHash = FEngHashString(ride.preset);
+			WriteLog(std::format("selected pinkslip {} {}", ride.name, ride.preset));
+
+			bool found = false;
+			auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+			for (auto& car : cars->CarTable) {
+				if (car.Handle == rideHash) {
+					WriteLog(std::format("found preset"));
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				FEPlayerCarDB::CreateNewPresetCar(cars, ride.preset);
+				WriteLog(std::format("creating preset"));
+			}
+
+			strcpy_s(effectName, 64, std::format("{} ({} - {})", sName, selectedMarker.name, ride.name).c_str());
+			FEPlayerCarDB::AwardRivalCar(&FEDatabase->mUserProfile->PlayersCarStable, rideHash);
+		}
+		else {
+			FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
+		}
+	}
+} E_AddRandomMarker;

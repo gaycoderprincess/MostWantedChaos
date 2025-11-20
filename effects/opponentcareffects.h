@@ -1,16 +1,3 @@
-class EffectBase_OpponentConditional : public ChaosEffect {
-public:
-
-	EffectBase_OpponentConditional() : ChaosEffect() {
-		sName = "(EFFECT BASE) Opponent Conditional";
-	}
-
-	bool IsAvailable() override {
-		return !VEHICLE_LIST::GetList(VEHICLE_AIRACERS).empty();
-	}
-	bool IsConditionallyAvailable() override { return true; }
-};
-
 class Effect_BlowEngineOpponents : public EffectBase_OpponentConditional {
 public:
 	Effect_BlowEngineOpponents() : EffectBase_OpponentConditional() {
