@@ -31,6 +31,7 @@ public:
 	ChaosEffect* pEffect = nullptr;
 	double fActiveTimer = 0;
 	double fTimer = 0;
+	double fTimeConditionMet = 3;
 	bool bFirstFrame = true;
 
 	ChaosEffectInstance(ChaosEffect* effect) : pEffect(effect) {
@@ -53,6 +54,7 @@ public:
 
 	void Draw(float y) const {
 		if (!IsActive()) return;
+		if (bFirstFrame) return;
 
 		auto x = fEffectX;
 		x = 1 - x;
@@ -84,6 +86,20 @@ public:
 			fTimer -= delta;
 			fActiveTimer += delta;
 			return;
+		}
+
+		// conditional effects will show after 3 seconds of the conditions being met, or immediately if the condition was met on trigger
+		if (bFirstFrame && pEffect->IsConditionallyAvailable()) {
+			if (pEffect->IsAvailable()) {
+				fTimeConditionMet += delta;
+				if (fTimeConditionMet < 3) {
+					return;
+				}
+			}
+			else {
+				fTimeConditionMet = 0;
+				return;
+			}
 		}
 
 		if (bFirstFrame) {

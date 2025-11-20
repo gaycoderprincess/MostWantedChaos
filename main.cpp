@@ -36,11 +36,11 @@ void MainLoop() {
 #include "hooks/fixes.h"
 #include "chaoseffect.h"
 
-// todo isconditionallyavailable/isavailable check
 ChaosEffect* GetRandomEffect() {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
 		if (effect->bTriggeredThisCycle) continue;
+		//if (effect->IsConditionallyAvailable() && !effect->IsAvailable()) continue;
 		//if (effect->fLastTriggerTime) // todo
 		availableEffects.push_back(effect);
 	}
@@ -60,7 +60,7 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
-	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || FEManager::mPauseRequest) {
+	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || FEManager::mPauseRequest) {
 		for (auto& effect : aRunningEffects) {
 			if (!effect.pEffect->RunInMenus()) continue;
 			effect.OnTick(gTimer.fDeltaTime);
@@ -124,19 +124,22 @@ void ChaosModMenu() {
 		DrawMenuOption(std::format("IVehicle: {:X}", (uintptr_t)ply->GetSimable()->mCOMObject->Find<IVehicle>()));
 		auto pos = ply->GetPosition();
 		DrawMenuOption(std::format("Coords: {:.2f} {:.2f} {:.2f}", pos->x, pos->y, pos->z));
+		UMath::Vector3 fwd;
+		if (auto rb = GetLocalPlayerInterface<IRigidBody>()) {
+			rb->GetForwardVector(&fwd);
+			DrawMenuOption(std::format("Forward: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
+		}
 		DrawMenuOption(std::format("InGameBreaker: {}", ply->InGameBreaker()));
 		DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
 		DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
 		DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
 		DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
 
-		auto cars = GetActiveVehicles();
-		for (auto& car : cars) {
-			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
 			auto modelName = car->GetVehicleName();
-			auto speed = car->GetSpeed();
-			auto driveSpeed = car->mCOMObject->Find<IVehicleAI>()->GetDriveSpeed();
-			DrawMenuOption(std::format("{} - {:.2f}, drivespeed {:.2f}", modelName, speed, driveSpeed));
+			DrawMenuOption(std::format("{} - active {} loading {}", modelName, car->IsActive(), car->IsLoading()));
 		}
 	}
 	else {

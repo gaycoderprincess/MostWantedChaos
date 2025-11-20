@@ -97,3 +97,7 @@ bool IsInLoadingScreen() {
 	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_Loading.fng")) return true;
 	return false;
 }
+
+bool IsInNIS() {
+	return !INIS::mInstance || !INIS::mInstance->IsPlaying();
+}
