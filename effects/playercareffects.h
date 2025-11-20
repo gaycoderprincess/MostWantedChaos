@@ -52,6 +52,36 @@ public:
 	}
 } E_LaunchCarUp;
 
+class Effect_SpinCar : public ChaosEffect {
+public:
+	Effect_SpinCar() : ChaosEffect() {
+		sName = "Spin Car Out";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			UMath::Vector3 vel = *ply->GetAngularVelocity();
+			vel.y = 4;
+			ply->SetAngularVelocity(&vel);
+		}
+	}
+} E_SpinCar;
+
+class Effect_SpinCar2 : public ChaosEffect {
+public:
+	Effect_SpinCar2() : ChaosEffect() {
+		sName = "Spin Car Rapidly";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			UMath::Vector3 vel = *ply->GetAngularVelocity();
+			vel.y = TOMPS(200);
+			ply->SetAngularVelocity(&vel);
+		}
+	}
+} E_SpinCar2;
+
 class Effect_InfGameBreaker : public ChaosEffect {
 public:
 	Effect_InfGameBreaker() : ChaosEffect() {
