@@ -36,23 +36,6 @@ void MainLoop() {
 #include "hooks/fixes.h"
 #include "chaoseffect.h"
 
-ChaosEffect* GetRandomEffect() {
-	std::vector<ChaosEffect*> availableEffects;
-	for (auto& effect : ChaosEffect::aEffects) {
-		if (effect->bTriggeredThisCycle) continue;
-		//if (effect->IsConditionallyAvailable() && !effect->IsAvailable()) continue;
-		//if (effect->fLastTriggerTime) // todo
-		availableEffects.push_back(effect);
-	}
-	if (availableEffects.empty()) {
-		for (auto& effect : ChaosEffect::aEffects) {
-			effect->bTriggeredThisCycle = false;
-		}
-		return GetRandomEffect();
-	}
-	return availableEffects[rand()%availableEffects.size()];
-}
-
 bool bTimerEnabled = true;
 float fEffectCycleTimer = 30;
 double fTimeSinceLastEffect = 0;

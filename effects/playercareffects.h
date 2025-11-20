@@ -86,6 +86,7 @@ class Effect_InfGameBreaker : public ChaosEffect {
 public:
 	Effect_InfGameBreaker() : ChaosEffect() {
 		sName = "Infinite Speedbreaker";
+		IncompatibilityGroup = Attrib::StringHash32("speedbreaker");
 	}
 
 	void TickFunction(double delta) override {
@@ -100,6 +101,7 @@ class Effect_InfNitro : public ChaosEffect {
 public:
 	Effect_InfNitro() : ChaosEffect() {
 		sName = "Infinite Nitro";
+		IncompatibilityGroup = Attrib::StringHash32("nitro");
 	}
 
 	void TickFunction(double delta) override {
@@ -121,6 +123,7 @@ class Effect_NoGameBreaker : public ChaosEffect {
 public:
 	Effect_NoGameBreaker() : ChaosEffect() {
 		sName = "Disable Speedbreaker";
+		IncompatibilityGroup = Attrib::StringHash32("speedbreaker");
 	}
 
 	void TickFunction(double delta) override {
@@ -135,6 +138,7 @@ class Effect_NoNitro : public ChaosEffect {
 public:
 	Effect_NoNitro() : ChaosEffect() {
 		sName = "Disable Nitro";
+		IncompatibilityGroup = Attrib::StringHash32("nitro");
 	}
 
 	void TickFunction(double delta) override {
@@ -214,6 +218,7 @@ class Effect_AutoDrive : public ChaosEffect {
 public:
 	Effect_AutoDrive() : ChaosEffect() {
 		sName = "Auto-Drive";
+		IncompatibilityGroup = Attrib::StringHash32("autodrive");
 	}
 
 	void TickFunction(double delta) override {
@@ -234,6 +239,7 @@ public:
 	Effect_AutoDrive2() : ChaosEffect() {
 		sName = "Auto-Drive (Traffic)";
 		fTimerLength = 15;
+		IncompatibilityGroup = Attrib::StringHash32("autodrive");
 	}
 
 	void TickFunction(double delta) override {
@@ -288,3 +294,103 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarSpin;
+
+class Effect_PlayerCarTuneAero : public ChaosEffect {
+public:
+	Effect_PlayerCarTuneAero() : ChaosEffect() {
+		sName = "Aerodynamics +100";
+		fTimerLength = 15;
+		IncompatibilityGroup = Attrib::StringHash32("aerodynamics");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::AERODYNAMICS] = 50;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::AERODYNAMICS] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTuneAero;
+
+class Effect_PlayerCarTuneHeight : public ChaosEffect {
+public:
+	Effect_PlayerCarTuneHeight() : ChaosEffect() {
+		sName = "Stanced Suspension";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("suspension");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = -2;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTuneHeight;
+
+class Effect_PlayerCarTuneHeight2 : public ChaosEffect {
+public:
+	Effect_PlayerCarTuneHeight2() : ChaosEffect() {
+		sName = "Super Stanced Suspension";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("suspension");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = -10;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTuneHeight2;
+
+class Effect_PlayerCarTuneHeight3 : public ChaosEffect {
+public:
+	Effect_PlayerCarTuneHeight3() : ChaosEffect() {
+		sName = "Monster Truck Suspension";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("suspension");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = 25;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTuneHeight3;

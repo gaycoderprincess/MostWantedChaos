@@ -40,12 +40,12 @@ public:
 	void InitFunction() override {
 		GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted--;
 	}
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps < 2) return false;
 		return GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted > 0;
 	}
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_RemoveLapProgress;*/
 
 class Effect_RemoveLap : public ChaosEffect {
@@ -118,4 +118,5 @@ public:
 		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;
 	}
 	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_RestartRace;

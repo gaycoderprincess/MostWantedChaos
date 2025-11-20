@@ -99,5 +99,5 @@ bool IsInLoadingScreen() {
 }
 
 bool IsInNIS() {
-	return !INIS::mInstance || !INIS::mInstance->IsPlaying();
+	return INIS::mInstance && INIS::mInstance->IsPlaying();
 }

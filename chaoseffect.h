@@ -4,6 +4,7 @@ public:
 	double fTimerLength = 30;
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;
+	uint32_t IncompatibilityGroup = 0;
 
 	static inline std::vector<ChaosEffect*> aEffects;
 
@@ -18,6 +19,7 @@ public:
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
 	virtual bool IsConditionallyAvailable() { return false; };
+	virtual bool AbortOnConditionFailed() { return false; };
 	virtual bool RunInMenus() { return false; }
 };
 
@@ -33,13 +35,14 @@ public:
 	double fTimer = 0;
 	double fTimeConditionMet = 3;
 	bool bFirstFrame = true;
+	bool bAborted = false;
 
 	ChaosEffectInstance(ChaosEffect* effect) : pEffect(effect) {
 		fTimer = pEffect->fTimerLength;
 	}
 
 	bool IsActive() const {
-		return fTimer > 0;
+		return fTimer > 0 && !bAborted;
 	}
 
 	bool HasTimer() const {
@@ -98,6 +101,7 @@ public:
 			}
 			else {
 				fTimeConditionMet = 0;
+				if (pEffect->AbortOnConditionFailed()) bAborted = true;
 				return;
 			}
 		}
@@ -125,6 +129,42 @@ void AddRunningEffect(ChaosEffect* effect) {
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
 }
 
+bool IsEffectRunning(ChaosEffect* effect) {
+	for (auto& running : aRunningEffects) {
+		if (!running.IsActive()) continue;
+		if (running.pEffect == effect) return true;
+	}
+	return false;
+}
+
+bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup) {
+	if (!IncompatibilityGroup) return false;
+	for (auto& running : aRunningEffects) {
+		if (!running.IsActive()) continue;
+		if (running.pEffect->IncompatibilityGroup == IncompatibilityGroup) return true;
+	}
+	return false;
+}
+
+ChaosEffect* GetRandomEffect() {
+	std::vector<ChaosEffect*> availableEffects;
+	for (auto& effect : ChaosEffect::aEffects) {
+		if (effect->bTriggeredThisCycle) continue;
+		if (IsEffectRunning(effect)) continue;
+		if (IsEffectRunningFromGroup(effect->IncompatibilityGroup)) continue;
+		//if (effect->IsConditionallyAvailable() && !effect->IsAvailable()) continue;
+		//if (effect->fLastTriggerTime) // todo
+		availableEffects.push_back(effect);
+	}
+	if (availableEffects.empty()) {
+		for (auto& effect : ChaosEffect::aEffects) {
+			effect->bTriggeredThisCycle = false;
+		}
+		return GetRandomEffect();
+	}
+	return availableEffects[rand()%availableEffects.size()];
+}
+
 bool RunningEffectsCleanup() {
 	for (auto& effect : aRunningEffects) {
 		if (!effect.IsActive()) {
@@ -143,5 +183,6 @@ bool RunningEffectsCleanup() {
 #include "effects/hudeffects.h"
 #include "effects/pursuiteffects.h"
 #include "effects/profileeffects.h"
+#include "effects/texteffects.h"
 #include "effects/effect_wreckonflip.h"
 #include "effects/effect_safehouse.h"
