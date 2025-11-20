@@ -104,6 +104,8 @@ public:
 static inline std::vector<ChaosEffectInstance> aRunningEffects;
 
 void AddRunningEffect(ChaosEffect* effect) {
+	effect->bTriggeredThisCycle = true;
+	effect->fLastTriggerTime = 0;
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
 }
 

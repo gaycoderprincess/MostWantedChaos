@@ -36,7 +36,25 @@ void MainLoop() {
 #include "chaoseffect.h"
 
 // todo isconditionallyavailable/isavailable check
+ChaosEffect* GetRandomEffect() {
+	std::vector<ChaosEffect*> availableEffects;
+	for (auto& effect : ChaosEffect::aEffects) {
+		if (effect->bTriggeredThisCycle) continue;
+		//if (effect->fLastTriggerTime) // todo
+		availableEffects.push_back(effect);
+	}
+	if (availableEffects.empty()) {
+		for (auto& effect : ChaosEffect::aEffects) {
+			effect->bTriggeredThisCycle = false;
+		}
+		return GetRandomEffect();
+	}
+	return availableEffects[rand()%availableEffects.size()];
+}
 
+bool bTimerEnabled = true;
+float fEffectCycleTimer = 30;
+double fTimeSinceLastEffect = 0;
 void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
@@ -59,17 +77,32 @@ void ChaosLoop() {
 		effect.Draw(y);
 		y += 1 - effect.GetOffscreenPercentage();
 	}
-
+	
 	while (RunningEffectsCleanup()) {}
+	
+	if (bTimerEnabled) {
+		fTimeSinceLastEffect += gTimer.fDeltaTime;
+		DrawRectangle(0, 1, 0, 0.05, {0, 0, 0, 255});
+		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.05, {255, 255, 255, 255});
+		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
+			fTimeSinceLastEffect -= fEffectCycleTimer;
+			AddRunningEffect(GetRandomEffect());
+		}
+	}
 }
 
 void ChaosModMenu() {
 	ChloeMenuLib::BeginMenu();
 
-	QuickValueEditor("fEffectX", fEffectX);
-	QuickValueEditor("fEffectY", fEffectY);
-	QuickValueEditor("fEffectSize", fEffectSize);
-	QuickValueEditor("fEffectSpacing", fEffectSpacing);
+	if (DrawMenuOption(std::format("Chaos On - {}", bTimerEnabled))) {
+		bTimerEnabled = !bTimerEnabled;
+	}
+	QuickValueEditor("Cycle Timer", fEffectCycleTimer);
+	
+	//QuickValueEditor("fEffectX", fEffectX);
+	//QuickValueEditor("fEffectY", fEffectY);
+	//QuickValueEditor("fEffectSize", fEffectSize);
+	//QuickValueEditor("fEffectSpacing", fEffectSpacing);
 	if (DrawMenuOption("Add Effect")) {
 		ChloeMenuLib::BeginMenu();
 		for (auto& effect : ChaosEffect::aEffects) {
