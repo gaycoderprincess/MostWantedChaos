@@ -420,6 +420,41 @@ public:
 	bool HasTimer() override { return true; }
 } E_PlayerCarTuneHeight3;
 
+class Effect_PlayerCarTuneHeight4 : public ChaosEffect {
+public:
+	double state = 0;
+	bool goBack = false;
+
+	Effect_PlayerCarTuneHeight4() : ChaosEffect() {
+		sName = "Bouncy Suspension";
+		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("suspension");
+	}
+
+	void InitFunction() override {
+		state = 0;
+	}
+	void TickFunction(double delta) override {
+		state += delta * (goBack ? -2 : 2);
+		if (state > 1) goBack = true;
+		if (state < 0) goBack = false;
+
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = std::lerp(0,20, easeInOutQuart(state));
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTuneHeight4;
+
 class Effect_PlayerCarTuneNitro : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_PlayerCarTuneNitro() : EffectBase_PlayerCarHasNitro() {

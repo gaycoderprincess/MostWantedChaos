@@ -167,7 +167,7 @@ ChaosEffect* GetRandomEffect() {
 		if (effect->bTriggeredThisCycle) continue;
 		if (IsEffectRunning(effect)) continue;
 		if (IsEffectRunningFromGroup(effect->IncompatibilityGroup)) continue;
-		//if (effect->IsConditionallyAvailable() && !effect->IsAvailable()) continue;
+		if (effect->IsConditionallyAvailable() && effect->AbortOnConditionFailed() && !effect->IsAvailable()) continue;
 		//if (effect->fLastTriggerTime) // todo
 		availableEffects.push_back(effect);
 	}

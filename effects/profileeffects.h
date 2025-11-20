@@ -129,9 +129,9 @@ public:
 	}
 } E_PlayerCarRandomTuning;
 
-class Effect_PlayerCarImpoundStrike : public EffectBase_TriggerInMenu {
+class Effect_PlayerCarImpoundStrike : public ChaosEffect {
 public:
-	Effect_PlayerCarImpoundStrike() : EffectBase_TriggerInMenu() {
+	Effect_PlayerCarImpoundStrike() : ChaosEffect() {
 		sName = "Add A Strike To Active Career Car";
 	}
 
@@ -144,9 +144,33 @@ public:
 	}
 } E_PlayerCarImpoundStrike;
 
-class Effect_PlayerCarImpoundMarker : public EffectBase_TriggerInMenu {
+class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
 public:
-	Effect_PlayerCarImpoundMarker() : EffectBase_TriggerInMenu() {
+	Effect_PlayerCarImpoundStrikeRemove() : ChaosEffect() {
+		sName = "Remove A Strike From Active Career Car";
+	}
+
+	void InitFunction() override {
+		auto car = GetCurrentCareerCar();
+		if (!car) return;
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		if (!career) return;
+		career->TheImpoundData.mTimesBusted++;
+	}
+	bool IsAvailable() override {
+		auto car = GetCurrentCareerCar();
+		if (!car) return false;
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		if (!career) return false;
+		return career->TheImpoundData.mTimesBusted > 0;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_PlayerCarImpoundStrikeRemove;
+
+class Effect_PlayerCarImpoundMarker : public ChaosEffect {
+public:
+	Effect_PlayerCarImpoundMarker() : ChaosEffect() {
 		sName = "Add An Extra Marker To Active Career Car";
 	}
 

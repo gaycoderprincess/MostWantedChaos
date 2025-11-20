@@ -126,6 +126,10 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
+	for (auto& effect : ChaosEffect::aEffects) {
+		effect->fLastTriggerTime += gTimer.fDeltaTime;
+	}
+
 	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || FEManager::mPauseRequest) {
 		for (auto& effect : aRunningEffects) {
 			if (!effect.pEffect->RunInMenus()) continue;
@@ -150,7 +154,7 @@ void ChaosLoop() {
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime;
 		DrawRectangle(0, 1, 0, 0.05, {0, 0, 0, 255});
-		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.05, {255, 255, 255, 255});
+		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.05, {0, 127, 0, 255});
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
