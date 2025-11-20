@@ -127,6 +127,7 @@ void ChaosModMenu() {
 		DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
 		DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
 		DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
+		DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
 		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms) {
 			DrawMenuOption(std::format("Race Hash: {:X}", Attrib::Instance::GetCollection(GRaceStatus::fObj->mRaceParms->mRaceRecord)));
 			auto numLaps = (uint32_t*)Attrib::Collection::GetData(GRaceStatus::fObj->mRaceParms->mRaceRecord->mCollection, Attrib::StringHash32("NumLaps"), 0);

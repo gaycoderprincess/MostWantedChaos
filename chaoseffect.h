@@ -1,6 +1,6 @@
 class ChaosEffect {
 public:
-	std::string sName;
+	const char* sName;
 	double fTimerLength = 30;
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;
@@ -59,7 +59,7 @@ public:
 		x *= GetAspectRatioInv();
 		x = 1 - x;
 
-		auto str = pEffect->sName;
+		std::string str = pEffect->sName;
 		if (HasTimer()) {
 			str += std::format(" ({})", (int)fTimer);
 		}
@@ -124,4 +124,6 @@ bool RunningEffectsCleanup() {
 #include "effects/opponentcareffects.h"
 #include "effects/allcareffects.h"
 #include "effects/raceeffects.h"
+#include "effects/hudeffects.h"
 #include "effects/effect_wreckonflip.h"
+#include "effects/effect_safehouse.h" // todo

@@ -175,7 +175,7 @@ public:
 
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
-			ply->Sabotage(5);
+			ply->Sabotage(3);
 		}
 	}
 } E_BlowEngine;
@@ -198,3 +198,24 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_AutoDrive;
+
+// todo
+class Effect_911 : public ChaosEffect {
+public:
+	Effect_911() : ChaosEffect() {
+		sName = "Call 911";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			ply->Set911CallTime(45);
+		}
+	}
+	bool IsAvailable() override {
+		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			return !ply->IsBeingPursued();
+		}
+		return true;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+} E_911;

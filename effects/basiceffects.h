@@ -38,3 +38,20 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_WidescreenMode;
+
+class Effect_FakeCrash : public ChaosEffect {
+public:
+	Effect_FakeCrash() : ChaosEffect() {
+		sName = "Fake Crash";
+	}
+
+	void InitFunction() override {
+		if (rand() % 100 > 50) {
+			Sleep(5000);
+		}
+		else {
+			MessageBoxA(nullptr, "Debug Error!\n\nProgram: speed.exe\n\nR6025\n- pure virtual function call\n\n(Press Retry to debug the application)", "Microsoft Visual C++ Debug Library", MB_ICONERROR | MB_ABORTRETRYIGNORE);
+			Sleep(2000);
+		}
+	}
+} E_FakeCrash;
