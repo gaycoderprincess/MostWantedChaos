@@ -89,6 +89,7 @@ public:
 		data.y = fEffectY + (fEffectSpacing * y);
 		data.size = fEffectSize;
 		data.XRightAlign = true;
+		data.outlinea = 255;
 		DrawString(data, str);
 	}
 

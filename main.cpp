@@ -241,7 +241,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				func();
 			}
 
-			ChloeMenuLib::RegisterMenu("test", &ChaosModMenu);
+			ChloeMenuLib::RegisterMenu("Chaos Test Menu", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->sName < (std::string)b->sName; });
 
 			NyaHooks::PlaceD3DHooks();

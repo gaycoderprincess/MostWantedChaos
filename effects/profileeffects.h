@@ -159,10 +159,10 @@ public:
 	}
 } E_PlayerCarImpoundMarker;
 
-class Effect_AddRandomMarker : public ChaosEffect {
+class Effect_AddRandomTuningMarker : public ChaosEffect {
 public:
-	Effect_AddRandomMarker() : ChaosEffect() {
-		sName = "Add A Random Marker";
+	Effect_AddRandomTuningMarker() : ChaosEffect() {
+		sName = "Add A Random Tuning Marker";
 	}
 
 	void InitFunction() override {
@@ -187,6 +187,29 @@ public:
 				//{"Special Vinyl", FEMarkerManager::MARKER_VINYL},
 				//{"Special Decal", FEMarkerManager::MARKER_DECAL},
 				//{"Special Paint", FEMarkerManager::MARKER_PAINT},
+		};
+
+		tMarker selectedMarker = markers[rand()%markers.size()];
+
+		auto effectName = new char[64];
+		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
+		EffectInstance->sNameToDisplay = effectName;
+		FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
+	}
+} E_AddRandomTuningMarker;
+
+class Effect_AddRandomBonusMarker : public ChaosEffect {
+public:
+	Effect_AddRandomBonusMarker() : ChaosEffect() {
+		sName = "Add A Random Bonus Marker";
+	}
+
+	void InitFunction() override {
+		struct tMarker {
+			std::string name;
+			int type;
+		};
+		std::vector<tMarker> markers = {
 				{"Get Out of Jail Free", FEMarkerManager::MARKER_GET_OUT_OF_JAIL},
 				{"Cash Reward $50000", FEMarkerManager::MARKER_CASH},
 				{"Add Impound Box", FEMarkerManager::MARKER_ADD_IMPOUND_BOX},
@@ -227,15 +250,9 @@ public:
 
 		if (!unearnedPinkSlips.empty() && FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) < 25) {
 			markers.push_back({"Pink Slip", FEMarkerManager::MARKER_PINK_SLIP});
-			WriteLog("added pinkslip option");
-		}
-		else {
-			WriteLog(std::format("unearned pinkslip count {}, career car count {}", unearnedPinkSlips.size(), FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable)));
 		}
 
 		tMarker selectedMarker = markers[rand()%markers.size()];
-
-		WriteLog(std::format("selected marker {}", selectedMarker.name));
 
 		auto effectName = new char[64];
 		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
@@ -246,20 +263,17 @@ public:
 		else if (selectedMarker.type == FEMarkerManager::MARKER_PINK_SLIP) {
 			auto ride = unearnedPinkSlips[rand() % unearnedPinkSlips.size()];
 			uint32_t rideHash = FEngHashString(ride.preset);
-			WriteLog(std::format("selected pinkslip {} {}", ride.name, ride.preset));
 
 			bool found = false;
 			auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
 			for (auto& car : cars->CarTable) {
 				if (car.Handle == rideHash) {
-					WriteLog(std::format("found preset"));
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
 				FEPlayerCarDB::CreateNewPresetCar(cars, ride.preset);
-				WriteLog(std::format("creating preset"));
 			}
 
 			strcpy_s(effectName, 64, std::format("{} ({} - {})", sName, selectedMarker.name, ride.name).c_str());
@@ -269,4 +283,4 @@ public:
 			FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
 		}
 	}
-} E_AddRandomMarker;
+} E_AddRandomBonusMarker;
