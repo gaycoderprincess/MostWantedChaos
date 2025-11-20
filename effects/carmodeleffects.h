@@ -1,6 +1,6 @@
-class Effect_AllCarsRazor : public ChaosEffect {
+class Effect_OpponentsRazor : public ChaosEffect {
 public:
-	Effect_AllCarsRazor() : ChaosEffect() {
+	Effect_OpponentsRazor() : ChaosEffect() {
 		sName = "All New Opponents Are BMWs";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
@@ -15,11 +15,11 @@ public:
 		RandomizeOpponentTuning = false;
 	}
 	bool HasTimer() override { return true; }
-} E_AllCarsRazor;
+} E_OpponentsRazor;
 
-class Effect_AllCarsGolf : public ChaosEffect {
+class Effect_OpponentsGolf : public ChaosEffect {
 public:
-	Effect_AllCarsGolf() : ChaosEffect() {
+	Effect_OpponentsGolf() : ChaosEffect() {
 		sName = "All New Opponents Are Golfs";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
@@ -34,11 +34,11 @@ public:
 		RandomizeOpponentTuning = false;
 	}
 	bool HasTimer() override { return true; }
-} E_AllCarsGolf;
+} E_OpponentsGolf;
 
-class Effect_AllCarsPlayer : public ChaosEffect {
+class Effect_OpponentsPlayer : public ChaosEffect {
 public:
-	Effect_AllCarsPlayer() : ChaosEffect() {
+	Effect_OpponentsPlayer() : ChaosEffect() {
 		sName = "All New Opponents Copy Your Car";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
@@ -51,11 +51,11 @@ public:
 		OpponentPlayerCar = false;
 	}
 	bool HasTimer() override { return true; }
-} E_AllCarsPlayer;
+} E_OpponentsPlayer;
 
-class Effect_AllCarsJunkman : public ChaosEffect {
+class Effect_OpponentsJunkman : public ChaosEffect {
 public:
-	Effect_AllCarsJunkman() : ChaosEffect() {
+	Effect_OpponentsJunkman() : ChaosEffect() {
 		sName = "All New Opponents Are Junkman";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_tune");
@@ -68,7 +68,7 @@ public:
 		OpponentsFullyTuned = false;
 	}
 	bool HasTimer() override { return true; }
-} E_AllCarsJunkman;
+} E_OpponentsJunkman;
 
 class Effect_AllTrafficPizza : public ChaosEffect {
 public:
@@ -87,7 +87,7 @@ public:
 	bool HasTimer() override { return true; }
 } E_AllTrafficPizza;
 
-class Effect_AllTrafficTruck : public ChaosEffect {
+/*class Effect_AllTrafficTruck : public ChaosEffect {
 public:
 	Effect_AllTrafficTruck() : ChaosEffect() {
 		sName = "All Traffic Is Trucks";
@@ -96,10 +96,34 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		ForcedTrafficVehicle = Attrib::StringHash32("semi");
+		ForcedTrafficVehicle = Attrib::StringHash32("semicrate");
 	}
 	void DeinitFunction() override {
 		ForcedTrafficVehicle = 0;
 	}
 	bool HasTimer() override { return true; }
-} E_AllTrafficTruck;
+} E_AllTrafficTruck;*/
+
+class Effect_PlayerCarTrafPizza : public ChaosEffect {
+public:
+	Effect_PlayerCarTrafPizza() : ChaosEffect() {
+		sName = "Spawn As TRAFPIZZA";
+		fTimerLength = 240;
+		IncompatibilityGroup = Attrib::StringHash32("player_car_model");
+	}
+
+	void TickFunction(double delta) override {
+		ForcedPlayerVehicle = Attrib::StringHash32("cs_clio_trafpizza");
+	}
+	void DeinitFunction() override {
+		ForcedPlayerVehicle = 0;
+	}
+	bool HasTimer() override { return true; }
+
+	// runs in menus to trigger the 3 second available cooldown, this way it'll only be visible once you spawn into the world again
+	bool RunInMenus() override { return true; }
+	bool IsAvailable() override {
+		return TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+} E_PlayerCarTrafPizza;
