@@ -4,7 +4,7 @@ public:
 		sName = "Stop Car";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			ply->SetSpeed(0);
 		}
@@ -17,7 +17,7 @@ public:
 		sName = "Launch Car Forward";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			ply->SetSpeed(TOMPS(400));
 		}
@@ -30,7 +30,7 @@ public:
 		sName = "Launch Car Backwards";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			ply->SetSpeed(TOMPS(-200));
 		}
@@ -43,7 +43,7 @@ public:
 		sName = "Launch Car Up";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			UMath::Vector3 vel = *ply->GetLinearVelocity();
 			vel.y = TOMPS(200);
@@ -58,12 +58,12 @@ public:
 		sName = "Infinite Speedbreaker";
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ChargeGameBreaker(1);
 		}
 	}
-	virtual bool HasTimer() { return true; }
+	bool HasTimer() override { return true; }
 } E_InfGameBreaker;
 
 class Effect_InfNitro : public ChaosEffect {
@@ -72,18 +72,19 @@ public:
 		sName = "Infinite Nitro";
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			ply->ChargeNOS(1);
 		}
 	}
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			return ply->HasNOS();
 		}
+		return false;
 	}
-	virtual bool HasTimer() { return true; }
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool HasTimer() override { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_InfNitro;
 
 class Effect_NoGameBreaker : public ChaosEffect {
@@ -92,12 +93,12 @@ public:
 		sName = "Disable Speedbreaker";
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);
 		}
 	}
-	virtual bool HasTimer() { return true; }
+	bool HasTimer() override { return true; }
 } E_NoGameBreaker;
 
 class Effect_NoNitro : public ChaosEffect {
@@ -106,18 +107,19 @@ public:
 		sName = "Disable Nitro";
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			ply->ChargeNOS(-1);
 		}
 	}
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			return ply->HasNOS();
 		}
+		return false;
 	}
-	virtual bool HasTimer() { return true; }
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool HasTimer() override { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_NoNitro;
 
 class Effect_SetHeat1 : public ChaosEffect {
@@ -126,7 +128,7 @@ public:
 		sName = "Reset Heat Level";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
 			ply->SetHeat(1);
 		}
@@ -139,7 +141,7 @@ public:
 		sName = "Set Heat Level to 5";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto max = GetMaxHeat()) {
 			if (*max < 5) *max = 5;
 		}
@@ -155,7 +157,7 @@ public:
 		sName = "Set Heat Level to 6";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto max = GetMaxHeat()) {
 			if (*max < 6) *max = 6;
 		}
@@ -171,7 +173,7 @@ public:
 		sName = "Blow Car Engine";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
 			ply->Sabotage(5);
 		}
@@ -184,15 +186,15 @@ public:
 		sName = "Auto-Drive";
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
 			if (!ply->GetAiControl()) ply->SetAiControl(true);
 		}
 	}
-	virtual void DeinitFunction() {
+	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
 			ply->SetAiControl(false);
 		}
 	}
-	virtual bool HasTimer() { return true; }
+	bool HasTimer() override { return true; }
 } E_AutoDrive;

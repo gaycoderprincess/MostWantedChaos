@@ -37,7 +37,7 @@ public:
 		sName = "Revert Progress By A Lap";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted--;
 	}
 	virtual bool IsAvailable() {
@@ -54,16 +54,16 @@ public:
 		sName = "Remove A Lap";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		SetRaceNumLaps((*GetRaceNumLaps())-1);
 		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps < 2) return false;
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_RemoveLap;
 
 class Effect_AddLap : public ChaosEffect {
@@ -72,16 +72,16 @@ public:
 		sName = "Add A Lap";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		SetRaceNumLaps((*GetRaceNumLaps())+1);
 		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_AddLap;
 
 class Effect_Add3Laps : public ChaosEffect {
@@ -90,19 +90,19 @@ public:
 		sName = "Add 3 Laps";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		auto laps = *GetRaceNumLaps();
 		laps += 3;
 		if (laps > 10) laps = 10;
 		SetRaceNumLaps(laps);
 		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_Add3Laps;
 
 class Effect_RestartRace : public ChaosEffect {
@@ -111,11 +111,11 @@ public:
 		sName = "Restart Race";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
 	}
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;
 	}
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_RestartRace;

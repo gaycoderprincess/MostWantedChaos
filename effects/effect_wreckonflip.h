@@ -5,7 +5,7 @@ public:
 		fTimerLength = 120;
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_RACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];

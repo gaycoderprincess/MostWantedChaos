@@ -5,10 +5,10 @@ public:
 		sName = "(EFFECT BASE) Opponent Conditional";
 	}
 
-	virtual bool IsAvailable() {
+	bool IsAvailable() override {
 		return !VEHICLE_LIST::GetList(VEHICLE_AIRACERS).empty();
 	}
-	virtual bool IsConditionallyAvailable() { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 };
 
 class Effect_BlowEngineOpponents : public EffectBase_OpponentConditional {
@@ -17,7 +17,7 @@ public:
 		sName = "Blow Opponents' Engines";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
@@ -34,7 +34,7 @@ public:
 		sName = "Blow One Opponent's Engine";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		int i = rand() % list.size();
 		auto racer = list[i];
@@ -50,7 +50,7 @@ public:
 		sName = "Launch Opponents Forward";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
@@ -65,7 +65,7 @@ public:
 		sName = "Launch Opponents Backwards";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
@@ -80,7 +80,7 @@ public:
 		sName = "Launch Opponents Up";
 	}
 
-	virtual void InitFunction() {
+	void InitFunction() override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];

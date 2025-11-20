@@ -5,10 +5,10 @@ public:
 		fTimerLength = 10;
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		DrawRectangle(0, 1, 0, 1, {0,0,0,255});
 	}
-	virtual bool HasTimer() { return true; }
+	bool HasTimer() override { return true; }
 } E_Blind;
 
 class Effect_PortraitMode : public ChaosEffect {
@@ -17,12 +17,12 @@ public:
 		sName = "Portrait Mode";
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		DrawRectangle(0, 0.25, 0, 1, {0,0,0,255});
 		DrawRectangle(0.75, 1, 0, 1, {0,0,0,255});
 	}
-	virtual bool HasTimer() { return true; }
-	virtual bool RunInMenus() { return true; }
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_PortraitMode;
 
 class Effect_WidescreenMode : public ChaosEffect {
@@ -31,10 +31,10 @@ public:
 		sName = "Widescreen Borders";
 	}
 
-	virtual void TickFunction() {
+	void TickFunction() override {
 		DrawRectangle(0, 1, 0, 0.1, {0,0,0,255});
 		DrawRectangle(0, 1, 0.9, 1, {0,0,0,255});
 	}
-	virtual bool HasTimer() { return true; }
-	virtual bool RunInMenus() { return true; }
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_WidescreenMode;
