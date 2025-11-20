@@ -541,3 +541,116 @@ public:
 		}
 	}
 } E_FixPlayerCar;
+
+class Effect_NoReset : public ChaosEffect {
+public:
+	Effect_NoReset() : ChaosEffect() {
+		sName = "Disable Resetting";
+		fTimerLength = 120;
+	}
+
+	static bool __thiscall ResetVehicleHooked(IResetable* pThis, bool a2) {
+		return false;
+	}
+
+	void TickFunction(double delta) override {
+		NyaHookLib::Patch(0x8ABA18, &ResetVehicleHooked);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8ABA18, 0x6B08C0);
+	}
+	bool HasTimer() override { return true; }
+} E_NoReset;
+
+class Effect_ResetImmune : public ChaosEffect {
+public:
+	Effect_ResetImmune() : ChaosEffect() {
+		sName = "Reset Immunity From Cops";
+		fTimerLength = 120;
+	}
+
+	static inline auto ResetVehicle = (bool(__thiscall*)(IResetable*, bool))0x6B08C0;
+	static bool __thiscall ResetVehicleHooked(IResetable* pThis, bool manual) {
+		return ResetVehicle(pThis, false);
+	}
+
+	void TickFunction(double delta) override {
+		NyaHookLib::Patch(0x8ABA18, &ResetVehicleHooked);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8ABA18, 0x6B08C0);
+	}
+	bool HasTimer() override { return true; }
+} E_ResetImmune;
+
+float CarMagnetForce = 3;
+class Effect_CarMagnet : public ChaosEffect {
+public:
+	Effect_CarMagnet() : ChaosEffect() {
+		sName = "Player Car Magnet";
+	}
+
+	void TickFunction(double delta) override {
+		auto playerCar = GetLocalPlayerVehicle();
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car == playerCar) continue;
+			auto otherCar = car->mCOMObject->Find<IRigidBody>();
+			if (!otherCar) continue;
+
+			auto v = playerCar->GetPosition();
+			auto c = otherCar->GetPosition();
+			auto vel = *otherCar->GetLinearVelocity();
+			vel.x += (v->x - c->x) * CarMagnetForce * delta;
+			vel.y += (v->y - c->y) * CarMagnetForce * delta;
+			vel.z += (v->z - c->z) * CarMagnetForce * delta;
+			otherCar->SetLinearVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CarMagnet;
+
+class Effect_CarForcefield : public ChaosEffect {
+public:
+	Effect_CarForcefield() : ChaosEffect() {
+		sName = "Player Car Forcefield";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto playerCar = GetLocalPlayerVehicle();
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car == playerCar) continue;
+			auto otherCar = car->mCOMObject->Find<IRigidBody>();
+			if (!otherCar) continue;
+
+			auto v = (NyaVec3*)playerCar->GetPosition();
+			auto c = (NyaVec3*)otherCar->GetPosition();
+			if ((*v - *c).length() < 15) {
+				auto dir = (*c - *v);
+				dir.Normalize();
+				dir *= 15;
+				auto newPos = *v;
+				newPos += dir;
+				otherCar->SetPosition((UMath::Vector3*)&newPos);
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CarForcefield;
+
+class Effect_NoInput : public ChaosEffect {
+public:
+	Effect_NoInput() : ChaosEffect() {
+		sName = "Disable Player Input";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			ply->ClearInput();
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_NoInput;

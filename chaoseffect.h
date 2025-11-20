@@ -186,5 +186,6 @@ bool RunningEffectsCleanup() {
 #include "effects/texteffects.h"
 #include "effects/worldeffects.h"
 #include "effects/carmodeleffects.h"
+#include "effects/physicseffects.h"
 #include "effects/effect_wreckonflip.h"
 #include "effects/effect_safehouse.h"

@@ -82,6 +82,14 @@ std::vector<IVehicle*> GetActiveVehicles() {
 	return cars;
 }
 
+bool IsVehicleValidAndActive(IVehicle* vehicle) {
+	auto cars = GetActiveVehicles();
+	for (auto& car : cars) {
+		if (car == vehicle) return true;
+	}
+	return false;
+}
+
 class ChloeHook {
 public:
 	static inline std::vector<void(*)()> aHooks;

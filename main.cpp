@@ -5,6 +5,7 @@
 
 #include "nya_dx9_hookbase.h"
 #include "nya_commonhooklib.h"
+#include "nya_commonmath.h"
 #include "nfsmw.h"
 
 #include "include/chloemenulib.h"
@@ -150,6 +151,8 @@ void ChaosModMenu() {
 	}
 	QuickValueEditor("Cycle Timer", fEffectCycleTimer);
 	
+	QuickValueEditor("CarMagnetForce", CarMagnetForce);
+
 	//QuickValueEditor("fEffectX", fEffectX);
 	//QuickValueEditor("fEffectY", fEffectY);
 	//QuickValueEditor("fEffectSize", fEffectSize);

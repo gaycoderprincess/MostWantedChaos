@@ -94,3 +94,45 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_SpinningTraffic;
+
+class Effect_CarMagnetRandom : public EffectBase_ActiveCarsConditional {
+public:
+	IVehicle* pRandomCar = nullptr;
+
+	Effect_CarMagnetRandom() : EffectBase_ActiveCarsConditional() {
+		sName = "Car Magnet On Random Car";
+		fTimerLength = 15;
+	}
+
+	void GenerateRandomCar() {
+		auto cars = GetActiveVehicles();
+		pRandomCar = cars[rand()%cars.size()];
+	}
+
+	void InitFunction() override {
+		GenerateRandomCar();
+	}
+	void TickFunction(double delta) override {
+		if (!IsVehicleValidAndActive(pRandomCar)) {
+			GenerateRandomCar();
+			return;
+		}
+
+		auto playerCar = pRandomCar;
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car == playerCar) continue;
+			auto otherCar = car->mCOMObject->Find<IRigidBody>();
+			if (!otherCar) continue;
+
+			auto v = playerCar->GetPosition();
+			auto c = otherCar->GetPosition();
+			auto vel = *otherCar->GetLinearVelocity();
+			vel.x += (v->x - c->x) * CarMagnetForce * delta;
+			vel.y += (v->y - c->y) * CarMagnetForce * delta;
+			vel.z += (v->z - c->z) * CarMagnetForce * delta;
+			otherCar->SetLinearVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CarMagnetRandom;
