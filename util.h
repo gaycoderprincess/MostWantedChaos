@@ -101,3 +101,32 @@ bool IsInLoadingScreen() {
 bool IsInNIS() {
 	return INIS::mInstance && INIS::mInstance->IsPlaying();
 }
+
+FECustomizationRecord CreateStockCustomizations(uint32_t carModel) {
+	FECustomizationRecord record;
+	FECustomizationRecord::Default(&record);
+
+	FECarRecord tmp;
+	tmp.FEKey = carModel;
+	tmp.VehicleKey = carModel;
+	RideInfo info;
+	RideInfo::Init(&info, FECarRecord::GetType(&tmp), CarRenderUsage_Player, false, false);
+	RideInfo::SetStockParts(&info);
+	FECustomizationRecord::WriteRideIntoRecord(&record, &info);
+	return record;
+}
+
+FECustomizationRecord CreateRandomCustomizations(uint32_t carModel) {
+	FECustomizationRecord record;
+	FECustomizationRecord::Default(&record);
+
+	FECarRecord tmp;
+	tmp.FEKey = carModel;
+	tmp.VehicleKey = carModel;
+	RideInfo info;
+	RideInfo::Init(&info, FECarRecord::GetType(&tmp), CarRenderUsage_Player, false, false);
+	RideInfo::SetRandomParts(&info);
+	RideInfo::SetRandomPaint(&info);
+	FECustomizationRecord::WriteRideIntoRecord(&record, &info);
+	return record;
+}
