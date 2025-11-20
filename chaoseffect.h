@@ -59,20 +59,24 @@ public:
 		x *= GetAspectRatioInv();
 		x = 1 - x;
 
-		auto width = GetStringWidth(fEffectSize, pEffect->sName.c_str());
+		auto str = pEffect->sName;
+		if (HasTimer()) {
+			str += std::format(" ({})", (int)fTimer);
+		}
+
+		auto width = GetStringWidth(fEffectSize, str.c_str());
 
 		if (fActiveTimer < 0.5) x = std::lerp(1 + width, x, easeInOutQuart(fActiveTimer * 2));
 		else if (fTimer < 0.5) x = std::lerp(1 + width, x, easeInOutQuart(fTimer * 2));
-		else if (HasTimer()) {
-
-		}
+		//else if (HasTimer()) {
+		//}
 
 		tNyaStringData data;
 		data.x = x;
 		data.y = fEffectY + (fEffectSpacing * y);
 		data.size = fEffectSize;
 		data.XRightAlign = true;
-		DrawString(data, pEffect->sName);
+		DrawString(data, str);
 	}
 
 	void OnTick(double delta) {
