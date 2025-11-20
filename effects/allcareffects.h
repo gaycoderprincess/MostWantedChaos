@@ -32,7 +32,7 @@ public:
 	double fTimer = 0;
 
 	Effect_RacerAITraffic() : ChaosEffect() {
-		sName = "Racer AI Traffic";
+		sName = "Racer AI For Traffic";
 		fTimerLength = 120;
 	}
 
@@ -58,9 +58,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_RacerAITraffic;
 
-class Effect_LobotomyTraffic : public ChaosEffect {
+class Effect_LobotomyTraffic : public EffectBase_ActiveCarsConditional {
 public:
-	Effect_LobotomyTraffic() : ChaosEffect() {
+	Effect_LobotomyTraffic() : EffectBase_ActiveCarsConditional() {
 		sName = "Lobotomized Traffic";
 		fTimerLength = 60;
 	}
@@ -74,3 +74,23 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_LobotomyTraffic;
+
+class Effect_SpinningTraffic : public EffectBase_ActiveCarsConditional {
+public:
+	Effect_SpinningTraffic() : EffectBase_ActiveCarsConditional() {
+		sName = "Spinning Traffic";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+			auto rb = car->mCOMObject->Find<IRigidBody>();
+			auto vel = *rb->GetAngularVelocity();
+			vel.y += 25 * delta;
+			rb->SetAngularVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SpinningTraffic;

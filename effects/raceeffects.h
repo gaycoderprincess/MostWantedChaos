@@ -120,3 +120,23 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_RestartRace;
+
+class Effect_DisableBarriers : public ChaosEffect {
+public:
+	Effect_DisableBarriers() : ChaosEffect() {
+		sName = "Disable Race Barriers";
+	}
+
+	void TickFunction(double delta) override {
+		GRaceStatus::DisableBarriers();
+	}
+	void DeinitFunction() override {
+		if (GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing) {
+			GRaceStatus::EnableBarriers(GRaceStatus::fObj);
+		}
+	}
+	bool IsAvailable() override {
+		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+} E_DisableBarriers;

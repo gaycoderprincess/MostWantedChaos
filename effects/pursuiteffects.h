@@ -121,3 +121,25 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_NeverBusted;
+
+// needs a way to force cooldown
+class Effect_NoCops : public ChaosEffect {
+public:
+	Effect_NoCops() : ChaosEffect() {
+		sName = "Disable Cops";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		ICopMgr::mDisableCops = true;
+	}
+	void DeinitFunction() override {
+		ICopMgr::mDisableCops = false;
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		return !ICopMgr::mDisableCops;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_NoCops;

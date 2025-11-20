@@ -1,7 +1,22 @@
+class EffectBase_PlayerCarHasNitro : public ChaosEffect {
+public:
+	EffectBase_PlayerCarHasNitro() : ChaosEffect() {
+		sName = "(EFFECT BASE) Player Has Nitro";
+	}
+
+	bool IsAvailable() override {
+		if (auto ply = GetLocalPlayerEngine()) {
+			return ply->HasNOS();
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class Effect_StopCar : public ChaosEffect {
 public:
 	Effect_StopCar() : ChaosEffect() {
-		sName = "Stop Car";
+		sName = "Stop Player Car";
 	}
 
 	void InitFunction() override {
@@ -14,7 +29,7 @@ public:
 class Effect_LaunchCarFwd : public ChaosEffect {
 public:
 	Effect_LaunchCarFwd() : ChaosEffect() {
-		sName = "Launch Car Forward";
+		sName = "Launch Player Forward";
 	}
 
 	void InitFunction() override {
@@ -27,7 +42,7 @@ public:
 class Effect_LaunchCarBwd : public ChaosEffect {
 public:
 	Effect_LaunchCarBwd() : ChaosEffect() {
-		sName = "Launch Car Backwards";
+		sName = "Launch Player Backwards";
 	}
 
 	void InitFunction() override {
@@ -37,10 +52,28 @@ public:
 	}
 } E_LaunchCarBwd;
 
+class Effect_LaunchCarSide : public ChaosEffect {
+public:
+	Effect_LaunchCarSide() : ChaosEffect() {
+		sName = "Launch Player Sideways";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			UMath::Vector3 side;
+			ply->GetRightVector(&side);
+			side.x *= TOMPS(200);
+			side.y *= TOMPS(200);
+			side.z *= TOMPS(200);
+			ply->SetLinearVelocity(&side);
+		}
+	}
+} E_LaunchCarSide;
+
 class Effect_LaunchCarUp : public ChaosEffect {
 public:
 	Effect_LaunchCarUp() : ChaosEffect() {
-		sName = "Launch Car Up";
+		sName = "Launch Player Up";
 	}
 
 	void InitFunction() override {
@@ -52,10 +85,28 @@ public:
 	}
 } E_LaunchCarUp;
 
+class Effect_LaunchCarDown : public ChaosEffect {
+public:
+	Effect_LaunchCarDown() : ChaosEffect() {
+		sName = "Launch Player Down";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			UMath::Vector3 pos = *ply->GetPosition();
+			pos.y += 15;
+			ply->SetPosition(&pos);
+			UMath::Vector3 vel = *ply->GetLinearVelocity();
+			vel.y = -TOMPS(200);
+			ply->SetLinearVelocity(&vel);
+		}
+	}
+} E_LaunchCarDown;
+
 class Effect_SpinCar : public ChaosEffect {
 public:
 	Effect_SpinCar() : ChaosEffect() {
-		sName = "Spin Car Out";
+		sName = "Spin Player Out";
 	}
 
 	void InitFunction() override {
@@ -70,7 +121,7 @@ public:
 class Effect_SpinCar2 : public ChaosEffect {
 public:
 	Effect_SpinCar2() : ChaosEffect() {
-		sName = "Spin Car Rapidly";
+		sName = "Spin Player Rapidly";
 	}
 
 	void InitFunction() override {
@@ -97,9 +148,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_InfGameBreaker;
 
-class Effect_InfNitro : public ChaosEffect {
+class Effect_InfNitro : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_InfNitro() : ChaosEffect() {
+	Effect_InfNitro() : EffectBase_PlayerCarHasNitro() {
 		sName = "Infinite Nitro";
 		IncompatibilityGroup = Attrib::StringHash32("nitro");
 	}
@@ -109,14 +160,8 @@ public:
 			ply->ChargeNOS(1);
 		}
 	}
-	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerEngine()) {
-			return ply->HasNOS();
-		}
-		return false;
-	}
 	bool HasTimer() override { return true; }
-	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_InfNitro;
 
 class Effect_NoGameBreaker : public ChaosEffect {
@@ -134,9 +179,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_NoGameBreaker;
 
-class Effect_NoNitro : public ChaosEffect {
+class Effect_NoNitro : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_NoNitro() : ChaosEffect() {
+	Effect_NoNitro() : EffectBase_PlayerCarHasNitro() {
 		sName = "Disable Nitro";
 		IncompatibilityGroup = Attrib::StringHash32("nitro");
 	}
@@ -146,14 +191,8 @@ public:
 			ply->ChargeNOS(-1);
 		}
 	}
-	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerEngine()) {
-			return ply->HasNOS();
-		}
-		return false;
-	}
 	bool HasTimer() override { return true; }
-	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_NoNitro;
 
 class Effect_SetHeat1 : public ChaosEffect {
@@ -204,12 +243,12 @@ public:
 class Effect_BlowEngine : public ChaosEffect {
 public:
 	Effect_BlowEngine() : ChaosEffect() {
-		sName = "Blow Car Engine";
+		sName = "Blow Player's Engine";
 	}
 
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
-			ply->Sabotage(3);
+			ply->Sabotage(5);
 		}
 	}
 } E_BlowEngine;
@@ -266,7 +305,8 @@ public:
 	}
 
 	void InitFunction() override {
-		EAXDispatch::Report911(SoundAI::mInstance->mDispatch, Csis::Type_pursuit_type_Reckless);
+		aMainLoopFunctions.push_back([]() { E911Call::Create(); });
+		//EAXDispatch::Report911(SoundAI::mInstance->mDispatch, Csis::Type_pursuit_type_Reckless);
 	}
 	bool IsAvailable() override {
 		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
@@ -345,7 +385,7 @@ public:
 	bool HasTimer() override { return true; }
 } E_PlayerCarTuneHeight;
 
-class Effect_PlayerCarTuneHeight2 : public ChaosEffect {
+/*class Effect_PlayerCarTuneHeight2 : public ChaosEffect {
 public:
 	Effect_PlayerCarTuneHeight2() : ChaosEffect() {
 		sName = "Super Stanced Suspension";
@@ -368,7 +408,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-} E_PlayerCarTuneHeight2;
+} E_PlayerCarTuneHeight2;*/
 
 class Effect_PlayerCarTuneHeight3 : public ChaosEffect {
 public:
@@ -394,3 +434,110 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarTuneHeight3;
+
+class Effect_PlayerCarTuneNitro : public EffectBase_PlayerCarHasNitro {
+public:
+	Effect_PlayerCarTuneNitro() : EffectBase_PlayerCarHasNitro() {
+		sName = "Weak Nitro";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("nitro_tune");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::NOS] = -5;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::NOS] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_PlayerCarTuneNitro;
+
+/*class Effect_PlayerCarTuneNitro2 : public EffectBase_PlayerCarHasNitro {
+public:
+	Effect_PlayerCarTuneNitro2() : EffectBase_PlayerCarHasNitro() {
+		sName = "Strong Nitro";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("nitro_tune");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::NOS] = 3;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = *ply->GetTunings();
+			tune.Value[Physics::Tunings::NOS] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_PlayerCarTuneNitro2;*/
+
+class Effect_PlayerCarReset : public ChaosEffect {
+public:
+	Effect_PlayerCarReset() : ChaosEffect() {
+		sName = "Reset Player";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IResetable>()) {
+			ply->ResetVehicle(true);
+		}
+	}
+} E_PlayerCarReset;
+
+class Effect_PlayerCarSpike1 : public ChaosEffect {
+public:
+	Effect_PlayerCarSpike1() : ChaosEffect() {
+		sName = "Puncture One Player Tire";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<ISpikeable>()) {
+			ply->Puncture(rand() % 4);
+		}
+	}
+} E_PlayerCarSpike1;
+
+class Effect_PlayerCarSpikeAll : public ChaosEffect {
+public:
+	Effect_PlayerCarSpikeAll() : ChaosEffect() {
+		sName = "Puncture Player's Tires";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<ISpikeable>()) {
+			ply->Puncture(0);
+			ply->Puncture(1);
+			ply->Puncture(2);
+			ply->Puncture(3);
+		}
+	}
+} E_PlayerCarSpikeAll;
+
+class Effect_FixPlayerCar : public ChaosEffect {
+public:
+	Effect_FixPlayerCar() : ChaosEffect() {
+		sName = "Fix Player's Tires";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IDamageable>()) {
+			ply->ResetDamage();
+		}
+	}
+} E_FixPlayerCar;
