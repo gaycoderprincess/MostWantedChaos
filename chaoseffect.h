@@ -120,5 +120,6 @@ bool RunningEffectsCleanup() {
 #include "effects/basiceffects.h"
 #include "effects/playercareffects.h"
 #include "effects/opponentcareffects.h"
+#include "effects/allcareffects.h"
 #include "effects/raceeffects.h"
 #include "effects/effect_wreckonflip.h"
