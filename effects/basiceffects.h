@@ -5,7 +5,7 @@ public:
 		fTimerLength = 10;
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		DrawRectangle(0, 1, 0, 1, {0,0,0,255});
 	}
 	bool HasTimer() override { return true; }
@@ -17,7 +17,7 @@ public:
 		sName = "Portrait Mode";
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		DrawRectangle(0, 0.25, 0, 1, {0,0,0,255});
 		DrawRectangle(0.75, 1, 0, 1, {0,0,0,255});
 	}
@@ -31,7 +31,7 @@ public:
 		sName = "Widescreen Borders";
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		DrawRectangle(0, 1, 0, 0.1, {0,0,0,255});
 		DrawRectangle(0, 1, 0.9, 1, {0,0,0,255});
 	}

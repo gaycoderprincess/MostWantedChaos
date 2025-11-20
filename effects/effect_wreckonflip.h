@@ -5,7 +5,7 @@ public:
 		fTimerLength = 120;
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_RACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
@@ -20,4 +20,5 @@ public:
 			}
 		}
 	}
+	bool HasTimer() override { return true; }
 } E_WreckOnFlip;

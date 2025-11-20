@@ -26,3 +26,51 @@ public:
 		damage->Destroy();
 	}
 } E_DestroyRandomCar;
+
+class Effect_RacerAITraffic : public ChaosEffect {
+public:
+	double fTimer = 0;
+
+	Effect_RacerAITraffic() : ChaosEffect() {
+		sName = "Racer AI Traffic";
+		fTimerLength = 120;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch(0x4231BD + 1, "AIGoalRacer"); // AIVehicleTraffic::StartDriving
+		NyaHookLib::Patch<uint16_t>(0x411E9E, 0x1BEB); // never set DriveSpeed for AIVehicleTraffic
+	}
+	void TickFunction(double delta) override {
+		fTimer += delta;
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+			car->mCOMObject->Find<IVehicleAI>()->SetDriveSpeed(100);
+		}
+		if (fTimer > 3) {
+			fTimer -= 3;
+		}
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x4231BD + 1, "AIGoalTraffic");
+		NyaHookLib::Patch<uint16_t>(0x411E9E, 0x1674);
+	}
+	bool HasTimer() override { return true; }
+} E_RacerAITraffic;
+
+class Effect_LobotomyTraffic : public ChaosEffect {
+public:
+	Effect_LobotomyTraffic() : ChaosEffect() {
+		sName = "Lobotomized Traffic";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+			car->mCOMObject->Find<IVehicle>()->SetSpeed(TOMPS(200));
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_LobotomyTraffic;

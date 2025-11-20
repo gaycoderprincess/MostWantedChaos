@@ -13,7 +13,7 @@ public:
 	};
 
 	virtual void InitFunction() {};
-	virtual void TickFunction() {};
+	virtual void TickFunction(double delta) {};
 	virtual void DeinitFunction() {};
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
@@ -97,7 +97,7 @@ public:
 		fTimer -= delta;
 		fActiveTimer += delta;
 		if (IsActive()) {
-			pEffect->TickFunction();
+			pEffect->TickFunction(delta);
 		}
 	}
 };
@@ -125,5 +125,7 @@ bool RunningEffectsCleanup() {
 #include "effects/allcareffects.h"
 #include "effects/raceeffects.h"
 #include "effects/hudeffects.h"
+#include "effects/pursuiteffects.h"
+#include "effects/profileeffects.h"
 #include "effects/effect_wreckonflip.h"
-#include "effects/effect_safehouse.h" // todo
+#include "effects/effect_safehouse.h"

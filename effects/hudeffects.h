@@ -10,3 +10,14 @@ public:
 		}
 	}
 } E_DragHUD;
+
+class Effect_ChallengeCam : public ChaosEffect {
+public:
+	Effect_ChallengeCam() : ChaosEffect() {
+		sName = "Challenge Series Camera";
+	}
+
+	void InitFunction() override {
+		Camera_SetGenericCamera("Cinematics", "Challenge");
+	}
+} E_Challenge;

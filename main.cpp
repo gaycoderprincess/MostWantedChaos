@@ -33,6 +33,7 @@ void MainLoop() {
 
 #include "d3dhook.h"
 #include "util.h"
+#include "hooks/fixes.h"
 #include "chaoseffect.h"
 
 // todo isconditionallyavailable/isavailable check
@@ -59,7 +60,7 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
-	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || FEManager::mPauseRequest) {
+	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || FEManager::mPauseRequest) {
 		for (auto& effect : aRunningEffects) {
 			if (!effect.pEffect->RunInMenus()) continue;
 			effect.OnTick(gTimer.fDeltaTime);
@@ -128,25 +129,14 @@ void ChaosModMenu() {
 		DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
 		DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
 		DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
-		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms) {
-			DrawMenuOption(std::format("Race Hash: {:X}", Attrib::Instance::GetCollection(GRaceStatus::fObj->mRaceParms->mRaceRecord)));
-			auto numLaps = (uint32_t*)Attrib::Collection::GetData(GRaceStatus::fObj->mRaceParms->mRaceRecord->mCollection, Attrib::StringHash32("NumLaps"), 0);
-			DrawMenuOption(std::format("Num Laps: {}", numLaps ? *numLaps : -1));
-			if (auto parent = GRaceStatus::fObj->mRaceParms->mRaceRecord->mCollection->mParent) {
-				DrawMenuOption(std::format("Parent Hash: {:X}", parent->mKey));
-				numLaps = (uint32_t*)Attrib::Collection::GetData(parent, Attrib::StringHash32("NumLaps"), 0);
-				DrawMenuOption(std::format("Parent Num Laps: {}", numLaps ? *numLaps : -1));
-			}
-			if (auto index = GRaceStatus::fObj->mRaceParms->mIndex) {
-				DrawMenuOption(std::format("Index Num Laps: {}", index->mNumLaps));
-			}
-			DrawMenuOption(std::format("Event ID: {}", GRaceParameters::GetEventID(GRaceStatus::fObj->mRaceParms)));
-		}
-		if (DrawMenuOption("Set Standard HUD")) {
-			ply->SetHud(PHT_STANDARD);
-		}
-		if (DrawMenuOption("Set Drag HUD")) {
-			ply->SetHud(PHT_DRAG);
+
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+			auto modelName = car->GetVehicleName();
+			auto speed = car->GetSpeed();
+			auto driveSpeed = car->mCOMObject->Find<IVehicleAI>()->GetDriveSpeed();
+			DrawMenuOption(std::format("{} - {:.2f}, drivespeed {:.2f}", modelName, speed, driveSpeed));
 		}
 	}
 	else {
@@ -154,26 +144,6 @@ void ChaosModMenu() {
 	}
 
 	ChloeMenuLib::EndMenu();
-}
-
-// fixes a crash when totaling your car after quitting from a race
-// in this case GRacerInfo is valid, mRaceParms is not
-void __thiscall TotalVehicleFixed(GRacerInfo* pThis) {
-	if (!GRaceStatus::fObj->mRaceParms) return;
-	GRacerInfo::TotalVehicle(pThis);
-}
-void __thiscall BlowEngineFixed(GRacerInfo* pThis) {
-	if (!GRaceStatus::fObj->mRaceParms) return;
-	GRacerInfo::BlowEngine(pThis);
-}
-
-// fixes a crash when hitting objects using a player-driven AI car
-// the result of this function is not null checked at 4F0E70
-EAX_CarState* GetClosestPlayerCarFixed(bVector3* a1) {
-	if (auto car = GetClosestPlayerCar(a1)) return car;
-	static EAX_CarState temp;
-	memset(&temp,0,sizeof(temp));
-	return &temp;
 }
 
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
@@ -190,11 +160,12 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			}
 
-			ChloeMenuLib::RegisterMenu("test", &ChaosModMenu);
+			for (auto& func : ChloeHook::aHooks) {
+				func();
+			}
 
-			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63C093, &TotalVehicleFixed);
-			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63839A, &BlowEngineFixed);
-			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x4F0E70, &GetClosestPlayerCarFixed);
+			ChloeMenuLib::RegisterMenu("test", &ChaosModMenu);
+			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->sName < (std::string)b->sName; });
 
 			NyaHooks::PlaceD3DHooks();
 			NyaHooks::aEndSceneFuncs.push_back(D3DHookMain);

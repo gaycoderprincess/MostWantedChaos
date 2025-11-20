@@ -60,7 +60,7 @@ public:
 
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
-			UMath::Vector3 vel = *ply->GetAngularVelocity();
+			auto vel = *ply->GetAngularVelocity();
 			vel.y = 4;
 			ply->SetAngularVelocity(&vel);
 		}
@@ -75,7 +75,7 @@ public:
 
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
-			UMath::Vector3 vel = *ply->GetAngularVelocity();
+			auto vel = *ply->GetAngularVelocity();
 			vel.y = TOMPS(200);
 			ply->SetAngularVelocity(&vel);
 		}
@@ -88,7 +88,7 @@ public:
 		sName = "Infinite Speedbreaker";
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ChargeGameBreaker(1);
 		}
@@ -102,7 +102,7 @@ public:
 		sName = "Infinite Nitro";
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			ply->ChargeNOS(1);
 		}
@@ -123,7 +123,7 @@ public:
 		sName = "Disable Speedbreaker";
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);
 		}
@@ -137,7 +137,7 @@ public:
 		sName = "Disable Nitro";
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			ply->ChargeNOS(-1);
 		}
@@ -216,7 +216,7 @@ public:
 		sName = "Auto-Drive";
 	}
 
-	void TickFunction() override {
+	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
 			if (!ply->GetAiControl()) ply->SetAiControl(true);
 		}
@@ -229,17 +229,38 @@ public:
 	bool HasTimer() override { return true; }
 } E_AutoDrive;
 
-// todo
-class Effect_911 : public ChaosEffect {
+class Effect_AutoDrive2 : public ChaosEffect {
+public:
+	Effect_AutoDrive2() : ChaosEffect() {
+		sName = "Auto-Drive (Traffic)";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
+			if (!ply->GetAiControl()) {
+				NyaHookLib::Patch(0x42920D + 1, "AIGoalTraffic");
+				ply->SetAiControl(true);
+				NyaHookLib::Patch(0x42920D + 1, "AIGoalRacer");
+			}
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
+			ply->SetAiControl(false);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_AutoDrive2;
+
+/*class Effect_911 : public ChaosEffect {
 public:
 	Effect_911() : ChaosEffect() {
 		sName = "Call 911";
 	}
 
 	void InitFunction() override {
-		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-			ply->Set911CallTime(45);
-		}
+		EAXDispatch::Report911(SoundAI::mInstance->mDispatch, Csis::Type_pursuit_type_Reckless);
 	}
 	bool IsAvailable() override {
 		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
@@ -248,4 +269,22 @@ public:
 		return true;
 	}
 	bool IsConditionallyAvailable() override { return true; }
-} E_911;
+} E_911;*/
+
+// todo this one could use audio
+class Effect_PlayerCarSpin : public ChaosEffect {
+public:
+	Effect_PlayerCarSpin() : ChaosEffect() {
+		sName = "Spain but the A is silent";
+		fTimerLength = 10;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			auto vel = *ply->GetAngularVelocity();
+			vel.y = 2;
+			ply->SetAngularVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarSpin;

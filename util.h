@@ -81,3 +81,19 @@ std::vector<IVehicle*> GetActiveVehicles() {
 	}
 	return cars;
 }
+
+class ChloeHook {
+public:
+	static inline std::vector<void(*)()> aHooks;
+
+	ChloeHook(void(*pFunction)()) {
+		aHooks.push_back(pFunction);
+	}
+};
+
+bool IsInLoadingScreen() {
+	if (FadeScreen::IsFadeScreenOn()) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "Loading.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_Loading.fng")) return true;
+	return false;
+}
