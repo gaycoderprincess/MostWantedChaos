@@ -2,6 +2,7 @@ class Effect_WreckOnFlip : public ChaosEffect {
 public:
 	Effect_WreckOnFlip() : ChaosEffect() {
 		sName = "Cars Wreck When Flipped";
+		fTimerLength = 120;
 	}
 
 	virtual void TickFunction() {

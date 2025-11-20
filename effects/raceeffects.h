@@ -3,11 +3,10 @@ uint8_t* GetRaceNumLaps() {
 	if (!race) return nullptr;
 	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return nullptr;
 	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return nullptr;
-	auto index = race->mRaceParms->mIndex;
-	if (!index) {
-		return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+	if (auto index = race->mRaceParms->mIndex) {
+		return &index->mNumLaps;
 	}
-	return &index->mNumLaps;
+	return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
 }
 
 void SetRaceNumLaps(int lapCount) {
@@ -15,16 +14,16 @@ void SetRaceNumLaps(int lapCount) {
 	if (!race) return;
 	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return;
 	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
+
 	if (auto index = race->mRaceParms->mIndex) {
 		index->mNumLaps = lapCount;
 	}
-	else {
-		auto pLaps = (uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+
+	auto pLaps = (uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+	if (pLaps) *pLaps = lapCount;
+	if (auto parent = race->mRaceParms->mRaceRecord->mCollection->mParent) {
+		pLaps = (uint32_t*)Attrib::Collection::GetData(parent, Attrib::StringHash32("NumLaps"), 0);
 		if (pLaps) *pLaps = lapCount;
-		if (auto parent = race->mRaceParms->mRaceRecord->mCollection->mParent) {
-			pLaps = (uint32_t*)Attrib::Collection::GetData(parent, Attrib::StringHash32("NumLaps"), 0);
-			if (pLaps) *pLaps = lapCount;
-		}
 	}
 }
 

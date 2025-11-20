@@ -9,12 +9,26 @@
 
 #include "include/chloemenulib.h"
 
+// copies the attrib lap count to GRaceIndexData, fixes lap glitch from the in-game menu and makes ingame lap count data persist in general
+void FixIndexLapCount() {
+	auto race = GRaceStatus::fObj;
+	if (!race) return;
+	//if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return;
+	if (!race->mRaceParms) return;
+	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
+	if (auto index = race->mRaceParms->mIndex) {
+		index->mNumLaps = *(uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+	}
+}
+
 std::vector<void(*)()> aMainLoopFunctions;
 void MainLoop() {
 	for (auto& func : aMainLoopFunctions) {
 		func();
 	}
 	aMainLoopFunctions.clear();
+
+	FixIndexLapCount();
 }
 
 #include "d3dhook.h"
@@ -82,8 +96,15 @@ void ChaosModMenu() {
 		DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
 		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms) {
 			DrawMenuOption(std::format("Race Hash: {:X}", Attrib::Instance::GetCollection(GRaceStatus::fObj->mRaceParms->mRaceRecord)));
+			auto numLaps = (uint32_t*)Attrib::Collection::GetData(GRaceStatus::fObj->mRaceParms->mRaceRecord->mCollection, Attrib::StringHash32("NumLaps"), 0);
+			DrawMenuOption(std::format("Num Laps: {}", numLaps ? *numLaps : -1));
 			if (auto parent = GRaceStatus::fObj->mRaceParms->mRaceRecord->mCollection->mParent) {
 				DrawMenuOption(std::format("Parent Hash: {:X}", parent->mKey));
+				numLaps = (uint32_t*)Attrib::Collection::GetData(parent, Attrib::StringHash32("NumLaps"), 0);
+				DrawMenuOption(std::format("Parent Num Laps: {}", numLaps ? *numLaps : -1));
+			}
+			if (auto index = GRaceStatus::fObj->mRaceParms->mIndex) {
+				DrawMenuOption(std::format("Index Num Laps: {}", index->mNumLaps));
 			}
 			DrawMenuOption(std::format("Event ID: {}", GRaceParameters::GetEventID(GRaceStatus::fObj->mRaceParms)));
 		}
