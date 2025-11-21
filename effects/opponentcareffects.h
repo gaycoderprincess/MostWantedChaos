@@ -188,3 +188,20 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_SpikeAllOpponents;
+
+/*class Effect_SendOffAllOpponents : public EffectBase_OpponentInRaceConditional {
+public:
+	Effect_SendOffAllOpponents() : EffectBase_OpponentInRaceConditional() {
+		sName = "Make All Opponents Leave";
+	}
+
+	void InitFunction() override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			auto ply = car->mCOMObject->Find<IRacer>();
+			ply->QuitRace();
+		}
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_SendOffAllOpponents;*/

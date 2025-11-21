@@ -49,3 +49,23 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_NoCollision;
+
+class Effect_NoCarCarCollision : public ChaosEffect {
+public:
+	Effect_NoCarCarCollision() : ChaosEffect() {
+		sName = "Disable Car To Car Collision";
+		fTimerLength = 90;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
+			ply->EnableObjectCollisions(false);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
+			ply->EnableObjectCollisions(true);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_NoCarCarCollision;

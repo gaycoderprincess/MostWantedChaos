@@ -25,6 +25,18 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
+class EffectBase_OpponentInRaceConditional : public ChaosEffect {
+public:
+	EffectBase_OpponentInRaceConditional() : ChaosEffect() {
+		sName = "(EFFECT BASE) Opponent In Race Conditional";
+	}
+
+	bool IsAvailable() override {
+		return !VEHICLE_LIST::GetList(VEHICLE_AIRACERS).empty() && GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class EffectBase_PursuitConditional : public ChaosEffect {
 public:
 	EffectBase_PursuitConditional() : ChaosEffect() {
