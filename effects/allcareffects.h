@@ -163,6 +163,54 @@ public:
 	bool HasTimer() override { return true; }
 } E_CarBouncy;
 
+class Effect_CarTumbly : public ChaosEffect {
+public:
+
+	Effect_CarTumbly() : ChaosEffect() {
+		sName = "Tumbling Cars";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			auto rb = car->mCOMObject->Find<IRigidBody>();
+			auto vel = *rb->GetAngularVelocity();
+			UMath::Vector3 right;
+			rb->GetForwardVector(&right);
+			vel.x += 25 * delta * right.x;
+			vel.y += 25 * delta * right.y;
+			vel.z += 25 * delta * right.z;
+			rb->SetAngularVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CarTumbly;
+
+class Effect_CarFlippy : public ChaosEffect {
+public:
+
+	Effect_CarFlippy() : ChaosEffect() {
+		sName = "Flippy Cars";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			auto rb = car->mCOMObject->Find<IRigidBody>();
+			auto vel = *rb->GetAngularVelocity();
+			UMath::Vector3 right;
+			rb->GetRightVector(&right);
+			vel.x += 25 * delta * right.x;
+			vel.y += 25 * delta * right.y;
+			vel.z += 25 * delta * right.z;
+			rb->SetAngularVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CarFlippy;
+
 class Effect_CarFloaty : public ChaosEffect {
 public:
 

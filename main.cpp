@@ -65,7 +65,7 @@ void ChaosLoop() {
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime;
 		DrawRectangle(0, 1, 0, 0.025, {0, 0, 0, 255});
-		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.025, {0, 127, 0, 255});
+		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.025, {0, 200, 200, 255});
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
