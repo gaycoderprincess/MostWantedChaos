@@ -733,7 +733,20 @@ public:
 	}
 
 	void InitFunction() override {
-		ChangePlayerCarInWorld(Attrib::StringHash32("trafpizza"), nullptr);
+		// copy tunings from the current car if applicable, all junkman if not
+		//auto customization = CreateStockCustomizations(Attrib::StringHash32("cs_clio_trafpizza"));
+		//if (auto car = GetCurrentCareerCar()) {
+		//	auto srcCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		//	if (!srcCustomization) return;
+		//	customization.InstalledPhysics = srcCustomization->InstalledPhysics;
+		//}
+		//else {
+		//	for (int i = 0; i < Physics::Upgrades::Package::PUT_MAX; i++) {
+		//		customization.InstalledPhysics.Part[i] = 4;
+		//	}
+		//	customization.InstalledPhysics.Junkman = 0xFFFFFFFF;
+		//}
+		ChangePlayerCarInWorld(Attrib::StringHash32("cs_clio_trafpizza"), nullptr);
 	}
 } E_SetCarTRAFPIZZA;
 
@@ -748,3 +761,23 @@ public:
 		ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization));
 	}
 } E_SetCarRazor;
+
+class Effect_SetCarRandom : public ChaosEffect {
+public:
+	Effect_SetCarRandom() : ChaosEffect() {
+		sName = "Change Car To Random Model";
+	}
+
+	void InitFunction() override {
+		std::vector<FECarRecord*> validCars;
+		auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+		for (auto& car : cars->CarTable) {
+			if (car.Handle == 0xFFFFFFFF) continue;
+			validCars.push_back(&car);
+		}
+		auto car = validCars[rand()%validCars.size()];
+		auto pCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(cars, car->Customization);
+		auto customization = pCustomization ? *pCustomization : CreateRandomCustomizations(car->VehicleKey);
+		ChangePlayerCarInWorld(car->VehicleKey, &customization);
+	}
+} E_SetCarRandom;

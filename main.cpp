@@ -169,8 +169,33 @@ void ChaosModMenu() {
 		bTimerEnabled = !bTimerEnabled;
 	}
 	QuickValueEditor("Cycle Timer", fEffectCycleTimer);
-	
-	QuickValueEditor("CarMagnetForce", CarMagnetForce);
+
+	if (DrawMenuOption("UI")) {
+		ChloeMenuLib::BeginMenu();
+		QuickValueEditor("fEffectX", fEffectX);
+		QuickValueEditor("fEffectY", fEffectY);
+		QuickValueEditor("fEffectSize", fEffectSize);
+		QuickValueEditor("fEffectSpacing", fEffectSpacing);
+		ChloeMenuLib::EndMenu();
+	}
+
+	if (DrawMenuOption("Add Effect")) {
+		ChloeMenuLib::BeginMenu();
+		for (auto& effect : ChaosEffect::aEffects) {
+			if (DrawMenuOption(effect->sName)) {
+				AddRunningEffect(effect);
+			}
+		}
+		ChloeMenuLib::EndMenu();
+	}
+
+	if (DrawMenuOption("Running Effects")) {
+		ChloeMenuLib::BeginMenu();
+		for (auto &effect: aRunningEffects) {
+			DrawMenuOption(std::format("{} - {:.2f} {}", effect.GetName(), effect.fTimer, effect.IsActive()));
+		}
+		ChloeMenuLib::EndMenu();
+	}
 
 	if (DrawMenuOption("Dump Effect List")) {
 		std::ofstream fout("cwoee_effects.txt", std::ios::out);
@@ -182,45 +207,32 @@ void ChaosModMenu() {
 		}
 	}
 
-	//QuickValueEditor("fEffectX", fEffectX);
-	//QuickValueEditor("fEffectY", fEffectY);
-	//QuickValueEditor("fEffectSize", fEffectSize);
-	//QuickValueEditor("fEffectSpacing", fEffectSpacing);
-	if (DrawMenuOption("Add Effect")) {
+	if (DrawMenuOption("Debug")) {
 		ChloeMenuLib::BeginMenu();
-		for (auto& effect : ChaosEffect::aEffects) {
-			if (DrawMenuOption(effect->sName)) {
-				AddRunningEffect(effect);
+		if (auto ply = GetLocalPlayer()) {
+			DrawMenuOption(std::format("IPlayer: {:X}", (uintptr_t)ply));
+			DrawMenuOption(std::format("ISimable: {:X}", (uintptr_t)ply->GetSimable()));
+			DrawMenuOption(std::format("IHud: {:X}", (uintptr_t)ply->GetHud()));
+			DrawMenuOption(std::format("IVehicle: {:X}", (uintptr_t)ply->GetSimable()->mCOMObject->Find<IVehicle>()));
+			auto pos = ply->GetPosition();
+			DrawMenuOption(std::format("Coords: {:.2f} {:.2f} {:.2f}", pos->x, pos->y, pos->z));
+			UMath::Vector3 fwd;
+			if (auto rb = GetLocalPlayerInterface<IRigidBody>()) {
+				rb->GetForwardVector(&fwd);
+				DrawMenuOption(std::format("Forward: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
 			}
+			DrawMenuOption(std::format("InGameBreaker: {}", ply->InGameBreaker()));
+			DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
+			DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
+			DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
+			DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
+			DrawMenuOption(std::format("Player Car: {}", FEDatabase->mUserProfile->TheCareerSettings.CurrentCar));
+			//DrawMenuOption(std::format("Race Context: {}", (int)GRaceStatus::fObj->mRaceContext));
+		}
+		else {
+			DrawMenuOption("Local player not found");
 		}
 		ChloeMenuLib::EndMenu();
-	}
-	for (auto& effect : aRunningEffects) {
-		DrawMenuOption(std::format("{} - {:.2f} {}", effect.GetName(), effect.fTimer, effect.IsActive()));
-	}
-
-	if (auto ply = GetLocalPlayer()) {
-		DrawMenuOption(std::format("IPlayer: {:X}", (uintptr_t)ply));
-		DrawMenuOption(std::format("ISimable: {:X}", (uintptr_t)ply->GetSimable()));
-		DrawMenuOption(std::format("IHud: {:X}", (uintptr_t)ply->GetHud()));
-		DrawMenuOption(std::format("IVehicle: {:X}", (uintptr_t)ply->GetSimable()->mCOMObject->Find<IVehicle>()));
-		auto pos = ply->GetPosition();
-		DrawMenuOption(std::format("Coords: {:.2f} {:.2f} {:.2f}", pos->x, pos->y, pos->z));
-		UMath::Vector3 fwd;
-		if (auto rb = GetLocalPlayerInterface<IRigidBody>()) {
-			rb->GetForwardVector(&fwd);
-			DrawMenuOption(std::format("Forward: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
-		}
-		DrawMenuOption(std::format("InGameBreaker: {}", ply->InGameBreaker()));
-		DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
-		DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
-		DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
-		DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
-		DrawMenuOption(std::format("Player Car: {}", FEDatabase->mUserProfile->TheCareerSettings.CurrentCar));
-		//DrawMenuOption(std::format("Race Context: {}", (int)GRaceStatus::fObj->mRaceContext));
-	}
-	else {
-		DrawMenuOption("Local player not found");
 	}
 
 	ChloeMenuLib::EndMenu();
