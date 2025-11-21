@@ -569,15 +569,11 @@ public:
 		fTimerLength = 120;
 	}
 
-	static bool __thiscall ResetVehicleHooked(IResetable* pThis, bool a2) {
-		return false;
-	}
-
-	void TickFunction(double delta) override {
-		NyaHookLib::Patch(0x8ABA18, &ResetVehicleHooked);
+	void InitFunction() override {
+		NoResetCount++;
 	}
 	void DeinitFunction() override {
-		NyaHookLib::Patch(0x8ABA18, 0x6B08C0);
+		NoResetCount--;
 	}
 	bool HasTimer() override { return true; }
 } E_NoReset;
@@ -589,16 +585,11 @@ public:
 		fTimerLength = 120;
 	}
 
-	static inline auto ResetVehicle = (bool(__thiscall*)(IResetable*, bool))0x6B08C0;
-	static bool __thiscall ResetVehicleHooked(IResetable* pThis, bool manual) {
-		return ResetVehicle(pThis, false);
-	}
-
-	void TickFunction(double delta) override {
-		NyaHookLib::Patch(0x8ABA18, &ResetVehicleHooked);
+	void InitFunction() override {
+		ManualResetImmunity = true;
 	}
 	void DeinitFunction() override {
-		NyaHookLib::Patch(0x8ABA18, 0x6B08C0);
+		ManualResetImmunity = false;
 	}
 	bool HasTimer() override { return true; }
 } E_ResetImmune;

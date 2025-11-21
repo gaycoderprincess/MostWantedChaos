@@ -129,11 +129,11 @@ public:
 		memcpy(customization->InstalledPartIndices, random.InstalledPartIndices, sizeof(random.InstalledPartIndices));
 		//ChangePlayerCarInWorld(car->VehicleKey, customization);
 	}
-	bool IsAvailable() override {
-		return GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext == kRaceContext_Career;
-	}
-	bool IsConditionallyAvailable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
+	//bool IsAvailable() override {
+	//	return GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext == kRaceContext_Career;
+	//}
+	//bool IsConditionallyAvailable() override { return true; }
+	//bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarRandomTuning;
 
 class Effect_PlayerCarImpoundStrike : public ChaosEffect {
@@ -264,11 +264,12 @@ public:
 				{"Earl", "BL9", "caymans"},
 				{"Baron", "BL10", ""},
 				{"Big Lou", "BL11", "eclipsegt"},
-				{"Izzy", "BL12", "rx8"},
+				{"Izzy", "BL12", nullptr},//"rx8"},
 				{"Vic", "BL13", nullptr},//"supra"},
 				{"Taz", "BL14", "is300"},
 				{"Sonny", "BL15", "gti"},
 				{"Rog", "OPM_MUSTANG_BOSS", "gto"},
+				{"Mia", "E3_DEMO_RX8", nullptr},//"rx8"}, // mia isn't actually a blacklist member, is this fine to have?
 				{"Razor - Mustang", "RAZORMUSTANG", nullptr},//"mustanggt"},
 				{"Ronnie - Supra", "DDAYSUPRA", nullptr},//"supra"},
 		};

@@ -43,6 +43,8 @@ bool OpponentPlayerCar = false;
 bool OpponentPlayerCarRandom = false;
 uint32_t PlayerCarModel;
 FECustomizationRecord PlayerCarCustomizations;
+int NoResetCount = 0;
+bool ManualResetImmunity = false;
 
 #include "d3dhook.h"
 #include "util.h"
@@ -117,6 +119,13 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 	return PVehicle::Construct(params);
 }
 
+static inline auto ResetVehicle = (bool(__thiscall*)(IResetable*, bool))0x6B08C0;
+static bool __thiscall ResetVehicleHooked(IResetable* pThis, bool manual) {
+	if (NoResetCount) return false;
+	if (ManualResetImmunity) manual = false;
+	return ResetVehicle(pThis, manual);
+}
+
 bool bTimerEnabled = true;
 float fEffectCycleTimer = 30;
 double fTimeSinceLastEffect = 0;
@@ -153,8 +162,8 @@ void ChaosLoop() {
 	
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime;
-		DrawRectangle(0, 1, 0, 0.05, {0, 0, 0, 255});
-		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.05, {0, 127, 0, 255});
+		DrawRectangle(0, 1, 0, 0.025, {0, 0, 0, 255});
+		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.025, {0, 127, 0, 255});
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
@@ -259,6 +268,8 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			ChloeMenuLib::RegisterMenu("Chaos Test Menu", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->sName < (std::string)b->sName; });
+
+			NyaHookLib::Patch(0x8ABA18, &ResetVehicleHooked);
 
 			NyaHooks::PlaceD3DHooks();
 			NyaHooks::aEndSceneFuncs.push_back(D3DHookMain);
