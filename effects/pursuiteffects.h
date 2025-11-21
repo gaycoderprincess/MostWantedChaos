@@ -4,23 +4,18 @@ public:
 		sName = "Spawn Cops";
 	}
 
-	// -384.4419861, 89.61328125, 2439.11499
-	// -0.9194986224 0 -0.3930932879
-	// copmidsize
-	// 0
-	// 0
-
 	void InitFunction() override {
 		ICopMgr::mDisableCops = false;
-		auto ply = GetLocalPlayerInterface<IRigidBody>();
-		UMath::Vector3 pos = *ply->GetPosition();
-		pos.y += 5;
-		UMath::Vector3 fwd;
-		ply->GetForwardVector(&fwd);
-		ICopMgr::mInstance->SpawnCop(&pos, &fwd, "copghost", false, false);
-		ICopMgr::mInstance->SpawnCop(&pos, &fwd, "copmidsize", false, false);
-		ICopMgr::mInstance->SpawnCop(&pos, &fwd, "copgto", false, false);
-		ICopMgr::mInstance->SpawnCop(&pos, &fwd, "copsporthench", false, false);
+		if (auto pursuit = GetLocalPlayerInterface<IPursuit>()) {
+			for (int i = 0; i < 8; i++) {
+				AICopManager::SpawnCopCarNow(TheOneCopManager, pursuit);
+			}
+		}
+		else {
+			for (int i = 0; i < 8; i++) {
+				AICopManager::SpawnPatrolCar(TheOneCopManager);
+			}
+		}
 	}
 	void TickFunction(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);

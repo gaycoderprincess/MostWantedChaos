@@ -85,6 +85,7 @@ std::vector<IVehicle*> GetActiveVehicles() {
 	std::vector<IVehicle*> cars;
 	for (int i = 0; i < list.size(); i++) {
 		if (!list[i]->IsActive()) continue;
+		if (list[i]->IsLoading()) continue;
 		cars.push_back(list[i]);
 	}
 	return cars;
@@ -235,6 +236,30 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record) {
 		else {
 			EAXSound::ReStartRace(g_pEAXSound, false);
 		}
+		return newCar->mCOMObject->Find<IVehicle>();
+	}
+	return nullptr;
+}
+
+IVehicle* SpawnCarInWorld(uint32_t hash, FECustomizationRecord* record) {
+	auto cache = ITrafficMgr::mInstance->mCOMObject->Find<IVehicleCache>();
+	if (!cache) return nullptr;
+
+	auto pos = *GetLocalPlayerSimable()->GetPosition();
+	auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();
+
+	Sim::Param param;
+	VehicleParams vehicleParams;
+	param.mType.mCRC = vehicleParams.mType.mCRC;
+	param.mName.mCRC = vehicleParams.mName.mCRC;
+	param.mData = &vehicleParams;
+	vehicleParams.carType = hash;
+	vehicleParams.initialPos = &pos;
+	vehicleParams.initialVec = &fwd;
+	vehicleParams.carClass = DRIVER_HUMAN;
+	vehicleParams.customization = record;
+	vehicleParams.VehicleCache = cache;
+	if (auto newCar = PVehicle::Construct(param)) {
 		return newCar->mCOMObject->Find<IVehicle>();
 	}
 	return nullptr;

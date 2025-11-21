@@ -137,3 +137,49 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_CarForcefieldRandom;
+
+class Effect_CarBouncy : public ChaosEffect {
+public:
+
+	Effect_CarBouncy() : ChaosEffect() {
+		sName = "Bouncy Cars";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			auto collision = car->mCOMObject->Find<ICollisionBody>();
+			auto rb = car->mCOMObject->Find<IRigidBody>();
+			auto sus = car->mCOMObject->Find<ISuspension>();
+			if (!collision || !rb || !sus) continue;
+			if (sus->GetNumWheelsOnGround() > 0 || collision->GetNumContactPoints() > 0) {
+				auto vel = *rb->GetLinearVelocity();
+				vel.y = 2;
+				rb->SetLinearVelocity(&vel);
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CarBouncy;
+
+class Effect_CarFloaty : public ChaosEffect {
+public:
+
+	Effect_CarFloaty() : ChaosEffect() {
+		sName = "Cars Float Away";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			auto rb = car->mCOMObject->Find<IRigidBody>();
+			if (!rb) continue;
+			auto vel = *rb->GetLinearVelocity();
+			vel.y = 2;
+			rb->SetLinearVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CarFloaty;
