@@ -5,6 +5,6 @@ public:
 	}
 
 	void InitFunction() override {
-		aMainLoopFunctions.push_back([]() { EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng"); });
+		aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng"); });
 	}
 } E_Safehouse;

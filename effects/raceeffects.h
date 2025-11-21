@@ -56,7 +56,7 @@ public:
 
 	void InitFunction() override {
 		SetRaceNumLaps((*GetRaceNumLaps())-1);
-		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
+		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
@@ -74,7 +74,7 @@ public:
 
 	void InitFunction() override {
 		SetRaceNumLaps((*GetRaceNumLaps())+1);
-		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
+		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
@@ -95,7 +95,7 @@ public:
 		laps += 3;
 		if (laps > 10) laps = 10;
 		SetRaceNumLaps(laps);
-		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
+		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
@@ -112,7 +112,7 @@ public:
 	}
 
 	void InitFunction() override {
-		aMainLoopFunctions.push_back([]() { ERestartRace::Create(); });
+		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {
 		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;

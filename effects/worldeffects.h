@@ -5,7 +5,7 @@ public:
 	}
 
 	void InitFunction() override {
-		aMainLoopFunctions.push_back([]() { EResetProps::Create(); });
+		aMainLoopFunctionsOnce.push_back([]() { EResetProps::Create(); });
 	}
 } E_ResetProps;
 

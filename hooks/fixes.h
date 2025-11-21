@@ -18,8 +18,21 @@ EAX_CarState* GetClosestPlayerCarFixed(bVector3* a1) {
 	return &temp;
 }
 
+// copies the attrib lap count to GRaceIndexData, fixes lap glitch from the in-game menu and makes ingame lap count data persist in general
+void FixIndexLapCount() {
+	auto race = GRaceStatus::fObj;
+	if (!race) return;
+	//if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return;
+	if (!race->mRaceParms) return;
+	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
+	if (auto index = race->mRaceParms->mIndex) {
+		index->mNumLaps = *(uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+	}
+}
+
 ChloeHook Hook_GameFixes([]() {
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63C093, &TotalVehicleFixed);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63839A, &BlowEngineFixed);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x4F0E70, &GetClosestPlayerCarFixed);
+	aMainLoopFunctions.push_back(FixIndexLapCount);
 });
