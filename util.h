@@ -256,7 +256,7 @@ IVehicle* SpawnCarInWorld(uint32_t hash, FECustomizationRecord* record) {
 	vehicleParams.carType = hash;
 	vehicleParams.initialPos = &pos;
 	vehicleParams.initialVec = &fwd;
-	vehicleParams.carClass = DRIVER_HUMAN;
+	vehicleParams.carClass = DRIVER_NONE;
 	vehicleParams.customization = record;
 	vehicleParams.VehicleCache = cache;
 	if (auto newCar = PVehicle::Construct(param)) {

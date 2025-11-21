@@ -307,6 +307,7 @@ class Effect_PlayerCarSpin : public ChaosEffect {
 public:
 	Effect_PlayerCarSpin() : ChaosEffect() {
 		sName = "Spain but the A is silent";
+		sFriendlyName = "Make Player Spin";
 		fTimerLength = 10;
 	}
 

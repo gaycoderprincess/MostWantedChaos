@@ -93,7 +93,7 @@ void ChaosModMenu() {
 	if (DrawMenuOption("Add Effect")) {
 		ChloeMenuLib::BeginMenu();
 		for (auto& effect : ChaosEffect::aEffects) {
-			if (DrawMenuOption(effect->sName)) {
+			if (DrawMenuOption(effect->GetFriendlyName())) {
 				AddRunningEffect(effect);
 			}
 		}
@@ -169,7 +169,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			}
 
 			ChloeMenuLib::RegisterMenu("Chaos Test Menu", &ChaosModMenu);
-			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->sName < (std::string)b->sName; });
+			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
 
 			NyaHooks::PlaceD3DHooks();
 			NyaHooks::aEndSceneFuncs.push_back(D3DHookMain);

@@ -2,6 +2,7 @@ class ChaosEffectInstance;
 class ChaosEffect {
 public:
 	const char* sName;
+	const char* sFriendlyName = nullptr;
 	double fTimerLength = 30;
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;
@@ -14,6 +15,11 @@ public:
 	ChaosEffect() {
 		aEffects.push_back(this);
 	};
+
+	const char* GetFriendlyName() const {
+		if (sFriendlyName) return sFriendlyName;
+		return sName;
+	}
 
 	virtual void InitFunction() {};
 	virtual void TickFunction(double delta) {};

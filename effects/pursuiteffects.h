@@ -53,7 +53,9 @@ public:
 	}
 
 	void InitFunction() override {
-		GetLocalPlayerInterface<IPerpetrator>()->SetCostToState(0);
+		if (auto pursuit = GetLocalPlayerInterface<IPursuit>()) {
+			pursuit->NotifyPropertyDamaged(100000);
+		}
 	}
 } E_ClearCostToState;
 
@@ -64,8 +66,11 @@ public:
 	}
 
 	void InitFunction() override {
-		GetLocalPlayerInterface<IPerpetrator>()->SetCostToState(100000);
+		if (auto pursuit = GetLocalPlayerInterface<IPursuit>()) {
+			pursuit->NotifyPropertyDamaged(100000);
+		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_AddCostToState;*/
 
 // needs a way to force cooldown
