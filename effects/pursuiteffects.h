@@ -48,6 +48,7 @@ public:
 		return true;
 	}
 	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_Pursuit;
 
 /*class Effect_ClearCostToState : public EffectBase_PursuitConditional {

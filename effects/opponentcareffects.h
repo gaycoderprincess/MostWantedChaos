@@ -13,6 +13,7 @@ public:
 			engine->Sabotage(1);
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_BlowEngineOpponents;
 
 class Effect_BlowEngineOpponents1 : public EffectBase_OpponentConditional {
@@ -44,6 +45,7 @@ public:
 			racer->SetSpeed(TOMPS(400));
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarFwdOpponents;
 
 class Effect_LaunchCarBwdOpponents : public EffectBase_OpponentConditional {
@@ -59,6 +61,7 @@ public:
 			racer->SetSpeed(TOMPS(-200));
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarBwdOpponents;
 
 class Effect_LaunchCarSideOpponents : public EffectBase_OpponentConditional {
@@ -80,6 +83,7 @@ public:
 			ply->SetLinearVelocity(&side);
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarSideOpponents;
 
 class Effect_LaunchCarUpOpponents : public EffectBase_OpponentConditional {
@@ -99,6 +103,7 @@ public:
 			ply->SetLinearVelocity(&vel);
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarUpOpponents;
 
 class Effect_SpinningOpponents : public EffectBase_OpponentConditional {
@@ -140,6 +145,7 @@ public:
 		NyaHookLib::Patch(0x8925C8, 0x409390);
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_RubberbandOpponents;
 
 class Effect_NoRubberbandOpponents : public EffectBase_OpponentConditional {
@@ -180,4 +186,5 @@ public:
 			ply->Puncture(3);
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_SpikeAllOpponents;
