@@ -11,6 +11,19 @@ public:
 	bool HasTimer() override { return true; }
 } E_Blind;
 
+class Effect_Dark : public ChaosEffect {
+public:
+	Effect_Dark() : ChaosEffect() {
+		sName = "Darken Screen";
+	}
+
+	void TickFunction(double delta) override {
+		DrawRectangle(0, 1, 0, 1, {0,0,0,127});
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_Dark;
+
 class Effect_PortraitMode : public ChaosEffect {
 public:
 	Effect_PortraitMode() : ChaosEffect() {

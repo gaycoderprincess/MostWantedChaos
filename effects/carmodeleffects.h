@@ -125,7 +125,7 @@ class Effect_PlayerCarTrafPizza : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarTrafPizza() : EffectBase_TriggerInMenu() {
 		sName = "Spawn As TRAFPIZZA";
-		fTimerLength = 240;
+		fTimerLength = 120;
 		IncompatibilityGroup = Attrib::StringHash32("player_car_model");
 	}
 

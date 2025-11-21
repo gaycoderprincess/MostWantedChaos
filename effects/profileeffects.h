@@ -110,13 +110,14 @@ public:
 		return !GetLocalPlayerInterface<IInput>()->IsAutomaticShift();
 	}
 	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 } E_AutoTrans;
 
 class Effect_PlayerCarRandomTuning : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarRandomTuning() : EffectBase_TriggerInMenu() {
-		sName = "Randomly Tune Active Career Car";
+		sName = "Randomize Active Car's Visuals";
 	}
 
 	void InitFunction() override {
@@ -126,7 +127,13 @@ public:
 		if (!customization) return;
 		auto random = CreateRandomCustomizations(car->VehicleKey);
 		memcpy(customization->InstalledPartIndices, random.InstalledPartIndices, sizeof(random.InstalledPartIndices));
+		//ChangePlayerCarInWorld(car->VehicleKey, customization);
 	}
+	bool IsAvailable() override {
+		return GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext == kRaceContext_Career;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarRandomTuning;
 
 class Effect_PlayerCarImpoundStrike : public ChaosEffect {
@@ -261,6 +268,7 @@ public:
 				{"Vic", "BL13", nullptr},//"supra"},
 				{"Taz", "BL14", "is300"},
 				{"Sonny", "BL15", "gti"},
+				{"Rog", "OPM_MUSTANG_BOSS", "gto"},
 				{"Razor - Mustang", "RAZORMUSTANG", nullptr},//"mustanggt"},
 				{"Ronnie - Supra", "DDAYSUPRA", nullptr},//"supra"},
 		};
@@ -286,22 +294,9 @@ public:
 		}
 		else if (selectedMarker.type == FEMarkerManager::MARKER_PINK_SLIP) {
 			auto ride = unearnedPinkSlips[rand() % unearnedPinkSlips.size()];
-			uint32_t rideHash = FEngHashString(ride.preset);
-
-			bool found = false;
-			auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
-			for (auto& car : cars->CarTable) {
-				if (car.Handle == rideHash) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				FEPlayerCarDB::CreateNewPresetCar(cars, ride.preset);
-			}
-
 			strcpy_s(effectName, 64, std::format("{} ({} - {})", sName, selectedMarker.name, ride.name).c_str());
-			FEPlayerCarDB::AwardRivalCar(&FEDatabase->mUserProfile->PlayersCarStable, rideHash);
+			CreatePinkSlipPreset(ride.preset);
+			FEPlayerCarDB::AwardRivalCar(&FEDatabase->mUserProfile->PlayersCarStable, FEngHashString(ride.preset));
 		}
 		else {
 			FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);

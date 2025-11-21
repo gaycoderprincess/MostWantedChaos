@@ -178,3 +178,64 @@ bool HasPinkSlip(uint32_t model) {
 	}
 	return false;
 }
+
+FECarRecord* CreatePinkSlipPreset(const char* presetName) {
+	uint32_t rideHash = FEngHashString(presetName);
+	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	for (auto& car : cars->CarTable) {
+		if (car.Handle == rideHash) {
+			return &car;
+		}
+	}
+	return FEPlayerCarDB::CreateNewPresetCar(cars, presetName);
+}
+
+IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record) {
+	auto oldCar = GetLocalPlayerSimable();
+	auto oldRB =  GetLocalPlayerInterface<IRigidBody>();
+	auto oldTrans =  GetLocalPlayerInterface<ITransmission>();
+	auto oldHandle = oldCar->GetOwnerHandle();
+
+	auto oldHeat = oldCar->mCOMObject->Find<IPerpetrator>()->GetHeat();
+	auto oldPos = *oldCar->GetPosition();
+	UMath::Vector3 oldFwd;
+	oldRB->GetForwardVector(&oldFwd);
+	auto oldOrient = *oldRB->GetOrientation();
+	auto oldVel = *oldRB->GetLinearVelocity();
+	auto oldAVel = *oldRB->GetAngularVelocity();
+	auto oldGear = oldTrans->GetGear();
+
+	Sim::Param param;
+	VehicleParams vehicleParams;
+	param.mType.mCRC = vehicleParams.mType.mCRC;
+	param.mName.mCRC = vehicleParams.mName.mCRC;
+	param.mData = &vehicleParams;
+	vehicleParams.carType = hash;
+	vehicleParams.initialPos = &oldPos;
+	vehicleParams.initialVec = &oldFwd;
+	vehicleParams.carClass = DRIVER_HUMAN;
+	vehicleParams.customization = record;
+	vehicleParams.VehicleCache = (IVehicleCache*)GRaceStatus::fObj; // this is what GRacerInfo::CreateVehicle does but it looks SO wrong
+	if (auto newCar = PVehicle::Construct(param)) {
+		newCar->Attach(GetLocalPlayer());
+		oldCar->Detach(GetLocalPlayer());
+		oldCar->Kill();
+		newCar->mCOMObject->Find<IPerpetrator>()->SetHeat(oldHeat);
+		newCar->mCOMObject->Find<IRigidBody>()->SetPosition(&oldPos);
+		newCar->mCOMObject->Find<IRigidBody>()->SetOrientation(&oldOrient);
+		newCar->mCOMObject->Find<IRigidBody>()->SetLinearVelocity(&oldVel);
+		newCar->mCOMObject->Find<IRigidBody>()->SetAngularVelocity(&oldAVel);
+		newCar->mCOMObject->Find<ITransmission>()->Shift(oldGear);
+		if (GRaceStatus::fObj->mRacerInfo[0].mhSimable == oldHandle) {
+			GRaceStatus::fObj->mRacerInfo[0].mhSimable = newCar->GetOwnerHandle();
+		}
+		if (GRaceStatus::fObj->mRaceParms && GRaceParameters::GetRaceType(GRaceStatus::fObj->mRaceParms) != 8) {
+			EAXSound::ReStartRace(g_pEAXSound, true);
+		}
+		else {
+			EAXSound::ReStartRace(g_pEAXSound, false);
+		}
+		return newCar->mCOMObject->Find<IVehicle>();
+	}
+	return nullptr;
+}

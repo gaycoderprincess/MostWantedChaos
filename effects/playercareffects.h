@@ -725,3 +725,26 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarGearR;
+
+class Effect_SetCarTRAFPIZZA : public ChaosEffect {
+public:
+	Effect_SetCarTRAFPIZZA() : ChaosEffect() {
+		sName = "Change Car To TRAFPIZZA";
+	}
+
+	void InitFunction() override {
+		ChangePlayerCarInWorld(Attrib::StringHash32("trafpizza"), nullptr);
+	}
+} E_SetCarTRAFPIZZA;
+
+class Effect_SetCarRazor : public ChaosEffect {
+public:
+	Effect_SetCarRazor() : ChaosEffect() {
+		sName = "Change Car To Razor's Mustang";
+	}
+
+	void InitFunction() override {
+		auto car = CreatePinkSlipPreset("RAZORMUSTANG");
+		ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization));
+	}
+} E_SetCarRazor;
