@@ -248,11 +248,10 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			srand(time(0));
 
-			auto configName = "NFSMWChaos_gcp.toml";
-			if (std::filesystem::exists(configName)) {
-				static auto config = toml::parse_file(configName);
-
-			}
+			//auto configName = "NFSMWChaos_gcp.toml";
+			//if (std::filesystem::exists(configName)) {
+			//	static auto config = toml::parse_file(configName);
+			//}
 
 			for (auto& func : ChloeHook::aHooks) {
 				func();
