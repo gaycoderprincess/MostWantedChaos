@@ -12,7 +12,6 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
-	bool HasTimer() override { return true; }
 } E_EnableMomentCam;
 
 class Effect_NoAutosave : public ChaosEffect {
@@ -66,17 +65,11 @@ public:
 		IncompatibilityGroup = Attrib::StringHash32("transmission");
 	}
 
-	static bool __thiscall IsAutomaticShiftHooked(IInput* pThis) {
-		return false;
-	}
-
 	void TickFunction(double delta) override {
-		NyaHookLib::Patch(0x8AC6B0, &IsAutomaticShiftHooked); // normal races
-		NyaHookLib::Patch(0x8AC748, &IsAutomaticShiftHooked); // drag races
+		ForceManualGearbox = true;
 	}
 	void DeinitFunction() override {
-		NyaHookLib::Patch(0x8AC6B0, 0x68D090);
-		NyaHookLib::Patch(0x8AC748, 0x68D090);
+		ForceManualGearbox = false;
 	}
 	bool IsAvailable() override {
 		return GetLocalPlayerInterface<IInput>()->IsAutomaticShift();
@@ -94,17 +87,11 @@ public:
 		IncompatibilityGroup = Attrib::StringHash32("transmission");
 	}
 
-	static bool __thiscall IsAutomaticShiftHooked(IInput* pThis) {
-		return true;
-	}
-
 	void TickFunction(double delta) override {
-		NyaHookLib::Patch(0x8AC6B0, &IsAutomaticShiftHooked); // normal races
-		NyaHookLib::Patch(0x8AC748, &IsAutomaticShiftHooked); // drag races
+		ForceAutomaticGearbox = true;
 	}
 	void DeinitFunction() override {
-		NyaHookLib::Patch(0x8AC6B0, 0x68D090);
-		NyaHookLib::Patch(0x8AC748, 0x68D090);
+		ForceAutomaticGearbox = false;
 	}
 	bool IsAvailable() override {
 		return !GetLocalPlayerInterface<IInput>()->IsAutomaticShift();

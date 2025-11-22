@@ -42,6 +42,7 @@ class Effect_WidescreenMode : public ChaosEffect {
 public:
 	Effect_WidescreenMode() : ChaosEffect() {
 		sName = "Widescreen Borders";
+		fTimerLength = 60;
 	}
 
 	void TickFunction(double delta) override {

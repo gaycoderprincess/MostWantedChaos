@@ -153,6 +153,7 @@ class Effect_NoGameBreaker : public ChaosEffect {
 public:
 	Effect_NoGameBreaker() : ChaosEffect() {
 		sName = "Disable Speedbreaker";
+		fTimerLength = 90;
 		IncompatibilityGroup = Attrib::StringHash32("speedbreaker");
 	}
 
@@ -678,12 +679,17 @@ public:
 	Effect_PlayerCarGear1() : ChaosEffect() {
 		sName = "Force Player To Gear 1";
 		fTimerLength = 15;
+		IncompatibilityGroup = Attrib::StringHash32("transmission");
 	}
 
 	void TickFunction(double delta) override {
+		ForceManualGearbox = true;
 		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
 			if (ply->GetGear() != G_FIRST) ply->Shift(G_FIRST);
 		}
+	}
+	void DeinitFunction() override {
+		ForceManualGearbox = false;
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarGear1;
@@ -691,14 +697,20 @@ public:
 class Effect_PlayerCarGearTop : public ChaosEffect {
 public:
 	Effect_PlayerCarGearTop() : ChaosEffect() {
-		sName = "Force Player To Top Gear";
+		sName = "Top Gear";
+		sFriendlyName = "Force Player To Top Gear";
 		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("transmission");
 	}
 
 	void TickFunction(double delta) override {
+		ForceManualGearbox = true;
 		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
 			if (ply->GetGear() != ply->GetTopGear()) ply->Shift(ply->GetTopGear());
 		}
+	}
+	void DeinitFunction() override {
+		ForceManualGearbox = false;
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarGearTop;

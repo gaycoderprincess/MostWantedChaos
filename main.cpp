@@ -28,6 +28,7 @@ void MainLoop() {
 #include "hooks/fixes.h"
 #include "hooks/noreset.h"
 #include "hooks/gamespeed.h"
+#include "hooks/geartype.h"
 #include "hooks/vehicleconstruct.h"
 #include "chaoseffect.h"
 
@@ -150,7 +151,18 @@ void ChaosModMenu() {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
 				if (effect->fTimerLength != 30) continue;
-				if (effect->HasTimer()) continue;
+				if (!effect->HasTimer()) continue;
+				if (DrawMenuOption(effect->GetFriendlyName())) {
+					AddRunningEffect(effect);
+				}
+			}
+			ChloeMenuLib::EndMenu();
+		}
+
+		if (DrawMenuOption("Rehideable Effects")) {
+			ChloeMenuLib::BeginMenu();
+			for (auto& effect : ChaosEffect::aEffects) {
+				if (!effect->IsRehideable()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
 					AddRunningEffect(effect);
 				}
