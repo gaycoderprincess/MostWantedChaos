@@ -803,7 +803,7 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
-			ply->SetCollisionMass(0);
+			ply->SetCollisionMass(0.01);
 		}
 	}
 	void DeinitFunction() override {

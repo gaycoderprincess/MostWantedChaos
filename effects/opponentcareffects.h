@@ -218,7 +218,7 @@ public:
 		for (int i = 0; i < list.size(); i++) {
 			auto car = list[i];
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
-				ply->SetCollisionMass(0);
+				ply->SetCollisionMass(0.01);
 			}
 		}
 	}
