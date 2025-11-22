@@ -138,3 +138,21 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarCopCorvette;
+
+class Effect_PlayerCarStockPunto : public EffectBase_TriggerInMenu {
+public:
+	Effect_PlayerCarStockPunto() : EffectBase_TriggerInMenu() {
+		sName = "Spawn As Stock Punto";
+		fTimerLength = 120;
+		fUnhideTime = 0;
+		IncompatibilityGroup = Attrib::StringHash32("player_car_model");
+	}
+
+	void TickFunction(double delta) override {
+		ForcedPlayerVehicle = Attrib::StringHash32("punto");
+	}
+	void DeinitFunction() override {
+		ForcedPlayerVehicle = 0;
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarStockPunto;

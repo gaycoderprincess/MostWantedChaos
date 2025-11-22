@@ -158,6 +158,8 @@ public:
 			auto sus = car->mCOMObject->Find<ISuspension>();
 			if (!collision || !rb || !sus) continue;
 			if (sus->GetNumWheelsOnGround() > 0 || collision->GetNumContactPoints() > 0) {
+				// todo incorporate GetGroundNormal somehow
+
 				auto vel = *rb->GetLinearVelocity();
 				vel.y = 2;
 				rb->SetLinearVelocity(&vel);

@@ -87,17 +87,19 @@ public:
 		x *= GetAspectRatioInv();
 		x = 1 - x;
 
-		std::string str = GetName();
+		std::string str;
 		if (HasTimer()) {
-			str += std::format(" ({})", (int)fTimer);
+			// todo does this look fine on the left? should there be a bar instead or something? graphics designers???? woof??????
+			str = std::format("({}) {}", (int)fTimer, GetName());
+		}
+		else {
+			str = GetName();
 		}
 
 		auto width = GetStringWidth(fEffectSize, str.c_str());
 
 		if (fActiveTimer < 0.5) x = std::lerp(1 + width, x, easeInOutQuart(fActiveTimer * 2));
 		else if (fTimer < 0.5) x = std::lerp(1 + width, x, easeInOutQuart(fTimer * 2));
-		//else if (HasTimer()) {
-		//}
 
 		tNyaStringData data;
 		data.x = x;

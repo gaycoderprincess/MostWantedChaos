@@ -871,6 +871,24 @@ public:
 	bool HasTimer() override { return true; }
 } E_LockPlayer;
 
+class Effect_LockPlayerOrient : public ChaosEffect {
+public:
+	UMath::Vector4 orient;
+
+	Effect_LockPlayerOrient() : ChaosEffect() {
+		sName = "Lock Player Rotation";
+		fTimerLength = 10;
+	}
+
+	void InitFunction() override {
+		orient = *GetLocalPlayerInterface<IRigidBody>()->GetOrientation();
+	}
+	void TickFunction(double delta) override {
+		GetLocalPlayerInterface<IRigidBody>()->SetOrientation(&orient);
+	}
+	bool HasTimer() override { return true; }
+} E_LockPlayerOrient;
+
 class Effect_SwapPlayerWithOpponent : public EffectBase_OpponentInRaceOrRoamingConditional {
 public:
 
