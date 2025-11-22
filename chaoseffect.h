@@ -103,7 +103,7 @@ public:
 		x = 1 - x;
 
 		std::string str;
-		if (HasTimer()) {
+		if (HasTimer() && (int)fTimer > 0) {
 			// todo does this look fine on the left? should there be a bar instead or something? graphics designers???? woof??????
 			str = std::format("({}) {}", (int)fTimer, GetName());
 		}

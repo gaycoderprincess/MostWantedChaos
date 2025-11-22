@@ -291,3 +291,68 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_WreckOnFlip;
+
+class Effect_FreezeEveryone : public EffectBase_ActiveCarsConditional {
+public:
+	struct tCarAssoc {
+		IVehicle* vehicle = nullptr;
+		uint32_t model;
+		CwoeeCarPhysicalState state;
+	};
+	std::vector<tCarAssoc> lastStates;
+	double timer = 0;
+
+	Effect_FreezeEveryone() : EffectBase_ActiveCarsConditional() {
+		sName = "DDOS The Server";
+		sFriendlyName = "Lag For All Other Cars";
+		fTimerLength = 60;
+	}
+
+	void CaptureAllCars() {
+		lastStates.clear();
+
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			lastStates.push_back({car, car->GetVehicleKey(), CwoeeCarPhysicalState(car)});
+		}
+	}
+
+	void ApplyAllCars() {
+		for (auto& car : lastStates) {
+			if (car.vehicle == GetLocalPlayerVehicle()) continue;
+			if (!IsVehicleValidAndActive(car.vehicle)) continue;
+			if (car.vehicle->GetVehicleKey() != car.model) continue;
+			car.state.Apply(car.vehicle);
+		}
+	}
+
+	void InitFunction() override {
+		timer = 0;
+		CaptureAllCars();
+	}
+	void TickFunction(double delta) override {
+		timer += delta;
+		if (timer > 1) {
+			int applyChance = 25;
+			int captureChance = 50;
+			if (!GRaceStatus::fObj->mRaceParms && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
+				applyChance = 40;
+				captureChance = 60;
+
+				// this effect makes cooldowns essentially free, disable during cooldowns
+				if (GetLocalPlayerInterface<IPursuit>() && GetLocalPlayerInterface<IPursuit>()->GetPursuitStatus() == PS_COOL_DOWN) {
+					return;
+				}
+			}
+
+			if (rand() % 100 < applyChance) {
+				ApplyAllCars();
+			}
+			else if (rand() % 100 < captureChance) {
+				CaptureAllCars();
+			}
+			timer -= 1;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_FreezeEveryone;
