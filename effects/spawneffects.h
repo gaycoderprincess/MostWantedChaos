@@ -8,7 +8,7 @@ public:
 		auto car = Attrib::StringHash32("gti");
 		auto customization = CreateStockCustomizations(car);
 		for (auto& part : customization.InstalledPartIndices) {
-			part--;
+			part -= 4;
 		}
 		if (auto pCar = SpawnCarInWorld(car, &customization)) {
 			if (auto rb = pCar->mCOMObject->Find<IRigidBody>()) {

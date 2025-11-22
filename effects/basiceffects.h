@@ -24,6 +24,19 @@ public:
 	bool RunInMenus() override { return true; }
 } E_Dark;
 
+class Effect_Bright : public ChaosEffect {
+public:
+	Effect_Bright() : ChaosEffect() {
+		sName = "Brighten Screen";
+	}
+
+	void TickFunction(double delta) override {
+		DrawRectangle(0, 1, 0, 1, {255,255,255,127});
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_Bright;
+
 class Effect_PortraitMode : public ChaosEffect {
 public:
 	Effect_PortraitMode() : ChaosEffect() {
@@ -69,3 +82,16 @@ public:
 		}
 	}
 } E_FakeCrash;
+
+class Effect_Lag : public ChaosEffect {
+public:
+	Effect_Lag() : ChaosEffect() {
+		sName = "Real Frame Drops";
+	}
+
+	void TickFunction(double delta) override {
+		if (rand() % 100 > 5) {
+			Sleep(100);
+		}
+	}
+} E_Lag;

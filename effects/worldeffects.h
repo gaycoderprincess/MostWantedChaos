@@ -54,3 +54,5 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_SpeedFast;
+
+// todo change ColourBloomTint in visuallook for a rainbow world thing?

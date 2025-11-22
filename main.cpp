@@ -85,6 +85,9 @@ void ChaosLoop() {
 			AddRunningEffect(GetRandomEffect());
 		}
 	}
+	else {
+		fTimeSinceLastEffect = 0;
+	}
 }
 
 void ChaosModMenu() {

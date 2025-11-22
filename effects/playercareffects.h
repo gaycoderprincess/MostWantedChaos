@@ -332,14 +332,14 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::AERODYNAMICS] = 50;
 			ply->SetTunings(&tune);
 		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::AERODYNAMICS] = 0;
 			ply->SetTunings(&tune);
 		}
@@ -357,14 +357,14 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = -2;
 			ply->SetTunings(&tune);
 		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
 			ply->SetTunings(&tune);
 		}
@@ -382,14 +382,14 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = -10;
 			ply->SetTunings(&tune);
 		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
 			ply->SetTunings(&tune);
 		}
@@ -407,14 +407,14 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = 25;
 			ply->SetTunings(&tune);
 		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
 			ply->SetTunings(&tune);
 		}
@@ -442,14 +442,14 @@ public:
 		if (state < 0) goBack = false;
 
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = std::lerp(0,20, easeInOutQuart(state));
 			ply->SetTunings(&tune);
 		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = 0;
 			ply->SetTunings(&tune);
 		}
@@ -467,14 +467,14 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = -5;
 			ply->SetTunings(&tune);
 		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = 0;
 			ply->SetTunings(&tune);
 		}
@@ -493,14 +493,14 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = 3;
 			ply->SetTunings(&tune);
 		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
-			Physics::Tunings tune = *ply->GetTunings();
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = 0;
 			ply->SetTunings(&tune);
 		}

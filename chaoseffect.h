@@ -43,8 +43,8 @@ class ChaosEffectInstance {
 public:
 	ChaosEffect* pEffect = nullptr;
 	const char* sNameToDisplay = nullptr;
-	double fActiveTimer = 0;
 	double fTimer = 0;
+	double fTextTimer = 0;
 	double fTimeConditionMet = 3;
 	bool bFirstFrame = true;
 	bool bAborted = false;
@@ -58,6 +58,21 @@ public:
 		return fTimer > 0 && !bAborted;
 	}
 
+	bool IsNameOnScreen() const {
+		return fTextTimer > 0;
+	}
+
+	bool ShouldNameBeOnScreen() const {
+		if (!IsActive()) return false;
+		if (bFirstFrame) return false;
+		if (IsHidden()) return false;
+		return true;
+	}
+
+	bool CanBeDeleted() const {
+		return !IsActive() && !IsNameOnScreen();
+	}
+
 	bool HasTimer() const {
 		return pEffect && pEffect->HasTimer();
 	}
@@ -68,8 +83,7 @@ public:
 	}
 
 	float GetOffscreenPercentage() const {
-		if (fActiveTimer < 0.5) return std::lerp(1, 0, easeInOutQuart(fActiveTimer * 2));
-		else if (fTimer < 0.5) return std::lerp(1, 0, easeInOutQuart(fTimer * 2));
+		if (fTextTimer < 1) return std::lerp(1, 0, easeInOutQuart(fTextTimer));
 		return 0;
 	}
 
@@ -78,9 +92,7 @@ public:
 	}
 
 	void Draw(float y) const {
-		if (!IsActive()) return;
-		if (bFirstFrame) return;
-		if (IsHidden()) return;
+		if (!IsNameOnScreen()) return;
 
 		auto x = fEffectX;
 		x = 1 - x;
@@ -98,8 +110,7 @@ public:
 
 		auto width = GetStringWidth(fEffectSize, str.c_str());
 
-		if (fActiveTimer < 0.5) x = std::lerp(1 + width, x, easeInOutQuart(fActiveTimer * 2));
-		else if (fTimer < 0.5) x = std::lerp(1 + width, x, easeInOutQuart(fTimer * 2));
+		if (fTextTimer < 1) x = std::lerp(1 + width, x, easeInOutQuart(fTextTimer));
 
 		tNyaStringData data;
 		data.x = x;
@@ -113,11 +124,27 @@ public:
 
 	void OnTick(double delta, bool inMenu) {
 		if (!pEffect) {
-			if (!inMenu) {
-				fTimer -= delta;
-				fActiveTimer += delta;
-			}
+			fTimer -= delta;
 			return;
+		}
+
+		if (!inMenu) {
+			if (ShouldNameBeOnScreen()) {
+				if (fTextTimer < 1) {
+					fTextTimer += delta * 2;
+				}
+				else {
+					fTextTimer = 1;
+				}
+			}
+			else {
+				if (fTextTimer > 0) {
+					fTextTimer -= delta * 2;
+				}
+				else {
+					fTextTimer = 0;
+				}
+			}
 		}
 
 		// conditional effects will show after 3 seconds of the conditions being met, or immediately if the condition was met on trigger
@@ -148,7 +175,6 @@ public:
 				pEffect->DeinitFunction();
 			}
 			fTimer -= delta;
-			fActiveTimer += delta;
 		}
 		if (IsActive()) {
 			pEffect->TickFunction(delta);
@@ -162,6 +188,7 @@ void AddRunningEffect(ChaosEffect* effect) {
 	effect->bTriggeredThisCycle = true;
 	effect->fLastTriggerTime = 0;
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
+	WriteLog(std::format("Activating {}", effect->sName));
 }
 
 bool IsEffectRunning(ChaosEffect* effect) {
@@ -202,7 +229,7 @@ ChaosEffect* GetRandomEffect() {
 
 bool RunningEffectsCleanup() {
 	for (auto& effect : aRunningEffects) {
-		if (!effect.IsActive()) {
+		if (effect.CanBeDeleted()) {
 			aRunningEffects.erase(aRunningEffects.begin() + (&effect - &aRunningEffects[0]));
 			return true;
 		}

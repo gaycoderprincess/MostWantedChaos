@@ -173,6 +173,7 @@ FECarRecord* GetCurrentCareerCar() {
 }
 
 FECarRecord* GetRandomCareerCar() {
+	static int counter = rand() % 4;
 	std::vector<FECarRecord*> records;
 	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
 	for (auto& car : cars->CarTable) {
@@ -184,7 +185,10 @@ FECarRecord* GetRandomCareerCar() {
 		records.push_back(&car);
 	}
 	if (records.empty()) return nullptr;
-	return records[rand()%records.size()];
+
+	// not truly random but i wanna reduce repeats
+	if (counter >= records.size()) counter = 0;
+	return records[counter++];
 }
 
 bool HasPinkSlip(uint32_t model) {

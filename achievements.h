@@ -1,5 +1,6 @@
 namespace Achievements {
 	std::string GetAchievementSavePath() {
+		std::filesystem::create_directory("CwoeeChaos");
 		return "CwoeeChaos/achievements.sav";
 	}
 
