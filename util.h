@@ -293,3 +293,13 @@ IVehicle* SpawnCarInWorld(uint32_t hash, FECustomizationRecord* record) {
 	}
 	return nullptr;
 }
+
+void DrawTopBar(float progress, NyaDrawing::CNyaRGBA32 rgb) {
+	DrawRectangle(0, 1, 0, 0.025, {0, 0, 0, 255});
+	DrawRectangle(0, progress, 0, 0.025, rgb);
+}
+
+void DrawBottomBar(float progress, NyaDrawing::CNyaRGBA32 rgb) {
+	DrawRectangle(0, 1, 0.975, 1, {0, 0, 0, 255});
+	DrawRectangle(0, progress, 0.975, 1, rgb);
+}

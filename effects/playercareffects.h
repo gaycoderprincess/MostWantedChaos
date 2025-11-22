@@ -226,6 +226,35 @@ public:
 	}
 } E_SetHeat6;
 
+class Effect_SetHeatDown : public ChaosEffect {
+public:
+	Effect_SetHeatDown() : ChaosEffect() {
+		sName = "Decrease Heat Level";
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			ply->SetHeat(ply->GetHeat() - 1);
+		}
+	}
+} E_SetHeatDown;
+
+class Effect_SetHeatUp : public ChaosEffect {
+public:
+	Effect_SetHeatUp() : ChaosEffect() {
+		sName = "Increase Heat Level";
+	}
+
+	void InitFunction() override {
+		if (auto max = GetMaxHeat()) {
+			if (*max < 6) *max = 6;
+		}
+		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			ply->SetHeat(ply->GetHeat() + 1);
+		}
+	}
+} E_SetHeatUp;
+
 class Effect_BlowEngine : public ChaosEffect {
 public:
 	Effect_BlowEngine() : ChaosEffect() {
@@ -921,3 +950,44 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_SwapPlayerWithOpponent;
+
+class Effect_PlayerResetTransform : public ChaosEffect {
+public:
+	Effect_PlayerResetTransform() : ChaosEffect() {
+		sName = "My Planet Needs Me";
+		sFriendlyName = "Disable Player Physics";
+		fTimerLength = 15;
+		fUnhideTime = 1;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			auto playerRB = GetLocalPlayerInterface<IRigidBody>();
+			auto playerPos = *playerRB->GetPosition();
+			auto playerOrient = *playerRB->GetOrientation();
+			auto playerVel = *playerRB->GetLinearVelocity();
+			auto playerAVel = *playerRB->GetAngularVelocity();
+			if ((*(NyaVec3*)&playerVel).length() < TOMPS(20)) return;
+
+			auto pos = *ply->GetPosition();
+			auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();
+			ply->SetVehicleOnGround(&pos, &fwd);
+
+			//playerRB->SetPosition(&playerPos);
+			playerRB->SetOrientation(&playerOrient);
+			playerRB->SetLinearVelocity(&playerVel);
+			playerRB->SetAngularVelocity(&playerAVel);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			auto playerRB = GetLocalPlayerInterface<IRigidBody>();
+			auto playerVel = *playerRB->GetLinearVelocity();
+			if ((*(NyaVec3*)&playerVel).length() < TOMPS(60)) return false;
+			return true;
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+} E_PlayerResetTransform;

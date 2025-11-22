@@ -38,7 +38,7 @@ void MainLoop() {
 void MoneyChecker() {
 	static ChaosEffect TempEffect;
 	TempEffect.DebugNeverPick = true;
-	if (!TempEffect.sName) TempEffect.sName = "(DEBUG) MONEY CHANGE";
+	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) MONEY CHANGE";
 
 	static int cash = 0;
 	if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
@@ -101,8 +101,7 @@ void ChaosLoop() {
 	
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime;
-		DrawRectangle(0, 1, 0, 0.025, {0, 0, 0, 255});
-		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.025, {219,100,193, 255});
+		DrawTopBar(fTimeSinceLastEffect / fEffectCycleTimer, {219,100,193,255});
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
@@ -166,7 +165,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Effect Debug")) {
 			ChloeMenuLib::BeginMenu();
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
-			QuickValueEditor("TankDrainRate", TankDrainRate);
+			QuickValueEditor("TankDrainRate", Effect_LeakTank::TankDrainRate);
 			ChloeMenuLib::EndMenu();
 		}
 

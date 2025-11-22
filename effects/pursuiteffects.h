@@ -176,3 +176,5 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; };
 } E_SetCopMassInf;
+
+// todo police jenga

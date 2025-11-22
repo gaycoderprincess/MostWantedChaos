@@ -11,6 +11,20 @@ public:
 	bool HasTimer() override { return true; }
 } E_Blind;
 
+class Effect_Flash : public ChaosEffect {
+public:
+	Effect_Flash() : ChaosEffect() {
+		sName = "Flashbang";
+		fTimerLength = 3;
+	}
+
+	void TickFunction(double delta) override {
+		uint8_t alpha = 255;
+		if (EffectInstance->fTimer < 1) alpha = EffectInstance->fTimer * 255;
+		DrawRectangle(0, 1, 0, 1, {255,255,255,alpha});
+	}
+} E_Flash;
+
 class Effect_Dark : public ChaosEffect {
 public:
 	Effect_Dark() : ChaosEffect() {
@@ -78,7 +92,7 @@ public:
 		}
 		else {
 			MessageBoxA(nullptr, "Debug Error!\n\nProgram: speed.exe\n\nR6025\n- pure virtual function call\n\n(Press Retry to debug the application)", "Microsoft Visual C++ Debug Library", MB_ICONERROR | MB_ABORTRETRYIGNORE);
-			Sleep(2000);
+			Sleep(1000);
 		}
 	}
 } E_FakeCrash;
@@ -98,3 +112,31 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_Lag;
+
+class Effect_CrashChance : public ChaosEffect {
+public:
+	bool chanceFired = false;
+
+	Effect_CrashChance() : ChaosEffect() {
+		sName = "10% Chance Of Game Crash";
+	}
+
+	void InitFunction() override {
+		chanceFired = false;
+	}
+	void TickFunction(double delta) override {
+		if (!chanceFired && EffectInstance->fTimer < 27) {
+			if (rand() % 100 < 10) {
+				__debugbreak();
+			}
+			chanceFired = true;
+		}
+	}
+} E_CrashChance;
+
+class Effect_Nothing : public ChaosEffect {
+public:
+	Effect_Nothing() : ChaosEffect() {
+		sName = "Nothing Happens";
+	}
+} E_Nothing;
