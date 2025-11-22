@@ -64,6 +64,22 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
+class EffectBase_ActiveCopsConditional : public ChaosEffect {
+public:
+	EffectBase_ActiveCopsConditional() : ChaosEffect() {
+		sName = "(EFFECT BASE) Active Cops Conditional";
+	}
+
+	bool IsAvailable() override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() == DRIVER_COP) return true;
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class EffectBase_TriggerInMenu : public ChaosEffect {
 public:
 	EffectBase_TriggerInMenu() : ChaosEffect() {

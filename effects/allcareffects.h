@@ -60,6 +60,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_LobotomyTraffic;
 
 class Effect_SpinningTraffic : public EffectBase_ActiveCarsConditional {
@@ -80,6 +81,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_SpinningTraffic;
 
 class Effect_CarMagnetRandom : public EffectBase_ActiveCarsConditional {
@@ -108,6 +110,7 @@ public:
 		DoCarMagnet(pRandomCar, delta);
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_CarMagnetRandom;
 
 class Effect_CarForcefieldRandom : public EffectBase_ActiveCarsConditional {
@@ -136,6 +139,7 @@ public:
 		DoCarForcefield(pRandomCar);
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_CarForcefieldRandom;
 
 class Effect_CarBouncy : public ChaosEffect {
@@ -258,6 +262,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_SetTrafficMassInf;
 
 class Effect_WreckOnFlip : public ChaosEffect {

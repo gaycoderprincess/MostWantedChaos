@@ -106,6 +106,7 @@ public:
 		ICopMgr::mInstance->SetAllBustedTimersToZero();
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_NeverBusted;
 
 // needs a way to force cooldown
@@ -144,11 +145,12 @@ public:
 		NyaHookLib::Patch<uint8_t>(0x429949, 0x74);
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_NoHidingSpots;
 
-class Effect_SetCopMassInf : public EffectBase_PursuitConditional {
+class Effect_SetCopMassInf : public EffectBase_ActiveCopsConditional {
 public:
-	Effect_SetCopMassInf() : EffectBase_PursuitConditional() {
+	Effect_SetCopMassInf() : EffectBase_ActiveCopsConditional() {
 		sName = "Infinite Police Mass";
 		fTimerLength = 60;
 	}
@@ -172,4 +174,5 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; };
 } E_SetCopMassInf;

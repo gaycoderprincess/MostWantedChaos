@@ -29,6 +29,7 @@ public:
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
 	virtual bool IsConditionallyAvailable() { return false; };
+	virtual bool IsRehideable() { return false; };
 	virtual bool AbortOnConditionFailed() { return false; };
 	virtual bool RunInMenus() { return false; }
 };
@@ -72,9 +73,14 @@ public:
 		return 0;
 	}
 
+	bool IsHidden() const {
+		return pEffect->IsConditionallyAvailable() && pEffect->IsRehideable() && !pEffect->IsAvailable();
+	}
+
 	void Draw(float y) const {
 		if (!IsActive()) return;
 		if (bFirstFrame) return;
+		if (IsHidden()) return;
 
 		auto x = fEffectX;
 		x = 1 - x;
@@ -125,6 +131,8 @@ public:
 				return;
 			}
 		}
+
+		if (IsHidden()) return;
 
 		pEffect->EffectInstance = this;
 		if (bFirstFrame) {
