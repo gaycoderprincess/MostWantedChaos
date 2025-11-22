@@ -13,10 +13,10 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
-class EffectBase_OpponentConditional : public ChaosEffect {
+class EffectBase_OpponentInRaceOrRoamingConditional : public ChaosEffect {
 public:
-	EffectBase_OpponentConditional() : ChaosEffect() {
-		sName = "(EFFECT BASE) Opponent Conditional";
+	EffectBase_OpponentInRaceOrRoamingConditional() : ChaosEffect() {
+		sName = "(EFFECT BASE) Opponent In Race Or Roaming Conditional";
 	}
 
 	bool IsAvailable() override {

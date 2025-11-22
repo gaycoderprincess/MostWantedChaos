@@ -870,3 +870,36 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_LockPlayer;
+
+class Effect_SwapPlayerWithOpponent : public EffectBase_OpponentInRaceOrRoamingConditional {
+public:
+
+	Effect_SwapPlayerWithOpponent() : EffectBase_OpponentInRaceOrRoamingConditional() {
+		sName = "Swap Places With Random Opponent";
+	}
+
+	void InitFunction() override {
+		auto playerRB =  GetLocalPlayerInterface<IRigidBody>();
+		auto playerPos = *playerRB->GetPosition();
+		auto playerOrient = *playerRB->GetOrientation();
+		auto playerVel = *playerRB->GetLinearVelocity();
+		auto playerAVel = *playerRB->GetAngularVelocity();
+
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		auto targetRB = cars[rand()%cars.size()]->mCOMObject->Find<IRigidBody>();
+		auto targetPos = *targetRB->GetPosition();
+		auto targetOrient = *targetRB->GetOrientation();
+		auto targetVel = *targetRB->GetLinearVelocity();
+		auto targetAVel = *targetRB->GetAngularVelocity();
+
+		playerRB->SetPosition(&targetPos);
+		playerRB->SetOrientation(&targetOrient);
+		playerRB->SetLinearVelocity(&targetVel);
+		playerRB->SetAngularVelocity(&targetAVel);
+		targetRB->SetPosition(&playerPos);
+		targetRB->SetOrientation(&playerOrient);
+		targetRB->SetLinearVelocity(&playerVel);
+		targetRB->SetAngularVelocity(&playerAVel);
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_SwapPlayerWithOpponent;

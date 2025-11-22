@@ -80,12 +80,13 @@ float* GetMaxHeat() {
 	return (float*)Attrib::Instance::GetAttributePointer(&race->mRaceBin->mBinRecord, Attrib::StringHash32("MaxOpenWorldHeat"), 0);
 }
 
-std::vector<IVehicle*> GetActiveVehicles() {
+std::vector<IVehicle*> GetActiveVehicles(int driverClass = -1) {
 	auto& list = VEHICLE_LIST::GetList(VEHICLE_ALL);
 	std::vector<IVehicle*> cars;
 	for (int i = 0; i < list.size(); i++) {
 		if (!list[i]->IsActive()) continue;
 		if (list[i]->IsLoading()) continue;
+		if (driverClass >= 0 && list[i]->GetDriverClass() != driverClass) continue;
 		cars.push_back(list[i]);
 	}
 	return cars;
