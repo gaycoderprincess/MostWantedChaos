@@ -234,7 +234,7 @@ public:
 
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
-			ply->Sabotage(5);
+			ply->Sabotage(3);
 		}
 	}
 } E_BlowEngine;

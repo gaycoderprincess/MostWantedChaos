@@ -163,6 +163,13 @@ void ChaosModMenu() {
 			ChloeMenuLib::EndMenu();
 		}
 
+		if (DrawMenuOption("Effect Debug")) {
+			ChloeMenuLib::BeginMenu();
+			QuickValueEditor("CarMagnetForce", CarMagnetForce);
+			QuickValueEditor("TankDrainRate", TankDrainRate);
+			ChloeMenuLib::EndMenu();
+		}
+
 		if (DrawMenuOption("Achievement Popup")) {
 			Achievements::AwardAchievement(GetAchievement("meow"));
 		}

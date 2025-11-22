@@ -33,6 +33,8 @@ public:
 	virtual bool IsRehideable() { return false; };
 	virtual bool AbortOnConditionFailed() { return false; };
 	virtual bool RunInMenus() { return false; }
+	virtual bool InfiniteTimer() { return false; }
+	virtual bool ShouldAbort() { return false; }
 };
 
 float fEffectX = 0.95;
@@ -172,10 +174,19 @@ public:
 		}
 
 		if (!inMenu) {
-			if (fTimer > 0 && fTimer - delta <= 0) {
+			if (pEffect->ShouldAbort()) {
+				if (!bAborted) {
+					pEffect->DeinitFunction();
+				}
+				bAborted = true;
+			}
+			else if (fTimer > 0 && fTimer - delta <= 0) {
 				pEffect->DeinitFunction();
 			}
-			fTimer -= delta;
+
+			if (!pEffect->InfiniteTimer()) {
+				fTimer -= delta;
+			}
 		}
 		if (IsActive()) {
 			pEffect->TickFunction(delta);
@@ -254,3 +265,4 @@ bool RunningEffectsCleanup() {
 #include "effects/physicseffects.h"
 #include "effects/spawneffects.h"
 #include "effects/effect_safehouse.h"
+#include "effects/effect_leaktank.h"

@@ -11,6 +11,7 @@ public:
 			part -= 4;
 		}
 		if (auto pCar = SpawnCarInWorld(car, &customization)) {
+			pCar->SetDriverClass(DRIVER_RACER);
 			if (auto rb = pCar->mCOMObject->Find<IRigidBody>()) {
 				auto pos = *rb->GetPosition();
 				UMath::Vector3 fwd;
