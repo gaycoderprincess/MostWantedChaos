@@ -931,27 +931,15 @@ public:
 	}
 
 	void InitFunction() override {
-		auto playerRB =  GetLocalPlayerInterface<IRigidBody>();
-		auto playerPos = *playerRB->GetPosition();
-		auto playerOrient = *playerRB->GetOrientation();
-		auto playerVel = *playerRB->GetLinearVelocity();
-		auto playerAVel = *playerRB->GetAngularVelocity();
-
 		auto cars = GetActiveVehicles(DRIVER_RACER);
-		auto targetRB = cars[rand()%cars.size()]->mCOMObject->Find<IRigidBody>();
-		auto targetPos = *targetRB->GetPosition();
-		auto targetOrient = *targetRB->GetOrientation();
-		auto targetVel = *targetRB->GetLinearVelocity();
-		auto targetAVel = *targetRB->GetAngularVelocity();
+		auto playerCar = GetLocalPlayerVehicle();
+		auto targetCar = cars[rand()%cars.size()];
 
-		playerRB->SetPosition(&targetPos);
-		playerRB->SetOrientation(&targetOrient);
-		playerRB->SetLinearVelocity(&targetVel);
-		playerRB->SetAngularVelocity(&targetAVel);
-		targetRB->SetPosition(&playerPos);
-		targetRB->SetOrientation(&playerOrient);
-		targetRB->SetLinearVelocity(&playerVel);
-		targetRB->SetAngularVelocity(&playerAVel);
+		CwoeeCarPhysicalState player(playerCar);
+		CwoeeCarPhysicalState target(targetCar);
+
+		player.Apply(targetCar);
+		target.Apply(playerCar);
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_SwapPlayerWithOpponent;
@@ -1012,3 +1000,33 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerNoBrakes;
+
+class Effect_PlayerLag : public ChaosEffect {
+public:
+	CwoeeCarPhysicalState lastState;
+	double timer = 0;
+
+	Effect_PlayerLag() : ChaosEffect() {
+		sName = "Connection Problem";
+		sFriendlyName = "Laggy Player";
+		fTimerLength = 30;
+	}
+
+	void InitFunction() override {
+		timer = 0;
+		lastState.Capture(GetLocalPlayerVehicle());
+	}
+	void TickFunction(double delta) override {
+		timer += delta;
+		if (timer > 1) {
+			if (rand() % 100 < 25) {
+				lastState.Apply(GetLocalPlayerVehicle());
+			}
+			else if (rand() % 100 < 50) {
+				lastState.Capture(GetLocalPlayerVehicle());
+			}
+			timer -= 1;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerLag;

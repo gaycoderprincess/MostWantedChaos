@@ -270,8 +270,7 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record) {
 	return nullptr;
 }
 
-IVehicle* SpawnCarInWorld(uint32_t hash, FECustomizationRecord* record) {
-	auto cache = ITrafficMgr::mInstance->mCOMObject->Find<IVehicleCache>();
+IVehicle* SpawnCarInWorld(uint32_t hash, FECustomizationRecord* record, IVehicleCache* cache = ITrafficMgr::mInstance->mCOMObject->Find<IVehicleCache>()) {
 	if (!cache) return nullptr;
 
 	auto pos = *GetLocalPlayerSimable()->GetPosition();
@@ -303,3 +302,28 @@ void DrawBottomBar(float progress, NyaDrawing::CNyaRGBA32 rgb) {
 	DrawRectangle(0, 1, 0.975, 1, {0, 0, 0, 255});
 	DrawRectangle(0, progress, 0.975, 1, rgb);
 }
+
+struct CwoeeCarPhysicalState {
+	UMath::Vector3 pos;
+	UMath::Vector4 orient;
+	UMath::Vector3 vel;
+	UMath::Vector3 avel;
+
+	CwoeeCarPhysicalState() {}
+	CwoeeCarPhysicalState(IVehicle* veh) { Capture(veh); }
+
+	void Capture(IVehicle* veh) {
+		auto rb = veh->mCOMObject->Find<IRigidBody>();
+		pos = *rb->GetPosition();
+		orient = *rb->GetOrientation();
+		vel = *rb->GetLinearVelocity();
+		avel = *rb->GetAngularVelocity();
+	}
+	void Apply(IVehicle* veh) {
+		auto rb = veh->mCOMObject->Find<IRigidBody>();
+		rb->SetPosition(&pos);
+		rb->SetOrientation(&orient);
+		rb->SetLinearVelocity(&vel);
+		rb->SetAngularVelocity(&avel);
+	}
+};

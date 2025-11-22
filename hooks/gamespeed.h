@@ -1,6 +1,6 @@
 float GameSpeedModifier = 1;
 
-inline auto OnManageTime = (float(__thiscall*)(Sim::ITimeManager*, float, float))0x6F4D10;
+auto OnManageTime = (float(__thiscall*)(Sim::ITimeManager*, float, float))0x6F4D10;
 float __thiscall OnManageTimeHooked(Sim::ITimeManager* pThis, float real_time_delta, float sim_speed) {
 	auto speed = OnManageTime(pThis, real_time_delta, sim_speed);
 	return speed * GameSpeedModifier;

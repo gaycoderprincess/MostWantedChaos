@@ -57,4 +57,23 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_SpeedFast;
+
+class Effect_InvisibleWorld : public ChaosEffect {
+public:
+	Effect_InvisibleWorld() : ChaosEffect() {
+		sName = "Invisible World";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(double delta) override {
+		NyaHookLib::Patch(0x723FA0, 0x530008C2);
+		NyaHookLib::Patch<uint8_t>(0x6DEF49, 0xEB); // FE
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x723FA0, 0x5314EC83);
+		NyaHookLib::Patch<uint8_t>(0x6DEF49, 0x74);
+	}
+	bool HasTimer() override { return true; }
+} E_InvisibleWorld;
+
 // todo change ColourBloomTint in visuallook for a rainbow world thing?

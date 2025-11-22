@@ -29,15 +29,15 @@ public:
 		fTimerLength = 60;
 	}
 
+	static uint32_t __thiscall DetermineHudFeaturesHooked(IHud* pThis, IPlayer* a2) {
+		return 0;
+	}
+
 	void TickFunction(double delta) override {
-		if (auto hud = GetLocalPlayer()->GetHud()) {
-			if (hud->IsHudVisible()) hud->FadeAll(true);
-		}
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, &DetermineHudFeaturesHooked);
 	}
 	void DeinitFunction() override {
-		if (auto hud = GetLocalPlayer()->GetHud()) {
-			hud->FadeAll(false);
-		}
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, 0x57CA60);
 	}
 	bool HasTimer() override { return true; }
 } E_NoHUD;

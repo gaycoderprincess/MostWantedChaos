@@ -15,12 +15,12 @@ class Effect_Flash : public ChaosEffect {
 public:
 	Effect_Flash() : ChaosEffect() {
 		sName = "Flashbang";
-		fTimerLength = 3;
+		fTimerLength = 4;
 	}
 
 	void TickFunction(double delta) override {
 		uint8_t alpha = 255;
-		if (EffectInstance->fTimer < 1) alpha = EffectInstance->fTimer * 255;
+		if (EffectInstance->fTimer < 2) alpha = (EffectInstance->fTimer * 0.5) * 255;
 		DrawRectangle(0, 1, 0, 1, {255,255,255,alpha});
 	}
 } E_Flash;
@@ -61,12 +61,45 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		DrawRectangle(0, 0.25, 0, 1, {0,0,0,255});
-		DrawRectangle(0.75, 1, 0, 1, {0,0,0,255});
+		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
+		if (EffectInstance->fTimer > fTimerLength - 1) {
+			fadeIn = fTimerLength - EffectInstance->fTimer;
+		}
+		DrawRectangle(0, std::lerp(0,0.33, fadeIn), 0, 1, {0,0,0,255});
+		DrawRectangle(std::lerp(1,0.66, fadeIn), 1, 0, 1, {0,0,0,255});
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_PortraitMode;
+
+class Effect_43Borders : public ChaosEffect {
+public:
+	Effect_43Borders() : ChaosEffect() {
+		sName = "4:3 Letterboxed";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto fLetterboxMultiplier = ((4.0 / 3.0) / GetAspectRatio()) * 0.5;
+		auto left = 0.5 - fLetterboxMultiplier;
+		auto right = 0.5 + fLetterboxMultiplier;
+
+		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
+		if (EffectInstance->fTimer > fTimerLength - 1) {
+			fadeIn = fTimerLength - EffectInstance->fTimer;
+		}
+
+		DrawRectangle(0, std::lerp(0,left, fadeIn), 0, 1, {0,0,0,255});
+		DrawRectangle(std::lerp(1,right, fadeIn), 1, 0, 1, {0,0,0,255});
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		return (((4.0 / 3.0) / GetAspectRatio()) * 0.5) < 0.99;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_43Borders;
 
 class Effect_WidescreenMode : public ChaosEffect {
 public:
@@ -76,8 +109,12 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		DrawRectangle(0, 1, 0, 0.1, {0,0,0,255});
-		DrawRectangle(0, 1, 0.9, 1, {0,0,0,255});
+		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
+		if (EffectInstance->fTimer > fTimerLength - 1) {
+			fadeIn = fTimerLength - EffectInstance->fTimer;
+		}
+		DrawRectangle(0, 1, 0, std::lerp(0,0.1, fadeIn), {0,0,0,255});
+		DrawRectangle(0, 1, std::lerp(1,0.9, fadeIn), 1, {0,0,0,255});
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
@@ -143,3 +180,51 @@ public:
 		sName = "Nothing Happens";
 	}
 } E_Nothing;
+
+class Effect_BlockyCover : public ChaosEffect {
+public:
+	Effect_BlockyCover() : ChaosEffect() {
+		sName = "Chess Board";
+		sFriendlyName = "Chess Board Screen Overlay";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(double delta) override {
+		for (int x = 0; x < 16; x++) {
+			for (int y = 0; y < 16; y++) {
+				float size = 1.0 / 16.0;
+				if (y % 2 == 0 && (x % 2 == 0)) continue;
+				if (y % 2 != 0 && (x % 2 != 0)) continue;
+				//if (y % 2 == 0) continue;
+				DrawRectangle(x * size, (x + 1) * size, y * size, (y + 1) * size, {0,0,0,255});
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_BlockyCover;
+
+class Effect_BlockyCoverMissing : public ChaosEffect {
+public:
+	Effect_BlockyCoverMissing() : ChaosEffect() {
+		sName = "Missing Texture";
+		sFriendlyName = "Missing Texture Screen Overlay";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		for (int x = 0; x < 16; x++) {
+			for (int y = 0; y < 16; y++) {
+				float size = 1.0 / 16.0;
+				if ((y % 2 == 0 && (x % 2 == 0)) || (y % 2 != 0 && (x % 2 != 0))){
+					DrawRectangle(x * size, (x + 1) * size, y * size, (y + 1) * size, {255,0,255,64});
+				}
+				else {
+					DrawRectangle(x * size, (x + 1) * size, y * size, (y + 1) * size, {0,0,0,64});
+				}
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_BlockyCoverMissing;
