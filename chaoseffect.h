@@ -210,5 +210,4 @@ bool RunningEffectsCleanup() {
 #include "effects/carmodeleffects.h"
 #include "effects/physicseffects.h"
 #include "effects/spawneffects.h"
-#include "effects/effect_wreckonflip.h"
 #include "effects/effect_safehouse.h"
