@@ -118,6 +118,7 @@ class Effect_PlayerCarRandomTuning : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarRandomTuning() : EffectBase_TriggerInMenu() {
 		sName = "Randomize Active Car's Visuals";
+		fUnhideTime = 0;
 	}
 
 	void InitFunction() override {

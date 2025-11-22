@@ -139,4 +139,5 @@ public:
 		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;
 	}
 	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_DisableBarriers;

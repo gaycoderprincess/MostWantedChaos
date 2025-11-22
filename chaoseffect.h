@@ -4,9 +4,11 @@ public:
 	const char* sName;
 	const char* sFriendlyName = nullptr;
 	double fTimerLength = 30;
+	double fUnhideTime = 3;
+	uint32_t IncompatibilityGroup = 0;
+
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;
-	uint32_t IncompatibilityGroup = 0;
 	ChaosEffectInstance* EffectInstance;
 
 	static inline std::vector<ChaosEffect*> aEffects;
@@ -48,6 +50,7 @@ public:
 
 	ChaosEffectInstance(ChaosEffect* effect) : pEffect(effect) {
 		fTimer = pEffect->fTimerLength;
+		fTimeConditionMet = pEffect->fUnhideTime;
 	}
 
 	bool IsActive() const {
@@ -112,7 +115,7 @@ public:
 		if (bFirstFrame && pEffect->IsConditionallyAvailable()) {
 			if (pEffect->IsAvailable()) {
 				fTimeConditionMet += delta;
-				if (fTimeConditionMet < 3) {
+				if (fTimeConditionMet < pEffect->fUnhideTime) {
 					return;
 				}
 			}

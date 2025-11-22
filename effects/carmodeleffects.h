@@ -121,19 +121,20 @@ public:
 	bool HasTimer() override { return true; }
 } E_AllTrafficTruck;*/
 
-class Effect_PlayerCarTrafPizza : public EffectBase_TriggerInMenu {
+class Effect_PlayerCarCopCorvette : public EffectBase_TriggerInMenu {
 public:
-	Effect_PlayerCarTrafPizza() : EffectBase_TriggerInMenu() {
-		sName = "Spawn As TRAFPIZZA";
+	Effect_PlayerCarCopCorvette() : EffectBase_TriggerInMenu() {
+		sName = "Spawn As Cop Corvette";
 		fTimerLength = 120;
+		fUnhideTime = 0;
 		IncompatibilityGroup = Attrib::StringHash32("player_car_model");
 	}
 
 	void TickFunction(double delta) override {
-		ForcedPlayerVehicle = Attrib::StringHash32("cs_clio_trafpizza");
+		ForcedPlayerVehicle = Attrib::StringHash32("cs_c6_copsporthench");
 	}
 	void DeinitFunction() override {
 		ForcedPlayerVehicle = 0;
 	}
 	bool HasTimer() override { return true; }
-} E_PlayerCarTrafPizza;
+} E_PlayerCarCopCorvette;

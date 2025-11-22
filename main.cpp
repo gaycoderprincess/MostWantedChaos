@@ -66,7 +66,7 @@ void ChaosLoop() {
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime;
 		DrawRectangle(0, 1, 0, 0.025, {0, 0, 0, 255});
-		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.025, {0, 200, 200, 255});
+		DrawRectangle(0, fTimeSinceLastEffect / fEffectCycleTimer, 0, 0.025, {219,100,193, 255});
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
@@ -94,6 +94,18 @@ void ChaosModMenu() {
 	if (DrawMenuOption("Add Effect")) {
 		ChloeMenuLib::BeginMenu();
 		for (auto& effect : ChaosEffect::aEffects) {
+			if (DrawMenuOption(effect->GetFriendlyName())) {
+				AddRunningEffect(effect);
+			}
+		}
+		ChloeMenuLib::EndMenu();
+	}
+
+	if (DrawMenuOption("Hideable Effects")) {
+		ChloeMenuLib::BeginMenu();
+		for (auto& effect : ChaosEffect::aEffects) {
+			if (!effect->IsConditionallyAvailable()) continue;
+			if (effect->AbortOnConditionFailed()) continue;
 			if (DrawMenuOption(effect->GetFriendlyName())) {
 				AddRunningEffect(effect);
 			}

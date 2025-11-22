@@ -30,6 +30,7 @@ public:
 		if (!engine) return;
 		engine->Sabotage(1);
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_BlowEngineOpponents1;
 
 class Effect_LaunchCarFwdOpponents : public EffectBase_OpponentInRaceConditional {
@@ -124,6 +125,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_SpinningOpponents;
 
 class Effect_RubberbandOpponents : public EffectBase_OpponentInRaceConditional {
@@ -232,6 +234,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_SetOpponentMass0;
 
 class Effect_SetOpponentPittable : public EffectBase_OpponentInRaceConditional {
@@ -262,4 +265,5 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_SetOpponentPittable;
