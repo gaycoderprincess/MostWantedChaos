@@ -137,6 +137,12 @@ public:
 		if (!career) return;
 		career->TheImpoundData.mTimesBusted++;
 	}
+	bool IsAvailable() override {
+		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
+		return true;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundStrike;
 
 class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
@@ -153,6 +159,8 @@ public:
 		career->TheImpoundData.mTimesBusted++;
 	}
 	bool IsAvailable() override {
+		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
+
 		auto car = GetCurrentCareerCar();
 		if (!car) return false;
 		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
@@ -176,6 +184,12 @@ public:
 		if (!career) return;
 		career->TheImpoundData.mMaxBusted++;
 	}
+	bool IsAvailable() override {
+		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
+		return true;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundMarker;
 
 class Effect_AddRandomTuningMarker : public ChaosEffect {

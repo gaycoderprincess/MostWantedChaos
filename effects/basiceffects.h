@@ -90,8 +90,10 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		if (rand() % 100 > 5) {
+		if (rand() % 100 < 5) {
 			Sleep(100);
 		}
 	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_Lag;

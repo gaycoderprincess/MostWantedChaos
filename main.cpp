@@ -35,10 +35,33 @@ void MainLoop() {
 #include "hooks/vehicleconstruct.h"
 #include "chaoseffect.h"
 
+void MoneyChecker() {
+	static ChaosEffect TempEffect;
+	TempEffect.DebugNeverPick = true;
+	if (!TempEffect.sName) TempEffect.sName = "(DEBUG) MONEY CHANGE";
+
+	static int cash = 0;
+	if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+		cash = FEDatabase->mUserProfile->TheCareerSettings.CurrentCash;
+	}
+	else if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
+		int currentCash = FEDatabase->mUserProfile->TheCareerSettings.CurrentCash;
+		if (cash != currentCash) {
+			static std::string name;
+			name = std::format("Money changed (${} -> ${})", cash, currentCash);
+			TempEffect.sName = name.c_str();
+			AddRunningEffect(&TempEffect);
+			cash = currentCash;
+		}
+	}
+}
+
 bool bTimerEnabled = true;
 float fEffectCycleTimer = 30;
 double fTimeSinceLastEffect = 0;
 void ChaosLoop() {
+	MoneyChecker();
+
 	for (auto& func : aDrawingLoopFunctions) {
 		func();
 	}

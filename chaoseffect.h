@@ -6,6 +6,7 @@ public:
 	double fTimerLength = 30;
 	double fUnhideTime = 3;
 	uint32_t IncompatibilityGroup = 0;
+	bool DebugNeverPick = false;
 
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;
@@ -211,6 +212,7 @@ bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup) {
 ChaosEffect* GetRandomEffect() {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
+		if (effect->DebugNeverPick) continue;
 		if (effect->bTriggeredThisCycle) continue;
 		if (IsEffectRunning(effect)) continue;
 		if (IsEffectRunningFromGroup(effect->IncompatibilityGroup)) continue;
