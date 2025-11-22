@@ -773,3 +773,43 @@ public:
 		ChangePlayerCarInWorld(car->VehicleKey, &customization);
 	}
 } E_SetCarRandom;
+
+class Effect_SetCarMassInf : public ChaosEffect {
+public:
+	Effect_SetCarMassInf() : ChaosEffect() {
+		sName = "Infinite Player Mass";
+		fTimerLength = 90;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
+			ply->SetCollisionMass(10000);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
+			ply->SetCollisionMass(GetLocalPlayerInterface<IRigidBody>()->GetMass());
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SetCarMassInf;
+
+class Effect_SetCarMass0 : public ChaosEffect {
+public:
+	Effect_SetCarMass0() : ChaosEffect() {
+		sName = "Zero Player Mass";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
+			ply->SetCollisionMass(0);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
+			ply->SetCollisionMass(GetLocalPlayerInterface<IRigidBody>()->GetMass());
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SetCarMass0;

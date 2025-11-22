@@ -27,6 +27,7 @@ void MainLoop() {
 #include "util.h"
 #include "hooks/fixes.h"
 #include "hooks/noreset.h"
+#include "hooks/gamespeed.h"
 #include "hooks/vehicleconstruct.h"
 #include "chaoseffect.h"
 
@@ -138,6 +139,9 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
 			DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
 			DrawMenuOption(std::format("Player Car: {}", FEDatabase->mUserProfile->TheCareerSettings.CurrentCar));
+			DrawMenuOption(std::format("Sim Timestep: {:.2f}", Sim::Internal::mSystem->mTimeStep));
+			DrawMenuOption(std::format("Sim Speed: {:.2f}", Sim::Internal::mSystem->mSpeed));
+			DrawMenuOption(std::format("Sim Target Speed: {:.2f}", Sim::Internal::mSystem->mTargetSpeed));
 			//DrawMenuOption(std::format("Race Context: {}", (int)GRaceStatus::fObj->mRaceContext));
 		}
 		else {

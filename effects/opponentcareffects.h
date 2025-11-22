@@ -1,6 +1,6 @@
-class Effect_BlowEngineOpponents : public EffectBase_OpponentConditional {
+class Effect_BlowEngineOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_BlowEngineOpponents() : EffectBase_OpponentConditional() {
+	Effect_BlowEngineOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Blow Opponents' Engines";
 	}
 
@@ -16,9 +16,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_BlowEngineOpponents;
 
-class Effect_BlowEngineOpponents1 : public EffectBase_OpponentConditional {
+class Effect_BlowEngineOpponents1 : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_BlowEngineOpponents1() : EffectBase_OpponentConditional() {
+	Effect_BlowEngineOpponents1() : EffectBase_OpponentInRaceConditional() {
 		sName = "Blow One Opponent's Engine";
 	}
 
@@ -32,9 +32,9 @@ public:
 	}
 } E_BlowEngineOpponents1;
 
-class Effect_LaunchCarFwdOpponents : public EffectBase_OpponentConditional {
+class Effect_LaunchCarFwdOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarFwdOpponents() : EffectBase_OpponentConditional() {
+	Effect_LaunchCarFwdOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Launch Opponents Forward";
 	}
 
@@ -48,9 +48,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarFwdOpponents;
 
-class Effect_LaunchCarBwdOpponents : public EffectBase_OpponentConditional {
+class Effect_LaunchCarBwdOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarBwdOpponents() : EffectBase_OpponentConditional() {
+	Effect_LaunchCarBwdOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Launch Opponents Backwards";
 	}
 
@@ -64,9 +64,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarBwdOpponents;
 
-class Effect_LaunchCarSideOpponents : public EffectBase_OpponentConditional {
+class Effect_LaunchCarSideOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarSideOpponents() : EffectBase_OpponentConditional() {
+	Effect_LaunchCarSideOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Launch Opponents Sideways";
 	}
 
@@ -86,9 +86,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarSideOpponents;
 
-class Effect_LaunchCarUpOpponents : public EffectBase_OpponentConditional {
+class Effect_LaunchCarUpOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarUpOpponents() : EffectBase_OpponentConditional() {
+	Effect_LaunchCarUpOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Launch Opponents Up";
 	}
 
@@ -106,9 +106,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarUpOpponents;
 
-class Effect_SpinningOpponents : public EffectBase_OpponentConditional {
+class Effect_SpinningOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_SpinningOpponents() : EffectBase_OpponentConditional() {
+	Effect_SpinningOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Spinning Opponents";
 		fTimerLength = 30;
 	}
@@ -126,9 +126,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_SpinningOpponents;
 
-class Effect_RubberbandOpponents : public EffectBase_OpponentConditional {
+class Effect_RubberbandOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_RubberbandOpponents() : EffectBase_OpponentConditional() {
+	Effect_RubberbandOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "FUCKING RUBBERBAND";
 		fTimerLength = 45;
 		IncompatibilityGroup = Attrib::StringHash32("rubberband");
@@ -148,9 +148,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_RubberbandOpponents;
 
-class Effect_NoRubberbandOpponents : public EffectBase_OpponentConditional {
+class Effect_NoRubberbandOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_NoRubberbandOpponents() : EffectBase_OpponentConditional() {
+	Effect_NoRubberbandOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Disable Rubberbanding";
 		fTimerLength = 90;
 		IncompatibilityGroup = Attrib::StringHash32("rubberband");
@@ -169,9 +169,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_NoRubberbandOpponents;
 
-class Effect_SpikeAllOpponents : public EffectBase_OpponentConditional {
+class Effect_SpikeAllOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_SpikeAllOpponents() : EffectBase_OpponentConditional() {
+	Effect_SpikeAllOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "Puncture Opponents' Tires";
 	}
 
@@ -205,3 +205,61 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_SendOffAllOpponents;*/
+
+class Effect_SetOpponentMass0 : public EffectBase_OpponentInRaceConditional {
+public:
+	Effect_SetOpponentMass0() : EffectBase_OpponentInRaceConditional() {
+		sName = "Zero Opponent Mass";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				ply->SetCollisionMass(0);
+			}
+		}
+	}
+	void DeinitFunction() override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				ply->SetCollisionMass(car->mCOMObject->Find<IRigidBody>()->GetMass());
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SetOpponentMass0;
+
+class Effect_SetOpponentPittable : public EffectBase_OpponentInRaceConditional {
+public:
+	Effect_SetOpponentPittable() : EffectBase_OpponentInRaceConditional() {
+		sName = "Pittable Opponents";
+		fTimerLength = 90;
+	}
+
+	void TickFunction(double delta) override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				auto inst = Attrib::Instance(Attrib::FindCollection(Attrib::StringHash32("collisionreactions"), Attrib::StringHash32("cops")), 0, nullptr);
+				ply->SetPlayerReactions(&inst);
+			}
+		}
+	}
+	void DeinitFunction() override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				auto inst = Attrib::Instance(Attrib::FindCollection(Attrib::StringHash32("collisionreactions"), Attrib::StringHash32("racing")), 0, nullptr);
+				ply->SetPlayerReactions(&inst);
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SetOpponentPittable;

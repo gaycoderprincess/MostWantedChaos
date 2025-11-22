@@ -57,6 +57,7 @@ public:
 			pursuit->NotifyPropertyDamaged(100000);
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_ClearCostToState;
 
 class Effect_AddCostToState : public EffectBase_PursuitConditional {
@@ -144,3 +145,31 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_NoHidingSpots;
+
+class Effect_SetCopMassInf : public EffectBase_PursuitConditional {
+public:
+	Effect_SetCopMassInf() : EffectBase_PursuitConditional() {
+		sName = "Infinite Police Mass";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				ply->SetCollisionMass(10000);
+			}
+		}
+	}
+	void DeinitFunction() override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				ply->SetCollisionMass(car->mCOMObject->Find<IRigidBody>()->GetMass());
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SetCopMassInf;

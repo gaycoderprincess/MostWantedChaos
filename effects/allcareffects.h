@@ -231,3 +231,31 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_CarFloaty;
+
+class Effect_SetTrafficMassInf : public EffectBase_ActiveCarsConditional {
+public:
+	Effect_SetTrafficMassInf() : EffectBase_ActiveCarsConditional() {
+		sName = "Infinite Traffic Mass";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				ply->SetCollisionMass(10000);
+			}
+		}
+	}
+	void DeinitFunction() override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
+				ply->SetCollisionMass(car->mCOMObject->Find<IRigidBody>()->GetMass());
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SetTrafficMassInf;

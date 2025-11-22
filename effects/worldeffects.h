@@ -24,3 +24,33 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_NoTraffic;
+
+class Effect_SpeedSlow : public ChaosEffect {
+public:
+	Effect_SpeedSlow() : ChaosEffect() {
+		sName = "Slow Motion";
+	}
+
+	void TickFunction(double delta) override {
+		GameSpeedModifier = 0.5;
+	}
+	void DeinitFunction() override {
+		GameSpeedModifier = 1.0;
+	}
+	bool HasTimer() override { return true; }
+} E_SpeedSlow;
+
+class Effect_SpeedFast : public ChaosEffect {
+public:
+	Effect_SpeedFast() : ChaosEffect() {
+		sName = "Fast Motion";
+	}
+
+	void TickFunction(double delta) override {
+		GameSpeedModifier = 2;
+	}
+	void DeinitFunction() override {
+		GameSpeedModifier = 1.0;
+	}
+	bool HasTimer() override { return true; }
+} E_SpeedFast;
