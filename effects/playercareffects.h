@@ -720,12 +720,17 @@ public:
 	Effect_PlayerCarGearR() : ChaosEffect() {
 		sName = "Force Player To Reverse Gear";
 		fTimerLength = 15;
+		IncompatibilityGroup = Attrib::StringHash32("transmission");
 	}
 
 	void TickFunction(double delta) override {
+		ForceManualGearbox = true;
 		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
 			if (ply->GetGear() != G_REVERSE) ply->Shift(G_REVERSE);
 		}
+	}
+	void DeinitFunction() override {
+		ForceManualGearbox = false;
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarGearR;
@@ -825,3 +830,43 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_SetCarMass0;
+
+class Effect_Piggyback : public EffectBase_ActiveCarsConditional {
+public:
+	Effect_Piggyback() : EffectBase_ActiveCarsConditional() {
+		sName = "Piggyback Ride";
+		sFriendlyName = "Place Player Onto Closest Car";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto target = GetClosestActiveVehicle(GetLocalPlayerVehicle())) {
+			auto playerPos = *GetLocalPlayerVehicle()->GetPosition();
+			auto targetPos = *target->GetPosition();
+			playerPos.x = targetPos.x;
+			playerPos.z = targetPos.z;
+			if (playerPos.y < targetPos.y) playerPos.y = targetPos.y + 3;
+			GetLocalPlayerInterface<IRigidBody>()->SetPosition(&playerPos);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
+} E_Piggyback;
+
+class Effect_LockPlayer : public ChaosEffect {
+public:
+	UMath::Vector3 position;
+
+	Effect_LockPlayer() : ChaosEffect() {
+		sName = "Lock Player In Place";
+		fTimerLength = 10;
+	}
+
+	void InitFunction() override {
+		position = *GetLocalPlayerSimable()->GetPosition();
+	}
+	void TickFunction(double delta) override {
+		GetLocalPlayerInterface<IRigidBody>()->SetPosition(&position);
+	}
+	bool HasTimer() override { return true; }
+} E_LockPlayer;

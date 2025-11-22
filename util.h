@@ -99,6 +99,22 @@ bool IsVehicleValidAndActive(IVehicle* vehicle) {
 	return false;
 }
 
+IVehicle* GetClosestActiveVehicle(IVehicle* toVehicle) {
+	auto sourcePos = *(NyaVec3*)toVehicle->GetPosition();
+	IVehicle* out = nullptr;
+	float distance = 99999;
+	auto cars = GetActiveVehicles();
+	for (auto& car : cars) {
+		if (car == toVehicle) continue;
+		auto targetPos = *(NyaVec3*)car->GetPosition();
+		if ((sourcePos - targetPos).length() < distance) {
+			out = car;
+			distance = (sourcePos - targetPos).length();
+		}
+	}
+	return out;
+}
+
 class ChloeHook {
 public:
 	static inline std::vector<void(*)()> aHooks;
