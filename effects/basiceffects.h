@@ -87,6 +87,7 @@ class Effect_Lag : public ChaosEffect {
 public:
 	Effect_Lag() : ChaosEffect() {
 		sName = "Real Frame Drops";
+		fTimerLength = 15;
 	}
 
 	void TickFunction(double delta) override {
