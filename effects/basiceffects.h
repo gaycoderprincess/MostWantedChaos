@@ -29,6 +29,7 @@ class Effect_Dark : public ChaosEffect {
 public:
 	Effect_Dark() : ChaosEffect() {
 		sName = "Darken Screen";
+		fTimerLength = 30;
 	}
 
 	void TickFunction(double delta) override {
@@ -42,6 +43,7 @@ class Effect_Bright : public ChaosEffect {
 public:
 	Effect_Bright() : ChaosEffect() {
 		sName = "Brighten Screen";
+		fTimerLength = 30;
 	}
 
 	void TickFunction(double delta) override {
@@ -55,6 +57,7 @@ class Effect_PortraitMode : public ChaosEffect {
 public:
 	Effect_PortraitMode() : ChaosEffect() {
 		sName = "Portrait Mode";
+		fTimerLength = 30;
 	}
 
 	void TickFunction(double delta) override {
@@ -125,7 +128,7 @@ public:
 		chanceFired = false;
 	}
 	void TickFunction(double delta) override {
-		if (!chanceFired && EffectInstance->fTimer < 27) {
+		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
 			if (rand() % 100 < 10) {
 				__debugbreak();
 			}

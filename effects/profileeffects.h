@@ -35,6 +35,28 @@ public:
 	bool HasTimer() override { return true; }
 } E_NoAutosave;
 
+class Effect_NoVisualTreatment : public ChaosEffect {
+public:
+	Effect_NoVisualTreatment() : ChaosEffect() {
+		sName = "Disable Visual Treatment";
+		fTimerLength = 60;
+	}
+
+	void InitFunction() override {
+		g_VisualTreatment = false;
+	}
+	void DeinitFunction() override {
+		g_VisualTreatment = true;
+	}
+	bool IsAvailable() override {
+		return g_VisualTreatment;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool HasTimer() override { return true; }
+} E_NoVisualTreatment;
+
+
 class Effect_Millionaire : public ChaosEffect {
 public:
 	Effect_Millionaire() : ChaosEffect() {

@@ -123,6 +123,7 @@ public:
 	Effect_InfGameBreaker() : ChaosEffect() {
 		sName = "Infinite Speedbreaker";
 		IncompatibilityGroup = Attrib::StringHash32("speedbreaker");
+		fTimerLength = 60;
 	}
 
 	void TickFunction(double delta) override {
@@ -138,6 +139,7 @@ public:
 	Effect_InfNitro() : EffectBase_PlayerCarHasNitro() {
 		sName = "Infinite Nitro";
 		IncompatibilityGroup = Attrib::StringHash32("nitro");
+		fTimerLength = 60;
 	}
 
 	void TickFunction(double delta) override {
@@ -169,6 +171,7 @@ class Effect_NoNitro : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_NoNitro() : EffectBase_PlayerCarHasNitro() {
 		sName = "Disable Nitro";
+		fTimerLength = 60;
 		IncompatibilityGroup = Attrib::StringHash32("nitro");
 	}
 
@@ -273,6 +276,7 @@ public:
 	Effect_AutoDrive() : ChaosEffect() {
 		sName = "Auto-Drive";
 		IncompatibilityGroup = Attrib::StringHash32("autodrive");
+		fTimerLength = 30;
 	}
 
 	void TickFunction(double delta) override {
@@ -667,6 +671,7 @@ class Effect_CarMagnet : public ChaosEffect {
 public:
 	Effect_CarMagnet() : ChaosEffect() {
 		sName = "Player Car Magnet";
+		fTimerLength = 30;
 	}
 
 	void TickFunction(double delta) override {
@@ -788,9 +793,9 @@ public:
 	}
 } E_SetCarTRAFPIZZA;
 
-class Effect_SetCarRazor : public ChaosEffect {
+class Effect_SetCarRazor : public EffectBase_SafelyChangePlayerCar {
 public:
-	Effect_SetCarRazor() : ChaosEffect() {
+	Effect_SetCarRazor() : EffectBase_SafelyChangePlayerCar() {
 		sName = "Change Car To Razor's Mustang";
 	}
 
@@ -800,9 +805,9 @@ public:
 	}
 } E_SetCarRazor;
 
-class Effect_SetCarRandom : public ChaosEffect {
+class Effect_SetCarRandom : public EffectBase_SafelyChangePlayerCar {
 public:
-	Effect_SetCarRandom() : ChaosEffect() {
+	Effect_SetCarRandom() : EffectBase_SafelyChangePlayerCar() {
 		sName = "Change Car To Random Model";
 	}
 
@@ -991,3 +996,19 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 } E_PlayerResetTransform;
+
+class Effect_PlayerNoBrakes : public ChaosEffect {
+public:
+	Effect_PlayerNoBrakes() : ChaosEffect() {
+		sName = "They Just Slow Us Down";
+		sFriendlyName = "Disable Player Brakes";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			ply->SetControlBrake(0);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerNoBrakes;

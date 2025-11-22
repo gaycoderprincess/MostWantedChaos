@@ -195,6 +195,18 @@ void ChaosModMenu() {
 			ChloeMenuLib::EndMenu();
 		}
 
+		if (DrawMenuOption("15 sec Effects")) {
+			ChloeMenuLib::BeginMenu();
+			for (auto& effect : ChaosEffect::aEffects) {
+				if (effect->fTimerLength != 15) continue;
+				if (!effect->HasTimer()) continue;
+				if (DrawMenuOption(effect->GetFriendlyName())) {
+					AddRunningEffect(effect);
+				}
+			}
+			ChloeMenuLib::EndMenu();
+		}
+
 		if (DrawMenuOption("30 sec Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
@@ -221,7 +233,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Unmarked Variable Timer Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
-				if (effect->fTimerLength == 30) continue;
+				if (effect->fTimerLength == 15) continue;
 				if (effect->HasTimer()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
 					AddRunningEffect(effect);

@@ -13,6 +13,7 @@ class Effect_NoTraffic : public ChaosEffect {
 public:
 	Effect_NoTraffic() : ChaosEffect() {
 		sName = "Disable Traffic";
+		fTimerLength = 60;
 	}
 
 	void TickFunction(double delta) override {
@@ -29,6 +30,7 @@ class Effect_SpeedSlow : public ChaosEffect {
 public:
 	Effect_SpeedSlow() : ChaosEffect() {
 		sName = "Slow Motion";
+		fTimerLength = 30;
 	}
 
 	void TickFunction(double delta) override {
@@ -44,6 +46,7 @@ class Effect_SpeedFast : public ChaosEffect {
 public:
 	Effect_SpeedFast() : ChaosEffect() {
 		sName = "Fast Motion";
+		fTimerLength = 30;
 	}
 
 	void TickFunction(double delta) override {
@@ -54,5 +57,4 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_SpeedFast;
-
 // todo change ColourBloomTint in visuallook for a rainbow world thing?

@@ -3,7 +3,7 @@ class ChaosEffect {
 public:
 	const char* sName;
 	const char* sFriendlyName = nullptr;
-	double fTimerLength = 30;
+	double fTimerLength = 15;
 	double fUnhideTime = 3;
 	uint32_t IncompatibilityGroup = 0;
 	bool DebugNeverPick = false;
