@@ -10,8 +10,10 @@
 
 #include "include/chloemenulib.h"
 
-std::vector<void(*)()> aMainLoopFunctionsOnce;
 std::vector<void(*)()> aMainLoopFunctions;
+std::vector<void(*)()> aMainLoopFunctionsOnce;
+std::vector<void(*)()> aDrawingLoopFunctions;
+std::vector<void(*)()> aDrawingLoopFunctionsOnce;
 void MainLoop() {
 	for (auto& func : aMainLoopFunctions) {
 		func();
@@ -25,6 +27,7 @@ void MainLoop() {
 
 #include "d3dhook.h"
 #include "util.h"
+#include "achievements.h"
 #include "hooks/fixes.h"
 #include "hooks/noreset.h"
 #include "hooks/gamespeed.h"
@@ -36,6 +39,15 @@ bool bTimerEnabled = true;
 float fEffectCycleTimer = 30;
 double fTimeSinceLastEffect = 0;
 void ChaosLoop() {
+	for (auto& func : aDrawingLoopFunctions) {
+		func();
+	}
+
+	for (auto& func : aDrawingLoopFunctionsOnce) {
+		func();
+	}
+	aDrawingLoopFunctionsOnce.clear();
+
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
@@ -123,6 +135,10 @@ void ChaosModMenu() {
 				DrawMenuOption("Local player not found");
 			}
 			ChloeMenuLib::EndMenu();
+		}
+
+		if (DrawMenuOption("Achievement Popup")) {
+			Achievements::AwardAchievement(GetAchievement("meow"));
 		}
 
 		if (DrawMenuOption("Add Effect")) {

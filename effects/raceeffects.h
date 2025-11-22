@@ -103,6 +103,7 @@ public:
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
 	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_Add3Laps;
 
 class Effect_RestartRace : public ChaosEffect {
