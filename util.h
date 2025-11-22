@@ -327,3 +327,8 @@ struct CwoeeCarPhysicalState {
 		rb->SetAngularVelocity(&avel);
 	}
 };
+
+void TeleportPlayer(UMath::Vector3 pos, UMath::Vector3 fwd) {
+	Sim::SetStream(&pos, true);
+	GetLocalPlayerVehicle()->SetVehicleOnGround(&pos, &fwd);
+}

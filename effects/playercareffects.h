@@ -996,10 +996,27 @@ public:
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			ply->SetControlBrake(0);
+			ply->SetControlHandBrake(0);
 		}
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerNoBrakes;
+
+class Effect_PlayerNoSteering : public ChaosEffect {
+public:
+	Effect_PlayerNoSteering() : ChaosEffect() {
+		sName = "Broken Steering Wheel";
+		sFriendlyName = "Disable Player Steering";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			ply->SetControlSteering(0);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerNoSteering;
 
 class Effect_PlayerLag : public ChaosEffect {
 public:
@@ -1030,3 +1047,14 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerLag;
+
+class Effect_PlayerTPHidingSpot : public ChaosEffect {
+public:
+	Effect_PlayerTPHidingSpot() : ChaosEffect() {
+		sName = "Teleport To Perfect Hiding Spot";
+	}
+
+	void InitFunction() override {
+		TeleportPlayer({-2200.7, 144.6, 1458.7}, {-0.14, 0.0, 0.99});
+	}
+} E_PlayerTPHidingSpot;

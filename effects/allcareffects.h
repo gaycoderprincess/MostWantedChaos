@@ -356,3 +356,55 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_FreezeEveryone;
+
+class Effect_SnakeCars : public EffectBase_ActiveCarsConditional {
+public:
+	std::vector<CwoeeCarPhysicalState> lastStates;
+	double timer = 0;
+
+	Effect_SnakeCars() : EffectBase_ActiveCarsConditional() {
+		sName = "Snake";
+		sFriendlyName = "All Other Cars Follow Player";
+		fTimerLength = 30;
+	}
+
+	void ApplyAllCars() {
+		if (lastStates.empty()) return;
+
+		auto cars = GetActiveVehicles();
+		int count = 0;
+		for (auto& car : cars) {
+			if (car == GetLocalPlayerVehicle()) continue;
+
+			if (auto col = car->mCOMObject->Find<IRBVehicle>()) {
+				col->EnableObjectCollisions(false);
+			}
+			int i = lastStates.size() - 1 - count++;
+			lastStates[i].Apply(car);
+			if (i < 0) break;
+		}
+	}
+
+	void InitFunction() override {
+		timer = 0;
+		lastStates.clear();
+	}
+	void TickFunction(double delta) override {
+		timer += delta;
+		if (timer > 0.25) {
+			lastStates.push_back(CwoeeCarPhysicalState(GetLocalPlayerVehicle()));
+			timer -= 0.25;
+		}
+		ApplyAllCars();
+	}
+	void DeinitFunction() override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car == GetLocalPlayerVehicle()) continue;
+			if (auto col = car->mCOMObject->Find<IRBVehicle>()) {
+				col->EnableObjectCollisions(true);
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SnakeCars;
