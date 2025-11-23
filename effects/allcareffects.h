@@ -355,6 +355,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
 } E_FreezeEveryone;
 
 class Effect_SnakeCars : public EffectBase_ActiveCarsConditional {

@@ -177,4 +177,39 @@ public:
 	bool IsRehideable() override { return true; };
 } E_SetCopMassInf;
 
+class Effect_GetBusted : public EffectBase_PursuitConditional {
+public:
+	Effect_GetBusted() : EffectBase_PursuitConditional() {
+		sName = "Get Busted";
+	}
+
+	void TickFunction(double delta) override {
+		static float f = -999.0;
+		NyaHookLib::Patch(0x4445CC + 2, &f);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x4445CC + 2, 0x890DA4);
+	}
+	bool ShouldAbort() override {
+		if (auto ply = GetLocalPlayerInterface<IPursuit>()) {
+			return ply->IsPerpBusted();
+		}
+		return false;
+	}
+} E_GetBusted;
+
+/*class Effect_EnterCooldown : public EffectBase_PursuitConditional {
+public:
+	Effect_EnterCooldown() : EffectBase_PursuitConditional() {
+		sName = "Enter Pursuit Cooldown";
+	}
+
+	void TickFunction(double delta) override {
+		NyaHookLib::Patch<uint64_t>(0x4448EF, 0x44D9909090909090);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint64_t>(0x4448EF, 0x44D90000012A850F);
+	}
+} E_EnterCooldown;*/
+
 // todo police jenga

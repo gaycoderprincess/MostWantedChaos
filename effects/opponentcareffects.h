@@ -132,6 +132,7 @@ class Effect_RubberbandOpponents : public EffectBase_OpponentInRaceConditional {
 public:
 	Effect_RubberbandOpponents() : EffectBase_OpponentInRaceConditional() {
 		sName = "FUCKING RUBBERBAND";
+		sFriendlyName = "Opponents Rubberband";
 		fTimerLength = 45;
 		IncompatibilityGroup = Attrib::StringHash32("rubberband");
 	}

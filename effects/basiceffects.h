@@ -128,7 +128,7 @@ public:
 
 	void InitFunction() override {
 		if (rand() % 100 > 50) {
-			Sleep(5000);
+			Sleep(rand() % 10 > 5 ? 3000 : 4000);
 		}
 		else {
 			MessageBoxA(nullptr, "Debug Error!\n\nProgram: speed.exe\n\nR6025\n- pure virtual function call\n\n(Press Retry to debug the application)", "Microsoft Visual C++ Debug Library", MB_ICONERROR | MB_ABORTRETRYIGNORE);

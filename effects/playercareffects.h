@@ -772,7 +772,8 @@ public:
 class Effect_SetCarTRAFPIZZA : public ChaosEffect {
 public:
 	Effect_SetCarTRAFPIZZA() : ChaosEffect() {
-		sName = "Change Car To TRAFPIZZA";
+		sName = "It's Pizza Time";
+		sFriendlyName = "Change Car To TRAFPIZZA";
 	}
 
 	void InitFunction() override {
@@ -881,6 +882,7 @@ public:
 			playerPos.z = targetPos.z;
 			if (playerPos.y < targetPos.y) playerPos.y = targetPos.y + 3;
 			GetLocalPlayerInterface<IRigidBody>()->SetPosition(&playerPos);
+			GetLocalPlayerInterface<IRBVehicle>()->EnableObjectCollisions(true);
 		}
 	}
 	bool HasTimer() override { return true; }

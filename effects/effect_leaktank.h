@@ -14,7 +14,7 @@ public:
 		abort = false;
 	}
 	void TickFunction(double delta) override {
-		NyaDrawing::CNyaRGBA32 rgb = {219,100,193,255};
+		NyaDrawing::CNyaRGBA32 rgb = {190,240,64,255};
 		if (tankAmount < 15) rgb = {200,0,0,255};
 		DrawBottomBar(tankAmount / 100.0, rgb);
 

@@ -110,9 +110,25 @@ public:
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	}
 	void DeinitFunction() override {
-		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	}
 	bool HasTimer() override { return true; }
 } E_WireframeWorld;
+
+class Effect_LaserScanWorld : public ChaosEffect {
+public:
+	Effect_LaserScanWorld() : ChaosEffect() {
+		sName = "Laser-Scanned World";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(double delta) override {
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
+	}
+	void DeinitFunction() override {
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	}
+	bool HasTimer() override { return true; }
+} E_LaserScanWorld;
 
 // todo change ColourBloomTint in visuallook for a rainbow world thing?
