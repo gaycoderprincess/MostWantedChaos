@@ -58,6 +58,29 @@ public:
 	bool HasTimer() override { return true; }
 } E_SpeedFast;
 
+class Effect_SpeedSpeedBased : public ChaosEffect {
+public:
+	Effect_SpeedSpeedBased() : ChaosEffect() {
+		sName = "Reverse Superhot";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(double delta) override {
+		auto speed = GetLocalPlayerVehicle()->GetSpeed();
+		if (speed < TOMPS(10)) {
+			GameSpeedModifier = TOMPS(150) / TOMPS(10);
+		}
+		else {
+			GameSpeedModifier = TOMPS(150) / speed;
+		}
+		if (GameSpeedModifier > 3) GameSpeedModifier = 3;
+	}
+	void DeinitFunction() override {
+		GameSpeedModifier = 1.0;
+	}
+	bool HasTimer() override { return true; }
+} E_SpeedSpeedBased;
+
 class Effect_InvisibleWorld : public ChaosEffect {
 public:
 	Effect_InvisibleWorld() : ChaosEffect() {

@@ -124,7 +124,7 @@ public:
 class Effect_PlayerCarCopCorvette : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarCopCorvette() : EffectBase_TriggerInMenu() {
-		sName = "Spawn As Cop Corvette";
+		sName = "Spawn Player As Cop Corvette";
 		fTimerLength = 120;
 		fUnhideTime = 0;
 		IncompatibilityGroup = Attrib::StringHash32("player_car_model");
@@ -142,7 +142,7 @@ public:
 class Effect_PlayerCarStockPunto : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarStockPunto() : EffectBase_TriggerInMenu() {
-		sName = "Spawn As Stock Punto";
+		sName = "Spawn Player As Stock Punto";
 		fTimerLength = 120;
 		fUnhideTime = 0;
 		IncompatibilityGroup = Attrib::StringHash32("player_car_model");

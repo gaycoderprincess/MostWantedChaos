@@ -2,6 +2,7 @@ class Effect_SpawnCarRandomized : public ChaosEffect {
 public:
 	Effect_SpawnCarRandomized() : ChaosEffect() {
 		sName = "Spawn Eldritch Monstrosity";
+		sFriendlyName = "Spawn Glitched Golf";
 	}
 
 	void InitFunction() override {
