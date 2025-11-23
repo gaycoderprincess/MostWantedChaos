@@ -99,4 +99,20 @@ public:
 	bool HasTimer() override { return true; }
 } E_InvisibleWorld;
 
+class Effect_WireframeWorld : public ChaosEffect {
+public:
+	Effect_WireframeWorld() : ChaosEffect() {
+		sName = "Wireframe World";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	}
+	void DeinitFunction() override {
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
+	}
+	bool HasTimer() override { return true; }
+} E_WireframeWorld;
+
 // todo change ColourBloomTint in visuallook for a rainbow world thing?
