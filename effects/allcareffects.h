@@ -365,7 +365,7 @@ public:
 	Effect_SnakeCars() : EffectBase_ActiveCarsConditional() {
 		sName = "Snake";
 		sFriendlyName = "All Other Cars Follow Player";
-		fTimerLength = 30;
+		fTimerLength = 45;
 	}
 
 	void ApplyAllCars() {
@@ -379,9 +379,9 @@ public:
 			if (auto col = car->mCOMObject->Find<IRBVehicle>()) {
 				col->EnableObjectCollisions(false);
 			}
-			int i = lastStates.size() - 1 - count++;
-			lastStates[i].Apply(car);
+			int i = lastStates.size() - 1 - (++count * 5);
 			if (i < 0) break;
+			lastStates[i].Apply(car);
 		}
 	}
 
@@ -391,9 +391,9 @@ public:
 	}
 	void TickFunction(double delta) override {
 		timer += delta;
-		if (timer > 0.25) {
+		if (timer > 0.033) {
 			lastStates.push_back(CwoeeCarPhysicalState(GetLocalPlayerVehicle()));
-			timer -= 0.25;
+			timer -= 0.033;
 		}
 		ApplyAllCars();
 	}
@@ -405,6 +405,7 @@ public:
 				col->EnableObjectCollisions(true);
 			}
 		}
+		lastStates.clear();
 	}
 	bool HasTimer() override { return true; }
 } E_SnakeCars;

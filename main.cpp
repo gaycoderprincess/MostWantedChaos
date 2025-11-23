@@ -254,7 +254,9 @@ void ChaosModMenu() {
 			std::ofstream fout("cwoee_effects.txt", std::ios::out);
 			if (fout.is_open()) {
 				for (auto& effect : ChaosEffect::aEffects) {
-					fout << effect->sName;
+					if (effect->DebugNeverPick) continue;
+					fout << effect->GetFriendlyName();
+					if (effect->sFriendlyName) fout << std::format(" ({})", effect->sName);
 					fout << "\n";
 				}
 			}
