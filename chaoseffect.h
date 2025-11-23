@@ -37,10 +37,18 @@ public:
 	virtual bool ShouldAbort() { return false; }
 };
 
-float fEffectX = 0.95;
+float fEffectX = 0.98;
 float fEffectY = 0.4;
 float fEffectSize = 0.04;
 float fEffectSpacing = 0.045;
+
+float fEffectTextureXSpacing = 0.03;
+float fEffectTextureYSpacing = 0.021;
+float fEffectTextureTipX = 0.021;
+float fEffectArcX = -0.003;
+float fEffectArcSize = 0.008;
+float fEffectArcThickness = 0.017;
+float fEffectArcRotation = -1.47;
 
 class ChaosEffectInstance {
 public:
@@ -101,23 +109,32 @@ public:
 		x = 1 - x;
 		x *= GetAspectRatioInv();
 		x = 1 - x;
+		y = fEffectY + (fEffectSpacing * y);
 
-		std::string str;
-		if (HasTimer() && (int)fTimer > 0) {
-			// todo does this look fine on the left? should there be a bar instead or something? graphics designers???? woof??????
-			str = std::format("({}) {}", (int)fTimer, GetName());
-		}
-		else {
-			str = GetName();
-		}
+		std::string str = GetName();
 
 		auto width = GetStringWidth(fEffectSize, str.c_str());
 
 		if (fTextTimer < 1) x = std::lerp(1 + width, x, easeInOutQuart(fTextTimer));
 
+		static auto textureBar = LoadTexture("CwoeeChaos/data/textures/effectbg_bar.png");
+		static auto textureTip = LoadTexture("CwoeeChaos/data/textures/effectbg_end.png");
+		if (textureBar && textureTip) {
+			float barX = x - width - (fEffectTextureXSpacing * GetAspectRatioInv());
+			DrawRectangle(barX, 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureBar);
+			DrawRectangle(barX - (fEffectTextureTipX * GetAspectRatioInv()), barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
+			if (HasTimer()) {
+				DrawArc(barX - (fEffectArcX * GetAspectRatioInv()), y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation + ((pEffect->fTimerLength - (fTimer / pEffect->fTimerLength)) * std::numbers::pi * 2), {255,255,255,255});
+			}
+		}
+		//static auto texture = LoadTexture("CwoeeChaos/data/textures/effectbg.png");
+		//if (texture) {
+		//	DrawRectangle(x - width - (fEffectTextureXSpacing * GetAspectRatioInv()), 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, texture);
+		//}
+
 		tNyaStringData data;
 		data.x = x;
-		data.y = fEffectY + (fEffectSpacing * y);
+		data.y = y;
 		data.size = fEffectSize;
 		data.XRightAlign = true;
 		data.outlinea = 255;
@@ -249,6 +266,8 @@ bool RunningEffectsCleanup() {
 	}
 	return false;
 }
+
+#include <numbers>
 
 #include "effects/effectbases.h"
 #include "effects/basiceffects.h"

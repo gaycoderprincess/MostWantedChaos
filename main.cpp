@@ -101,7 +101,8 @@ void ChaosLoop() {
 	
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime;
-		DrawTopBar(fTimeSinceLastEffect / fEffectCycleTimer, {219,100,193,255});
+		static auto texture = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
+		DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, {243,138,175,255}, texture);
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
@@ -126,6 +127,12 @@ void ChaosModMenu() {
 		QuickValueEditor("fEffectY", fEffectY);
 		QuickValueEditor("fEffectSize", fEffectSize);
 		QuickValueEditor("fEffectSpacing", fEffectSpacing);
+		QuickValueEditor("fEffectTextureXSpacing", fEffectTextureXSpacing);
+		QuickValueEditor("fEffectTextureYSpacing", fEffectTextureYSpacing);
+		QuickValueEditor("fEffectArcX", fEffectArcX);
+		QuickValueEditor("fEffectArcSize", fEffectArcSize);
+		QuickValueEditor("fEffectArcThickness", fEffectArcThickness);
+		QuickValueEditor("fEffectArcRotation", fEffectArcRotation);
 		ChloeMenuLib::EndMenu();
 	}
 
