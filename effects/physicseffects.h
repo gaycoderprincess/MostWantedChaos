@@ -23,9 +23,11 @@ public:
 
 	// RigidBody::DoWorldCollisions
 	void InitFunction() override {
+		NoResetCount++;
 		NyaHookLib::Patch<uint8_t>(0x6BB796, 0xEB);
 	}
 	void DeinitFunction() override {
+		NoResetCount--;
 		NyaHookLib::Patch<uint8_t>(0x6BB796, 0x75);
 	}
 	bool HasTimer() override { return true; }
@@ -35,7 +37,7 @@ class Effect_NoCollision : public ChaosEffect {
 public:
 	Effect_NoCollision() : ChaosEffect() {
 		sName = "Disable World Collision";
-		fTimerLength = 60;
+		fTimerLength = 45;
 	}
 
 	// RigidBody::UpdateCollider

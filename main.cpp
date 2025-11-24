@@ -182,6 +182,9 @@ void ChaosModMenu() {
 				if (auto heat = GetMaxHeat()) {
 					DrawMenuOption(std::format("Max Heat: {:.2f}", *heat));
 				}
+				if (auto tune = GetLocalPlayerVehicle()->GetTunings()) {
+					DrawMenuOption(std::format("Aerodynamics: {:.2f}", tune->Value[Physics::Tunings::AERODYNAMICS]));
+				}
 				if (GRaceStatus::fObj && GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing) {
 					DrawMenuOption(std::format("Race Completion: {:.2f}", GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete));
 				}
@@ -191,13 +194,6 @@ void ChaosModMenu() {
 				DrawMenuOption("Local player not found");
 			}
 			ChloeMenuLib::EndMenu();
-		}
-
-		if (DrawMenuOption("Progress Forward In Blacklist")) {
-			FEDatabase->mUserProfile->TheCareerSettings.CurrentBin--;
-		}
-		if (DrawMenuOption("Progress Backwards In Blacklist")) {
-			FEDatabase->mUserProfile->TheCareerSettings.CurrentBin++;
 		}
 
 		if (DrawMenuOption("Effect Debug")) {
@@ -235,50 +231,11 @@ void ChaosModMenu() {
 			ChloeMenuLib::EndMenu();
 		}
 
-		if (DrawMenuOption("15 sec Effects")) {
-			ChloeMenuLib::BeginMenu();
-			for (auto& effect : ChaosEffect::aEffects) {
-				if (effect->DebugNeverPick) continue;
-				if (effect->fTimerLength != 15) continue;
-				if (!effect->HasTimer()) continue;
-				if (DrawMenuOption(effect->GetFriendlyName())) {
-					AddRunningEffect(effect);
-				}
-			}
-			ChloeMenuLib::EndMenu();
-		}
-
-		if (DrawMenuOption("30 sec Effects")) {
-			ChloeMenuLib::BeginMenu();
-			for (auto& effect : ChaosEffect::aEffects) {
-				if (effect->DebugNeverPick) continue;
-				if (effect->fTimerLength != 30) continue;
-				if (!effect->HasTimer()) continue;
-				if (DrawMenuOption(effect->GetFriendlyName())) {
-					AddRunningEffect(effect);
-				}
-			}
-			ChloeMenuLib::EndMenu();
-		}
-
 		if (DrawMenuOption("Rehideable Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
 				if (effect->DebugNeverPick) continue;
 				if (!effect->IsRehideable()) continue;
-				if (DrawMenuOption(effect->GetFriendlyName())) {
-					AddRunningEffect(effect);
-				}
-			}
-			ChloeMenuLib::EndMenu();
-		}
-
-		if (DrawMenuOption("Unmarked Variable Timer Effects")) {
-			ChloeMenuLib::BeginMenu();
-			for (auto& effect : ChaosEffect::aEffects) {
-				if (effect->DebugNeverPick) continue;
-				if (effect->fTimerLength == 15) continue;
-				if (effect->HasTimer()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
 					AddRunningEffect(effect);
 				}

@@ -142,7 +142,7 @@ public:
 	//static inline float PointSize = 4;
 
 	void TickFunction(double delta) override {
-		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING ? D3DFILL_POINT : D3DFILL_SOLID);
 		//g_pd3dDevice->SetRenderState(D3DRS_POINTSCALEENABLE, TRUE);
 		//g_pd3dDevice->SetRenderState(D3DRS_POINTSIZE, PointSize);
 	}
@@ -150,6 +150,7 @@ public:
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_LaserScanWorld;
 
 // todo change ColourBloomTint in visuallook for a rainbow world thing?

@@ -176,7 +176,8 @@ public:
 	bool IsRehideable() override { return true; };
 } E_SetCopMassInf;
 
-class Effect_GetBusted : public EffectBase_PursuitConditional {
+// todo add this back once there's enough effects for it not to be too unfairly frequent
+/*class Effect_GetBusted : public EffectBase_PursuitConditional {
 public:
 	Effect_GetBusted() : EffectBase_PursuitConditional() {
 		sName = "Get Busted";
@@ -197,31 +198,44 @@ public:
 		return false;
 	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_GetBusted;
+} E_GetBusted;*/
 
-// crashes the game
-/*class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
+class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
 public:
 	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional() {
 		sName = "Ruthless Cop Spawns";
-		fTimerLength = 60;
+		fTimerLength = 90;
 	}
 
-	static void __thiscall GetAdjustedCopCountsHooked(void* pThis, void* a1, int* a2) {
-		*a2 = 15;
+	static const char* __thiscall CopRequestHooked(void* pThis) {
+		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			float heat = ply->GetHeat();
+			if (heat < 2) return "copmidsize";
+			if (heat < 3) return "copghost";
+			if (heat < 4) return "copgto";
+			if (heat < 5) return "copgtoghost";
+			if (heat < 6) return "copsporthench";
+			if (heat < 7) return rand() % 100 > 50 ? "copcross" : "copsportghost";
+			if (heat < 8) return "copsuvpatrol";
+			if (heat < 9) return "copsportghost";
+			if (heat < 10) return "copmidsize";
+			return "copsport";
+		}
+		return "copmidsize";
 	}
 
-	void TickFunction(double delta) override {
-		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x42BB92, &GetAdjustedCopCountsHooked);
-		//NyaHookLib::Patch<uint16_t>(0x43EB90, 0x9090);
+	void InitFunction() override {
+		NyaHookLib::Patch(0x8927C0, &CopRequestHooked);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x9090);
 	}
 	void DeinitFunction() override {
-		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x42BB92, 0x424110);
-		//NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
+		NyaHookLib::Patch(0x8927C0, 0x42BA50);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
-} E_RuthlessCopSpawns;*/
+} E_RuthlessCopSpawns;
 
 /*class Effect_EnterCooldown : public EffectBase_PursuitConditional {
 public:

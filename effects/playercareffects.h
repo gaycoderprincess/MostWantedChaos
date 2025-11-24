@@ -187,7 +187,7 @@ public:
 class Effect_SetHeat1 : public ChaosEffect {
 public:
 	Effect_SetHeat1() : ChaosEffect() {
-		sName = "Reset Heat Level";
+		sName = "Set Heat Level to 1";
 	}
 
 	void InitFunction() override {
@@ -383,6 +383,56 @@ public:
 	bool HasTimer() override { return true; }
 } E_PlayerCarTuneAero;
 
+class Effect_PlayerCarTuneHandling : public ChaosEffect {
+public:
+	Effect_PlayerCarTuneHandling() : ChaosEffect() {
+		sName = "Handling +10";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("handling_tune");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
+			tune.Value[Physics::Tunings::HANDLING] = 2;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
+			tune.Value[Physics::Tunings::HANDLING] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTuneHandling;
+
+class Effect_PlayerCarTuneHandling2 : public ChaosEffect {
+public:
+	Effect_PlayerCarTuneHandling2() : ChaosEffect() {
+		sName = "Handling -10";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("handling_tune");
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
+			tune.Value[Physics::Tunings::HANDLING] = -2;
+			ply->SetTunings(&tune);
+		}
+	}
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
+			tune.Value[Physics::Tunings::HANDLING] = 0;
+			ply->SetTunings(&tune);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTuneHandling2;
+
 class Effect_PlayerCarTuneHeight : public ChaosEffect {
 public:
 	Effect_PlayerCarTuneHeight() : ChaosEffect() {
@@ -519,8 +569,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneNitro;
 
-// instantly drains, need a different method
-/*class Effect_PlayerCarTuneNitro2 : public EffectBase_PlayerCarHasNitro {
+class Effect_PlayerCarTuneNitro2 : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_PlayerCarTuneNitro2() : EffectBase_PlayerCarHasNitro() {
 		sName = "Strong Nitro";
@@ -533,6 +582,9 @@ public:
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = 3;
 			ply->SetTunings(&tune);
+			if (auto engine = GetLocalPlayerEngine()) {
+				engine->ChargeNOS(1);
+			}
 		}
 	}
 	void DeinitFunction() override {
@@ -544,7 +596,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
-} E_PlayerCarTuneNitro2;*/
+} E_PlayerCarTuneNitro2;
 
 class Effect_PlayerCarReset : public ChaosEffect {
 public:
@@ -576,6 +628,7 @@ class Effect_PlayerCarSpikeAll : public ChaosEffect {
 public:
 	Effect_PlayerCarSpikeAll() : ChaosEffect() {
 		sName = "Puncture Player's Tires";
+		fTimerLength = 15;
 	}
 
 	void InitFunction() override {
@@ -586,6 +639,13 @@ public:
 			ply->Puncture(3);
 		}
 	}
+
+	void DeinitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IDamageable>()) {
+			ply->ResetDamage();
+		}
+	}
+	bool HasTimer() override { return true; }
 } E_PlayerCarSpikeAll;
 
 class Effect_FixPlayerCar : public ChaosEffect {

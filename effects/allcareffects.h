@@ -476,17 +476,61 @@ public:
 	Effect_WideCars() : ChaosEffect() {
 		sName = "Wide Cars";
 		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("car_scale");
 	}
 
-	void InitFunction() override {
-		CarScaleMatrix._v1.x *= 4;
-		CarScaleMatrix._v1.y *= 4;
-		CarScaleMatrix._v1.z *= 4;
+	void TickFunction(double delta) override {
+		CarScaleMatrix = UMath::Matrix4::kIdentity;
+
+		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
+		if (EffectInstance->fTimer > fTimerLength - 1) {
+			fadeIn = fTimerLength - EffectInstance->fTimer;
+		}
+
+		CarScaleMatrix._v1.x *= 1 + (easeInOutQuart(fadeIn) * 3);
+		CarScaleMatrix._v1.y *= 1 + (easeInOutQuart(fadeIn) * 3);
+		CarScaleMatrix._v1.z *= 1 + (easeInOutQuart(fadeIn) * 3);
 	}
 	void DeinitFunction() override {
-		CarScaleMatrix._v1.x /= 4;
-		CarScaleMatrix._v1.y /= 4;
-		CarScaleMatrix._v1.z /= 4;
+		CarScaleMatrix = UMath::Matrix4::kIdentity;
 	}
 	bool HasTimer() override { return true; }
 } E_WideCars;
+
+class Effect_GroovyCars : public ChaosEffect {
+public:
+	double state = 0;
+	bool goBack = false;
+
+	Effect_GroovyCars() : ChaosEffect() {
+		sName = "Why's This Dealer?";
+		sFriendlyName = "Groovy Cars";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("car_scale");
+	}
+
+	void InitFunction() override {
+		state = 0;
+	}
+	void TickFunction(double delta) override {
+		state += delta * (goBack ? -4 : 4);
+		if (state > 1) goBack = true;
+		if (state < 0) goBack = false;
+
+		CarScaleMatrix = UMath::Matrix4::kIdentity;
+
+		CarScaleMatrix._v0.x *= 1 + (easeInOutQuart(1 - state) * 0.5);
+		CarScaleMatrix._v0.y *= 1 + (easeInOutQuart(1 - state) * 0.5);
+		CarScaleMatrix._v0.z *= 1 + (easeInOutQuart(1 - state) * 0.5);
+		CarScaleMatrix._v1.x *= 1 + (easeInOutQuart(1 - state) * 0.5);
+		CarScaleMatrix._v1.y *= 1 + (easeInOutQuart(1 - state) * 0.5);
+		CarScaleMatrix._v1.z *= 1 + (easeInOutQuart(1 - state) * 0.5);
+		CarScaleMatrix._v2.x *= 1 + (easeInOutQuart(state) * 0.5);
+		CarScaleMatrix._v2.y *= 1 + (easeInOutQuart(state) * 0.5);
+		CarScaleMatrix._v2.z *= 1 + (easeInOutQuart(state) * 0.5);
+	}
+	void DeinitFunction() override {
+		CarScaleMatrix = UMath::Matrix4::kIdentity;
+	}
+	bool HasTimer() override { return true; }
+} E_GroovyCars;

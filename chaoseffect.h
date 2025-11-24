@@ -147,8 +147,10 @@ public:
 		data.y = y;
 		data.size = fEffectSize;
 		data.XRightAlign = true;
-		data.outlinea = 255;
-		data.outlinedist = 0.025;
+		if (!bDarkMode) {
+			data.outlinea = 255;
+			data.outlinedist = 0.025;
+		}
 		DrawString(data, str);
 	}
 
