@@ -145,8 +145,13 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		if (rand() % 100 < 5) {
-			Sleep(100);
+		static double timer = 0;
+		timer += delta;
+		while (timer > 0.03) {
+			if (rand() % 100 < 5) {
+				Sleep(100);
+			}
+			timer -= 0.03;
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -194,9 +199,9 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		for (int x = 0; x < 16; x++) {
-			for (int y = 0; y < 16; y++) {
-				float size = 1.0 / 16.0;
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
+				float size = 1.0 / 8.0;
 				if (y % 2 == 0 && (x % 2 == 0)) continue;
 				if (y % 2 != 0 && (x % 2 != 0)) continue;
 				//if (y % 2 == 0) continue;

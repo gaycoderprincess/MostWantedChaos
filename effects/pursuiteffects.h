@@ -94,7 +94,6 @@ public:
 	bool HasTimer() override { return true; }
 } E_HiddenFromCops;*/
 
-// needs a way to force cooldown
 class Effect_NeverBusted : public EffectBase_PursuitConditional {
 public:
 	Effect_NeverBusted() : EffectBase_PursuitConditional() {
@@ -107,9 +106,9 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; };
+	bool AbortOnConditionFailed() override { return true; }
 } E_NeverBusted;
 
-// needs a way to force cooldown
 class Effect_NoCops : public ChaosEffect {
 public:
 	Effect_NoCops() : ChaosEffect() {
@@ -160,7 +159,7 @@ public:
 		for (int i = 0; i < list.size(); i++) {
 			auto car = list[i];
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
-				ply->SetCollisionMass(10000);
+				ply->SetCollisionMass(100000);
 			}
 		}
 	}

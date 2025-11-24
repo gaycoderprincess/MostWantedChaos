@@ -196,7 +196,7 @@ public:
 class Effect_PlayerCarImpoundMarker : public ChaosEffect {
 public:
 	Effect_PlayerCarImpoundMarker() : ChaosEffect() {
-		sName = "Add Extra Marker Slot To Active Career Car";
+		sName = "Add Extra Impound Slot To Active Career Car";
 	}
 
 	void InitFunction() override {
@@ -328,7 +328,8 @@ public:
 	}
 } E_AddRandomBonusMarker;
 
-class Effect_SkipChance : public ChaosEffect {
+// todo this breaks speedtraps and milestones
+/*class Effect_SkipChance : public ChaosEffect {
 public:
 	bool chanceFired = false;
 
@@ -357,4 +358,4 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool IgnoreHUDState() override { return true; }
-} E_SkipChance;
+} E_SkipChance;*/

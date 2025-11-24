@@ -14,11 +14,11 @@ public:
 	}
 } E_DestroyRandomCar;
 
-class Effect_RacerAITraffic : public ChaosEffect {
+class Effect_RacerAITraffic : public EffectBase_ActiveTrafficConditional {
 public:
 	double fTimer = 0;
 
-	Effect_RacerAITraffic() : ChaosEffect() {
+	Effect_RacerAITraffic() : EffectBase_ActiveTrafficConditional() {
 		sName = "Racer AI For Traffic";
 		fTimerLength = 120;
 	}
@@ -43,11 +43,12 @@ public:
 		NyaHookLib::Patch<uint16_t>(0x411E9E, 0x1674);
 	}
 	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
 } E_RacerAITraffic;
 
-class Effect_LobotomyTraffic : public EffectBase_ActiveCarsConditional {
+class Effect_LobotomyTraffic : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_LobotomyTraffic() : EffectBase_ActiveCarsConditional() {
+	Effect_LobotomyTraffic() : EffectBase_ActiveTrafficConditional() {
 		sName = "Lobotomized Traffic";
 		fTimerLength = 60;
 	}
@@ -63,9 +64,9 @@ public:
 	bool IsRehideable() override { return true; };
 } E_LobotomyTraffic;
 
-class Effect_SpinningTraffic : public EffectBase_ActiveCarsConditional {
+class Effect_SpinningTraffic : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_SpinningTraffic() : EffectBase_ActiveCarsConditional() {
+	Effect_SpinningTraffic() : EffectBase_ActiveTrafficConditional() {
 		sName = "Spinning Traffic";
 		fTimerLength = 60;
 	}
@@ -244,9 +245,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_CarFloaty;
 
-class Effect_SetTrafficMassInf : public EffectBase_ActiveCarsConditional {
+class Effect_SetTrafficMassInf : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_SetTrafficMassInf() : EffectBase_ActiveCarsConditional() {
+	Effect_SetTrafficMassInf() : EffectBase_ActiveTrafficConditional() {
 		sName = "Infinite Traffic Mass";
 		fTimerLength = 60;
 	}
@@ -256,7 +257,7 @@ public:
 		for (auto& car : cars) {
 			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
-				ply->SetCollisionMass(10000);
+				ply->SetCollisionMass(100000);
 			}
 		}
 	}

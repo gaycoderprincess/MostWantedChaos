@@ -617,10 +617,10 @@ public:
 	bool HasTimer() override { return true; }
 } E_NoReset;
 
-class Effect_ResetImmune : public ChaosEffect {
+class Effect_ResetImmune : public EffectBase_PursuitConditional {
 public:
-	Effect_ResetImmune() : ChaosEffect() {
-		sName = "Reset Immunity From Cops";
+	Effect_ResetImmune() : EffectBase_PursuitConditional() {
+		sName = "Disable Instant Bust On Reset";
 		fTimerLength = 120;
 	}
 
@@ -839,7 +839,7 @@ public:
 
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
-			ply->SetCollisionMass(10000);
+			ply->SetCollisionMass(100000);
 		}
 	}
 	void DeinitFunction() override {

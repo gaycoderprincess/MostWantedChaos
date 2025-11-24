@@ -79,6 +79,18 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
+class EffectBase_ActiveTrafficConditional : public ChaosEffect {
+public:
+	EffectBase_ActiveTrafficConditional() : ChaosEffect() {
+		sName = "(EFFECT BASE) Active Traffic Conditional";
+	}
+
+	bool IsAvailable() override {
+		return GetActiveVehicles(DRIVER_TRAFFIC).size() > 0;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class EffectBase_ActiveCopsConditional : public ChaosEffect {
 public:
 	EffectBase_ActiveCopsConditional() : ChaosEffect() {

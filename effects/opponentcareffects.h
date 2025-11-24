@@ -43,7 +43,7 @@ public:
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
-			racer->SetSpeed(TOMPS(400));
+			racer->SetSpeed(TOMPS(800));
 		}
 	}
 	bool AbortOnConditionFailed() override { return true; }

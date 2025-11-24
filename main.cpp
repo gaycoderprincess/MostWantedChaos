@@ -192,6 +192,13 @@ void ChaosModMenu() {
 			ChloeMenuLib::EndMenu();
 		}
 
+		if (DrawMenuOption("Progress Forward In Blacklist")) {
+			FEDatabase->mUserProfile->TheCareerSettings.CurrentBin--;
+		}
+		if (DrawMenuOption("Progress Backwards In Blacklist")) {
+			FEDatabase->mUserProfile->TheCareerSettings.CurrentBin++;
+		}
+
 		if (DrawMenuOption("Effect Debug")) {
 			ChloeMenuLib::BeginMenu();
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
@@ -314,10 +321,11 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			srand(time(0));
 
-			//auto configName = "NFSMWChaos_gcp.toml";
-			//if (std::filesystem::exists(configName)) {
-			//	static auto config = toml::parse_file(configName);
-			//}
+			auto configName = "NFSMWChaos_gcp.toml";
+			if (std::filesystem::exists(configName)) {
+				static auto config = toml::parse_file(configName);
+				bDarkMode = config["main"]["dark_mode"].value_or(false);
+			}
 
 			for (auto& func : ChloeHook::aHooks) {
 				func();
