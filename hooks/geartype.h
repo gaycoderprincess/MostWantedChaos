@@ -2,7 +2,7 @@ bool ForceManualGearbox = false;
 bool ForceAutomaticGearbox = false;
 
 auto IsAutomaticShift = (bool(__thiscall*)(IInput*))0x68D090;
-static bool __thiscall IsAutomaticShiftHooked(IInput* pThis) {
+bool __thiscall IsAutomaticShiftHooked(IInput* pThis) {
 	if (ForceManualGearbox) return false;
 	if (ForceAutomaticGearbox) return true;
 	return IsAutomaticShift(pThis);

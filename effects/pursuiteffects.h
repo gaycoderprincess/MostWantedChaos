@@ -199,6 +199,30 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_GetBusted;
 
+// crashes the game
+/*class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
+public:
+	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional() {
+		sName = "Ruthless Cop Spawns";
+		fTimerLength = 60;
+	}
+
+	static void __thiscall GetAdjustedCopCountsHooked(void* pThis, void* a1, int* a2) {
+		*a2 = 15;
+	}
+
+	void TickFunction(double delta) override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x42BB92, &GetAdjustedCopCountsHooked);
+		//NyaHookLib::Patch<uint16_t>(0x43EB90, 0x9090);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x42BB92, 0x424110);
+		//NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
+	}
+	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_RuthlessCopSpawns;*/
+
 /*class Effect_EnterCooldown : public EffectBase_PursuitConditional {
 public:
 	Effect_EnterCooldown() : EffectBase_PursuitConditional() {

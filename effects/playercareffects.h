@@ -295,7 +295,7 @@ public:
 	bool HasTimer() override { return true; }
 } E_AutoDrive;
 
-class Effect_AutoDrive2 : public ChaosEffect {
+/*class Effect_AutoDrive2 : public ChaosEffect {
 public:
 	Effect_AutoDrive2() : ChaosEffect() {
 		sName = "Auto-Drive (Traffic)";
@@ -318,7 +318,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-} E_AutoDrive2;
+} E_AutoDrive2;*/
 
 /*class Effect_911 : public ChaosEffect {
 public:
@@ -959,6 +959,9 @@ public:
 		fUnhideTime = 1;
 	}
 
+	void InitFunction() override {
+		NoResetCount++;
+	}
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			auto playerRB = GetLocalPlayerInterface<IRigidBody>();
@@ -978,10 +981,12 @@ public:
 			playerRB->SetAngularVelocity(&playerAVel);
 		}
 	}
+	void DeinitFunction() override {
+		NoResetCount--;
+	}
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerVehicle()) {
-			auto playerRB = GetLocalPlayerInterface<IRigidBody>();
+		if (auto playerRB = GetLocalPlayerInterface<IRigidBody>()) {
 			auto playerVel = *playerRB->GetLinearVelocity();
 			if ((*(NyaVec3*)&playerVel).length() < TOMPS(60)) return false;
 			return true;

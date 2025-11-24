@@ -102,6 +102,11 @@ public:
 
 	void TickFunction(double delta) override {
 		ForcedTrafficVehicle = Attrib::StringHash32("trafpizza");
+
+		auto cars = GetActiveVehicles(DRIVER_TRAFFIC);
+		for (auto& car : cars) {
+			if (car->GetVehicleKey() != ForcedTrafficVehicle) car->mCOMObject->Find<ISimable>()->Kill();
+		}
 	}
 	void DeinitFunction() override {
 		ForcedTrafficVehicle = 0;

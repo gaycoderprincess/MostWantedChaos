@@ -19,6 +19,7 @@ public:
 		DrawTopBar(tankAmount / 100.0, rgb);
 
 		auto playerSpeed = GetLocalPlayerVehicle()->GetSpeed();
+		if (playerSpeed < 1) playerSpeed = 1;
 		tankAmount -= TankDrainRate * playerSpeed * delta;
 		if (tankAmount <= 0) {
 			if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {

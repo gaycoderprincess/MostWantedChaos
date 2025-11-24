@@ -1,6 +1,6 @@
-class Effect_BlowEngineOpponents : public EffectBase_OpponentInRaceConditional {
+class Effect_BlowEngineOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_BlowEngineOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_BlowEngineOpponents() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Blow Opponents' Engines";
 	}
 
@@ -16,9 +16,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_BlowEngineOpponents;
 
-class Effect_BlowEngineOpponents1 : public EffectBase_OpponentInRaceConditional {
+class Effect_BlowEngineOpponents1 : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_BlowEngineOpponents1() : EffectBase_OpponentInRaceConditional() {
+	Effect_BlowEngineOpponents1() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Blow One Opponent's Engine";
 	}
 
@@ -128,9 +128,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_SpinningOpponents;
 
-class Effect_RubberbandOpponents : public EffectBase_OpponentInRaceConditional {
+class Effect_RubberbandOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_RubberbandOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_RubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "FUCKING RUBBERBAND";
 		sFriendlyName = "Opponents Rubberband";
 		fTimerLength = 45;
@@ -151,9 +151,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_RubberbandOpponents;
 
-class Effect_NoRubberbandOpponents : public EffectBase_OpponentInRaceConditional {
+class Effect_NoRubberbandOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_NoRubberbandOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_NoRubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Disable Rubberbanding";
 		fTimerLength = 90;
 		IncompatibilityGroup = Attrib::StringHash32("rubberband");
@@ -172,9 +172,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_NoRubberbandOpponents;
 
-class Effect_SpikeAllOpponents : public EffectBase_OpponentInRaceConditional {
+class Effect_SpikeAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SpikeAllOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_SpikeAllOpponents() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Puncture Opponents' Tires";
 	}
 
@@ -192,9 +192,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_SpikeAllOpponents;
 
-/*class Effect_SendOffAllOpponents : public EffectBase_OpponentInRaceConditional {
+/*class Effect_SendOffAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SendOffAllOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_SendOffAllOpponents() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Make All Opponents Leave";
 	}
 
@@ -209,9 +209,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_SendOffAllOpponents;*/
 
-class Effect_SetOpponentMass0 : public EffectBase_OpponentInRaceConditional {
+class Effect_SetOpponentMass0 : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SetOpponentMass0() : EffectBase_OpponentInRaceConditional() {
+	Effect_SetOpponentMass0() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Zero Opponent Mass";
 		fTimerLength = 60;
 	}
@@ -238,9 +238,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_SetOpponentMass0;
 
-class Effect_SetOpponentPittable : public EffectBase_OpponentInRaceConditional {
+class Effect_SetOpponentPittable : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SetOpponentPittable() : EffectBase_OpponentInRaceConditional() {
+	Effect_SetOpponentPittable() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Pittable Opponents";
 		fTimerLength = 90;
 	}
@@ -269,9 +269,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_SetOpponentPittable;
 
-class Effect_NoNitroOpponents : public EffectBase_OpponentInRaceConditional {
+class Effect_NoNitroOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_NoNitroOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_NoNitroOpponents() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Disable Opponents' Nitro";
 		fTimerLength = 90;
 	}

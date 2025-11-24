@@ -37,6 +37,24 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
+class EffectBase_OpponentAliveInRaceConditional : public ChaosEffect {
+public:
+	EffectBase_OpponentAliveInRaceConditional() : ChaosEffect() {
+		sName = "(EFFECT BASE) Opponent Alive & In Race Conditional";
+	}
+
+	bool IsAvailable() override {
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
+			if (!car->IsDestroyed()) {
+				return GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
+			}
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class EffectBase_PursuitConditional : public ChaosEffect {
 public:
 	EffectBase_PursuitConditional() : ChaosEffect() {

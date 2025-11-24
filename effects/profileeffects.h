@@ -1,7 +1,7 @@
 class Effect_EnableMomentCam : public ChaosEffect {
 public:
 	Effect_EnableMomentCam() : ChaosEffect() {
-		sName = "Enable Jump Camera";
+		sName = "Enable Game Moment Camera";
 	}
 
 	void InitFunction() override {

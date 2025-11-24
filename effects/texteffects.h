@@ -6,13 +6,9 @@ public:
 		fTimerLength = 120;
 	}
 
-	static const char* __fastcall SearchForStringHooked(void*, uint32_t inputHash) {
-		return "Trans Rights";
-	}
-
 	void InitFunction() override {
 		SummonChyron("Trans Rights", "Trans Rights", "Trans Rights");
-		NyaHookLib::PatchRelative(NyaHookLib::JMP, 0x56BB80, &SearchForStringHooked);
+		TextHook_ReplaceText = "Trans Rights";
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0xEB); // remove duplicate racer name check
 	}
 	void TickFunction(double delta) override {
@@ -21,8 +17,24 @@ public:
 		Chyron::mAlbum = "Trans Rights";
 	}
 	void DeinitFunction() override {
-		NyaHookLib::Patch<uint64_t>(0x56BB80, 0x850091CF801D8B53);
+		TextHook_ReplaceText = nullptr;
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0x7E);
 	}
 	bool HasTimer() override { return true; }
 } E_TransRights;
+
+class Effect_ReverseText : public ChaosEffect {
+public:
+	Effect_ReverseText() : ChaosEffect() {
+		sName = "Reverse Text";
+		fTimerLength = 120;
+	}
+
+	void InitFunction() override {
+		TextHook_ReverseText = true;
+	}
+	void DeinitFunction() override {
+		TextHook_ReverseText = false;
+	}
+	bool HasTimer() override { return true; }
+} E_ReverseText;

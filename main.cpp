@@ -36,6 +36,7 @@ bool DisableChaosHUD = false;
 #include "hooks/gamespeed.h"
 #include "hooks/geartype.h"
 #include "hooks/vehicleconstruct.h"
+#include "hooks/text.h"
 #include "chaoseffect.h"
 
 void MoneyChecker() {
