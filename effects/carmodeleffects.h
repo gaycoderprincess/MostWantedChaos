@@ -1,6 +1,6 @@
-class Effect_OpponentsRazor : public ChaosEffect {
+class Effect_OpponentsRazor : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsRazor() : ChaosEffect() {
+	Effect_OpponentsRazor() : EffectBase_NotInPursuitConditional() {
 		sName = "New Opponents Are BMWs";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
@@ -15,11 +15,12 @@ public:
 		RandomizeOpponentTuning = false;
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsRazor;
 
-class Effect_OpponentsGolf : public ChaosEffect {
+class Effect_OpponentsGolf : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsGolf() : ChaosEffect() {
+	Effect_OpponentsGolf() : EffectBase_NotInPursuitConditional() {
 		sName = "New Opponents Are Golfs";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
@@ -34,11 +35,12 @@ public:
 		RandomizeOpponentTuning = false;
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsGolf;
 
-class Effect_OpponentsPlayer : public ChaosEffect {
+class Effect_OpponentsPlayer : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsPlayer() : ChaosEffect() {
+	Effect_OpponentsPlayer() : EffectBase_NotInPursuitConditional() {
 		sName = "New Opponents Copy Your Car";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
@@ -51,11 +53,12 @@ public:
 		OpponentPlayerCar = false;
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayer;
 
-class Effect_OpponentsPlayerRandom : public ChaosEffect {
+class Effect_OpponentsPlayerRandom : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsPlayerRandom() : ChaosEffect() {
+	Effect_OpponentsPlayerRandom() : EffectBase_NotInPursuitConditional() {
 		sName = "New Opponents Steal Your Cars";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_model");
@@ -68,11 +71,12 @@ public:
 		OpponentPlayerCarRandom = false;
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayerRandom;
 
-class Effect_OpponentsJunkman : public ChaosEffect {
+class Effect_OpponentsJunkman : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsJunkman() : ChaosEffect() {
+	Effect_OpponentsJunkman() : EffectBase_NotInPursuitConditional() {
 		sName = "New Opponents Are Junkman";
 		fTimerLength = 240;
 		IncompatibilityGroup = Attrib::StringHash32("opponent_car_tune");
@@ -85,6 +89,7 @@ public:
 		OpponentsFullyTuned = false;
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsJunkman;
 
 class Effect_AllTrafficPizza : public ChaosEffect {

@@ -26,6 +26,7 @@ class Effect_NoHUD : public ChaosEffect {
 public:
 	Effect_NoHUD() : ChaosEffect() {
 		sName = "Disable HUD";
+		sFriendlyName = "Disable Game HUD";
 		fTimerLength = 60;
 	}
 

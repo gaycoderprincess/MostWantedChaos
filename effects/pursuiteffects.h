@@ -181,6 +181,7 @@ class Effect_GetBusted : public EffectBase_PursuitConditional {
 public:
 	Effect_GetBusted() : EffectBase_PursuitConditional() {
 		sName = "Get Busted";
+		fTimerLength = 2;
 	}
 
 	void TickFunction(double delta) override {
@@ -196,6 +197,7 @@ public:
 		}
 		return false;
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_GetBusted;
 
 /*class Effect_EnterCooldown : public EffectBase_PursuitConditional {

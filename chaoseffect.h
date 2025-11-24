@@ -35,6 +35,7 @@ public:
 	virtual bool RunInMenus() { return false; }
 	virtual bool InfiniteTimer() { return false; }
 	virtual bool ShouldAbort() { return false; }
+	virtual bool IgnoreHUDState() { return false; }
 };
 
 bool bDarkMode = false;
@@ -107,9 +108,6 @@ public:
 
 	void Draw(float y) const {
 		if (!IsNameOnScreen()) return;
-		if (DisableChaosHUD && strcmp(pEffect->sName, "Disable Chaos Mod HUD")) return;
-		
-		if (DisableChaosHUD) y = 0;
 
 		auto x = fEffectX;
 		x = 1 - x;

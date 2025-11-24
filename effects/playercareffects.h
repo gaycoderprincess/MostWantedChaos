@@ -197,9 +197,9 @@ public:
 	}
 } E_SetHeat1;
 
-class Effect_SetHeat5 : public ChaosEffect {
+class Effect_SetHeat5 : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_SetHeat5() : ChaosEffect() {
+	Effect_SetHeat5() : EffectBase_NotInPursuitConditional() {
 		sName = "Set Heat Level to 5";
 	}
 
@@ -211,11 +211,13 @@ public:
 			ply->SetHeat(5);
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_SetHeat5;
 
-class Effect_SetHeat6 : public ChaosEffect {
+// max heat level doesn't seem to apply when in the middle of an active pursuit
+class Effect_SetHeat6 : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_SetHeat6() : ChaosEffect() {
+	Effect_SetHeat6() : EffectBase_NotInPursuitConditional() {
 		sName = "Set Heat Level to 6";
 	}
 
@@ -227,6 +229,7 @@ public:
 			ply->SetHeat(6);
 		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
 } E_SetHeat6;
 
 class Effect_SetHeatDown : public ChaosEffect {

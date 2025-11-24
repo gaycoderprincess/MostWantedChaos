@@ -175,6 +175,7 @@ public:
 			chanceFired = true;
 		}
 	}
+	bool IgnoreHUDState() override { return true; }
 } E_CrashChance;
 
 class Effect_Nothing : public ChaosEffect {
@@ -246,4 +247,5 @@ public:
 		DisableChaosHUD = false;
 	}
 	bool HasTimer() override { return true; }
+	bool IgnoreHUDState() override { return true; }
 } E_NoChaosHUD;

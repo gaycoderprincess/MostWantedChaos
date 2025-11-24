@@ -52,6 +52,21 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
+class EffectBase_NotInPursuitConditional : public ChaosEffect {
+public:
+	EffectBase_NotInPursuitConditional() : ChaosEffect() {
+		sName = "(EFFECT BASE) Not In Pursuit Conditional";
+	}
+
+	bool IsAvailable() override {
+		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			return !ply->IsBeingPursued();
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class EffectBase_ActiveCarsConditional : public ChaosEffect {
 public:
 	EffectBase_ActiveCarsConditional() : ChaosEffect() {

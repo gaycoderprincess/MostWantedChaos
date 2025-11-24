@@ -102,6 +102,7 @@ void ChaosLoop() {
 
 	float y = 0;
 	for (auto& effect : aRunningEffects) {
+		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
 		effect.Draw(y);
 		y += 1 - effect.GetOffscreenPercentage();
 	}
