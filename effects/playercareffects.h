@@ -806,7 +806,7 @@ public:
 
 	void InitFunction() override {
 		auto car = CreatePinkSlipPreset("RAZORMUSTANG");
-		ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization));
+		ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization), true);
 	}
 } E_SetCarRazor;
 
@@ -826,7 +826,7 @@ public:
 		auto car = validCars[rand()%validCars.size()];
 		auto pCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(cars, car->Customization);
 		auto customization = pCustomization ? *pCustomization : CreateRandomCustomizations(car->VehicleKey);
-		ChangePlayerCarInWorld(car->VehicleKey, &customization);
+		ChangePlayerCarInWorld(car->VehicleKey, &customization, true);
 	}
 } E_SetCarRandom;
 

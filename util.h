@@ -212,7 +212,7 @@ FECarRecord* CreatePinkSlipPreset(const char* presetName) {
 	return FEPlayerCarDB::CreateNewPresetCar(cars, presetName);
 }
 
-IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record) {
+IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, bool forceNOS = false) {
 	// really weird hack for transparent car skins, change to a non-skinnable car first
 	// works but crashes the game after a few attempts
 	//if (hash != Attrib::StringHash32("cs_clio_trafpizza") && GetActiveVehicles(DRIVER_RACER).size() >= 3) {
@@ -246,6 +246,14 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record) {
 	vehicleParams.carClass = DRIVER_HUMAN;
 	vehicleParams.customization = record;
 	vehicleParams.VehicleCache = (IVehicleCache*)GRaceStatus::fObj; // this is what GRacerInfo::CreateVehicle does but it looks SO wrong
+
+	//if (forceNOS && record && record->InstalledPhysics.Part[Physics::Upgrades::Package::PUT_NOS] <= 0) {
+	//	static auto temp = new FECustomizationRecord;
+	//	*temp = *record;
+	//	temp->InstalledPhysics.Part[Physics::Upgrades::Package::PUT_NOS] = 4;
+	//	vehicleParams.customization = temp;
+	//}
+
 	if (auto newCar = PVehicle::Construct(param)) {
 		newCar->Attach(GetLocalPlayer());
 		oldCar->Detach(GetLocalPlayer());

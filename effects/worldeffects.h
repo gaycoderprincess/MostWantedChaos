@@ -35,6 +35,10 @@ public:
 	}
 
 	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayer()) {
+			ply->ResetGameBreaker(false);
+		}
+
 		GameSpeedModifier = 0.5;
 	}
 	void DeinitFunction() override {
@@ -52,6 +56,10 @@ public:
 	}
 
 	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayer()) {
+			ply->ResetGameBreaker(false);
+		}
+
 		GameSpeedModifier = 2;
 	}
 	void DeinitFunction() override {
@@ -69,6 +77,10 @@ public:
 	}
 
 	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayer()) {
+			ply->ResetGameBreaker(false);
+		}
+
 		auto speed = GetLocalPlayerVehicle()->GetSpeed();
 		if (speed < TOMPS(10)) {
 			GameSpeedModifier = TOMPS(150) / TOMPS(10);
@@ -107,6 +119,7 @@ public:
 	Effect_WireframeWorld() : ChaosEffect() {
 		sName = "Wireframe World";
 		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("fillmode");
 	}
 
 	void TickFunction(double delta) override {
@@ -123,6 +136,7 @@ public:
 	Effect_LaserScanWorld() : ChaosEffect() {
 		sName = "Laser-Scanned World";
 		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("fillmode");
 	}
 
 	//static inline float PointSize = 4;

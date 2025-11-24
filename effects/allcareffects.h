@@ -469,3 +469,23 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; }
 } E_BouncyMod;
+
+class Effect_WideCars : public ChaosEffect {
+public:
+	Effect_WideCars() : ChaosEffect() {
+		sName = "Wide Cars";
+		fTimerLength = 60;
+	}
+
+	void InitFunction() override {
+		CarScaleMatrix._v1.x *= 4;
+		CarScaleMatrix._v1.y *= 4;
+		CarScaleMatrix._v1.z *= 4;
+	}
+	void DeinitFunction() override {
+		CarScaleMatrix._v1.x /= 4;
+		CarScaleMatrix._v1.y /= 4;
+		CarScaleMatrix._v1.z /= 4;
+	}
+	bool HasTimer() override { return true; }
+} E_WideCars;

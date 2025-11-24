@@ -249,3 +249,18 @@ public:
 	bool HasTimer() override { return true; }
 	bool IgnoreHUDState() override { return true; }
 } E_NoChaosHUD;
+
+class Effect_PunchHole : public ChaosEffect {
+public:
+	Effect_PunchHole() : ChaosEffect() {
+		sName = "Punch-Hole";
+		sFriendlyName = "Punch-Hole Screen Overlay";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(double delta) override {
+		static auto texture = LoadTexture("CwoeeChaos/data/textures/punchhole.png");
+		DrawRectangle(0, 1, 0, 1, {255,255,255,255}, 0, texture);
+	}
+	bool HasTimer() override { return true; }
+} E_PunchHole;

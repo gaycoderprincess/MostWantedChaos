@@ -247,6 +247,13 @@ bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup) {
 	return false;
 }
 
+int GetRandomNumber(int min, int max) {
+	static std::random_device device;
+	static std::mt19937 randGen(device());
+	std::uniform_int_distribution<> distr(min, max-1);
+	return distr(randGen);
+}
+
 ChaosEffect* GetRandomEffect() {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
@@ -264,7 +271,7 @@ ChaosEffect* GetRandomEffect() {
 		}
 		return GetRandomEffect();
 	}
-	return availableEffects[rand()%availableEffects.size()];
+	return availableEffects[GetRandomNumber(0, availableEffects.size())];
 }
 
 bool RunningEffectsCleanup() {

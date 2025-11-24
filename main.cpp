@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <d3d9.h>
 #include <mutex>
+#include <random>
 #include <toml++/toml.hpp>
 
 #include "nya_dx9_hookbase.h"
