@@ -109,6 +109,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_NeverBusted;
 
+// todo this softlocks the game when starting a milestone or bounty event
 class Effect_NoCops : public ChaosEffect {
 public:
 	Effect_NoCops() : ChaosEffect() {

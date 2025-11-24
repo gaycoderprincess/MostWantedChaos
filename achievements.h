@@ -31,6 +31,7 @@ namespace Achievements {
 		new CAchievement("WIN_RACE", "Starting Point", "Win a race"),
 		new CAchievement("WIN_PINKSLIP", "Take Your Ride", "Win a pinkslip from an effect"),
 		new CAchievement("MILLIONAIRE", "Multi-Millionaire", "Earn $2,000,000"),
+		new CAchievement("ANTI_MILLIONAIRE", "Multi-Brokeionaire", "Earn -$2,000,000"),
 		new CAchievement("LAPS_10", "Time Waster", "Up a race to 10 laps"),
 		new CAchievement("RESTART_LATE", "Trolled", "Have a race restart at over 90% complete"),
 	};

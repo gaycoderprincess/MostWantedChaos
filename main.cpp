@@ -56,11 +56,14 @@ void MoneyChecker() {
 			TempEffect.sName = name.c_str();
 			AddRunningEffect(&TempEffect);
 			// todo this is an unreliable hack
-			if (currentCash > cash && currentCash < cash + 10000) {
+			if (currentCash > cash && currentCash < cash + 15000) {
 				Achievements::AwardAchievement(GetAchievement("WIN_RACE"));
 			}
 			if (currentCash >= 2000000) {
 				Achievements::AwardAchievement(GetAchievement("MILLIONAIRE"));
+			}
+			if (currentCash <= -2000000) {
+				Achievements::AwardAchievement(GetAchievement("ANTI_MILLIONAIRE"));
 			}
 			cash = currentCash;
 		}

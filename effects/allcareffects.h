@@ -519,15 +519,15 @@ public:
 
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
 
-		CarScaleMatrix._v0.x *= 1 + (easeInOutQuart(1 - state) * 0.5);
-		CarScaleMatrix._v0.y *= 1 + (easeInOutQuart(1 - state) * 0.5);
-		CarScaleMatrix._v0.z *= 1 + (easeInOutQuart(1 - state) * 0.5);
-		CarScaleMatrix._v1.x *= 1 + (easeInOutQuart(1 - state) * 0.5);
-		CarScaleMatrix._v1.y *= 1 + (easeInOutQuart(1 - state) * 0.5);
-		CarScaleMatrix._v1.z *= 1 + (easeInOutQuart(1 - state) * 0.5);
-		CarScaleMatrix._v2.x *= 1 + (easeInOutQuart(state) * 0.5);
-		CarScaleMatrix._v2.y *= 1 + (easeInOutQuart(state) * 0.5);
-		CarScaleMatrix._v2.z *= 1 + (easeInOutQuart(state) * 0.5);
+		CarScaleMatrix._v0.x *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix._v0.y *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix._v0.z *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix._v1.x *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix._v1.y *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix._v1.z *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix._v2.x *= 1 + (easeInOutQuart(state) * 0.33);
+		CarScaleMatrix._v2.y *= 1 + (easeInOutQuart(state) * 0.33);
+		CarScaleMatrix._v2.z *= 1 + (easeInOutQuart(state) * 0.33);
 	}
 	void DeinitFunction() override {
 		CarScaleMatrix = UMath::Matrix4::kIdentity;

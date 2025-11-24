@@ -345,6 +345,7 @@ public:
 			if (rand() % 100 < 10) {
 				FEDatabase->mUserProfile->TheCareerSettings.CurrentBin--;
 				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng"); });
+				EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
 			}
 			else {
 				EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
