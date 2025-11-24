@@ -1,7 +1,7 @@
 class Effect_ResetProps : public ChaosEffect {
 public:
 	Effect_ResetProps() : ChaosEffect() {
-		sName = "Respawn All Props";
+		sName = "Respawn Props And Pursuit Breakers";
 	}
 
 	void InitFunction() override {
@@ -31,6 +31,7 @@ public:
 	Effect_SpeedSlow() : ChaosEffect() {
 		sName = "Slow Motion";
 		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("gamespeed");
 	}
 
 	void TickFunction(double delta) override {
@@ -47,6 +48,7 @@ public:
 	Effect_SpeedFast() : ChaosEffect() {
 		sName = "Fast Motion";
 		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("gamespeed");
 	}
 
 	void TickFunction(double delta) override {
@@ -63,6 +65,7 @@ public:
 	Effect_SpeedSpeedBased() : ChaosEffect() {
 		sName = "Reverse Superhot";
 		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("gamespeed");
 	}
 
 	void TickFunction(double delta) override {
@@ -119,7 +122,7 @@ class Effect_LaserScanWorld : public ChaosEffect {
 public:
 	Effect_LaserScanWorld() : ChaosEffect() {
 		sName = "Laser-Scanned World";
-		fTimerLength = 45;
+		fTimerLength = 30;
 	}
 
 	//static inline float PointSize = 4;

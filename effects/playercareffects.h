@@ -249,10 +249,10 @@ public:
 	}
 
 	void InitFunction() override {
-		if (auto max = GetMaxHeat()) {
-			if (*max < 6) *max = 6;
-		}
 		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			if (auto max = GetMaxHeat()) {
+				if (*max < ply->GetHeat() + 1) *max = ply->GetHeat() + 1;
+			}
 			ply->SetHeat(ply->GetHeat() + 1);
 		}
 	}
@@ -516,6 +516,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneNitro;
 
+// instantly drains, need a different method
 /*class Effect_PlayerCarTuneNitro2 : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_PlayerCarTuneNitro2() : EffectBase_PlayerCarHasNitro() {

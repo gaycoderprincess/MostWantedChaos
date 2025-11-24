@@ -25,6 +25,8 @@ void MainLoop() {
 	aMainLoopFunctionsOnce.clear();
 }
 
+bool DisableChaosHUD = false;
+
 #include "d3dhook.h"
 #include "util.h"
 #include "achievements.h"
@@ -51,6 +53,13 @@ void MoneyChecker() {
 			name = std::format("Money changed (${} -> ${})", cash, currentCash);
 			TempEffect.sName = name.c_str();
 			AddRunningEffect(&TempEffect);
+			// todo this is an unreliable hack
+			if (currentCash > cash && currentCash < cash + 10000) {
+				Achievements::AwardAchievement(GetAchievement("WIN_RACE"));
+			}
+			if (currentCash >= 2000000) {
+				Achievements::AwardAchievement(GetAchievement("MILLIONAIRE"));
+			}
 			cash = currentCash;
 		}
 	}
@@ -105,7 +114,7 @@ void ChaosLoop() {
 		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");
 		auto texture = bDarkMode ? textureD : textureL;
 		NyaDrawing::CNyaRGBA32 rgb = bDarkMode ? NyaDrawing::CNyaRGBA32(133,122,168,255) : NyaDrawing::CNyaRGBA32(243,138,175,255);
-		DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, rgb, texture);
+		if (!DisableChaosHUD) DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, rgb, texture);
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
@@ -167,6 +176,12 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Sim Timestep: {:.2f}", Sim::Internal::mSystem->mTimeStep));
 				DrawMenuOption(std::format("Sim Speed: {:.2f}", Sim::Internal::mSystem->mSpeed));
 				DrawMenuOption(std::format("Sim Target Speed: {:.2f}", Sim::Internal::mSystem->mTargetSpeed));
+				if (auto heat = GetMaxHeat()) {
+					DrawMenuOption(std::format("Max Heat: {:.2f}", *heat));
+				}
+				if (GRaceStatus::fObj && GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing) {
+					DrawMenuOption(std::format("Race Completion: {:.2f}", GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete));
+				}
 				//DrawMenuOption(std::format("Race Context: {}", (int)GRaceStatus::fObj->mRaceContext));
 			}
 			else {

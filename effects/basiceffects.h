@@ -231,3 +231,19 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_BlockyCoverMissing;
+
+class Effect_NoChaosHUD : public ChaosEffect {
+public:
+	Effect_NoChaosHUD() : ChaosEffect() {
+		sName = "Disable Chaos Mod HUD";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		DisableChaosHUD = true;
+	}
+	void DeinitFunction() override {
+		DisableChaosHUD = false;
+	}
+	bool HasTimer() override { return true; }
+} E_NoChaosHUD;

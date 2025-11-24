@@ -73,7 +73,13 @@ public:
 	}
 
 	void InitFunction() override {
-		SetRaceNumLaps((*GetRaceNumLaps())+1);
+		auto laps = *GetRaceNumLaps();
+		laps++;
+		if (laps >= 10) {
+			laps = 10;
+			Achievements::AwardAchievement(GetAchievement("LAPS_10"));
+		}
+		SetRaceNumLaps(laps);
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {
@@ -93,7 +99,10 @@ public:
 	void InitFunction() override {
 		auto laps = *GetRaceNumLaps();
 		laps += 3;
-		if (laps > 10) laps = 10;
+		if (laps >= 10) {
+			laps = 10;
+			Achievements::AwardAchievement(GetAchievement("LAPS_10"));
+		}
 		SetRaceNumLaps(laps);
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
@@ -113,6 +122,9 @@ public:
 	}
 
 	void InitFunction() override {
+		if (GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 90) {
+			Achievements::AwardAchievement(GetAchievement("RESTART_LATE"));
+		}
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {

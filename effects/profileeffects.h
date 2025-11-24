@@ -316,6 +316,7 @@ public:
 			FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 50000;
 		}
 		else if (selectedMarker.type == FEMarkerManager::MARKER_PINK_SLIP) {
+			Achievements::AwardAchievement(GetAchievement("WIN_PINKSLIP"));
 			auto ride = unearnedPinkSlips[rand() % unearnedPinkSlips.size()];
 			EffectInstance->sNameToDisplay = std::format("{} ({} - {})", sName, selectedMarker.name, ride.name);
 			CreatePinkSlipPreset(ride.preset);

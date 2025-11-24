@@ -107,6 +107,9 @@ public:
 
 	void Draw(float y) const {
 		if (!IsNameOnScreen()) return;
+		if (DisableChaosHUD && strcmp(pEffect->sName, "Disable Chaos Mod HUD")) return;
+		
+		if (DisableChaosHUD) y = 0;
 
 		auto x = fEffectX;
 		x = 1 - x;

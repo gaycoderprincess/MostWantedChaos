@@ -268,3 +268,21 @@ public:
 	bool HasTimer() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_SetOpponentPittable;
+
+class Effect_NoNitroOpponents : public EffectBase_OpponentInRaceConditional {
+public:
+	Effect_NoNitroOpponents() : EffectBase_OpponentInRaceConditional() {
+		sName = "Disable Opponents' Nitro";
+		fTimerLength = 90;
+	}
+
+	void TickFunction(double delta) override {
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			car->mCOMObject->Find<IEngine>()->ChargeNOS(-1);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_NoNitroOpponents;
