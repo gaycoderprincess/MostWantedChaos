@@ -169,6 +169,9 @@ public:
 			if (rand() % 100 < 10) {
 				__debugbreak();
 			}
+			else {
+				EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
+			}
 			chanceFired = true;
 		}
 	}

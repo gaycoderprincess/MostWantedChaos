@@ -225,6 +225,9 @@ public:
 		fTimerLength = 15;
 	}
 
+	void InitFunction() override {
+		NoResetCount++;
+	}
 	void TickFunction(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
@@ -234,6 +237,9 @@ public:
 			vel.y = 2;
 			rb->SetLinearVelocity(&vel);
 		}
+	}
+	void DeinitFunction() override {
+		NoResetCount--;
 	}
 	bool HasTimer() override { return true; }
 } E_CarFloaty;
@@ -410,3 +416,56 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_SnakeCars;
+
+class Effect_BouncyMod : public EffectBase_ActiveCarsConditional {
+public:
+	Effect_BouncyMod() : EffectBase_ActiveCarsConditional() {
+		sName = "Bouncy Mod";
+		fTimerLength = 90;
+	}
+
+	static inline const char* collections[] = {
+			"cars",
+			"racers",
+			"cops",
+			"tractors",
+			"traffic",
+			"trailers",
+	};
+
+	void TickFunction(double delta) override {
+		for (auto& name : collections) {
+			auto collection = Attrib::FindCollection(Attrib::StringHash32("rigidbodyspecs"), Attrib::StringHash32(name));
+			if (!collection) continue;
+			auto obj = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("OBJ_ELASTICITY"), 0);
+			auto wall = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("WALL_ELASTICITY"), 0);
+			// THE NUMBERS MASON WHAT DO THEY MEAN????
+			obj[0] = 4;
+			obj[1] = 4;
+			obj[2] = 4;
+			obj[3] = 1;
+			wall[0] = 2;
+			wall[1] = 2;
+			wall[2] = 2;
+			wall[3] = 1;
+		}
+	}
+	void DeinitFunction() override {
+		for (auto& name : collections) {
+			auto collection = Attrib::FindCollection(Attrib::StringHash32("rigidbodyspecs"), Attrib::StringHash32(name));
+			if (!collection) continue;
+			auto obj = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("OBJ_ELASTICITY"), 0);
+			auto wall = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("WALL_ELASTICITY"), 0);
+			obj[0] = 0;
+			obj[1] = 0;
+			obj[2] = 0.05;
+			obj[3] = 0;
+			wall[0] = 0;
+			wall[1] = 0;
+			wall[2] = 0;
+			wall[3] = 0;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
+} E_BouncyMod;

@@ -37,23 +37,26 @@ public:
 	virtual bool ShouldAbort() { return false; }
 };
 
+bool bDarkMode = false;
+
 float fEffectX = 0.98;
 float fEffectY = 0.4;
 float fEffectSize = 0.04;
 float fEffectSpacing = 0.045;
 
 float fEffectTextureXSpacing = 0.03;
+float fEffectTextureXSpacingNoTimer = 0.0;
 float fEffectTextureYSpacing = 0.021;
 float fEffectTextureTipX = 0.021;
 float fEffectArcX = -0.003;
 float fEffectArcSize = 0.008;
 float fEffectArcThickness = 0.017;
-float fEffectArcRotation = -1.47;
+float fEffectArcRotation = -1.5;
 
 class ChaosEffectInstance {
 public:
 	ChaosEffect* pEffect = nullptr;
-	const char* sNameToDisplay = nullptr;
+	std::string sNameToDisplay;
 	double fTimer = 0;
 	double fTextTimer = 0;
 	double fTimeConditionMet = 3;
@@ -89,7 +92,7 @@ public:
 	}
 
 	const char* GetName() const {
-		if (sNameToDisplay) return sNameToDisplay;
+		if (!sNameToDisplay.empty()) return sNameToDisplay.c_str();
 		return pEffect->sName;
 	}
 
@@ -114,17 +117,23 @@ public:
 		std::string str = GetName();
 
 		auto width = GetStringWidth(fEffectSize, str.c_str());
+		float barWidth = ((HasTimer() ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());
+		float barTipWidth = (fEffectTextureTipX * GetAspectRatioInv());
 
-		if (fTextTimer < 1) x = std::lerp(1 + width, x, easeInOutQuart(fTextTimer));
+		if (fTextTimer < 1) x = std::lerp(1 + width + barWidth + barTipWidth, x, easeInOutQuart(fTextTimer));
 
-		static auto textureBar = LoadTexture("CwoeeChaos/data/textures/effectbg_bar.png");
-		static auto textureTip = LoadTexture("CwoeeChaos/data/textures/effectbg_end.png");
+		static auto textureBarL = LoadTexture("CwoeeChaos/data/textures/effectbg_bar.png");
+		static auto textureTipL = LoadTexture("CwoeeChaos/data/textures/effectbg_end.png");
+		static auto textureBarD = LoadTexture("CwoeeChaos/data/textures/effectbg_dark_bar.png");
+		static auto textureTipD = LoadTexture("CwoeeChaos/data/textures/effectbg_dark_end.png");
+		auto textureBar = bDarkMode ? textureBarD : textureBarL;
+		auto textureTip = bDarkMode ? textureTipD : textureTipL;
 		if (textureBar && textureTip) {
-			float barX = x - width - (fEffectTextureXSpacing * GetAspectRatioInv());
+			float barX = x - width - barWidth;
 			DrawRectangle(barX, 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureBar);
-			DrawRectangle(barX - (fEffectTextureTipX * GetAspectRatioInv()), barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
-			if (HasTimer()) {
-				DrawArc(barX - (fEffectArcX * GetAspectRatioInv()), y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation + ((pEffect->fTimerLength - (fTimer / pEffect->fTimerLength)) * std::numbers::pi * 2), {255,255,255,255});
+			DrawRectangle(barX - barTipWidth, barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
+			if (HasTimer() && fTimer > 0) {
+				DrawArc(barX - (fEffectArcX * GetAspectRatioInv()), y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
 			}
 		}
 		//static auto texture = LoadTexture("CwoeeChaos/data/textures/effectbg.png");

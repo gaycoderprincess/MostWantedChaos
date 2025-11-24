@@ -101,8 +101,11 @@ void ChaosLoop() {
 	
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime;
-		static auto texture = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
-		DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, {243,138,175,255}, texture);
+		static auto textureL = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
+		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");
+		auto texture = bDarkMode ? textureD : textureL;
+		NyaDrawing::CNyaRGBA32 rgb = bDarkMode ? NyaDrawing::CNyaRGBA32(133,122,168,255) : NyaDrawing::CNyaRGBA32(243,138,175,255);
+		DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, rgb, texture);
 		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
 			fTimeSinceLastEffect -= fEffectCycleTimer;
 			AddRunningEffect(GetRandomEffect());
@@ -123,6 +126,9 @@ void ChaosModMenu() {
 
 	if (DrawMenuOption("UI")) {
 		ChloeMenuLib::BeginMenu();
+		if (DrawMenuOption(std::format("Dark Mode - {}", bDarkMode))) {
+			bDarkMode = !bDarkMode;
+		}
 		QuickValueEditor("fEffectX", fEffectX);
 		QuickValueEditor("fEffectY", fEffectY);
 		QuickValueEditor("fEffectSize", fEffectSize);
@@ -183,6 +189,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Add Effect")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
+				if (effect->DebugNeverPick) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
 					AddRunningEffect(effect);
 				}
@@ -193,6 +200,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Hideable Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
+				if (effect->DebugNeverPick) continue;
 				if (!effect->IsConditionallyAvailable()) continue;
 				if (effect->AbortOnConditionFailed()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
@@ -205,6 +213,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("15 sec Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
+				if (effect->DebugNeverPick) continue;
 				if (effect->fTimerLength != 15) continue;
 				if (!effect->HasTimer()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
@@ -217,6 +226,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("30 sec Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
+				if (effect->DebugNeverPick) continue;
 				if (effect->fTimerLength != 30) continue;
 				if (!effect->HasTimer()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
@@ -229,6 +239,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Rehideable Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
+				if (effect->DebugNeverPick) continue;
 				if (!effect->IsRehideable()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {
 					AddRunningEffect(effect);
@@ -240,6 +251,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Unmarked Variable Timer Effects")) {
 			ChloeMenuLib::BeginMenu();
 			for (auto& effect : ChaosEffect::aEffects) {
+				if (effect->DebugNeverPick) continue;
 				if (effect->fTimerLength == 15) continue;
 				if (effect->HasTimer()) continue;
 				if (DrawMenuOption(effect->GetFriendlyName())) {

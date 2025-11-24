@@ -119,11 +119,15 @@ class Effect_LaserScanWorld : public ChaosEffect {
 public:
 	Effect_LaserScanWorld() : ChaosEffect() {
 		sName = "Laser-Scanned World";
-		fTimerLength = 30;
+		fTimerLength = 45;
 	}
+
+	//static inline float PointSize = 4;
 
 	void TickFunction(double delta) override {
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
+		//g_pd3dDevice->SetRenderState(D3DRS_POINTSCALEENABLE, TRUE);
+		//g_pd3dDevice->SetRenderState(D3DRS_POINTSIZE, PointSize);
 	}
 	void DeinitFunction() override {
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);

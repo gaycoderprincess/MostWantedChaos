@@ -196,7 +196,7 @@ public:
 class Effect_PlayerCarImpoundMarker : public ChaosEffect {
 public:
 	Effect_PlayerCarImpoundMarker() : ChaosEffect() {
-		sName = "Add An Extra Marker To Active Career Car";
+		sName = "Add Extra Marker Slot To Active Career Car";
 	}
 
 	void InitFunction() override {
@@ -246,9 +246,7 @@ public:
 
 		tMarker selectedMarker = markers[rand()%markers.size()];
 
-		auto effectName = new char[64];
-		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
-		EffectInstance->sNameToDisplay = effectName;
+		EffectInstance->sNameToDisplay = std::format("{} ({})", sName, selectedMarker.name);
 		FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
 	}
 } E_AddRandomTuningMarker;
@@ -313,13 +311,13 @@ public:
 
 		auto effectName = new char[64];
 		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
-		EffectInstance->sNameToDisplay = effectName;
+		EffectInstance->sNameToDisplay = std::format("{} ({})", sName, selectedMarker.name);
 		if (selectedMarker.type == FEMarkerManager::MARKER_CASH) {
 			FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 50000;
 		}
 		else if (selectedMarker.type == FEMarkerManager::MARKER_PINK_SLIP) {
 			auto ride = unearnedPinkSlips[rand() % unearnedPinkSlips.size()];
-			strcpy_s(effectName, 64, std::format("{} ({} - {})", sName, selectedMarker.name, ride.name).c_str());
+			EffectInstance->sNameToDisplay = std::format("{} ({} - {})", sName, selectedMarker.name, ride.name);
 			CreatePinkSlipPreset(ride.preset);
 			FEPlayerCarDB::AwardRivalCar(&FEDatabase->mUserProfile->PlayersCarStable, FEngHashString(ride.preset));
 		}
@@ -328,3 +326,33 @@ public:
 		}
 	}
 } E_AddRandomBonusMarker;
+
+class Effect_SkipChance : public ChaosEffect {
+public:
+	bool chanceFired = false;
+
+	Effect_SkipChance() : ChaosEffect() {
+		sName = "10% Chance Of Boss Skip";
+	}
+
+	void InitFunction() override {
+		chanceFired = false;
+	}
+	void TickFunction(double delta) override {
+		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
+			if (rand() % 100 < 10) {
+				FEDatabase->mUserProfile->TheCareerSettings.CurrentBin--;
+				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng"); });
+			}
+			else {
+				EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
+			}
+			chanceFired = true;
+		}
+	}
+	bool IsAvailable() override {
+		return FEDatabase->mUserProfile->TheCareerSettings.CurrentBin > 1;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_SkipChance;
