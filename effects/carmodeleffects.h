@@ -110,7 +110,7 @@ public:
 
 		auto cars = GetActiveVehicles(DRIVER_TRAFFIC);
 		for (auto& car : cars) {
-			if (car->GetVehicleKey() != ForcedTrafficVehicle) car->mCOMObject->Find<ISimable>()->Kill();
+			if (strcmp(car->GetVehicleName(), "trafpizza")) car->mCOMObject->Find<ISimable>()->Kill();
 		}
 	}
 	void DeinitFunction() override {

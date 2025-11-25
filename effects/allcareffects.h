@@ -288,7 +288,7 @@ public:
 			auto rb = racer->mCOMObject->Find<IRigidBody>();
 			auto damage = racer->mCOMObject->Find<IDamageable>();
 			if (!rb || !damage) continue;
-			if (damage->IsDestroyed()) continue;
+			if (IsCarDestroyed(racer)) continue;
 			UMath::Vector3 up;
 			rb->GetUpVector(&up);
 			if (up.y < 0) {
@@ -507,14 +507,12 @@ public:
 		IncompatibilityGroup = Attrib::StringHash32("car_scale");
 	}
 
+	NyaAudio::NyaSound sound = 0;
+
 	void InitFunction() override {
 		state = 0;
 
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/dealer.mp3");
-		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
-			NyaAudio::Play(sound);
-		}
+		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/dealer.mp3");
 	}
 	void TickFunction(double delta) override {
 		state += delta * (goBack ? -GroovySpeed : GroovySpeed);
@@ -532,9 +530,18 @@ public:
 		CarScaleMatrix._v2.x *= 1 + (easeInOutQuart(state) * 0.33);
 		CarScaleMatrix._v2.y *= 1 + (easeInOutQuart(state) * 0.33);
 		CarScaleMatrix._v2.z *= 1 + (easeInOutQuart(state) * 0.33);
+
+		if (sound && NyaAudio::IsFinishedPlaying(sound)) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound);
+		}
 	}
 	void DeinitFunction() override {
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
+
+		if (sound && !NyaAudio::IsFinishedPlaying(sound)) {
+			NyaAudio::Stop(sound);
+		}
 	}
 	bool HasTimer() override { return true; }
 } E_GroovyCars;
@@ -556,3 +563,22 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_TeleportAllCars;
+
+/*class Effect_HeavyTraffic : public EffectBase_NotInPursuitConditional {
+public:
+	Effect_HeavyTraffic() : EffectBase_NotInPursuitConditional() {
+		sName = "Rush Hour Traffic";
+		fTimerLength = 90;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch<uint64_t>(0x4263DC, 0x4C8D909090909090); // AITrafficManager::GetAvailableTrafficVehicle
+		NyaHookLib::Patch<uint16_t>(0x42634C, 0x9090); // AITrafficManager::NextSpawn
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint64_t>(0x4263DC, 0x4C8D000000A9840F);
+		NyaHookLib::Patch<uint16_t>(0x42634C, 0x0773);
+	}
+	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_HeavyTraffic;*/

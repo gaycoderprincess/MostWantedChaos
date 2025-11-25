@@ -348,3 +348,10 @@ void TeleportPlayer(UMath::Vector3 pos, UMath::Vector3 fwd) {
 	Sim::SetStream(&pos, true);
 	GetLocalPlayerVehicle()->SetVehicleOnGround(&pos, &fwd);
 }
+
+bool IsCarDestroyed(IVehicle* car) {
+	auto engine = car->mCOMObject->Find<IEngineDamage>();
+	if (engine && engine->IsBlown()) return true;
+	if (engine && engine->IsSabotaged()) return true;
+	return car->IsDestroyed();
+}

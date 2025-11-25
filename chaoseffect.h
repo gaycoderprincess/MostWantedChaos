@@ -134,7 +134,7 @@ public:
 			float barX = x - width - barWidth;
 			DrawRectangle(barX, 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureBar);
 			DrawRectangle(barX - barTipWidth, barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
-			if (HasTimer() && fTimer > 0) {
+			if (HasTimer() && fTimer > 0.01) {
 				float arcX = barX - (fEffectArcX * GetAspectRatioInv());
 				DrawArc(arcX, y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
 				if (fTimer < 5 && pEffect->fTimerLength > 5) {

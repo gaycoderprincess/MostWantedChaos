@@ -24,6 +24,7 @@ public:
 	bool HasTimer() override { return true; }
 } E_TransRights;
 
+// todo i think this crashes randomly upon launching into the world
 class Effect_ReverseText : public ChaosEffect {
 public:
 	Effect_ReverseText() : ChaosEffect() {

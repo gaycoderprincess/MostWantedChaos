@@ -195,6 +195,9 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Sim Speed: {:.2f}", Sim::Internal::mSystem->mSpeed));
 				DrawMenuOption(std::format("Sim Target Speed: {:.2f}", Sim::Internal::mSystem->mTargetSpeed));
 				DrawMenuOption(std::format("Wheel Velocity: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetWheelAngularVelocity(0)));
+				DrawMenuOption(std::format("Racers: {}", VEHICLE_LIST::GetList(VEHICLE_AIRACERS).size()));
+				DrawMenuOption(std::format("Cops: {}", VEHICLE_LIST::GetList(VEHICLE_AICOPS).size()));
+				DrawMenuOption(std::format("Traffic: {}", VEHICLE_LIST::GetList(VEHICLE_AITRAFFIC).size()));
 				if (auto heat = GetMaxHeat()) {
 					DrawMenuOption(std::format("Max Heat: {:.2f}", *heat));
 				}
@@ -306,7 +309,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				func();
 			}
 
-			ChloeMenuLib::RegisterMenu("Chaos Test Menu", &ChaosModMenu);
+			ChloeMenuLib::RegisterMenu("Cwoee Chaos", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
 
 			NyaHooks::PlaceD3DHooks();

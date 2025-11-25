@@ -628,7 +628,7 @@ class Effect_PlayerCarSpikeAll : public ChaosEffect {
 public:
 	Effect_PlayerCarSpikeAll() : ChaosEffect() {
 		sName = "Puncture Player's Tires";
-		fTimerLength = 15;
+		fTimerLength = 10;
 	}
 
 	void InitFunction() override {
@@ -659,6 +659,16 @@ public:
 			ply->ResetDamage();
 		}
 	}
+	bool IsAvailable() override {
+		if (auto ply = GetLocalPlayerInterface<ISpikeable>()) {
+			for (int i = 0; i < 4; i++) {
+				if (ply->GetTireDamage(i) != TIRE_DAMAGE_NONE) return true;
+			}
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_FixPlayerCar;
 
 class Effect_NoReset : public ChaosEffect {
@@ -1132,9 +1142,9 @@ public:
 } E_PlayerTPHidingSpot;
 
 // this technically affects all cars but it's here in playercareffects since it mostly only affects the player
-class Effect_NOSBoost : public ChaosEffect {
+class Effect_NOSBoost : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_NOSBoost() : ChaosEffect() {
+	Effect_NOSBoost() : EffectBase_PlayerCarHasNitro() {
 		sName = "Nitro Boosting";
 		fTimerLength = 45;
 	}
@@ -1149,13 +1159,14 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_NOSBoost;
 
 class Effect_CruiseControl : public ChaosEffect {
 public:
 	Effect_CruiseControl() : ChaosEffect() {
 		sName = "Cruise Control";
-		fTimerLength = 30;
+		fTimerLength = 15;
 	}
 
 	void TickFunction(double timer) override {
