@@ -326,7 +326,7 @@ struct CwoeeCarPhysicalState {
 	UMath::Vector3 avel;
 
 	CwoeeCarPhysicalState() {}
-	CwoeeCarPhysicalState(IVehicle* veh) { Capture(veh); }
+	explicit CwoeeCarPhysicalState(IVehicle* veh) { Capture(veh); }
 
 	void Capture(IVehicle* veh) {
 		auto rb = veh->mCOMObject->Find<IRigidBody>();

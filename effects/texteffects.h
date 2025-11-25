@@ -4,6 +4,7 @@ public:
 	Effect_TransRights() : ChaosEffect() {
 		sName = "Trans Rights";
 		fTimerLength = 120;
+		IncompatibilityGroup = Attrib::StringHash32("string_replace");
 	}
 
 	void InitFunction() override {
@@ -38,3 +39,21 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_ReverseText;
+
+// incredibly unstable
+/*class Effect_RandomText : public ChaosEffect {
+public:
+	Effect_RandomText() : ChaosEffect() {
+		sName = "Random Text";
+		fTimerLength = 120;
+		IncompatibilityGroup = Attrib::StringHash32("string_replace");
+	}
+
+	void InitFunction() override {
+		TextHook_RandomText = true;
+	}
+	void DeinitFunction() override {
+		TextHook_RandomText = false;
+	}
+	bool HasTimer() override { return true; }
+} E_RandomText;*/

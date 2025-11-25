@@ -162,7 +162,7 @@ public:
 				// todo incorporate GetGroundNormal somehow
 
 				auto vel = *rb->GetLinearVelocity();
-				vel.y = 2;
+				vel.y = 3;
 				rb->SetLinearVelocity(&vel);
 			}
 		}
@@ -482,14 +482,10 @@ public:
 	void TickFunction(double delta) override {
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
 
-		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
-		if (EffectInstance->fTimer > fTimerLength - 1) {
-			fadeIn = fTimerLength - EffectInstance->fTimer;
-		}
-
-		CarScaleMatrix._v1.x *= 1 + (easeInOutQuart(fadeIn) * 3);
-		CarScaleMatrix._v1.y *= 1 + (easeInOutQuart(fadeIn) * 3);
-		CarScaleMatrix._v1.z *= 1 + (easeInOutQuart(fadeIn) * 3);
+		auto fadeIn = GetEffectFadeInOut(this, 1, true);
+		CarScaleMatrix._v1.x *= 1 + (fadeIn * 3);
+		CarScaleMatrix._v1.y *= 1 + (fadeIn * 3);
+		CarScaleMatrix._v1.z *= 1 + (fadeIn * 3);
 	}
 	void DeinitFunction() override {
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
@@ -554,7 +550,7 @@ public:
 		auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
-			if (car == GetLocalPlayerVehicle()) continue;
+			//if (car == GetLocalPlayerVehicle()) continue;
 			car->SetVehicleOnGround(&pos, &fwd);
 		}
 	}

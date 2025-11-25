@@ -1,3 +1,11 @@
+float GetEffectFadeInOut(ChaosEffect* effect, float time, bool ease) {
+	float fade = effect->EffectInstance->fTimer > time ? 1 : effect->EffectInstance->fTimer / time;
+	if (effect->EffectInstance->fTimer > effect->fTimerLength - time) {
+		fade = (effect->fTimerLength - effect->EffectInstance->fTimer) / time;
+	}
+	return ease ? easeInOutQuart(fade) : fade;
+}
+
 class Effect_Blind : public ChaosEffect {
 public:
 	Effect_Blind() : ChaosEffect() {
@@ -58,13 +66,11 @@ public:
 	Effect_PortraitMode() : ChaosEffect() {
 		sName = "Portrait Mode";
 		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("letterbox_aspect");
 	}
 
 	void TickFunction(double delta) override {
-		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
-		if (EffectInstance->fTimer > fTimerLength - 1) {
-			fadeIn = fTimerLength - EffectInstance->fTimer;
-		}
+		auto fadeIn = GetEffectFadeInOut(this, 1, true);
 		DrawRectangle(0, std::lerp(0,0.33, fadeIn), 0, 1, {0,0,0,255});
 		DrawRectangle(std::lerp(1,0.66, fadeIn), 1, 0, 1, {0,0,0,255});
 	}
@@ -77,6 +83,7 @@ public:
 	Effect_43Borders() : ChaosEffect() {
 		sName = "4:3 Letterboxed";
 		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("letterbox_aspect");
 	}
 
 	void TickFunction(double delta) override {
@@ -84,11 +91,7 @@ public:
 		auto left = 0.5 - fLetterboxMultiplier;
 		auto right = 0.5 + fLetterboxMultiplier;
 
-		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
-		if (EffectInstance->fTimer > fTimerLength - 1) {
-			fadeIn = fTimerLength - EffectInstance->fTimer;
-		}
-
+		auto fadeIn = GetEffectFadeInOut(this, 1, true);
 		DrawRectangle(0, std::lerp(0,left, fadeIn), 0, 1, {0,0,0,255});
 		DrawRectangle(std::lerp(1,right, fadeIn), 1, 0, 1, {0,0,0,255});
 	}
@@ -109,10 +112,7 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		float fadeIn = EffectInstance->fTimer > 1 ? 1 : EffectInstance->fTimer;
-		if (EffectInstance->fTimer > fTimerLength - 1) {
-			fadeIn = fTimerLength - EffectInstance->fTimer;
-		}
+		auto fadeIn = GetEffectFadeInOut(this, 1, true);
 		DrawRectangle(0, 1, 0, std::lerp(0,0.1, fadeIn), {0,0,0,255});
 		DrawRectangle(0, 1, std::lerp(1,0.9, fadeIn), 1, {0,0,0,255});
 	}

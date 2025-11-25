@@ -1169,3 +1169,25 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_CruiseControl;
+
+class Effect_Skyfall : public ChaosEffect {
+public:
+	Effect_Skyfall() : ChaosEffect() {
+		sName = "Skyfall";
+		fTimerLength = 20;
+	}
+
+	void InitFunction() override {
+		NoResetCount++;
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			auto pos = *ply->GetPosition();
+			pos.y += 2500;
+			ply->SetPosition(&pos);
+			ply->SetLinearVelocity(&UMath::Vector3::kZero);
+		}
+	}
+	void DeinitFunction() override {
+		NoResetCount--;
+	}
+	bool HasTimer() override { return true; }
+} E_Skyfall;

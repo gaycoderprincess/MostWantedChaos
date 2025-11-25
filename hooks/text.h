@@ -1,4 +1,5 @@
 bool TextHook_ReverseText = false;
+bool TextHook_RandomText = false;
 const char* TextHook_ReplaceText = nullptr;
 
 bool CanStringBeReversed(const std::string& str) {
@@ -10,6 +11,12 @@ bool CanStringBeReversed(const std::string& str) {
 
 const char* __fastcall SearchForStringHooked(void* a1, uint32_t a2) {
 	auto str = SearchForString(a1, a2);
+	if (TextHook_RandomText && CanStringBeReversed(str)) {
+		auto len = strlen(str);
+		do {
+			str = RecordTable[rand() % NumStringRecords].PackedString;
+		} while (!str || !CanStringBeReversed(str) || strlen(str) > len);
+	}
 	if (TextHook_ReplaceText) str = TextHook_ReplaceText;
 	if (str && TextHook_ReverseText && CanStringBeReversed(str)) {
 		std::string reversed = str;
