@@ -308,6 +308,7 @@ bool RunningEffectsCleanup() {
 #include "effects/playercareffects.h"
 #include "effects/opponentcareffects.h"
 #include "effects/allcareffects.h"
+#include "effects/trafficeffects.h"
 #include "effects/raceeffects.h"
 #include "effects/hudeffects.h"
 #include "effects/pursuiteffects.h"
