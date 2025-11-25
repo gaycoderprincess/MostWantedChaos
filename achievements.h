@@ -29,10 +29,13 @@ namespace Achievements {
 
 	std::vector<CAchievement*> gAchievements = {
 		new CAchievement("WIN_RACE", "Starting Point", "Win a race"),
+		new CAchievement("WIN_RACE_LEAKTANK", "Gas Budgeting", "Win a race with Leaking Gas Tank"),
+		new CAchievement("WIN_RACE_TRAFPIZZA", "Express Delivery", "Win a race with TRAFPIZZA"),
 		new CAchievement("WIN_PINKSLIP", "Take Your Ride", "Win a pinkslip from an effect"),
 		new CAchievement("MILLIONAIRE", "Multi-Millionaire", "Earn $2,000,000"),
-		new CAchievement("ANTI_MILLIONAIRE", "Multi-Brokeionaire", "Earn -$2,000,000"),
+		new CAchievement("ANTI_MILLIONAIRE", "Multi-Brokeionaire", "'Earn' -$2,000,000"),
 		new CAchievement("LAPS_10", "Time Waster", "Up a race to 10 laps"),
+		new CAchievement("LAPS_1", "Lap Glitch", "Lower a race to 1 lap"),
 		new CAchievement("RESTART_LATE", "Trolled", "Have a race restart at over 90% complete"),
 	};
 

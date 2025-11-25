@@ -9,6 +9,10 @@ bool OpponentPlayerCar = false;
 bool OpponentPlayerCarRandom = false;
 uint32_t PlayerCarModel;
 FECustomizationRecord PlayerCarCustomizations;
+uint32_t LastOpponentVehicleSpawn = 0;
+bool LastOpponentPlayerCar = 0;
+bool LastOpponentPlayerCarRandom = 0;
+bool LastOpponentFullyTuned = 0;
 
 ISimable* VehicleConstructHooked(Sim::Param params) {
 	auto vehicle = (VehicleParams*)params.mData;
@@ -39,12 +43,20 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 		if (ForcedOpponentVehicle) {
 			vehicle->carType = ForcedOpponentVehicle;
 			vehicle->customization = nullptr;
+			LastOpponentVehicleSpawn = ForcedOpponentVehicle;
+		}
+		else {
+			LastOpponentVehicleSpawn = 0;
 		}
 		if (OpponentPlayerCar) {
 			vehicle->carType = PlayerCarModel;
 			vehicle->customization = new FECustomizationRecord;
 			*vehicle->customization = PlayerCarCustomizations;
 			vehicle->matched = nullptr;
+			LastOpponentPlayerCar = true;
+		}
+		else {
+			LastOpponentPlayerCar = false;
 		}
 		if (OpponentPlayerCarRandom) {
 			if (auto car = GetRandomCareerCar()) {
@@ -59,12 +71,20 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 				*vehicle->customization = PlayerCarCustomizations;
 				vehicle->matched = nullptr;
 			}
+			LastOpponentPlayerCarRandom = true;
+		}
+		else {
+			LastOpponentPlayerCarRandom = false;
 		}
 		if (OpponentsFullyTuned) {
 			if (!vehicle->matched) vehicle->matched = new Physics::Info::Performance;
 			vehicle->matched->Acceleration = 100;
 			vehicle->matched->Handling = 100;
 			vehicle->matched->TopSpeed = 100;
+			LastOpponentFullyTuned = true;
+		}
+		else {
+			LastOpponentFullyTuned = false;
 		}
 		if (RandomizeOpponentTuning) {
 			vehicle->customization = new FECustomizationRecord;

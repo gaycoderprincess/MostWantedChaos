@@ -153,4 +153,102 @@ public:
 	bool RunInMenus() override { return true; }
 } E_LaserScanWorld;
 
+class Effect_SlipperyWorld : public ChaosEffect {
+public:
+	struct tBackup {
+		uint32_t collection;
+		uint32_t key;
+		float value;
+	};
+	std::vector<tBackup> backups;
+
+	Effect_SlipperyWorld() : ChaosEffect() {
+		sName = "Slippery World";
+		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("simsurface_friction");
+	}
+
+	void InitFunction() override {
+		backups.clear();
+		auto pClass = Attrib::Database::GetClass(Attrib::Database::sThis, Attrib::StringHash32("simsurface"));
+		auto collHash = Attrib::Class::GetFirstCollection(pClass);
+		while (collHash) {
+			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), collHash);
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("GROUND_FRICTION"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("GROUND_FRICTION"), *f1});
+				*f1 /= 4;
+			}
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("DRIVE_GRIP"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("DRIVE_GRIP"), *f1});
+				*f1 /= 2;
+			}
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("LATERAL_GRIP"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("LATERAL_GRIP"), *f1});
+				*f1 /= 2;
+			}
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("ROLLING_RESISTANCE"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("ROLLING_RESISTANCE"), *f1});
+				*f1 /= 4;
+			}
+			collHash = Attrib::Class::GetNextCollection(pClass, collHash);
+		}
+	}
+	void DeinitFunction() override {
+		for (auto& backup : backups) {
+			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), backup.collection);
+			*(float*)Attrib::Collection::GetData(collection, backup.key, 0) = backup.value;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_SlipperyWorld;
+
+class Effect_GrippyWorld : public ChaosEffect {
+public:
+	struct tBackup {
+		uint32_t collection;
+		uint32_t key;
+		float value;
+	};
+	std::vector<tBackup> backups;
+
+	Effect_GrippyWorld() : ChaosEffect() {
+		sName = "Grippy World";
+		fTimerLength = 30;
+		IncompatibilityGroup = Attrib::StringHash32("simsurface_friction");
+	}
+
+	void InitFunction() override {
+		backups.clear();
+		auto pClass = Attrib::Database::GetClass(Attrib::Database::sThis, Attrib::StringHash32("simsurface"));
+		auto collHash = Attrib::Class::GetFirstCollection(pClass);
+		while (collHash) {
+			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), collHash);
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("GROUND_FRICTION"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("GROUND_FRICTION"), *f1});
+				*f1 *= 4;
+			}
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("DRIVE_GRIP"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("DRIVE_GRIP"), *f1});
+				*f1 *= 2;
+			}
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("LATERAL_GRIP"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("LATERAL_GRIP"), *f1});
+				*f1 *= 2;
+			}
+			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("ROLLING_RESISTANCE"), 0)) {
+				backups.push_back({collHash, Attrib::StringHash32("ROLLING_RESISTANCE"), *f1});
+				*f1 *= 4;
+			}
+			collHash = Attrib::Class::GetNextCollection(pClass, collHash);
+		}
+	}
+	void DeinitFunction() override {
+		for (auto& backup : backups) {
+			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), backup.collection);
+			*(float*)Attrib::Collection::GetData(collection, backup.key, 0) = backup.value;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_GrippyWorld;
+
 // todo change ColourBloomTint in visuallook for a rainbow world thing?

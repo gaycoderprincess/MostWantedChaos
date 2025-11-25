@@ -39,6 +39,17 @@ bool DisableChaosHUD = false;
 #include "hooks/text.h"
 #include "chaoseffect.h"
 
+void OnWinRace() {
+	Achievements::AwardAchievement(GetAchievement("WIN_RACE"));
+	if (IsEffectRunning(&E_LeakTank)) {
+		Achievements::AwardAchievement(GetAchievement("WIN_RACE_LEAKTANK"));
+	}
+	auto plyModel = GetLocalPlayerVehicle()->GetVehicleName();
+	if (!strcmp(plyModel, "cs_clio_trafpizza")) {
+		Achievements::AwardAchievement(GetAchievement("WIN_RACE_TRAFPIZZA"));
+	}
+}
+
 void MoneyChecker() {
 	static ChaosEffect TempEffect;
 	TempEffect.DebugNeverPick = true;
@@ -57,7 +68,7 @@ void MoneyChecker() {
 			AddRunningEffect(&TempEffect);
 			// todo this is an unreliable hack
 			if (currentCash > cash && currentCash < cash + 15000) {
-				Achievements::AwardAchievement(GetAchievement("WIN_RACE"));
+				OnWinRace();
 			}
 			if (currentCash >= 2000000) {
 				Achievements::AwardAchievement(GetAchievement("MILLIONAIRE"));

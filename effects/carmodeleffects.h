@@ -14,7 +14,8 @@ public:
 		ForcedOpponentVehicle = 0;
 		RandomizeOpponentTuning = false;
 	}
-	bool HasTimer() override { return true; }
+	bool InfiniteTimer() override { return LastOpponentVehicleSpawn != Attrib::StringHash32("bmwm3gtre46"); }
+	bool HasTimer() override { return !InfiniteTimer(); }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsRazor;
 
@@ -34,7 +35,8 @@ public:
 		ForcedOpponentVehicle = 0;
 		RandomizeOpponentTuning = false;
 	}
-	bool HasTimer() override { return true; }
+	bool InfiniteTimer() override { return LastOpponentVehicleSpawn != Attrib::StringHash32("gti"); }
+	bool HasTimer() override { return !InfiniteTimer(); }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsGolf;
 
@@ -52,7 +54,8 @@ public:
 	void DeinitFunction() override {
 		OpponentPlayerCar = false;
 	}
-	bool HasTimer() override { return true; }
+	bool InfiniteTimer() override { return !LastOpponentPlayerCar; }
+	bool HasTimer() override { return !InfiniteTimer(); }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayer;
 
@@ -70,7 +73,8 @@ public:
 	void DeinitFunction() override {
 		OpponentPlayerCarRandom = false;
 	}
-	bool HasTimer() override { return true; }
+	bool InfiniteTimer() override { return !LastOpponentPlayerCarRandom; }
+	bool HasTimer() override { return !InfiniteTimer(); }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayerRandom;
 
@@ -88,7 +92,8 @@ public:
 	void DeinitFunction() override {
 		OpponentsFullyTuned = false;
 	}
-	bool HasTimer() override { return true; }
+	bool InfiniteTimer() override { return !LastOpponentFullyTuned; }
+	bool HasTimer() override { return !InfiniteTimer(); }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsJunkman;
 

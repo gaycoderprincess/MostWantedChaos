@@ -1129,3 +1129,23 @@ public:
 		TeleportPlayer({-2200.7, 144.6, 1458.7}, {-0.14, 0.0, 0.99});
 	}
 } E_PlayerTPHidingSpot;
+
+// this technically affects all cars but it's here in playercareffects since it mostly only affects the player
+class Effect_NOSBoost : public ChaosEffect {
+public:
+	Effect_NOSBoost() : ChaosEffect() {
+		sName = "NOS Boosting";
+		fTimerLength = 45;
+	}
+
+	void TickFunction(double timer) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			auto engine = car->mCOMObject->Find<IEngine>();
+			if (!engine) continue;
+			if (!engine->IsNOSEngaged()) continue;
+			car->SetSpeed(TOMPS(300));
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_NOSBoost;

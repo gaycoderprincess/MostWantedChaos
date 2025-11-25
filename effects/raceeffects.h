@@ -55,7 +55,13 @@ public:
 	}
 
 	void InitFunction() override {
-		SetRaceNumLaps((*GetRaceNumLaps())-1);
+		auto laps = *GetRaceNumLaps();
+		laps--;
+		if (laps <= 1) {
+			laps = 1;
+			Achievements::AwardAchievement(GetAchievement("LAPS_1"));
+		}
+		SetRaceNumLaps(laps);
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {
