@@ -24,7 +24,6 @@ public:
 	bool HasTimer() override { return true; }
 } E_TransRights;
 
-// todo i think this crashes randomly upon launching into the world
 class Effect_ReverseText : public ChaosEffect {
 public:
 	Effect_ReverseText() : ChaosEffect() {
@@ -33,12 +32,13 @@ public:
 	}
 
 	void InitFunction() override {
-		TextHook_ReverseText = true;
+		TextHook_ReverseText = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
 	}
 	void DeinitFunction() override {
 		TextHook_ReverseText = false;
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_ReverseText;
 
 // incredibly unstable
