@@ -1,12 +1,7 @@
 void UpdateD3DProperties() {
 	g_pd3dDevice = *(IDirect3DDevice9**)0x982BDC;
 	ghWnd = *(HWND*)0x982BF4;
-
-	// todo this can prolly be done better
-	RECT rect;
-	GetWindowRect(ghWnd, &rect);
-	nResX = rect.right - rect.left;
-	nResY = rect.bottom - rect.top;
+	GetRacingResolution(&nResX, &nResY);
 }
 
 bool bDeviceJustReset = false;

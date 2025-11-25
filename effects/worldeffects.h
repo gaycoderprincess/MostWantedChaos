@@ -229,11 +229,11 @@ public:
 			}
 			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("DRIVE_GRIP"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("DRIVE_GRIP"), *f1});
-				*f1 *= 2;
+				*f1 *= 4;
 			}
 			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("LATERAL_GRIP"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("LATERAL_GRIP"), *f1});
-				*f1 *= 2;
+				*f1 *= 4;
 			}
 			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("ROLLING_RESISTANCE"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("ROLLING_RESISTANCE"), *f1});

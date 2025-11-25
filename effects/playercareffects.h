@@ -1149,3 +1149,22 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_NOSBoost;
+
+class Effect_CruiseControl : public ChaosEffect {
+public:
+	Effect_CruiseControl() : ChaosEffect() {
+		sName = "Cruise Control";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(double timer) override {
+		// this results in around 60km/h with my cobalt
+		if (auto ply = GetLocalPlayerInterface<ISuspension>()) {
+			ply->SetWheelAngularVelocity(0, 50.0);
+			ply->SetWheelAngularVelocity(1, 50.0);
+			ply->SetWheelAngularVelocity(2, 50.0);
+			ply->SetWheelAngularVelocity(3, 50.0);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_CruiseControl;
