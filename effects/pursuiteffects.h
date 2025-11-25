@@ -145,7 +145,8 @@ public:
 		NyaHookLib::Patch<uint8_t>(0x429949, 0x74);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
+	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_NoHidingSpots;
 
 class Effect_SetCopMassInf : public EffectBase_ActiveCopsConditional {
@@ -174,38 +175,44 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
+	bool IsRehideable() override { return true; }
 } E_SetCopMassInf;
 
-// todo add this back once there's enough effects for it not to be too unfairly frequent
-/*class Effect_GetBusted : public EffectBase_PursuitConditional {
+class Effect_GetBusted : public EffectBase_PursuitConditional {
 public:
+	bool pass = false;
+
 	Effect_GetBusted() : EffectBase_PursuitConditional() {
-		sName = "Get Busted";
+		sName = "10% Chance Of Getting Busted";
 		fTimerLength = 2;
 	}
 
+	void InitFunction() override {
+		if (pass = rand() % 100 < 10) {
+			EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
+		}
+		else {
+			EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
+		}
+	}
 	void TickFunction(double delta) override {
-		static float f = -999.0;
-		NyaHookLib::Patch(0x4445CC + 2, &f);
+		if (pass) {
+			static float f = -999.0;
+			NyaHookLib::Patch(0x4445CC + 2, &f);
+		}
 	}
 	void DeinitFunction() override {
 		NyaHookLib::Patch(0x4445CC + 2, 0x890DA4);
 	}
-	bool ShouldAbort() override {
-		if (auto ply = GetLocalPlayerInterface<IPursuit>()) {
-			return ply->IsPerpBusted();
-		}
-		return false;
-	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_GetBusted;*/
+} E_GetBusted;
 
 class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
 public:
 	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional() {
 		sName = "Ruthless Cop Spawns";
 		fTimerLength = 90;
+		IncompatibilityGroup = Attrib::StringHash32("coprequest");
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -238,6 +245,29 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_RuthlessCopSpawns;
 
+class Effect_NoCopSpawns : public EffectBase_PursuitConditional {
+public:
+	Effect_NoCopSpawns() : EffectBase_PursuitConditional() {
+		sName = "Disable Cop Spawns";
+		fTimerLength = 60;
+		IncompatibilityGroup = Attrib::StringHash32("coprequest");
+	}
+
+	static const char* __thiscall CopRequestHooked(void* pThis) {
+		return nullptr;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch(0x8927C0, &CopRequestHooked);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8927C0, 0x42BA50);
+	}
+	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_NoCopSpawns;
+
 /*class Effect_EnterCooldown : public EffectBase_PursuitConditional {
 public:
 	Effect_EnterCooldown() : EffectBase_PursuitConditional() {
@@ -251,5 +281,21 @@ public:
 		NyaHookLib::Patch<uint64_t>(0x4448EF, 0x44D90000012A850F);
 	}
 } E_EnterCooldown;*/
+
+class Effect_InvincibleTires : public EffectBase_PursuitConditional {
+public:
+	Effect_InvincibleTires() : EffectBase_PursuitConditional() {
+		sName = "Invincible Player Tires";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IDamageable>()) {
+			if (ply->IsDestroyed()) return;
+			ply->ResetDamage();
+		}
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_InvincibleTires;
 
 // todo police jenga

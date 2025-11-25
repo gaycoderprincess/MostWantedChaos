@@ -70,6 +70,7 @@ public:
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
 	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_RemoveLap;
 
 class Effect_AddLap : public ChaosEffect {
@@ -94,6 +95,7 @@ public:
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
 	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_AddLap;
 
 class Effect_Add3Laps : public ChaosEffect {

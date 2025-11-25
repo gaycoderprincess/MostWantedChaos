@@ -42,3 +42,14 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_NoHUD;
+
+class Effect_PauseMenu : public ChaosEffect {
+public:
+	Effect_PauseMenu() : ChaosEffect() {
+		sName = "Open Pause Menu";
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() { EPause::Create(0, 0, 0); });
+	}
+} E_PauseMenu;

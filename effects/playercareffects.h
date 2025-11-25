@@ -137,7 +137,7 @@ public:
 class Effect_InfNitro : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_InfNitro() : EffectBase_PlayerCarHasNitro() {
-		sName = "Infinite Nitro";
+		sName = "Infinite Player Nitro";
 		IncompatibilityGroup = Attrib::StringHash32("nitro");
 		fTimerLength = 60;
 	}
@@ -170,7 +170,7 @@ public:
 class Effect_NoNitro : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_NoNitro() : EffectBase_PlayerCarHasNitro() {
-		sName = "Disable Nitro";
+		sName = "Disable Player Nitro";
 		fTimerLength = 60;
 		IncompatibilityGroup = Attrib::StringHash32("nitro");
 	}
@@ -691,6 +691,7 @@ public:
 		ManualResetImmunity = false;
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_ResetImmune;
 
 float CarMagnetForce = 3;
@@ -1134,7 +1135,7 @@ public:
 class Effect_NOSBoost : public ChaosEffect {
 public:
 	Effect_NOSBoost() : ChaosEffect() {
-		sName = "NOS Boosting";
+		sName = "Nitro Boosting";
 		fTimerLength = 45;
 	}
 

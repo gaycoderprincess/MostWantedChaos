@@ -502,6 +502,8 @@ public:
 	double state = 0;
 	bool goBack = false;
 
+	static inline float GroovySpeed = 4.5;
+
 	Effect_GroovyCars() : ChaosEffect() {
 		sName = "Why's This Dealer?";
 		sFriendlyName = "Groovy Cars";
@@ -511,9 +513,15 @@ public:
 
 	void InitFunction() override {
 		state = 0;
+
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/dealer.mp3");
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound);
+		}
 	}
 	void TickFunction(double delta) override {
-		state += delta * (goBack ? -4 : 4);
+		state += delta * (goBack ? -GroovySpeed : GroovySpeed);
 		if (state > 1) goBack = true;
 		if (state < 0) goBack = false;
 
@@ -534,3 +542,21 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_GroovyCars;
+
+class Effect_TeleportAllCars : public EffectBase_ActiveCarsConditional {
+public:
+	Effect_TeleportAllCars() : EffectBase_ActiveCarsConditional() {
+		sName = "Teleport All Cars To Player";
+	}
+
+	void InitFunction() override {
+		auto pos = *GetLocalPlayerVehicle()->GetPosition();
+		auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car == GetLocalPlayerVehicle()) continue;
+			car->SetVehicleOnGround(&pos, &fwd);
+		}
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_TeleportAllCars;

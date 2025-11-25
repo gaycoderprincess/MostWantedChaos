@@ -53,6 +53,7 @@ float fEffectArcX = -0.003;
 float fEffectArcSize = 0.008;
 float fEffectArcThickness = 0.017;
 float fEffectArcRotation = -1.5;
+float fEffectTimerTextSize = 0.03;
 
 class ChaosEffectInstance {
 public:
@@ -134,7 +135,21 @@ public:
 			DrawRectangle(barX, 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureBar);
 			DrawRectangle(barX - barTipWidth, barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
 			if (HasTimer() && fTimer > 0) {
-				DrawArc(barX - (fEffectArcX * GetAspectRatioInv()), y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
+				float arcX = barX - (fEffectArcX * GetAspectRatioInv());
+				DrawArc(arcX, y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
+				if (fTimer < 5 && pEffect->fTimerLength > 5) {
+					tNyaStringData data;
+					data.x = arcX;
+					data.y = y;
+					data.size = fEffectTimerTextSize;
+					data.XCenterAlign = true;
+					data.outlinea = 255;
+					data.outlinedist = 0.025;
+					int timer = ((int)fTimer) + 1;
+					if (timer < 1) timer = 1;
+					if (timer > 5) timer = 5;
+					DrawString(data, std::to_string(timer));
+				}
 			}
 		}
 		//static auto texture = LoadTexture("CwoeeChaos/data/textures/effectbg.png");

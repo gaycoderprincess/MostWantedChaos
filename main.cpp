@@ -165,6 +165,7 @@ void ChaosModMenu() {
 		QuickValueEditor("fEffectArcSize", fEffectArcSize);
 		QuickValueEditor("fEffectArcThickness", fEffectArcThickness);
 		QuickValueEditor("fEffectArcRotation", fEffectArcRotation);
+		QuickValueEditor("fEffectTimerTextSize", fEffectTimerTextSize);
 		ChloeMenuLib::EndMenu();
 	}
 
@@ -215,6 +216,7 @@ void ChaosModMenu() {
 			ChloeMenuLib::BeginMenu();
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("TankDrainRate", Effect_LeakTank::TankDrainRate);
+			QuickValueEditor("GroovySpeed", Effect_GroovyCars::GroovySpeed);
 			ChloeMenuLib::EndMenu();
 		}
 

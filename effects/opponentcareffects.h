@@ -138,7 +138,7 @@ public:
 	}
 
 	static float __thiscall GetCatchupCheatHooked(ICheater* pThis) {
-		return 100;
+		return 50;
 	}
 
 	void InitFunction() override {
@@ -170,6 +170,7 @@ public:
 		NyaHookLib::Patch(0x8925C8, 0x409390);
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_NoRubberbandOpponents;
 
 class Effect_SpikeAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
