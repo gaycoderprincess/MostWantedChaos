@@ -24,9 +24,9 @@ public:
 		return sName;
 	}
 
-	virtual void InitFunction() {};
-	virtual void TickFunction(double delta) {};
-	virtual void DeinitFunction() {};
+	virtual void InitFunction() {}
+	virtual void TickFunction(double delta) {}
+	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
 	virtual bool IsConditionallyAvailable() { return false; };
@@ -36,6 +36,7 @@ public:
 	virtual bool InfiniteTimer() { return false; }
 	virtual bool ShouldAbort() { return false; }
 	virtual bool IgnoreHUDState() { return false; }
+	virtual void OnAnyEffectTriggered() {}
 };
 
 bool bDarkMode = false;
@@ -245,6 +246,10 @@ void AddRunningEffect(ChaosEffect* effect) {
 	effect->fLastTriggerTime = 0;
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
 	WriteLog(std::format("Activating {}", effect->sName));
+
+	for (auto& running : aRunningEffects) {
+		running.pEffect->OnAnyEffectTriggered();
+	}
 }
 
 bool IsEffectRunning(ChaosEffect* effect) {

@@ -26,6 +26,10 @@ void MainLoop() {
 	aMainLoopFunctionsOnce.clear();
 }
 
+bool bTimerEnabled = true;
+float fEffectCycleTimer = 30;
+float fEffectCycleTimerSpeedMult = 1;
+double fTimeSinceLastEffect = 0;
 bool DisableChaosHUD = false;
 
 #include "d3dhook.h"
@@ -81,9 +85,6 @@ void MoneyChecker() {
 	}
 }
 
-bool bTimerEnabled = true;
-float fEffectCycleTimer = 30;
-double fTimeSinceLastEffect = 0;
 void ChaosLoop() {
 	MoneyChecker();
 
@@ -126,7 +127,7 @@ void ChaosLoop() {
 	while (RunningEffectsCleanup()) {}
 	
 	if (bTimerEnabled) {
-		fTimeSinceLastEffect += gTimer.fDeltaTime;
+		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
 		static auto textureL = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
 		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");
 		auto texture = bDarkMode ? textureD : textureL;

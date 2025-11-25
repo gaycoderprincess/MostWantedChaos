@@ -269,3 +269,20 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PunchHole;
+
+class Effect_RandomChaosTimer : public ChaosEffect {
+public:
+	Effect_RandomChaosTimer() : ChaosEffect() {
+		sName = "Chaos For Your Chaos";
+		sFriendlyName = "Randomized Chaos Timer";
+		fTimerLength = 120;
+	}
+
+	void DeinitFunction() override {
+		fEffectCycleTimerSpeedMult = 1;
+	}
+	bool HasTimer() override { return true; }
+	void OnAnyEffectTriggered() override {
+		fEffectCycleTimerSpeedMult = GetRandomNumber(10, 500) * 0.01;
+	}
+} E_RandomChaosTimer;
