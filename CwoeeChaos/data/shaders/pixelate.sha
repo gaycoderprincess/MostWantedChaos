@@ -1,0 +1,17 @@
+uniform sampler2D pTexture : register(s0);
+float4 reg_timer : register(c1);
+
+struct PS_INPUT {
+	float4 Color : COLOR;
+	float2 UV : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : COLOR {
+	float2 outUV = input.UV;
+	outUV.x = (int)(outUV.x * 100.0);
+	outUV.y = (int)(outUV.y * 100.0);
+	outUV.x = outUV.x / 100.0;
+	outUV.y = outUV.y / 100.0;
+	float4 outColor = tex2D(pTexture, outUV) * input.Color;
+	return outColor;
+}
