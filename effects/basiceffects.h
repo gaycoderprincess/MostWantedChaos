@@ -33,34 +33,6 @@ public:
 	}
 } E_Flash;
 
-class Effect_Dark : public ChaosEffect {
-public:
-	Effect_Dark() : ChaosEffect() {
-		sName = "Darken Screen";
-		fTimerLength = 30;
-	}
-
-	void TickFunction(double delta) override {
-		DrawRectangle(0, 1, 0, 1, {0,0,0,127});
-	}
-	bool HasTimer() override { return true; }
-	bool RunInMenus() override { return true; }
-} E_Dark;
-
-class Effect_Bright : public ChaosEffect {
-public:
-	Effect_Bright() : ChaosEffect() {
-		sName = "Brighten Screen";
-		fTimerLength = 30;
-	}
-
-	void TickFunction(double delta) override {
-		DrawRectangle(0, 1, 0, 1, {255,255,255,127});
-	}
-	bool HasTimer() override { return true; }
-	bool RunInMenus() override { return true; }
-} E_Bright;
-
 class Effect_PortraitMode : public ChaosEffect {
 public:
 	Effect_PortraitMode() : ChaosEffect() {

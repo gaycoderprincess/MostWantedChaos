@@ -70,7 +70,7 @@ public:
 		sName = "Disco Time";
 		sFriendlyName = "Disco Screen Overlay";
 		fTimerLength = 60;
-		sFileName = "disco";
+		sFileName = "default";
 	}
 
 	void TickFunction(double delta) override {
@@ -90,3 +90,37 @@ public:
 
 	bool RunInMenus() override { return true; }
 } E_ShaderSquared;
+
+class Effect_ShaderSqrt : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderSqrt() : EffectBase_ScreenShader() {
+		sName = "Low Contrast";
+		fTimerLength = 60;
+		sFileName = "sqrt";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderSqrt;
+
+class Effect_ShaderInverted : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderInverted() : EffectBase_ScreenShader() {
+		sName = "Inverted Colors";
+		fTimerLength = 60;
+		sFileName = "invert";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderInverted;
+
+class Effect_ShaderBlue : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderBlue() : EffectBase_ScreenShader() {
+		sName = "Da Ba Dee";
+		sFriendlyName = "Blue Screen Overlay";
+		fTimerLength = 60;
+		sFileName = "blue";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderBlue;
