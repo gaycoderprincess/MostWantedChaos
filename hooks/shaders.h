@@ -1,4 +1,6 @@
 IDirect3DPixelShader9* pShaderToDraw = nullptr;
+bool bShaderDisco = false;
+float fDiscoSpeed = 255 * 2;
 
 void DoScreenShaders() {
 	static IDirect3DTexture9* pRenderTargetCopy = nullptr;
@@ -34,7 +36,60 @@ void DoScreenShaders() {
 			g_pd3dDevice->SetPixelShader(pShader);
 			g_pd3dDevice->SetPixelShaderConstantF(1, fTime, 1);
 		}, false);
-		DrawRectangle(0,1,0,1,{255,255,255,255},0,pRenderTargetCopy);
+		if (bShaderDisco) {
+			static double r = 0;
+			static double g = 255;
+			static double b = 255;
+			static int stage = 0;
+			switch (stage) {
+				case 0:
+					b -= fDiscoSpeed * gTimer.fDeltaTime;
+					if (b <= 0) {
+						b = 0;
+						stage++;
+					}
+					break;
+				case 1:
+					g += fDiscoSpeed * gTimer.fDeltaTime;
+					if (g >= 255) {
+						g = 255;
+						stage++;
+					}
+					break;
+				case 2:
+					r -= fDiscoSpeed * gTimer.fDeltaTime;
+					if (r <= 0) {
+						r = 0;
+						stage++;
+					}
+					break;
+				case 3:
+					b += fDiscoSpeed * gTimer.fDeltaTime;
+					if (b >= 255) {
+						b = 255;
+						stage++;
+					}
+					break;
+				case 4:
+					g -= fDiscoSpeed * gTimer.fDeltaTime;
+					if (g <= 0) {
+						g = 0;
+						stage++;
+					}
+					break;
+				case 5:
+					r += fDiscoSpeed * gTimer.fDeltaTime;
+					if (r >= 255) {
+						r = 255;
+						stage = 0;
+					}
+					break;
+			}
+			DrawRectangle(0,1,0,1,{(uint8_t)r,(uint8_t)g,(uint8_t)b,255},0,pRenderTargetCopy);
+		}
+		else {
+			DrawRectangle(0,1,0,1,{255,255,255,255},0,pRenderTargetCopy);
+		}
 		DrawCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
 			pRenderTargetCopy->Release();
 			pRenderTargetCopy = nullptr;
@@ -43,9 +98,10 @@ void DoScreenShaders() {
 		DrawCallback(ImDrawCallback_ResetRenderState, false);
 	}
 	pShaderToDraw = nullptr;
+	bShaderDisco = false;
 }
 
 // todo move this to draw under the hud
 ChloeHook Hook_ScreenShaders([]() {
-	aDrawingLoopFunctions.push_back(DoScreenShaders);
+	aDrawingGameUILoopFunctions.push_back(DoScreenShaders);
 });

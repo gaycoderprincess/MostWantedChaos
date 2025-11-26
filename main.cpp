@@ -16,6 +16,8 @@ std::vector<void(*)()> aMainLoopFunctions;
 std::vector<void(*)()> aMainLoopFunctionsOnce;
 std::vector<void(*)()> aDrawingLoopFunctions;
 std::vector<void(*)()> aDrawingLoopFunctionsOnce;
+std::vector<void(*)()> aDrawingGameUILoopFunctions;
+std::vector<void(*)()> aDrawingGameUILoopFunctionsOnce;
 void MainLoop() {
 	for (auto& func : aMainLoopFunctions) {
 		func();
@@ -315,9 +317,10 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			ChloeMenuLib::RegisterMenu("Cwoee Chaos", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
 
-			NyaHooks::PlaceD3DHooks();
+			NyaHooks::PlaceD3DHooks(true);
 			NyaHooks::aEndSceneFuncs.push_back(D3DHookMain);
 			NyaHooks::aD3DResetFuncs.push_back(OnD3DReset);
+			NyaHooks::aPreHUDDrawFuncs.push_back(D3DHookPreHUD);
 			NyaHooks::PlaceWndProcHook();
 			NyaHooks::aWndProcFuncs.push_back(WndProcHook);
 			NyaHooks::PlaceWorldServiceHook();

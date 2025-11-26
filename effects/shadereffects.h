@@ -44,7 +44,8 @@ public:
 class Effect_ShaderMirror : public EffectBase_ScreenShader {
 public:
 	Effect_ShaderMirror() : EffectBase_ScreenShader() {
-		sName = "Mirror The Screen";
+		sName = "British";
+		sFriendlyName = "Mirror The Screen";
 		fTimerLength = 60;
 		sFileName = "mirror";
 	}
@@ -62,3 +63,30 @@ public:
 
 	bool RunInMenus() override { return true; }
 } E_ShaderPixel;
+
+class Effect_ShaderDisco : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderDisco() : EffectBase_ScreenShader() {
+		sName = "Disco Time";
+		sFriendlyName = "Disco Screen Overlay";
+		fTimerLength = 60;
+		sFileName = "disco";
+	}
+
+	void TickFunction(double delta) override {
+		bShaderDisco = true;
+		EffectBase_ScreenShader::TickFunction(delta);
+	}
+	bool RunInMenus() override { return true; }
+} E_ShaderDisco;
+
+class Effect_ShaderSquared : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderSquared() : EffectBase_ScreenShader() {
+		sName = "High Contrast";
+		fTimerLength = 60;
+		sFileName = "squared";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderSquared;

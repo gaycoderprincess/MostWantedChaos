@@ -1,3 +1,4 @@
+bool bDrawingGameUI = false;
 void UpdateD3DProperties() {
 	g_pd3dDevice = *(IDirect3DDevice9**)0x982BDC;
 	ghWnd = *(HWND*)0x982BF4;
@@ -26,8 +27,28 @@ void OnD3DReset() {
 	}
 }
 
+void D3DHookPreHUD() {
+	bDrawingGameUI = true;
+	D3DHookMain();
+}
+
 void ChaosLoop();
 void HookLoop() {
+	if (bDrawingGameUI) {
+		for (auto& func : aDrawingGameUILoopFunctions) {
+			func();
+		}
+
+		for (auto& func : aDrawingGameUILoopFunctionsOnce) {
+			func();
+		}
+		aDrawingGameUILoopFunctionsOnce.clear();
+
+		bDontRefreshInputsThisLoop = true;
+		CommonMain();
+		bDrawingGameUI = false;
+		return;
+	}
 	ChaosLoop();
 	CommonMain();
 }
