@@ -124,3 +124,26 @@ public:
 
 	bool RunInMenus() override { return true; }
 } E_ShaderBlue;
+
+class Effect_ShaderWide : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderWide() : EffectBase_ScreenShader() {
+		sName = "4:3 Stretched";
+		fTimerLength = 60;
+		sFileName = "wide";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderWide;
+
+class Effect_ShaderTikTok : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderTikTok() : EffectBase_ScreenShader() {
+		sName = "Tik Tok Mode";
+		sFriendlyName = "Tik Tok Screen Overlay";
+		fTimerLength = 60;
+		sFileName = "tiktokportrait";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderTikTok;
