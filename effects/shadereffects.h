@@ -1,8 +1,7 @@
 class EffectBase_ScreenShader : public ChaosEffect {
 public:
-	IDirect3DTexture9* pRTSurface = nullptr;
+	// todo add this to the d3d reset handler
 	IDirect3DPixelShader9* pShader = nullptr;
-	float ShaderConstants[4] = {0,0,0,0};
 	std::string sFileName = "mirror";
 	
 	EffectBase_ScreenShader() : ChaosEffect() {
