@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <d3d9.h>
+#include <d3dx9.h>
 #include <mutex>
 #include <random>
 #include <toml++/toml.hpp>
@@ -41,6 +42,7 @@ bool DisableChaosHUD = false;
 #include "hooks/geartype.h"
 #include "hooks/vehicleconstruct.h"
 #include "hooks/text.h"
+#include "hooks/shaders.h"
 #include "chaoseffect.h"
 
 void OnWinRace() {
