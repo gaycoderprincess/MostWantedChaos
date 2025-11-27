@@ -783,6 +783,26 @@ public:
 	bool HasTimer() override { return true; }
 } E_NoInput;
 
+/*class Effect_NoInputMash : public ChaosEffect {
+public:
+	Effect_NoInputMash() : ChaosEffect() {
+		sName = "Mash To Drive";
+		fTimerLength = 15;
+	}
+
+	void TickFunction(double delta) override {
+		static double timer = 0;
+		timer += delta;
+		while (timer > 0.1) {
+			if (auto ply = GetLocalPlayerInterface<IInputPlayer>()) {
+				ply->ClearInput();
+			}
+			timer -= 0.1;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_NoInputMash;*/
+
 class Effect_PlayerCarGear1 : public ChaosEffect {
 public:
 	Effect_PlayerCarGear1() : ChaosEffect() {
@@ -949,6 +969,9 @@ public:
 		fTimerLength = 15;
 	}
 
+	void InitFunction() override {
+		NoResetCount++;
+	}
 	void TickFunction(double delta) override {
 		if (auto target = GetClosestActiveVehicle(GetLocalPlayerVehicle())) {
 			auto playerPos = *GetLocalPlayerVehicle()->GetPosition();
@@ -959,6 +982,9 @@ public:
 			GetLocalPlayerInterface<IRigidBody>()->SetPosition(&playerPos);
 			GetLocalPlayerInterface<IRBVehicle>()->EnableObjectCollisions(true);
 		}
+	}
+	void DeinitFunction() override {
+		NoResetCount++;
 	}
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; }
