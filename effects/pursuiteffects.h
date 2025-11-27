@@ -190,11 +190,9 @@ public:
 	void InitFunction() override {
 		if (pass = rand() % 100 < 10) {
 			EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
-			fTimerLength = 2;
 		}
 		else {
 			EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
-			fTimerLength = 15;
 		}
 	}
 	void TickFunction(double delta) override {

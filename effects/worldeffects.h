@@ -39,7 +39,7 @@ public:
 			ply->ResetGameBreaker(false);
 		}
 
-		GameSpeedModifier = 0.5;
+		GameSpeedModifier = 1 - (GetEffectFadeInOut(this, 1, false) * 0.5);
 	}
 	void DeinitFunction() override {
 		GameSpeedModifier = 1.0;
@@ -60,7 +60,7 @@ public:
 			ply->ResetGameBreaker(false);
 		}
 
-		GameSpeedModifier = 2;
+		GameSpeedModifier = 1 + GetEffectFadeInOut(this, 1, false);
 	}
 	void DeinitFunction() override {
 		GameSpeedModifier = 1.0;

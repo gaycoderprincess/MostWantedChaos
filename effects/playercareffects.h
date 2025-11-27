@@ -433,7 +433,7 @@ public:
 	bool HasTimer() override { return true; }
 } E_PlayerCarTuneHandling2;
 
-class Effect_PlayerCarTuneHeight : public ChaosEffect {
+/*class Effect_PlayerCarTuneHeight : public ChaosEffect {
 public:
 	Effect_PlayerCarTuneHeight() : ChaosEffect() {
 		sName = "Stanced Suspension";
@@ -456,7 +456,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-} E_PlayerCarTuneHeight;
+} E_PlayerCarTuneHeight;*/
 
 /*class Effect_PlayerCarTuneHeight2 : public ChaosEffect {
 public:
@@ -1059,7 +1059,7 @@ public:
 	bool IsAvailable() override {
 		if (auto playerRB = GetLocalPlayerInterface<IRigidBody>()) {
 			auto playerVel = *playerRB->GetLinearVelocity();
-			if ((*(NyaVec3*)&playerVel).length() < TOMPS(60)) return false;
+			if ((*(NyaVec3*)&playerVel).length() < TOMPS(100)) return false;
 			return true;
 		}
 		return false;

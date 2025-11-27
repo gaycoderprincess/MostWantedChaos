@@ -77,6 +77,11 @@ public:
 	void InitFunction() override {
 		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash -= 1000000;
 	}
+	bool IsAvailable() override {
+		return FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) > 0;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_Millionaire2;
 
 class Effect_ManualTrans : public ChaosEffect {
