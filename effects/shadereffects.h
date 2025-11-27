@@ -3,7 +3,9 @@ public:
 	// todo add this to the d3d reset handler
 	IDirect3DPixelShader9* pShader = nullptr;
 	std::string sFileName = "mirror";
-	
+	bool bEasedTimer = true;
+	bool bInvertTimerAtEnd = true;
+
 	EffectBase_ScreenShader() : ChaosEffect() {
 		IncompatibilityGroup = Attrib::StringHash32("screenshader");
 	};
@@ -36,6 +38,8 @@ public:
 	void TickFunction(double delta) override {
 		if (!pShader) return;
 		pShaderToDraw = pShader;
+		if (bEasedTimer) bShaderTimerEase1 = true;
+		if (bInvertTimerAtEnd && EffectInstance->fTimer < 1) bShaderTimerInvert = true;
 	}
 	bool HasTimer() override { return true; }
 	bool ShouldAbort() override { return !pShader; }
@@ -59,6 +63,7 @@ public:
 		sName = "Pixelate The Screen";
 		fTimerLength = 30;
 		sFileName = "pixelate";
+		//bEasedTimer = false;
 	}
 
 	bool RunInMenus() override { return true; }
@@ -142,8 +147,31 @@ public:
 		sName = "Tik Tok Mode";
 		sFriendlyName = "Tik Tok Screen Overlay";
 		fTimerLength = 60;
-		sFileName = "tiktokportrait";
+		sFileName = "portrait";
 	}
 
 	bool RunInMenus() override { return true; }
 } E_ShaderTikTok;
+
+class Effect_ShaderZoomIn : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderZoomIn() : EffectBase_ScreenShader() {
+		sName = "Tunnel Vision";
+		fTimerLength = 30;
+		sFileName = "zoom";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderZoomIn;
+
+/*class Effect_ShaderRed : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderRed() : EffectBase_ScreenShader() {
+		sName = "Ketchup";
+		sFriendlyName = "Ketchup Screen Overlay";
+		fTimerLength = 60;
+		sFileName = "red";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderRed;*/

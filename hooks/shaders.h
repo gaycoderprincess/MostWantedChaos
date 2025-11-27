@@ -1,16 +1,28 @@
 IDirect3DPixelShader9* pShaderToDraw = nullptr;
 bool bShaderDisco = false;
 float fDiscoSpeed = 255 * 2;
+bool bShaderTimerEase1 = false;
+bool bShaderTimerInvert = false;
 
 void DoScreenShaders() {
 	static IDirect3DTexture9* pRenderTargetCopy = nullptr;
 	static IDirect3DPixelShader9* pShader = nullptr;
 	static float fTime[4] = {0,0,0,0};
-	
+	static float fTimeEased[4] = {0,0,0,0};
+
 	static CNyaTimer gTimer;
 	gTimer.Process();
 	for (auto& time : fTime) {
-		time += gTimer.fDeltaTime;
+		time += gTimer.fDeltaTime * (bShaderTimerInvert ? -1 : 1);
+		if (bShaderTimerInvert) {
+			if (time < 0) time = 0;
+			if (time > 1) time = 1;
+		}
+	}
+	for (auto& eased : fTimeEased) {
+		eased = fTime[0];
+		if (eased > 1) eased = 1;
+		eased = easeInOutQuart(eased);
 	}
 	
 	if (auto shader = pShaderToDraw) {
@@ -34,7 +46,7 @@ void DoScreenShaders() {
 			
 			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE); // the render target may have alpha baked in!
 			g_pd3dDevice->SetPixelShader(pShader);
-			g_pd3dDevice->SetPixelShaderConstantF(1, fTime, 1);
+			g_pd3dDevice->SetPixelShaderConstantF(1, bShaderTimerEase1 ? fTimeEased : fTime, 1);
 		}, false);
 		if (bShaderDisco) {
 			static double r = 0;
@@ -97,11 +109,14 @@ void DoScreenShaders() {
 		}, false);
 		DrawCallback(ImDrawCallback_ResetRenderState, false);
 	}
+	else {
+		memset(fTime, 0, sizeof(fTime));
+	}
 	pShaderToDraw = nullptr;
 	bShaderDisco = false;
+	bShaderTimerInvert = false;
 }
 
-// todo move this to draw under the hud
 ChloeHook Hook_ScreenShaders([]() {
 	aDrawingGameUILoopFunctions.push_back(DoScreenShaders);
 });
