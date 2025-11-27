@@ -51,12 +51,12 @@ namespace Achievements {
 	const float fSpritePopBalloonSize = 1.2;
 	const float fSpriteExpandTimerSpeed = 1;
 	const float fSpriteStayTimerSpeed = 1.0 / 6.0;
-	float fTextFGX = 740;
-	float fTextFGY = 946;
-	float fTextFGS = 0.035;
-	float fTextBGX = 740;
-	float fTextBGY = 976;
-	float fTextBGS = 0.025;
+	const float fTextFGX = 740;
+	const float fTextFGY = 946;
+	const float fTextFGS = 0.035;
+	const float fTextBGX = 740;
+	const float fTextBGY = 976;
+	const float fTextBGS = 0.025;
 
 	double fSpritePopTimer = 0;
 	double fSpriteExpandTimer = 0;

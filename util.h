@@ -136,6 +136,10 @@ bool IsInNIS() {
 	return INIS::mInstance && INIS::mInstance->IsPlaying();
 }
 
+bool IsInMovie() {
+	return gMoviePlayer;
+}
+
 FECustomizationRecord CreateStockCustomizations(uint32_t carModel) {
 	FECustomizationRecord record;
 	FECustomizationRecord::Default(&record);

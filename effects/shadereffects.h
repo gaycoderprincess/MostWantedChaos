@@ -175,3 +175,15 @@ public:
 
 	bool RunInMenus() override { return true; }
 } E_ShaderRed;*/
+
+class Effect_ShaderUpsideDown : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderUpsideDown() : EffectBase_ScreenShader() {
+		sName = "Meanwhile In Australia";
+		sFriendlyName = "Upside Down Screen";
+		fTimerLength = 45;
+		sFileName = "flip";
+	}
+
+	bool RunInMenus() override { return true; }
+} E_ShaderUpsideDown;

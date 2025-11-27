@@ -89,7 +89,21 @@ void MoneyChecker() {
 	}
 }
 
+bool bForceHighSettings = false;
 void ChaosLoop() {
+	if (bForceHighSettings && TheGameFlowManager.CurrentGameFlowState < GAMEFLOW_STATE_IN_FRONTEND) {
+		*(int*)0x9017B8 = 3; // g_CarEnvironmentMapEnable
+		*(int*)0x9017BC = 1; // g_CarEnvironmentMapUpdateData
+		*(int*)0x9017D4 = 3; // g_RoadReflectionEnable
+		//*(int*)0x9017DC = ; // g_MotionBlurEnable
+		*(int*)0x9017EC = 1; // g_ParticleSystemEnable
+		*(int*)0x9017F4 = 3; // g_WorldLodLevel
+		*(int*)0x9017F8 = 1; // g_CarLodLevel
+		*(int*)0x901810 = 1; // g_RainEnable
+		*(int*)0x901818 = 2; // g_TextureFiltering
+		*(int*)0x901830 = 2; // g_ShadowDetail
+	}
+
 	MoneyChecker();
 
 	for (auto& func : aDrawingLoopFunctions) {
@@ -108,7 +122,7 @@ void ChaosLoop() {
 		effect->fLastTriggerTime += gTimer.fDeltaTime;
 	}
 
-	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || FEManager::mPauseRequest) {
+	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || IsInMovie() || FEManager::mPauseRequest) {
 		for (auto& effect : aRunningEffects) {
 			if (!effect.pEffect->RunInMenus()) continue;
 			effect.OnTick(gTimer.fDeltaTime, true);
@@ -308,6 +322,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			if (std::filesystem::exists(configName)) {
 				static auto config = toml::parse_file(configName);
 				bDarkMode = config["main"]["dark_mode"].value_or(false);
+				bForceHighSettings = config["main"]["force_high_settings"].value_or(false);
 			}
 
 			for (auto& func : ChloeHook::aHooks) {
