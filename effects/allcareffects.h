@@ -359,7 +359,7 @@ public:
 			if (auto col = car->mCOMObject->Find<IRBVehicle>()) {
 				col->EnableObjectCollisions(false);
 			}
-			int i = lastStates.size() - 1 - (++count * 5);
+			int i = lastStates.size() - 1 - (++count * 10);
 			if (i < 0) break;
 			lastStates[i].Apply(car);
 		}
@@ -371,9 +371,9 @@ public:
 	}
 	void TickFunction(double delta) override {
 		timer += delta;
-		if (timer > 0.033) {
+		if (timer > 1.0 / 60.0) {
 			lastStates.push_back(CwoeeCarPhysicalState(GetLocalPlayerVehicle()));
-			timer -= 0.033;
+			timer -= 1.0 / 60.0;
 		}
 		ApplyAllCars();
 	}
