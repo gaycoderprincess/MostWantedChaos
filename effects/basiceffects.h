@@ -104,7 +104,7 @@ public:
 		}
 		else {
 			MessageBoxA(nullptr, "Debug Error!\n\nProgram: speed.exe\n\nR6025\n- pure virtual function call\n\n(Press Retry to debug the application)", "Microsoft Visual C++ Debug Library", MB_ICONERROR | MB_ABORTRETRYIGNORE);
-			Sleep(1000);
+			//Sleep(1000);
 		}
 	}
 } E_FakeCrash;

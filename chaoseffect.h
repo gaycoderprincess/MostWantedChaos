@@ -108,8 +108,8 @@ public:
 		return pEffect->IsConditionallyAvailable() && pEffect->IsRehideable() && !pEffect->IsAvailable();
 	}
 
-	void Draw(float y) const {
-		if (!IsNameOnScreen()) return;
+	void Draw(float y, bool inMenu) const {
+		if (!IsNameOnScreen() && !inMenu) return;
 
 		auto x = fEffectX;
 		x = 1 - x;
@@ -123,7 +123,7 @@ public:
 		float barWidth = ((HasTimer() ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());
 		float barTipWidth = (fEffectTextureTipX * GetAspectRatioInv());
 
-		if (fTextTimer < 1) x = std::lerp(1 + width + barWidth + barTipWidth, x, easeInOutQuart(fTextTimer));
+		if (fTextTimer < 1 && !inMenu) x = std::lerp(1 + width + barWidth + barTipWidth, x, easeInOutQuart(fTextTimer));
 
 		static auto textureBarL = LoadTexture("CwoeeChaos/data/textures/effectbg_bar.png");
 		static auto textureTipL = LoadTexture("CwoeeChaos/data/textures/effectbg_end.png");
@@ -135,7 +135,7 @@ public:
 			float barX = x - width - barWidth;
 			DrawRectangle(barX, 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureBar);
 			DrawRectangle(barX - barTipWidth, barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
-			if (HasTimer() && fTimer > 0.01) {
+			if (HasTimer() && fTimer > 0.1) {
 				float arcX = barX - (fEffectArcX * GetAspectRatioInv());
 				DrawArc(arcX, y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
 				if (fTimer < 5 && pEffect->fTimerLength > 5) {

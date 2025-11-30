@@ -55,6 +55,28 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
+class EffectBase_MultiOpponentAliveInRaceConditional : public ChaosEffect {
+public:
+	EffectBase_MultiOpponentAliveInRaceConditional() : ChaosEffect() {
+		sName = "(EFFECT BASE) Multiple Opponents Alive & In Race Conditional";
+	}
+
+	bool IsAvailable() override {
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		int count = 0;
+		for (auto& car : cars) {
+			if (!IsCarDestroyed(car)) {
+				count++;
+			}
+		}
+		if (count > 1) {
+			return GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class EffectBase_PursuitConditional : public ChaosEffect {
 public:
 	EffectBase_PursuitConditional() : ChaosEffect() {

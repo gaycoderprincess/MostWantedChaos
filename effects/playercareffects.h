@@ -97,7 +97,7 @@ public:
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			auto vel = *ply->GetAngularVelocity();
-			vel.y = 4;
+			vel.y = rand() % 2 ? 4 : -4;
 			ply->SetAngularVelocity(&vel);
 		}
 	}
@@ -112,7 +112,7 @@ public:
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			auto vel = *ply->GetAngularVelocity();
-			vel.y = TOMPS(200);
+			vel.y = TOMPS(200) * (rand() % 2 ? 1 : -1);
 			ply->SetAngularVelocity(&vel);
 		}
 	}

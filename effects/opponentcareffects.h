@@ -1,6 +1,6 @@
-class Effect_BlowEngineOpponents : public EffectBase_OpponentAliveInRaceConditional {
+class Effect_BlowEngineOpponents : public EffectBase_MultiOpponentAliveInRaceConditional {
 public:
-	Effect_BlowEngineOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_BlowEngineOpponents() : EffectBase_MultiOpponentAliveInRaceConditional() {
 		sName = "Blow Opponents' Engines";
 	}
 

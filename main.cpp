@@ -89,6 +89,24 @@ void MoneyChecker() {
 	}
 }
 
+void ProcessChaosEffects(double fDeltaTime, bool inMenu) {
+	// run effects first, then draw the chaos HUD over top
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		effect.OnTick(fDeltaTime, inMenu);
+	}
+
+	float y = 0;
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
+		effect.Draw(y, inMenu);
+		y += 1 - effect.GetOffscreenPercentage();
+	}
+
+	while (RunningEffectsCleanup()) {}
+}
+
 void ChaosLoop() {
 	MoneyChecker();
 
@@ -109,27 +127,12 @@ void ChaosLoop() {
 	}
 
 	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || IsInMovie() || FEManager::mPauseRequest) {
-		for (auto& effect : aRunningEffects) {
-			if (!effect.pEffect->RunInMenus()) continue;
-			effect.OnTick(gTimer.fDeltaTime, true);
-		}
+		ProcessChaosEffects(gTimer.fDeltaTime, true);
 		return;
 	}
 
-	// run effects first, then draw the chaos HUD over top
-	for (auto& effect : aRunningEffects) {
-		effect.OnTick(gTimer.fDeltaTime, false);
-	}
+	ProcessChaosEffects(gTimer.fDeltaTime, false);
 
-	float y = 0;
-	for (auto& effect : aRunningEffects) {
-		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
-		effect.Draw(y);
-		y += 1 - effect.GetOffscreenPercentage();
-	}
-	
-	while (RunningEffectsCleanup()) {}
-	
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
 		static auto textureL = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
@@ -308,7 +311,6 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			if (std::filesystem::exists(configName)) {
 				static auto config = toml::parse_file(configName);
 				bDarkMode = config["main"]["dark_mode"].value_or(false);
-				
 			}
 
 			for (auto& func : ChloeHook::aHooks) {

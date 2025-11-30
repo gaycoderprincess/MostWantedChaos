@@ -31,7 +31,7 @@ public:
 		fTimerLength = 120;
 	}
 
-	void InitFunction() override {
+	void TickFunction(double delta) override {
 		TextHook_ReverseText = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
 	}
 	void DeinitFunction() override {
