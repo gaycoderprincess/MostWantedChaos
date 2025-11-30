@@ -1064,7 +1064,7 @@ public:
 			auto playerOrient = *playerRB->GetOrientation();
 			auto playerVel = *playerRB->GetLinearVelocity();
 			auto playerAVel = *playerRB->GetAngularVelocity();
-			if ((*(NyaVec3*)&playerVel).length() < TOMPS(20)) return;
+			//if ((*(NyaVec3*)&playerVel).length() < TOMPS(20)) return;
 
 			auto pos = *ply->GetPosition();
 			auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();

@@ -268,7 +268,7 @@ public:
 	NyaAudio::NyaSound sound = 0;
 
 	void InitFunction() override {
-		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/fish.ogg"); // todo reencode this!!
+		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/fish.mp3");
 		if (sound) {
 			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
 			NyaAudio::Play(sound);
