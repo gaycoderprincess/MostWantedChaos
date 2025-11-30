@@ -326,3 +326,4 @@ bool RunningEffectsCleanup() {
 #include "effects/spawneffects.h"
 #include "effects/effect_safehouse.h"
 #include "effects/effect_leaktank.h"
+#include "effects/effect_flashbacks.h"

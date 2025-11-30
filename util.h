@@ -348,6 +348,64 @@ struct CwoeeCarPhysicalState {
 	}
 };
 
+struct CwoeeCarMiscState {
+	GearID gear;
+	float wheelSpeed[4];
+	eTireDamage tireDamage[4];
+	bool destroyed = false;
+	bool engineDamaged = false;
+
+	CwoeeCarMiscState() {}
+	explicit CwoeeCarMiscState(IVehicle* veh) { Capture(veh); }
+
+	void Capture(IVehicle* veh) {
+		if (auto i = veh->mCOMObject->Find<ITransmission>()) {
+			gear = i->GetGear();
+		}
+		if (auto i = veh->mCOMObject->Find<ISuspension>()) {
+			for (int j = 0; j < 4; j++) {
+				wheelSpeed[j] = i->GetWheelAngularVelocity(j);
+			}
+		}
+		if (auto i = veh->mCOMObject->Find<ISpikeable>()) {
+			for (int j = 0; j < 4; j++) {
+				tireDamage[j] = i->GetTireDamage(j);
+			}
+		}
+		if (auto i = veh->mCOMObject->Find<IDamageable>()) {
+			destroyed = i->IsDestroyed();
+		}
+		if (auto i = veh->mCOMObject->Find<IEngineDamage>()) {
+			engineDamaged = i->IsBlown() || i->IsSabotaged();
+		}
+	}
+	void Apply(IVehicle* veh) {
+		if (auto i = veh->mCOMObject->Find<ITransmission>()) {
+			if (i->GetGear() != gear) i->Shift(gear);
+		}
+		if (auto i = veh->mCOMObject->Find<ISuspension>()) {
+			for (int j = 0; j < 4; j++) {
+				i->SetWheelAngularVelocity(j, wheelSpeed[j]);
+			}
+		}
+
+		// only using these to repair a car
+		if (auto i = veh->mCOMObject->Find<ISpikeable>()) {
+			for (int j = 0; j < 4; j++) {
+				if (i->GetTireDamage(j) > tireDamage[j]) {
+					veh->mCOMObject->Find<IDamageable>()->ResetDamage();
+				}
+			}
+		}
+		if (auto i = veh->mCOMObject->Find<IDamageable>()) {
+			if (i->IsDestroyed() && !destroyed) i->ResetDamage();
+		}
+		if (auto i = veh->mCOMObject->Find<IEngineDamage>()) {
+			if ((i->IsBlown() || i->IsSabotaged()) && !engineDamaged) i->Repair();
+		}
+	}
+};
+
 void TeleportPlayer(UMath::Vector3 pos, UMath::Vector3 fwd) {
 	Sim::SetStream(&pos, true);
 	GetLocalPlayerVehicle()->SetVehicleOnGround(&pos, &fwd);

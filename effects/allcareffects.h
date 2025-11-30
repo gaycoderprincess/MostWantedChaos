@@ -335,6 +335,7 @@ public:
 		sName = "Snake";
 		sFriendlyName = "All Other Cars Follow Player";
 		fTimerLength = 45;
+		IncompatibilityGroup = Attrib::StringHash32("car_lag");
 	}
 
 	void ApplyAllCars() {
