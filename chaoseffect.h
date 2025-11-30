@@ -121,7 +121,7 @@ public:
 		std::string str = GetName();
 
 		auto width = GetStringWidth(fEffectSize, str.c_str());
-		float barWidth = ((HasTimer() ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());
+		float barWidth = ((HasTimer() && !inMenu ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());
 		float barTipWidth = (fEffectTextureTipX * GetAspectRatioInv());
 
 		if (fTextTimer < 1 && !inMenu) x = std::lerp(1 + width + barWidth + barTipWidth, x, easeInOutQuart(fTextTimer));
@@ -136,7 +136,7 @@ public:
 			float barX = x - width - barWidth;
 			DrawRectangle(barX, 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureBar);
 			DrawRectangle(barX - barTipWidth, barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
-			if (HasTimer() && fTimer > 0.1) {
+			if (!inMenu && HasTimer() && fTimer > 0.1) {
 				float arcX = barX - (fEffectArcX * GetAspectRatioInv());
 				DrawArc(arcX, y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
 				if (fTimer < 5 && pEffect->fTimerLength > 5) {

@@ -37,7 +37,7 @@ class Effect_NoCollision : public ChaosEffect {
 public:
 	Effect_NoCollision() : ChaosEffect() {
 		sName = "Disable World Collision";
-		fTimerLength = 45;
+		fTimerLength = 30;
 	}
 
 	// RigidBody::UpdateCollider

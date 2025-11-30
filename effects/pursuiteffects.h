@@ -193,6 +193,7 @@ public:
 		}
 		else {
 			EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
+			EffectInstance->fTimer = 15;
 		}
 	}
 	void TickFunction(double delta) override {
@@ -244,6 +245,32 @@ public:
 	bool IsRehideable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_RuthlessCopSpawns;
+
+class Effect_RuthlessCopCross : public EffectBase_PursuitConditional {
+public:
+	Effect_RuthlessCopCross() : EffectBase_PursuitConditional() {
+		sName = "It's Cross";
+		sFriendlyName = "Ruthless Cross Spawns";
+		fTimerLength = 90;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
+	}
+
+	static const char* __thiscall CopRequestHooked(void* pThis) {
+		return "copcross";
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch(0x8927C0, &CopRequestHooked);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x9090);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8927C0, 0x42BA50);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
+	}
+	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_RuthlessCopCross;
 
 class Effect_NoCopSpawns : public EffectBase_PursuitConditional {
 public:
