@@ -122,7 +122,7 @@ class Effect_InfGameBreaker : public ChaosEffect {
 public:
 	Effect_InfGameBreaker() : ChaosEffect() {
 		sName = "Infinite Speedbreaker";
-		IncompatibilityGroup = Attrib::StringHash32("speedbreaker");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 		fTimerLength = 60;
 	}
 
@@ -138,7 +138,7 @@ class Effect_InfNitro : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_InfNitro() : EffectBase_PlayerCarHasNitro() {
 		sName = "Infinite Player Nitro";
-		IncompatibilityGroup = Attrib::StringHash32("nitro");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro"));
 		fTimerLength = 60;
 	}
 
@@ -156,7 +156,7 @@ public:
 	Effect_NoGameBreaker() : ChaosEffect() {
 		sName = "Disable Speedbreaker";
 		fTimerLength = 90;
-		IncompatibilityGroup = Attrib::StringHash32("speedbreaker");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
 	void TickFunction(double delta) override {
@@ -172,7 +172,7 @@ public:
 	Effect_NoNitro() : EffectBase_PlayerCarHasNitro() {
 		sName = "Disable Player Nitro";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("nitro");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro"));
 	}
 
 	void TickFunction(double delta) override {
@@ -278,7 +278,7 @@ class Effect_AutoDrive : public ChaosEffect {
 public:
 	Effect_AutoDrive() : ChaosEffect() {
 		sName = "Auto-Drive";
-		IncompatibilityGroup = Attrib::StringHash32("autodrive");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("autodrive"));
 		fTimerLength = 30;
 	}
 
@@ -300,7 +300,7 @@ public:
 	Effect_AutoDrive2() : ChaosEffect() {
 		sName = "Auto-Drive (Traffic)";
 		fTimerLength = 15;
-		IncompatibilityGroup = Attrib::StringHash32("autodrive");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("autodrive"));
 	}
 
 	void TickFunction(double delta) override {
@@ -363,7 +363,7 @@ public:
 	Effect_PlayerCarTuneAero() : ChaosEffect() {
 		sName = "Aerodynamics +100";
 		fTimerLength = 15;
-		IncompatibilityGroup = Attrib::StringHash32("aerodynamics");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("aerodynamics"));
 	}
 
 	void TickFunction(double delta) override {
@@ -388,7 +388,7 @@ public:
 	Effect_PlayerCarTuneHandling() : ChaosEffect() {
 		sName = "Handling +10";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("handling_tune");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
 	}
 
 	void TickFunction(double delta) override {
@@ -413,7 +413,7 @@ public:
 	Effect_PlayerCarTuneHandling2() : ChaosEffect() {
 		sName = "Handling -10";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("handling_tune");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
 	}
 
 	void TickFunction(double delta) override {
@@ -438,7 +438,7 @@ public:
 	Effect_PlayerCarTuneHeight() : ChaosEffect() {
 		sName = "Stanced Suspension";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("suspension");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
 	}
 
 	void TickFunction(double delta) override {
@@ -463,7 +463,7 @@ public:
 	Effect_PlayerCarTuneHeight2() : ChaosEffect() {
 		sName = "Super Stanced Suspension";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("suspension");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
 	}
 
 	void TickFunction(double delta) override {
@@ -488,7 +488,7 @@ public:
 	Effect_PlayerCarTuneHeight3() : ChaosEffect() {
 		sName = "Monster Truck Suspension";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("suspension");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
 	}
 
 	void TickFunction(double delta) override {
@@ -516,7 +516,7 @@ public:
 	Effect_PlayerCarTuneHeight4() : ChaosEffect() {
 		sName = "Bouncy Suspension";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("suspension");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
 	}
 
 	void InitFunction() override {
@@ -548,7 +548,7 @@ public:
 	Effect_PlayerCarTuneNitro() : EffectBase_PlayerCarHasNitro() {
 		sName = "Weak Nitro";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("nitro_tune");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
 	}
 
 	void TickFunction(double delta) override {
@@ -574,7 +574,7 @@ public:
 	Effect_PlayerCarTuneNitro2() : EffectBase_PlayerCarHasNitro() {
 		sName = "Strong Nitro";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("nitro_tune");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
 	}
 
 	void TickFunction(double delta) override {
@@ -808,7 +808,7 @@ public:
 	Effect_PlayerCarGear1() : ChaosEffect() {
 		sName = "Force Player To Gear 1";
 		fTimerLength = 15;
-		IncompatibilityGroup = Attrib::StringHash32("transmission");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
 	void TickFunction(double delta) override {
@@ -829,7 +829,7 @@ public:
 		sName = "Top Gear";
 		sFriendlyName = "Force Player To Top Gear";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("transmission");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
 	void TickFunction(double delta) override {
@@ -849,7 +849,7 @@ public:
 	Effect_PlayerCarGearR() : ChaosEffect() {
 		sName = "Force Player To Reverse Gear";
 		fTimerLength = 15;
-		IncompatibilityGroup = Attrib::StringHash32("transmission");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
 	void TickFunction(double delta) override {
@@ -1050,8 +1050,7 @@ public:
 class Effect_PlayerResetTransform : public ChaosEffect {
 public:
 	Effect_PlayerResetTransform() : ChaosEffect() {
-		sName = "My Planet Needs Me";
-		sFriendlyName = "Disable Player Physics";
+		sName = "Disable Player Physics";
 		fTimerLength = 15;
 		fUnhideTime = 1;
 	}
@@ -1062,7 +1061,6 @@ public:
 	void TickFunction(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			auto playerRB = GetLocalPlayerInterface<IRigidBody>();
-			auto playerPos = *playerRB->GetPosition();
 			auto playerOrient = *playerRB->GetOrientation();
 			auto playerVel = *playerRB->GetLinearVelocity();
 			auto playerAVel = *playerRB->GetAngularVelocity();
@@ -1072,7 +1070,6 @@ public:
 			auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();
 			ply->SetVehicleOnGround(&pos, &fwd);
 
-			//playerRB->SetPosition(&playerPos);
 			playerRB->SetOrientation(&playerOrient);
 			playerRB->SetLinearVelocity(&playerVel);
 			playerRB->SetAngularVelocity(&playerAVel);

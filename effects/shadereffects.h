@@ -7,7 +7,7 @@ public:
 	bool bInvertTimerAtEnd = true;
 
 	EffectBase_ScreenShader() : ChaosEffect() {
-		IncompatibilityGroup = Attrib::StringHash32("screenshader");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("screenshader"));
 	};
 	
 	void InitFunction() override {

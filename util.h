@@ -379,7 +379,7 @@ struct CwoeeCarMiscState {
 			engineDamaged = i->IsBlown() || i->IsSabotaged();
 		}
 	}
-	void Apply(IVehicle* veh) {
+	void Apply(IVehicle* veh, bool fix) {
 		if (auto i = veh->mCOMObject->Find<ITransmission>()) {
 			if (i->GetGear() != gear) i->Shift(gear);
 		}
@@ -390,6 +390,8 @@ struct CwoeeCarMiscState {
 		}
 
 		// only using these to repair a car
+		if (!fix) return;
+
 		if (auto i = veh->mCOMObject->Find<ISpikeable>()) {
 			for (int j = 0; j < 4; j++) {
 				if (i->GetTireDamage(j) > tireDamage[j]) {

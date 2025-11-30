@@ -15,8 +15,8 @@ public:
 
 	Effect_Flashbacks() : ChaosEffect() {
 		sName = "Forza Rewind";
-		fTimerLength = 120;
-		IncompatibilityGroup = Attrib::StringHash32("car_lag");
+		fTimerLength = 240;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
 	}
 
 	void CaptureAllCars() {
@@ -36,7 +36,7 @@ public:
 			if (!IsVehicleValidAndActive(car.vehicle)) continue;
 			if (car.vehicle->GetVehicleKey() != car.model) continue;
 			car.state.Apply(car.vehicle);
-			car.miscState.Apply(car.vehicle);
+			car.miscState.Apply(car.vehicle, true);
 		}
 		while (lastStates.size() >= id) {
 			lastStates.pop_back();

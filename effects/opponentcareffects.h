@@ -134,7 +134,7 @@ public:
 		sName = "FUCKING RUBBERBAND";
 		sFriendlyName = "Opponents Rubberband";
 		fTimerLength = 45;
-		IncompatibilityGroup = Attrib::StringHash32("rubberband");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("rubberband"));
 	}
 
 	static float __thiscall GetCatchupCheatHooked(ICheater* pThis) {
@@ -156,7 +156,7 @@ public:
 	Effect_NoRubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional() {
 		sName = "Disable Rubberbanding";
 		fTimerLength = 90;
-		IncompatibilityGroup = Attrib::StringHash32("rubberband");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("rubberband"));
 	}
 
 	static float __thiscall GetCatchupCheatHooked(ICheater* pThis) {

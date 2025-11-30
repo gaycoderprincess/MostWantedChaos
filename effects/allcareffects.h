@@ -208,6 +208,7 @@ public:
 		IVehicle* vehicle = nullptr;
 		uint32_t model;
 		CwoeeCarPhysicalState state;
+		CwoeeCarMiscState miscState;
 	};
 	std::vector<tCarAssoc> lastStates;
 	double timer = 0;
@@ -216,7 +217,7 @@ public:
 		sName = "DDOS The Server";
 		sFriendlyName = "Lag For All Cars";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("car_lag");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
 	}
 
 	void CaptureAllCars() {
@@ -224,7 +225,7 @@ public:
 
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
-			lastStates.push_back({car, car->GetVehicleKey(), CwoeeCarPhysicalState(car)});
+			lastStates.push_back({car, car->GetVehicleKey(), CwoeeCarPhysicalState(car), CwoeeCarMiscState(car)});
 		}
 	}
 
@@ -234,6 +235,7 @@ public:
 			if (!IsVehicleValidAndActive(car.vehicle)) continue;
 			if (car.vehicle->GetVehicleKey() != car.model) continue;
 			car.state.Apply(car.vehicle);
+			car.miscState.Apply(car.vehicle, false);
 		}
 	}
 
@@ -255,6 +257,9 @@ public:
 			timer -= 1;
 		}
 	}
+	void DeinitFunction() override {
+		lastStates.clear();
+	}
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; }
 } E_FreezeEveryone;
@@ -265,6 +270,7 @@ public:
 		IVehicle* vehicle = nullptr;
 		uint32_t model;
 		CwoeeCarPhysicalState state;
+		CwoeeCarMiscState miscState;
 	};
 	std::vector<tCarAssoc> lastStates;
 	double timer = 0;
@@ -272,7 +278,7 @@ public:
 	Effect_FreezeEveryoneNoPlayer() : EffectBase_ActiveCarsConditional() {
 		sName = "Lag For All Other Cars";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("car_lag");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
 	}
 
 	void CaptureAllCars() {
@@ -280,7 +286,7 @@ public:
 
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
-			lastStates.push_back({car, car->GetVehicleKey(), CwoeeCarPhysicalState(car)});
+			lastStates.push_back({car, car->GetVehicleKey(), CwoeeCarPhysicalState(car), CwoeeCarMiscState(car)});
 		}
 	}
 
@@ -290,6 +296,7 @@ public:
 			if (!IsVehicleValidAndActive(car.vehicle)) continue;
 			if (car.vehicle->GetVehicleKey() != car.model) continue;
 			car.state.Apply(car.vehicle);
+			car.miscState.Apply(car.vehicle, false);
 		}
 	}
 
@@ -322,6 +329,9 @@ public:
 			timer -= 1;
 		}
 	}
+	void DeinitFunction() override {
+		lastStates.clear();
+	}
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; }
 } E_FreezeEveryoneNoPlayer;
@@ -335,7 +345,7 @@ public:
 		sName = "Snake";
 		sFriendlyName = "All Other Cars Follow Player";
 		fTimerLength = 45;
-		IncompatibilityGroup = Attrib::StringHash32("car_lag");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
 	}
 
 	void ApplyAllCars() {
@@ -438,7 +448,7 @@ public:
 	Effect_WideCars() : ChaosEffect() {
 		sName = "Wide Cars";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("car_scale");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
 	}
 
 	void TickFunction(double delta) override {
@@ -466,7 +476,7 @@ public:
 		sName = "Why's This Dealer?";
 		sFriendlyName = "Groovy Cars";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("car_scale");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
 	}
 
 	NyaAudio::NyaSound sound = 0;

@@ -5,7 +5,8 @@ public:
 	const char* sFriendlyName = nullptr;
 	double fTimerLength = 15;
 	double fUnhideTime = 3;
-	uint32_t IncompatibilityGroup = 0;
+	std::vector<uint32_t> IncompatibilityGroups;
+	std::vector<uint32_t> ActivateIncompatibilityGroups; // checks IncompatibilityGroups but doesn't deactivate for effects that only share ActivateIncompatibilityGroups
 	bool DebugNeverPick = false;
 
 	double fLastTriggerTime = 99999;
@@ -260,11 +261,18 @@ bool IsEffectRunning(ChaosEffect* effect) {
 	return false;
 }
 
-bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup) {
+bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup, bool includeActivate) {
 	if (!IncompatibilityGroup) return false;
 	for (auto& running : aRunningEffects) {
 		if (!running.IsActive()) continue;
-		if (running.pEffect->IncompatibilityGroup == IncompatibilityGroup) return true;
+		for (auto& group : running.pEffect->IncompatibilityGroups) {
+			if (group == IncompatibilityGroup) return true;
+		}
+		if (includeActivate) {
+			for (auto& group : running.pEffect->ActivateIncompatibilityGroups) {
+				if (group == IncompatibilityGroup) return true;
+			}
+		}
 	}
 	return false;
 }
@@ -282,7 +290,14 @@ ChaosEffect* GetRandomEffect() {
 		if (effect->DebugNeverPick) continue;
 		if (effect->bTriggeredThisCycle) continue;
 		if (IsEffectRunning(effect)) continue;
-		if (IsEffectRunningFromGroup(effect->IncompatibilityGroup)) continue;
+		bool incompatible = false;
+		for (auto& group : effect->IncompatibilityGroups) {
+			if (IsEffectRunningFromGroup(group, true)) incompatible = true;
+		}
+		for (auto& group : effect->ActivateIncompatibilityGroups) {
+			if (IsEffectRunningFromGroup(group, false)) incompatible = true;
+		}
+		if (incompatible) continue;
 		if (effect->IsConditionallyAvailable() && effect->AbortOnConditionFailed() && !effect->IsAvailable()) continue;
 		//if (effect->fLastTriggerTime) // todo
 		availableEffects.push_back(effect);

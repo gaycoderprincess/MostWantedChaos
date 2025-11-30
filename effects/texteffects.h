@@ -4,7 +4,7 @@ public:
 	Effect_TransRights() : ChaosEffect() {
 		sName = "Trans Rights";
 		fTimerLength = 120;
-		IncompatibilityGroup = Attrib::StringHash32("string_replace");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("string_replace"));
 	}
 
 	void InitFunction() override {
@@ -47,7 +47,7 @@ public:
 	Effect_RandomText() : ChaosEffect() {
 		sName = "Random Text";
 		fTimerLength = 120;
-		IncompatibilityGroup = Attrib::StringHash32("string_replace");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("string_replace");
 	}
 
 	void InitFunction() override {

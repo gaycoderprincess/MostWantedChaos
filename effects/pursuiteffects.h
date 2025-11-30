@@ -212,7 +212,7 @@ public:
 	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional() {
 		sName = "Ruthless Cop Spawns";
 		fTimerLength = 90;
-		IncompatibilityGroup = Attrib::StringHash32("coprequest");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -250,7 +250,7 @@ public:
 	Effect_NoCopSpawns() : EffectBase_PursuitConditional() {
 		sName = "Disable Cop Spawns";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("coprequest");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {

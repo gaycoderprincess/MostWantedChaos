@@ -38,7 +38,7 @@ public:
 	Effect_PortraitMode() : ChaosEffect() {
 		sName = "Portrait Mode";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("letterbox_aspect");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
 	}
 
 	void TickFunction(double delta) override {
@@ -55,7 +55,7 @@ public:
 	Effect_43Borders() : ChaosEffect() {
 		sName = "4:3 Letterboxed";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("letterbox_aspect");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
 	}
 
 	void TickFunction(double delta) override {
@@ -258,3 +258,20 @@ public:
 		fEffectCycleTimerSpeedMult = GetRandomNumber(25, 500) * 0.01;
 	}
 } E_RandomChaosTimer;
+
+class Effect_SFXPursuitBreaker : public ChaosEffect {
+public:
+	Effect_SFXPursuitBreaker() : ChaosEffect() {
+		sName = "Pursuit Breaker Sound Effect";
+	}
+
+	NyaAudio::NyaSound sound = 0;
+
+	void InitFunction() override {
+		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/fish.ogg"); // todo reencode this!!
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound);
+		}
+	}
+} E_SFXPursuitBreaker;

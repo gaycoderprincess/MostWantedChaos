@@ -31,7 +31,7 @@ public:
 	Effect_SpeedSlow() : ChaosEffect() {
 		sName = "Slow Motion";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("gamespeed");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
 	}
 
 	void TickFunction(double delta) override {
@@ -52,7 +52,7 @@ public:
 	Effect_SpeedFast() : ChaosEffect() {
 		sName = "Fast Motion";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("gamespeed");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
 	}
 
 	void TickFunction(double delta) override {
@@ -73,7 +73,7 @@ public:
 	Effect_SpeedSpeedBased() : ChaosEffect() {
 		sName = "Reverse Superhot";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("gamespeed");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
 	}
 
 	void TickFunction(double delta) override {
@@ -119,7 +119,7 @@ public:
 	Effect_WireframeWorld() : ChaosEffect() {
 		sName = "Wireframe World";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("fillmode");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
 	}
 
 	void TickFunction(double delta) override {
@@ -136,7 +136,7 @@ public:
 	Effect_LaserScanWorld() : ChaosEffect() {
 		sName = "Laser-Scanned World";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("fillmode");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
 	}
 
 	//static inline float PointSize = 4;
@@ -165,7 +165,7 @@ public:
 	Effect_SlipperyWorld() : ChaosEffect() {
 		sName = "Slippery World";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("simsurface_friction");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("simsurface_friction"));
 	}
 
 	void InitFunction() override {
@@ -214,7 +214,7 @@ public:
 	Effect_GrippyWorld() : ChaosEffect() {
 		sName = "Grippy World";
 		fTimerLength = 30;
-		IncompatibilityGroup = Attrib::StringHash32("simsurface_friction");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("simsurface_friction"));
 	}
 
 	void InitFunction() override {

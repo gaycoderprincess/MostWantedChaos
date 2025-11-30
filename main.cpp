@@ -101,7 +101,7 @@ void ProcessChaosEffects(double fDeltaTime, bool inMenu) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
 		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
 		effect.Draw(y, inMenu);
-		y += 1 - effect.GetOffscreenPercentage();
+		y += 1 - (inMenu ? 1 : effect.GetOffscreenPercentage());
 	}
 
 	while (RunningEffectsCleanup()) {}
@@ -127,7 +127,9 @@ void ChaosLoop() {
 	}
 
 	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || IsInMovie() || FEManager::mPauseRequest) {
-		ProcessChaosEffects(gTimer.fDeltaTime, true);
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+			ProcessChaosEffects(gTimer.fDeltaTime, true);
+		}
 		return;
 	}
 

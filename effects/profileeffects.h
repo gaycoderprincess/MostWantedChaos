@@ -89,7 +89,7 @@ public:
 	Effect_ManualTrans() : ChaosEffect() {
 		sName = "Force Manual Transmission";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("transmission");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
 	void TickFunction(double delta) override {
@@ -111,7 +111,7 @@ public:
 	Effect_AutoTrans() : ChaosEffect() {
 		sName = "Force Automatic Transmission";
 		fTimerLength = 60;
-		IncompatibilityGroup = Attrib::StringHash32("transmission");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
 	void TickFunction(double delta) override {
