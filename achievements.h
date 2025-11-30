@@ -37,6 +37,7 @@ namespace Achievements {
 		new CAchievement("LAPS_10", "Time Waster", "Up a race to 10 laps"),
 		new CAchievement("LAPS_1", "Lap Glitch", "Lower a race to 1 lap"),
 		new CAchievement("RESTART_LATE", "Trolled", "Have a race restart at over 90% complete"),
+		new CAchievement("DESTROY_RANDOM_PLAYER", "Millions To One", "Get totaled from Destroy Random Car"),
 	};
 
 	const float fSpriteBGX = 960;

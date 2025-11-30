@@ -287,3 +287,46 @@ public:
 	bool HasTimer() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_NoNitroOpponents;
+
+class Effect_LockOpponents : public EffectBase_OpponentAliveInRaceConditional {
+public:
+	struct tCarAssoc {
+		IVehicle* vehicle = nullptr;
+		uint32_t model;
+		UMath::Vector3 position;
+	};
+	std::vector<tCarAssoc> lastStates;
+
+	Effect_LockOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+		sName = "Lock Opponents In Place";
+		fTimerLength = 15;
+	}
+
+	void CaptureAllCars() {
+		lastStates.clear();
+
+		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		for (int i = 0; i < list.size(); i++) {
+			auto car = list[i];
+			lastStates.push_back({car, car->GetVehicleKey(), *car->GetPosition()});
+		}
+	}
+
+	void ApplyAllCars() {
+		for (auto& car : lastStates) {
+			if (car.vehicle == GetLocalPlayerVehicle()) continue;
+			if (!IsVehicleValidAndActive(car.vehicle)) continue;
+			if (car.vehicle->GetVehicleKey() != car.model) continue;
+			car.vehicle->mCOMObject->Find<IRigidBody>()->SetPosition(&car.position);
+		}
+	}
+
+	void InitFunction() override {
+		CaptureAllCars();
+	}
+	void TickFunction(double delta) override {
+		ApplyAllCars();
+	}
+	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_LockOpponents;

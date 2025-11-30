@@ -10,6 +10,9 @@ public:
 		auto racer = cars[i];
 		auto damage = racer->mCOMObject->Find<IDamageable>();
 		if (!damage) return;
+		if (racer == GetLocalPlayerVehicle()) {
+			Achievements::AwardAchievement(GetAchievement("DESTROY_RANDOM_PLAYER"));
+		}
 		damage->Destroy();
 	}
 } E_DestroyRandomCar;
@@ -304,9 +307,10 @@ public:
 				captureChance = 60;
 
 				// this effect makes cooldowns essentially free, disable during cooldowns
-				if (GetLocalPlayerInterface<IPursuit>() && GetLocalPlayerInterface<IPursuit>()->GetPursuitStatus() == PS_COOL_DOWN) {
-					return;
-				}
+				// todo how do i get the player's IPursuit?
+				//if (ICopMgr::mInstance->IsPlayerPursuitActive() && GetLocalPlayerInterface<IPursuit>()->GetPursuitStatus() == PS_COOL_DOWN) {
+				//	return;
+				//}
 			}
 
 			if (rand() % 100 < applyChance) {
