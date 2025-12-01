@@ -9,6 +9,10 @@ bool CanStringBeReversed(const std::string& str) {
 	return true;
 }
 
+bool CanStringBeRandomized(const std::string& str) {
+	return CanStringBeReversed(str);
+}
+
 struct tRandomizeTextAssoc {
 	uint32_t origHash;
 	uint32_t newHash;
@@ -16,6 +20,12 @@ struct tRandomizeTextAssoc {
 };
 std::vector<tRandomizeTextAssoc> RandomTextCache;
 bool RandomTextNoRepeats = true;
+
+struct tReverseTextAssoc {
+	uint32_t origHash;
+	char* newString;
+};
+std::vector<tReverseTextAssoc> ReverseTextCache;
 
 bool IsRandomTextHashUsed(uint32_t hash) {
 	if (!RandomTextNoRepeats) return false;
@@ -40,25 +50,34 @@ uint32_t GetRandomizedText(uint32_t hash) {
 		auto id = rand() % NumStringRecords;
 		newHash = RecordTable[id].Hash;
 		str = RecordTable[id].PackedString;
-	} while (!str || !CanStringBeReversed(str) || strlen(str) > len || IsRandomTextHashUsed(newHash));
+	} while (!str || !CanStringBeRandomized(str) || strlen(str) > len || IsRandomTextHashUsed(newHash));
 	RandomTextCache.push_back({hash, newHash, SearchForString(nullptr, newHash)});
 	return newHash;
+}
+
+const char* GetReversedText(uint32_t hash) {
+	for (auto& cache : ReverseTextCache) {
+		if (cache.origHash == hash) return cache.newString;
+	}
+
+	std::string reversed = SearchForString(nullptr, hash);
+	std::reverse(reversed.begin(), reversed.end());
+
+	auto text = new char[reversed.length()+1];
+	strcpy_s(text, reversed.length()+1, reversed.c_str());
+	ReverseTextCache.push_back({hash, text});
+	return text;
 }
 
 const char* __fastcall SearchForStringHooked(void* a1, uint32_t a2) {
 	auto str = SearchForString(a1, a2);
 	if (!str) return nullptr;
-	if (TextHook_RandomText && CanStringBeReversed(str)) {
+	if (TextHook_RandomText && CanStringBeRandomized(str)) {
 		str = SearchForString(a1, GetRandomizedText(a2));
 	}
 	if (TextHook_ReplaceText) str = TextHook_ReplaceText;
 	if (TextHook_ReverseText && CanStringBeReversed(str)) {
-		std::string reversed = str;
-		std::reverse(reversed.begin(), reversed.end());
-
-		static char text[256];
-		strcpy_s(text, 256, reversed.c_str());
-		return text;
+		str = GetReversedText(a2);
 	}
 	return str;
 }

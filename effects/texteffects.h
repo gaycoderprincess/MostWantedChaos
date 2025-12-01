@@ -40,7 +40,6 @@ public:
 	bool HasTimer() override { return true; }
 } E_ReverseText;
 
-// incredibly unstable
 class Effect_RandomText : public ChaosEffect {
 public:
 	Effect_RandomText() : ChaosEffect() {
