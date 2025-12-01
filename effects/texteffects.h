@@ -32,22 +32,21 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		TextHook_ReverseText = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
+		TextHook_ReverseText = true;
 	}
 	void DeinitFunction() override {
 		TextHook_ReverseText = false;
 	}
 	bool HasTimer() override { return true; }
-	bool RunInMenus() override { return true; }
 } E_ReverseText;
 
 // incredibly unstable
-/*class Effect_RandomText : public ChaosEffect {
+class Effect_RandomText : public ChaosEffect {
 public:
 	Effect_RandomText() : ChaosEffect() {
 		sName = "Random Text";
 		fTimerLength = 120;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("string_replace");
+		IncompatibilityGroups.push_back(Attrib::StringHash32("string_replace"));
 	}
 
 	void InitFunction() override {
@@ -57,4 +56,4 @@ public:
 		TextHook_RandomText = false;
 	}
 	bool HasTimer() override { return true; }
-} E_RandomText;*/
+} E_RandomText;

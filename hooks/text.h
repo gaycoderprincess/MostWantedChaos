@@ -9,16 +9,50 @@ bool CanStringBeReversed(const std::string& str) {
 	return true;
 }
 
+struct tRandomizeTextAssoc {
+	uint32_t origHash;
+	uint32_t newHash;
+	const char* newString;
+};
+std::vector<tRandomizeTextAssoc> RandomTextCache;
+bool RandomTextNoRepeats = true;
+
+bool IsRandomTextHashUsed(uint32_t hash) {
+	if (!RandomTextNoRepeats) return false;
+
+	auto str = SearchForString(nullptr, hash);
+	for (auto& cache : RandomTextCache) {
+		if (cache.newHash == hash) return true;
+		if (!strcmp(str, cache.newString)) return true;
+	}
+	return false;
+}
+
+uint32_t GetRandomizedText(uint32_t hash) {
+	for (auto& cache : RandomTextCache) {
+		if (cache.origHash == hash) return cache.newHash;
+	}
+
+	uint32_t newHash;
+	auto str = SearchForString(nullptr, hash);
+	auto len = strlen(str);
+	do {
+		auto id = rand() % NumStringRecords;
+		newHash = RecordTable[id].Hash;
+		str = RecordTable[id].PackedString;
+	} while (!str || !CanStringBeReversed(str) || strlen(str) > len || IsRandomTextHashUsed(newHash));
+	RandomTextCache.push_back({hash, newHash, SearchForString(nullptr, newHash)});
+	return newHash;
+}
+
 const char* __fastcall SearchForStringHooked(void* a1, uint32_t a2) {
 	auto str = SearchForString(a1, a2);
+	if (!str) return nullptr;
 	if (TextHook_RandomText && CanStringBeReversed(str)) {
-		auto len = strlen(str);
-		do {
-			str = RecordTable[rand() % NumStringRecords].PackedString;
-		} while (!str || !CanStringBeReversed(str) || strlen(str) > len);
+		str = SearchForString(a1, GetRandomizedText(a2));
 	}
 	if (TextHook_ReplaceText) str = TextHook_ReplaceText;
-	if (str && TextHook_ReverseText && CanStringBeReversed(str)) {
+	if (TextHook_ReverseText && CanStringBeReversed(str)) {
 		std::string reversed = str;
 		std::reverse(reversed.begin(), reversed.end());
 

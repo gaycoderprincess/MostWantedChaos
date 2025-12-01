@@ -343,7 +343,7 @@ public:
 
 	Effect_SnakeCars() : EffectBase_ActiveCarsConditional() {
 		sName = "Snake";
-		sFriendlyName = "All Other Cars Follow Player";
+		sFriendlyName = "All Cars Follow Player";
 		fTimerLength = 45;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
 	}
