@@ -419,3 +419,14 @@ bool IsCarDestroyed(IVehicle* car) {
 	if (engine && engine->IsSabotaged()) return true;
 	return car->IsDestroyed();
 }
+
+bool IsChaosBlocked() {
+	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return true;
+	if (IsInLoadingScreen() || IsInNIS() || IsInMovie()) return true;
+	if (FEManager::mPauseRequest) return true;
+	return false;
+}
+
+Camera* GetLocalPlayerCamera() {
+	return eViews[EVIEW_PLAYER1].pCamera;
+}

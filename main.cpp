@@ -89,6 +89,27 @@ void MoneyChecker() {
 	}
 }
 
+void CameraHook() {
+	auto view = &eViews[EVIEW_PLAYER1];
+	if (!view->Active) return;
+
+	static auto matrix = view->pCamera->CurrentKey.Matrix;
+	if (!memcmp(&matrix, &view->pCamera->CurrentKey.Matrix, sizeof(bMatrix4))) return;
+	matrix = view->pCamera->CurrentKey.Matrix;
+
+	static CNyaTimer gTimer;
+	gTimer.Process();
+
+	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) return;
+
+	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		effect.OnTickCamera(gTimer.fDeltaTime);
+	}
+	matrix = view->pCamera->CurrentKey.Matrix;
+}
+
 void ProcessChaosEffects(double fDeltaTime, bool inMenu) {
 	// run effects first, then draw the chaos HUD over top
 	for (auto& effect : aRunningEffects) {
@@ -126,13 +147,12 @@ void ChaosLoop() {
 		effect->fLastTriggerTime += gTimer.fDeltaTime;
 	}
 
-	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || IsInLoadingScreen() || IsInNIS() || IsInMovie() || FEManager::mPauseRequest) {
+	if (IsChaosBlocked()) {
 		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
 			ProcessChaosEffects(gTimer.fDeltaTime, true);
 		}
 		return;
 	}
-
 	ProcessChaosEffects(gTimer.fDeltaTime, false);
 
 	if (bTimerEnabled) {
@@ -195,6 +215,13 @@ void ChaosModMenu() {
 					rb->GetForwardVector(&fwd);
 					DrawMenuOption(std::format("Forward: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
 				}
+				auto cam = GetLocalPlayerCamera();
+				auto camMatrix = *(NyaMat4x4*)&cam->CurrentKey.Matrix;
+				camMatrix = camMatrix.Invert();
+				DrawMenuOption(std::format("Camera Coords: {:.2f} {:.2f} {:.2f}", camMatrix.p.x, camMatrix.p.y, camMatrix.p.z));
+				DrawMenuOption(std::format("Camera v0: {:.2f} {:.2f} {:.2f}", camMatrix.x.x, camMatrix.x.y, camMatrix.x.z));
+				DrawMenuOption(std::format("Camera v1: {:.2f} {:.2f} {:.2f}", camMatrix.y.x, camMatrix.y.y, camMatrix.y.z));
+				DrawMenuOption(std::format("Camera v2: {:.2f} {:.2f} {:.2f}", camMatrix.z.x, camMatrix.z.y, camMatrix.z.z));
 				DrawMenuOption(std::format("InGameBreaker: {}", ply->InGameBreaker()));
 				DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
 				DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
@@ -230,6 +257,7 @@ void ChaosModMenu() {
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("GroovySpeed", Effect_GroovyCars::GroovySpeed);
+			QuickValueEditor("LiftOffset", Effect_LiftCamera::LiftOffset);
 			ChloeMenuLib::EndMenu();
 		}
 
@@ -331,6 +359,9 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::PlaceWorldServiceHook();
 			NyaHooks::aWorldServiceFuncs.push_back(MainLoop);
 			NyaHooks::PlaceInputBlockerHook();
+			NyaHooks::aCameraFuncs.push_back(CameraHook);
+			NyaHooks::PlaceLateInitHook();
+			NyaHooks::aLateInitFuncs.push_back([](){ NyaHooks::PlaceCameraHook(); }); // x360stuff is incredibly and insanely rude
 		} break;
 		default:
 			break;

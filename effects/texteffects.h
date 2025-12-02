@@ -9,7 +9,7 @@ public:
 
 	void InitFunction() override {
 		SummonChyron("Trans Rights", "Trans Rights", "Trans Rights");
-		TextHook_ReplaceText = "Trans Rights";
+		TextHook::pReplaceText = "Trans Rights";
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0xEB); // remove duplicate racer name check
 	}
 	void TickFunction(double delta) override {
@@ -18,10 +18,11 @@ public:
 		Chyron::mAlbum = "Trans Rights";
 	}
 	void DeinitFunction() override {
-		TextHook_ReplaceText = nullptr;
+		TextHook::pReplaceText = nullptr;
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0x7E);
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_TransRights;
 
 class Effect_ReverseText : public ChaosEffect {
@@ -32,12 +33,13 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		TextHook_ReverseText = true;
+		TextHook::bReverseText = true;
 	}
 	void DeinitFunction() override {
-		TextHook_ReverseText = false;
+		TextHook::bReverseText = false;
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_ReverseText;
 
 class Effect_RandomText : public ChaosEffect {
@@ -49,10 +51,11 @@ public:
 	}
 
 	void InitFunction() override {
-		TextHook_RandomText = true;
+		TextHook::bRandomText = true;
 	}
 	void DeinitFunction() override {
-		TextHook_RandomText = false;
+		TextHook::bRandomText = false;
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_RandomText;

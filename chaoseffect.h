@@ -27,6 +27,7 @@ public:
 
 	virtual void InitFunction() {}
 	virtual void TickFunction(double delta) {}
+	virtual void TickFunctionCamera(double delta) {}
 	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
@@ -169,6 +170,16 @@ public:
 			data.outlinedist = 0.025;
 		}
 		DrawString(data, str);
+	}
+
+	void OnTickCamera(double delta) {
+		if (IsHidden()) return;
+		if (bFirstFrame) return;
+		if (!IsActive()) return;
+
+		pEffect->EffectInstance = this;
+		pEffect->TickFunctionCamera(delta);
+		pEffect->EffectInstance = nullptr;
 	}
 
 	void OnTick(double delta, bool inMenu) {
@@ -339,6 +350,7 @@ bool RunningEffectsCleanup() {
 #include "effects/carmodeleffects.h"
 #include "effects/physicseffects.h"
 #include "effects/spawneffects.h"
+#include "effects/cameraeffects.h"
 #include "effects/effect_safehouse.h"
 #include "effects/effect_leaktank.h"
 #include "effects/effect_flashbacks.h"

@@ -99,5 +99,5 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 }
 
 ChloeHook Hook_VehicleConstruct([]() {
-	aMainLoopFunctions.push_back([]() { *(void**)0x92C534 = (void*)&VehicleConstructHooked; });
+	NyaHooks::aLateInitFuncs.push_back([]() { *(void**)0x92C534 = (void*)&VehicleConstructHooked; });
 });
