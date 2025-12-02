@@ -117,3 +117,34 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_SecondPersonCamera;
+
+class Effect_CinematicCamera : public ChaosEffect {
+public:
+	Effect_CinematicCamera() : ChaosEffect() {
+		sName = "Cinematic Camera";
+		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	static inline float rx = -0.15;
+	static inline float ry = 0.2;
+	static inline float rz = -0.1;
+	static inline float x = -1.5;
+	static inline float y = 0.0;
+	static inline float z = -2.0;
+
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
+		NyaMat4x4 playerMatrix;
+		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
+		playerMatrix.p = *(NyaVec3*)GetLocalPlayerVehicle()->GetPosition();
+		NyaMat4x4 offsetMatrix;
+		offsetMatrix.Rotate({rx, ry, rz});
+		offsetMatrix.p.x = x;
+		offsetMatrix.p.y = y;
+		offsetMatrix.p.z = z;
+		playerMatrix = playerMatrix * offsetMatrix;
+		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(playerMatrix));
+	}
+	bool HasTimer() override { return true; }
+} E_CinematicCamera;

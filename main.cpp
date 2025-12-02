@@ -46,6 +46,7 @@ bool DisableChaosHUD = false;
 #include "hooks/vehicleconstruct.h"
 #include "hooks/text.h"
 #include "hooks/shaders.h"
+#include "hooks/carrender.h"
 #include "chaoseffect.h"
 
 void OnWinRace() {
@@ -260,12 +261,18 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Effect Debug")) {
 			ChloeMenuLib::BeginMenu();
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
-			QuickValueEditor("TankDrainRate", Effect_LeakTank::TankDrainRate);
-			QuickValueEditor("GroovySpeed", Effect_GroovyCars::GroovySpeed);
-			//QuickValueEditor("LiftOffset", Effect_LiftCamera::LiftOffset);
-			QuickValueEditor("XOffset", Effect_GTCamera::XOffset);
-			QuickValueEditor("YOffset", Effect_GTCamera::YOffset);
-			QuickValueEditor("ZOffset", Effect_GTCamera::ZOffset);
+			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
+			QuickValueEditor("GroovyCars::GroovySpeed", Effect_GroovyCars::GroovySpeed);
+			//QuickValueEditor("LiftCamera::LiftOffset", Effect_LiftCamera::LiftOffset);
+			QuickValueEditor("GTCamera::XOffset", Effect_GTCamera::XOffset);
+			QuickValueEditor("GTCamera::YOffset", Effect_GTCamera::YOffset);
+			QuickValueEditor("GTCamera::ZOffset", Effect_GTCamera::ZOffset);
+			QuickValueEditor("CinematicCamera::x", Effect_CinematicCamera::x);
+			QuickValueEditor("CinematicCamera::y", Effect_CinematicCamera::y);
+			QuickValueEditor("CinematicCamera::z", Effect_CinematicCamera::z);
+			QuickValueEditor("CinematicCamera::rx", Effect_CinematicCamera::rx);
+			QuickValueEditor("CinematicCamera::ry", Effect_CinematicCamera::ry);
+			QuickValueEditor("CinematicCamera::rz", Effect_CinematicCamera::rz);
 			ChloeMenuLib::EndMenu();
 		}
 

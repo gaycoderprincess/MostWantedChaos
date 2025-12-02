@@ -535,3 +535,40 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_TeleportAllCars;
+
+class Effect_LaggyLookingCars : public ChaosEffect {
+public:
+	Effect_LaggyLookingCars() : ChaosEffect() {
+		sName = "Snap To Grid";
+		sFriendlyName = "Shaky Cars";
+		fTimerLength = 60;
+	}
+
+	void InitFunction() override {
+		CarRender_Truncate = true;
+		CarRender_TruncateRotation = true;
+		CarRender_TruncateRotationAccuracy = 10;
+	}
+	void DeinitFunction() override {
+		CarRender_Truncate = false;
+		CarRender_TruncateRotation = false;
+	}
+	bool HasTimer() override { return true; }
+} E_LaggyLookingCars;
+
+class Effect_LaggyLookingCars2 : public ChaosEffect {
+public:
+	Effect_LaggyLookingCars2() : ChaosEffect() {
+		sName = "Low Quality Movement";
+		fTimerLength = 60;
+	}
+
+	void InitFunction() override {
+		CarRender_TruncateRotation = true;
+		CarRender_TruncateRotationAccuracy = 5;
+	}
+	void DeinitFunction() override {
+		CarRender_TruncateRotation = false;
+	}
+	bool HasTimer() override { return true; }
+} E_LaggyLookingCars2;
