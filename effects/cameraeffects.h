@@ -8,7 +8,7 @@ public:
 
 	static inline float LiftOffset = 3;
 
-	void TickFunctionCamera(double delta) override {
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		auto camMatrix = PrepareCameraMatrix();
 		camMatrix.p.z += LiftOffset;
 		ApplyCameraMatrix(camMatrix);
@@ -27,7 +27,7 @@ public:
 
 	static inline float LiftOffset = -0.4;
 
-	void TickFunctionCamera(double delta) override {
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		auto camMatrix = PrepareCameraMatrix();
 		camMatrix.p.z += LiftOffset;
 		ApplyCameraMatrix(camMatrix);
@@ -46,7 +46,7 @@ public:
 
 	static inline float RoofOffset = 0.5;
 
-	void TickFunctionCamera(double delta) override {
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		auto camMatrix = PrepareCameraMatrix();
 		NyaMat4x4 playerMatrix;
 		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
@@ -71,7 +71,7 @@ public:
 	static inline float YOffset = -1;
 	static inline float ZOffset = -5;
 
-	void TickFunctionCamera(double delta) override {
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		NyaMat4x4 playerMatrix;
 		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
 		playerMatrix.p = *(NyaVec3*)GetLocalPlayerVehicle()->GetPosition();
@@ -79,7 +79,7 @@ public:
 		camMatrix.p += XOffset * camMatrix.x;
 		camMatrix.p += YOffset * camMatrix.y;
 		camMatrix.p += ZOffset * camMatrix.z;
-		ApplyCameraMatrix(camMatrix);
+		ApplyCameraMatrix(pCamera, camMatrix);
 	}
 	bool HasTimer() override { return true; }
 } E_GTCamera;
@@ -111,9 +111,9 @@ public:
 		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
 	}
 
-	void TickFunctionCamera(double delta) override {
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		CustomCamera::SetTargetCar(GetClosestActiveVehicle(GetLocalPlayerVehicle()), GetLocalPlayerVehicle());
-		CustomCamera::ProcessCam(eViews[EVIEW_PLAYER1].pCamera, delta);
+		CustomCamera::ProcessCam(pCamera, delta);
 	}
 	bool HasTimer() override { return true; }
 } E_SecondPersonCamera;

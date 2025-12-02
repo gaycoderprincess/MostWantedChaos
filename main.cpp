@@ -90,12 +90,7 @@ void MoneyChecker() {
 	}
 }
 
-void CameraHook() {
-	Camera::JollyRancherResponse.UseMatrix = 0;
-
-	auto view = &eViews[EVIEW_PLAYER1];
-	if (!view->Active) return;
-
+void CameraHook(CameraMover* pMover) {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
@@ -104,7 +99,7 @@ void CameraHook() {
 	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		effect.OnTickCamera(gTimer.fDeltaTime);
+		effect.OnTickCamera(pMover->pCamera, gTimer.fDeltaTime);
 	}
 }
 
@@ -396,9 +391,11 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::PlaceWorldServiceHook();
 			NyaHooks::aWorldServiceFuncs.push_back(MainLoop);
 			NyaHooks::PlaceInputBlockerHook();
-			NyaHooks::aCameraFuncs.push_back(CameraHook);
-			NyaHooks::PlaceLateInitHook();
-			NyaHooks::aLateInitFuncs.push_back([](){ NyaHooks::PlaceCameraHook(); }); // x360stuff is incredibly and insanely rude
+			NyaHooks::PlaceCameraMoverHook();
+			NyaHooks::aCameraMoverFuncs.push_back(CameraHook);
+			//NyaHooks::aCameraFuncs.push_back(CameraHook);
+			//NyaHooks::PlaceLateInitHook();
+			//NyaHooks::aLateInitFuncs.push_back([](){ NyaHooks::PlaceCameraHook(); }); // x360stuff is incredibly and insanely rude
 		} break;
 		default:
 			break;

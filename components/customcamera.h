@@ -6,6 +6,8 @@ namespace CustomCamera {
 	IVehicle* pTargetPlayerSecondPerson = nullptr;
 	IRigidBody* pTargetPlayerBodySecondPerson = nullptr;
 
+	bool bSecondPersonOrbitMode = true;
+
 	const float fPanSpeedBase = 0.005;
 
 	double fMouse[2] = {};
@@ -66,7 +68,7 @@ namespace CustomCamera {
 		return &vec;
 	}
 
-	void SetRotation() {
+	void SetRotation(Camera* pCam) {
 		auto plyPos = GetTargetPosition(pTargetPlayerBody);
 		if (!plyPos) return;
 
@@ -75,10 +77,10 @@ namespace CustomCamera {
 		auto mat = NyaMat4x4::LookAt(lookat);
 		mat.p = vPos;
 		mat = WorldToRenderMatrix(mat);
-		ApplyCameraMatrix(mat);
+		ApplyCameraMatrix(pCam, mat);
 	}
 
-	void SetRotationSecondPerson() {
+	void SetRotationSecondPerson(Camera* pCam) {
 		auto plyPos = GetTargetPosition(pTargetPlayerBodySecondPerson);
 		if (!plyPos) return;
 
@@ -87,7 +89,7 @@ namespace CustomCamera {
 		auto mat = NyaMat4x4::LookAt(lookat);
 		mat.p = vPos;
 		mat = WorldToRenderMatrix(mat);
-		ApplyCameraMatrix(mat);
+		ApplyCameraMatrix(pCam, mat);
 	}
 
 	void DoCamString() {
@@ -131,11 +133,11 @@ namespace CustomCamera {
 		}
 	}
 
-	void DoMovement() {
+	void DoMovement(Camera* pCam) {
 		auto player = pTargetPlayerBody;
 		if (!player) return;
 
-		auto mat = PrepareCameraMatrix();
+		auto mat = PrepareCameraMatrix(pCam);
 		vPosChange = mat.x * fMouse[0] * fMouseRotateSpeed * fPanSpeedBase;
 		vPosChange += mat.y * fMouse[1] * -fMouseRotateSpeed * fPanSpeedBase;
 		vPos -= vPosChange;
@@ -163,7 +165,7 @@ namespace CustomCamera {
 		vLastPlayerPosition = *(NyaVec3*)player->GetPosition();
 
 		mat.p = WorldToRenderCoords(vPos);
-		ApplyCameraMatrix(mat);
+		ApplyCameraMatrix(pCam, mat);
 	}
 
 	void SetCameraToDefaultPos(IRigidBody* ply) {
@@ -212,10 +214,17 @@ namespace CustomCamera {
 		bReset = false;
 
 		vPosChange = {0,0,0};
-		SetRotation();
-		DoMovement();
-		SetRotation();
-		SetRotationSecondPerson();
+		if (bSecondPersonOrbitMode && pTargetPlayerSecondPerson) {
+			SetRotationSecondPerson(cam);
+			DoMovement(cam);
+			SetRotationSecondPerson(cam);
+		}
+		else {
+			SetRotation(cam);
+			DoMovement(cam);
+			SetRotation(cam);
+			SetRotationSecondPerson(cam);
+		}
 
 		if (fMouse[0] != 0.0 || fMouse[1] != 0.0) {
 			fMouseTimer = fStringResetTime;

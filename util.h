@@ -449,15 +449,14 @@ NyaMat4x4 WorldToRenderMatrix(NyaMat4x4 world) {
 }
 
 // view to world
-NyaMat4x4 PrepareCameraMatrix() {
-	auto camMatrix = *(NyaMat4x4*)&GetLocalPlayerCamera()->CurrentKey.Matrix;
+NyaMat4x4 PrepareCameraMatrix(Camera* pCamera) {
+	auto camMatrix = *(NyaMat4x4*)&pCamera->CurrentKey.Matrix;
 	return camMatrix.Invert();
 }
 
 // world to view
-void ApplyCameraMatrix(NyaMat4x4 mat) {
-	Camera::JollyRancherResponse.UseMatrix = 1;
+void ApplyCameraMatrix(Camera* pCamera, NyaMat4x4 mat) {
 	auto inv = mat.Invert();
-	inv.p *= 100;
-	Camera::JollyRancherResponse.CamMatrix = *(bMatrix4*)&inv;
+	pCamera->bClearVelocity = true;
+	Camera::SetCameraMatrix(pCamera, (bMatrix4*)&inv, 0);
 }

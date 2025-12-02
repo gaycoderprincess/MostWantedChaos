@@ -27,7 +27,7 @@ public:
 
 	virtual void InitFunction() {}
 	virtual void TickFunction(double delta) {}
-	virtual void TickFunctionCamera(double delta) {}
+	virtual void TickFunctionCamera(Camera* pCamera, double delta) {}
 	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
@@ -172,13 +172,13 @@ public:
 		DrawString(data, str);
 	}
 
-	void OnTickCamera(double delta) {
+	void OnTickCamera(Camera* pCamera, double delta) {
 		if (IsHidden()) return;
 		if (bFirstFrame) return;
 		if (!IsActive()) return;
 
 		pEffect->EffectInstance = this;
-		pEffect->TickFunctionCamera(delta);
+		pEffect->TickFunctionCamera(pCamera, delta);
 		pEffect->EffectInstance = nullptr;
 	}
 
