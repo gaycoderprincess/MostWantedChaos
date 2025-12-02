@@ -147,13 +147,10 @@ void ChaosLoop() {
 		effect->fLastTriggerTime += gTimer.fDeltaTime;
 	}
 
-	if (IsChaosBlocked()) {
-		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
-			ProcessChaosEffects(gTimer.fDeltaTime, true);
-		}
-		return;
-	}
-	ProcessChaosEffects(gTimer.fDeltaTime, false);
+	bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	if (IsChaosBlocked() && !inMenu) return;
+	ProcessChaosEffects(gTimer.fDeltaTime, inMenu);
+	if (inMenu) return;
 
 	if (bTimerEnabled) {
 		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
@@ -212,8 +209,12 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Coords: {:.2f} {:.2f} {:.2f}", pos->x, pos->y, pos->z));
 				UMath::Vector3 fwd;
 				if (auto rb = GetLocalPlayerInterface<IRigidBody>()) {
+					rb->GetRightVector(&fwd);
+					DrawMenuOption(std::format("Right: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
 					rb->GetForwardVector(&fwd);
 					DrawMenuOption(std::format("Forward: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
+					rb->GetUpVector(&fwd);
+					DrawMenuOption(std::format("Up: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
 				}
 				auto cam = GetLocalPlayerCamera();
 				auto camMatrix = *(NyaMat4x4*)&cam->CurrentKey.Matrix;
@@ -258,6 +259,9 @@ void ChaosModMenu() {
 			QuickValueEditor("TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("GroovySpeed", Effect_GroovyCars::GroovySpeed);
 			QuickValueEditor("LiftOffset", Effect_LiftCamera::LiftOffset);
+			QuickValueEditor("XOffset", Effect_GTCamera::XOffset);
+			QuickValueEditor("YOffset", Effect_GTCamera::YOffset);
+			QuickValueEditor("ZOffset", Effect_GTCamera::ZOffset);
 			ChloeMenuLib::EndMenu();
 		}
 

@@ -430,3 +430,20 @@ bool IsChaosBlocked() {
 Camera* GetLocalPlayerCamera() {
 	return eViews[EVIEW_PLAYER1].pCamera;
 }
+
+NyaVec3 WorldToRenderCoords(NyaVec3 world) {
+	return {world.z, -world.x, world.y};
+}
+
+NyaVec3 RenderToWorldCoords(NyaVec3 render) {
+	return {-render.y, render.z, render.x};
+}
+
+NyaMat4x4 WorldToRenderMatrix(NyaMat4x4 world) {
+	NyaMat4x4 out;
+	out.x = WorldToRenderCoords(world.x);
+	out.y = -WorldToRenderCoords(world.y); // v1, up
+	out.z = WorldToRenderCoords(world.z);
+	out.p = WorldToRenderCoords(world.p);
+	return out;
+}

@@ -52,3 +52,50 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_LowerCamera;
+
+/*class Effect_RoofCamera : public EffectBase_CameraHelper {
+public:
+	Effect_RoofCamera() : EffectBase_CameraHelper() {
+		sName = "00Roof Camera";
+		fTimerLength = 60;
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	static inline float RoofOffset = 0.5;
+
+	void TickFunctionCamera(double delta) override {
+		auto camMatrix = PrepareCameraMatrix();
+		NyaMat4x4 playerMatrix;
+		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
+		playerMatrix.p = *(NyaVec3*)GetLocalPlayerVehicle()->GetPosition();
+		camMatrix = WorldToRenderMatrix(playerMatrix);
+		camMatrix.p += RoofOffset * -camMatrix.y;
+		ApplyCameraMatrix(camMatrix);
+	}
+	bool HasTimer() override { return true; }
+} E_RoofCamera;*/
+
+class Effect_GTCamera : public EffectBase_CameraHelper {
+public:
+	Effect_GTCamera() : EffectBase_CameraHelper() {
+		sName = "Gran Turismo Camera";
+		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+	}
+
+	static inline float XOffset = 0;
+	static inline float YOffset = -1;
+	static inline float ZOffset = -5;
+
+	void TickFunctionCamera(double delta) override {
+		NyaMat4x4 playerMatrix;
+		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
+		playerMatrix.p = *(NyaVec3*)GetLocalPlayerVehicle()->GetPosition();
+		auto camMatrix = WorldToRenderMatrix(playerMatrix);
+		camMatrix.p += XOffset * camMatrix.x;
+		camMatrix.p += YOffset * camMatrix.y;
+		camMatrix.p += ZOffset * camMatrix.z;
+		ApplyCameraMatrix(camMatrix);
+	}
+	bool HasTimer() override { return true; }
+} E_GTCamera;
