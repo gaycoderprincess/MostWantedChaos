@@ -1,23 +1,6 @@
-class EffectBase_CameraHelper : public ChaosEffect {
+class Effect_LiftCamera : public ChaosEffect {
 public:
-	EffectBase_CameraHelper() : ChaosEffect() {
-		sName = "(EFFECT BASE) Camera Helper";
-	}
-
-	// view to world
-	static NyaMat4x4 PrepareCameraMatrix() {
-		auto camMatrix = *(NyaMat4x4*)&GetLocalPlayerCamera()->CurrentKey.Matrix;
-		return camMatrix.Invert();
-	}
-	// world to view
-	static void ApplyCameraMatrix(NyaMat4x4 mat) {
-		*(NyaMat4x4*)&GetLocalPlayerCamera()->CurrentKey.Matrix = mat.Invert();
-	}
-};
-
-class Effect_LiftCamera : public EffectBase_CameraHelper {
-public:
-	Effect_LiftCamera() : EffectBase_CameraHelper() {
+	Effect_LiftCamera() : ChaosEffect() {
 		sName = "Lift Camera Up";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
@@ -34,9 +17,9 @@ public:
 	bool RunInMenus() override { return true; }
 } E_LiftCamera;
 
-class Effect_LowerCamera : public EffectBase_CameraHelper {
+class Effect_LowerCamera : public ChaosEffect {
 public:
-	Effect_LowerCamera() : EffectBase_CameraHelper() {
+	Effect_LowerCamera() : ChaosEffect() {
 		sName = "Low Camera Height";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
@@ -53,9 +36,9 @@ public:
 	bool RunInMenus() override { return true; }
 } E_LowerCamera;
 
-/*class Effect_RoofCamera : public EffectBase_CameraHelper {
+/*class Effect_RoofCamera : public ChaosEffect {
 public:
-	Effect_RoofCamera() : EffectBase_CameraHelper() {
+	Effect_RoofCamera() : ChaosEffect() {
 		sName = "00Roof Camera";
 		fTimerLength = 60;
 		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
@@ -75,12 +58,13 @@ public:
 	bool HasTimer() override { return true; }
 } E_RoofCamera;*/
 
-class Effect_GTCamera : public EffectBase_CameraHelper {
+class Effect_GTCamera : public ChaosEffect {
 public:
-	Effect_GTCamera() : EffectBase_CameraHelper() {
+	Effect_GTCamera() : ChaosEffect() {
 		sName = "Gran Turismo Camera";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
 	}
 
 	static inline float XOffset = 0;

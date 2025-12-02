@@ -37,7 +37,8 @@ bool DisableChaosHUD = false;
 
 #include "d3dhook.h"
 #include "util.h"
-#include "achievements.h"
+#include "components/achievements.h"
+#include "components/customcamera.h"
 #include "hooks/fixes.h"
 #include "hooks/noreset.h"
 #include "hooks/gamespeed.h"
@@ -95,10 +96,14 @@ void CameraHook() {
 
 	static auto matrix = view->pCamera->CurrentKey.Matrix;
 	if (!memcmp(&matrix, &view->pCamera->CurrentKey.Matrix, sizeof(bMatrix4))) return;
-	matrix = view->pCamera->CurrentKey.Matrix;
 
 	static CNyaTimer gTimer;
 	gTimer.Process();
+
+	CustomCamera::bEnabled = true;
+	CustomCamera::ProcessCam(view->pCamera, gTimer.fDeltaTime);
+
+	matrix = view->pCamera->CurrentKey.Matrix;
 
 	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) return;
 
@@ -215,6 +220,8 @@ void ChaosModMenu() {
 					DrawMenuOption(std::format("Forward: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
 					rb->GetUpVector(&fwd);
 					DrawMenuOption(std::format("Up: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
+					rb->GetDimension(&fwd);
+					DrawMenuOption(std::format("Dimension: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
 				}
 				auto cam = GetLocalPlayerCamera();
 				auto camMatrix = *(NyaMat4x4*)&cam->CurrentKey.Matrix;
@@ -331,6 +338,29 @@ void ChaosModMenu() {
 	ChloeMenuLib::EndMenu();
 }
 
+/*void MouseWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	static bool bOnce = true;
+	if (bOnce) {
+		RAWINPUTDEVICE device;
+		device.usUsagePage = 1;
+		device.usUsage = 2;
+		device.dwFlags = 256;
+		device.hwndTarget = hWnd;
+		RegisterRawInputDevices(&device, 1, sizeof(RAWINPUTDEVICE));
+		bOnce = false;
+	}
+
+	if (msg == WM_INPUT) {
+		RAWINPUT raw;
+		UINT size = sizeof(raw);
+		GetRawInputData((HRAWINPUT)lParam, RID_INPUT, &raw, &size, sizeof(RAWINPUTHEADER));
+		if (raw.header.dwType != RIM_TYPEMOUSE) return;
+		CustomCamera::fMouse[0] += raw.data.mouse.lLastX;
+		CustomCamera::fMouse[1] += raw.data.mouse.lLastY;
+	}
+	WndProcHook(hWnd, msg, wParam, lParam);
+}*/
+
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 	switch( fdwReason ) {
 		case DLL_PROCESS_ATTACH: {
@@ -359,6 +389,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::aD3DResetFuncs.push_back(OnD3DReset);
 			NyaHooks::aPreHUDDrawFuncs.push_back(D3DHookPreHUD);
 			NyaHooks::PlaceWndProcHook();
+			//NyaHooks::aWndProcFuncs.push_back(MouseWndProc);
 			NyaHooks::aWndProcFuncs.push_back(WndProcHook);
 			NyaHooks::PlaceWorldServiceHook();
 			NyaHooks::aWorldServiceFuncs.push_back(MainLoop);

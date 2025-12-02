@@ -447,3 +447,14 @@ NyaMat4x4 WorldToRenderMatrix(NyaMat4x4 world) {
 	out.p = WorldToRenderCoords(world.p);
 	return out;
 }
+
+// view to world
+NyaMat4x4 PrepareCameraMatrix() {
+	auto camMatrix = *(NyaMat4x4*)&GetLocalPlayerCamera()->CurrentKey.Matrix;
+	return camMatrix.Invert();
+}
+
+// world to view
+void ApplyCameraMatrix(NyaMat4x4 mat) {
+	*(NyaMat4x4*)&GetLocalPlayerCamera()->CurrentKey.Matrix = mat.Invert();
+}
