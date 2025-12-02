@@ -455,9 +455,9 @@ public:
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
 
 		auto fadeIn = GetEffectFadeInOut(this, 1, true);
-		CarScaleMatrix._v1.x *= 1 + (fadeIn * 3);
-		CarScaleMatrix._v1.y *= 1 + (fadeIn * 3);
-		CarScaleMatrix._v1.z *= 1 + (fadeIn * 3);
+		CarScaleMatrix.y.x *= 1 + (fadeIn * 3);
+		CarScaleMatrix.y.y *= 1 + (fadeIn * 3);
+		CarScaleMatrix.y.z *= 1 + (fadeIn * 3);
 	}
 	void DeinitFunction() override {
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
@@ -493,15 +493,15 @@ public:
 
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
 
-		CarScaleMatrix._v0.x *= 1 + (easeInOutQuart(1 - state) * 0.33);
-		CarScaleMatrix._v0.y *= 1 + (easeInOutQuart(1 - state) * 0.33);
-		CarScaleMatrix._v0.z *= 1 + (easeInOutQuart(1 - state) * 0.33);
-		CarScaleMatrix._v1.x *= 1 + (easeInOutQuart(1 - state) * 0.33);
-		CarScaleMatrix._v1.y *= 1 + (easeInOutQuart(1 - state) * 0.33);
-		CarScaleMatrix._v1.z *= 1 + (easeInOutQuart(1 - state) * 0.33);
-		CarScaleMatrix._v2.x *= 1 + (easeInOutQuart(state) * 0.33);
-		CarScaleMatrix._v2.y *= 1 + (easeInOutQuart(state) * 0.33);
-		CarScaleMatrix._v2.z *= 1 + (easeInOutQuart(state) * 0.33);
+		CarScaleMatrix.x.x *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix.x.y *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix.x.z *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix.y.x *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix.y.y *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix.y.z *= 1 + (easeInOutQuart(1 - state) * 0.33);
+		CarScaleMatrix.z.x *= 1 + (easeInOutQuart(state) * 0.33);
+		CarScaleMatrix.z.y *= 1 + (easeInOutQuart(state) * 0.33);
+		CarScaleMatrix.z.z *= 1 + (easeInOutQuart(state) * 0.33);
 
 		if (sound && NyaAudio::IsFinishedPlaying(sound)) {
 			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);

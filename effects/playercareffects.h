@@ -729,15 +729,15 @@ void DoCarForcefield(IVehicle* source) {
 		auto otherCar = car->mCOMObject->Find<IRigidBody>();
 		if (!otherCar) continue;
 
-		auto v = (NyaVec3*)source->GetPosition();
-		auto c = (NyaVec3*)otherCar->GetPosition();
+		auto v = source->GetPosition();
+		auto c = otherCar->GetPosition();
 		if ((*v - *c).length() < 15) {
 			auto dir = (*c - *v);
 			dir.Normalize();
 			dir *= 15;
 			auto newPos = *v;
 			newPos += dir;
-			otherCar->SetPosition((UMath::Vector3*)&newPos);
+			otherCar->SetPosition(&newPos);
 		}
 	}
 }
@@ -1064,7 +1064,7 @@ public:
 			auto playerOrient = *playerRB->GetOrientation();
 			auto playerVel = *playerRB->GetLinearVelocity();
 			auto playerAVel = *playerRB->GetAngularVelocity();
-			//if ((*(NyaVec3*)&playerVel).length() < TOMPS(20)) return;
+			//if (playerVel.length() < TOMPS(20)) return;
 
 			auto pos = *ply->GetPosition();
 			auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();
@@ -1082,7 +1082,7 @@ public:
 	bool IsAvailable() override {
 		if (auto playerRB = GetLocalPlayerInterface<IRigidBody>()) {
 			auto playerVel = *playerRB->GetLinearVelocity();
-			if ((*(NyaVec3*)&playerVel).length() < TOMPS(100)) return false;
+			if (playerVel.length() < TOMPS(100)) return false;
 			return true;
 		}
 		return false;

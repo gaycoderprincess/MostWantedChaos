@@ -48,9 +48,9 @@ public:
 
 	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		auto camMatrix = PrepareCameraMatrix();
-		NyaMat4x4 playerMatrix;
-		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
-		playerMatrix.p = *(NyaVec3*)GetLocalPlayerVehicle()->GetPosition();
+		UMath::Matrix4 playerMatrix;
+		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&playerMatrix);
+		playerMatrix.p = *GetLocalPlayerVehicle()->GetPosition();
 		camMatrix = WorldToRenderMatrix(playerMatrix);
 		camMatrix.p += RoofOffset * -camMatrix.y;
 		ApplyCameraMatrix(camMatrix);
@@ -72,9 +72,9 @@ public:
 	static inline float ZOffset = -5;
 
 	void TickFunctionCamera(Camera* pCamera, double delta) override {
-		NyaMat4x4 playerMatrix;
-		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
-		playerMatrix.p = *(NyaVec3*)GetLocalPlayerVehicle()->GetPosition();
+		UMath::Matrix4 playerMatrix;
+		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&playerMatrix);
+		playerMatrix.p = *GetLocalPlayerVehicle()->GetPosition();
 		auto camMatrix = WorldToRenderMatrix(playerMatrix);
 		camMatrix.p += XOffset * camMatrix.x;
 		camMatrix.p += YOffset * camMatrix.y;
@@ -135,15 +135,15 @@ public:
 	static inline float z = -2.0;
 
 	void TickFunctionCamera(Camera* pCamera, double delta) override {
-		NyaMat4x4 playerMatrix;
-		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4((UMath::Matrix4*)&playerMatrix);
-		playerMatrix.p = *(NyaVec3*)GetLocalPlayerVehicle()->GetPosition();
+		UMath::Matrix4 playerMatrix;
+		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&playerMatrix);
+		playerMatrix.p = *GetLocalPlayerVehicle()->GetPosition();
 		NyaMat4x4 offsetMatrix;
 		offsetMatrix.Rotate({rx, ry, rz});
 		offsetMatrix.p.x = x;
 		offsetMatrix.p.y = y;
 		offsetMatrix.p.z = z;
-		playerMatrix = playerMatrix * offsetMatrix;
+		playerMatrix = (UMath::Matrix4)(playerMatrix * offsetMatrix);
 		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(playerMatrix));
 	}
 	bool HasTimer() override { return true; }
@@ -191,12 +191,12 @@ public:
 	}
 	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		auto ply = GetLocalPlayerInterface<IRigidBody>();
-		NyaMat4x4 playerMatrix;
-		ply->GetMatrix4((UMath::Matrix4*)&playerMatrix);
-		playerMatrix.p = *(NyaVec3*)ply->GetPosition();
-		NyaVec3 fwd;
-		ply->GetForwardVector((UMath::Vector3*)&fwd);
-		auto velocity = *(NyaVec3*)ply->GetLinearVelocity();
+		UMath::Matrix4 playerMatrix;
+		ply->GetMatrix4(&playerMatrix);
+		playerMatrix.p = *ply->GetPosition();
+		UMath::Vector3 fwd;
+		ply->GetForwardVector(&fwd);
+		auto velocity = *ply->GetLinearVelocity();
 		fwd.y = 0;
 		fwd.Normalize();
 		velocity.y = 0;

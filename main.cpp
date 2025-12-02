@@ -224,7 +224,7 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Camera Position: {:.2f} {:.2f} {:.2f}", camPos.x, camPos.y, camPos.z));
 				DrawMenuOption(std::format("Camera Direction: {:.2f} {:.2f} {:.2f}", camDir.x, camDir.y, camDir.z));
 				auto jolly = Camera::JollyRancherResponse.CamMatrix;
-				DrawMenuOption(std::format("Jolly Rancher Position: {:.2f} {:.2f} {:.2f}", jolly._v3.x, jolly._v3.y, jolly._v3.z));
+				DrawMenuOption(std::format("Jolly Rancher Position: {:.2f} {:.2f} {:.2f}", jolly.p.x, jolly.p.y, jolly.p.z));
 				DrawMenuOption(std::format("InGameBreaker: {}", ply->InGameBreaker()));
 				DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
 				DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));

@@ -101,13 +101,13 @@ bool IsVehicleValidAndActive(IVehicle* vehicle) {
 }
 
 IVehicle* GetClosestActiveVehicle(IVehicle* toVehicle) {
-	auto sourcePos = *(NyaVec3*)toVehicle->GetPosition();
+	auto sourcePos = *toVehicle->GetPosition();
 	IVehicle* out = nullptr;
 	float distance = 99999;
 	auto cars = GetActiveVehicles();
 	for (auto& car : cars) {
 		if (car == toVehicle) continue;
-		auto targetPos = *(NyaVec3*)car->GetPosition();
+		auto targetPos = *car->GetPosition();
 		if ((sourcePos - targetPos).length() < distance) {
 			out = car;
 			distance = (sourcePos - targetPos).length();
@@ -450,8 +450,7 @@ NyaMat4x4 WorldToRenderMatrix(NyaMat4x4 world) {
 
 // view to world
 NyaMat4x4 PrepareCameraMatrix(Camera* pCamera) {
-	auto camMatrix = *(NyaMat4x4*)&pCamera->CurrentKey.Matrix;
-	return camMatrix.Invert();
+	return pCamera->CurrentKey.Matrix.Invert();
 }
 
 // world to view

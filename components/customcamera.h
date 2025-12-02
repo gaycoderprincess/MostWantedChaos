@@ -54,7 +54,7 @@ namespace CustomCamera {
 		if (!ply) return nullptr;
 
 		static NyaVec3 vec;
-		vec = *(NyaVec3*)ply->GetPosition();
+		vec = *ply->GetPosition();
 		vec += GetLookatOffset(ply);
 		return &vec;
 	}
@@ -63,7 +63,7 @@ namespace CustomCamera {
 		if (!ply) return nullptr;
 
 		static NyaVec3 vec;
-		vec = *(NyaVec3*)ply->GetPosition();
+		vec = *ply->GetPosition();
 		vec += GetFollowOffset(ply);
 		return &vec;
 	}
@@ -142,13 +142,13 @@ namespace CustomCamera {
 		vPosChange += mat.y * fMouse[1] * -fMouseRotateSpeed * fPanSpeedBase;
 		vPos -= vPosChange;
 
-		auto velocity = *(NyaVec3*)player->GetPosition() - vLastPlayerPosition;
+		auto velocity = *player->GetPosition() - vLastPlayerPosition;
 		if ((vPos - *GetFollowPosition(player)).length() >= fStringMaxDistance * 0.999) {
 			velocity *= fStringVelocityMult;
 		}
 
 		vPos -= vLastPlayerPosition;
-		vPos += *(NyaVec3*)player->GetPosition();
+		vPos += *player->GetPosition();
 		if (fMouseTimer <= 0) {
 			vPos -= velocity;
 			DoCamString();
@@ -162,16 +162,16 @@ namespace CustomCamera {
 			vPos.y = lookat->y + fStringMaxYDiff;
 		}
 
-		vLastPlayerPosition = *(NyaVec3*)player->GetPosition();
+		vLastPlayerPosition = *player->GetPosition();
 
 		mat.p = WorldToRenderCoords(vPos);
 		ApplyCameraMatrix(pCam, mat);
 	}
 
 	void SetCameraToDefaultPos(IRigidBody* ply) {
-		NyaMat4x4 mat;
-		ply->GetMatrix4((UMath::Matrix4*)&mat);
-		vPos = vLastPlayerPosition = *(NyaVec3*)ply->GetPosition();
+		UMath::Matrix4 mat;
+		ply->GetMatrix4(&mat);
+		vPos = vLastPlayerPosition = *ply->GetPosition();
 		vPos += GetFollowOffset(ply);
 		vPos -= mat.z * GetMaxStringDistance(ply);
 		fMouseTimer = -1;
