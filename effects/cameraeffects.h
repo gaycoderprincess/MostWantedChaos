@@ -1,4 +1,4 @@
-class Effect_LiftCamera : public ChaosEffect {
+/*class Effect_LiftCamera : public ChaosEffect {
 public:
 	Effect_LiftCamera() : ChaosEffect() {
 		sName = "Lift Camera Up";
@@ -36,7 +36,7 @@ public:
 	bool RunInMenus() override { return true; }
 } E_LowerCamera;
 
-/*class Effect_RoofCamera : public ChaosEffect {
+class Effect_RoofCamera : public ChaosEffect {
 public:
 	Effect_RoofCamera() : ChaosEffect() {
 		sName = "00Roof Camera";
@@ -83,3 +83,37 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_GTCamera;
+
+class Effect_FreezeCamera : public ChaosEffect {
+public:
+	Effect_FreezeCamera() : ChaosEffect() {
+		sName = "Freeze Camera";
+		fTimerLength = 10;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	void InitFunction() override {
+		Camera::StopUpdating = true;
+	}
+	void DeinitFunction() override {
+		Camera::StopUpdating = false;
+	}
+	bool HasTimer() override { return true; }
+} E_FreezeCamera;
+
+class Effect_SecondPersonCamera : public ChaosEffect {
+public:
+	Effect_SecondPersonCamera() : ChaosEffect() {
+		sName = "Second Person View";
+		fTimerLength = 45;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	void TickFunctionCamera(double delta) override {
+		CustomCamera::SetTargetCar(GetClosestActiveVehicle(GetLocalPlayerVehicle()), GetLocalPlayerVehicle());
+		CustomCamera::ProcessCam(eViews[EVIEW_PLAYER1].pCamera, delta);
+	}
+	bool HasTimer() override { return true; }
+} E_SecondPersonCamera;

@@ -91,19 +91,13 @@ void MoneyChecker() {
 }
 
 void CameraHook() {
+	Camera::JollyRancherResponse.UseMatrix = 0;
+
 	auto view = &eViews[EVIEW_PLAYER1];
 	if (!view->Active) return;
 
-	static auto matrix = view->pCamera->CurrentKey.Matrix;
-	if (!memcmp(&matrix, &view->pCamera->CurrentKey.Matrix, sizeof(bMatrix4))) return;
-
 	static CNyaTimer gTimer;
 	gTimer.Process();
-
-	CustomCamera::bEnabled = true;
-	CustomCamera::ProcessCam(view->pCamera, gTimer.fDeltaTime);
-
-	matrix = view->pCamera->CurrentKey.Matrix;
 
 	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) return;
 
@@ -112,7 +106,6 @@ void CameraHook() {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
 		effect.OnTickCamera(gTimer.fDeltaTime);
 	}
-	matrix = view->pCamera->CurrentKey.Matrix;
 }
 
 void ProcessChaosEffects(double fDeltaTime, bool inMenu) {
@@ -226,10 +219,16 @@ void ChaosModMenu() {
 				auto cam = GetLocalPlayerCamera();
 				auto camMatrix = *(NyaMat4x4*)&cam->CurrentKey.Matrix;
 				camMatrix = camMatrix.Invert();
-				DrawMenuOption(std::format("Camera Coords: {:.2f} {:.2f} {:.2f}", camMatrix.p.x, camMatrix.p.y, camMatrix.p.z));
+				auto camPos = *(NyaVec3*)&cam->CurrentKey.Position;
+				auto camDir = *(NyaVec3*)&cam->CurrentKey.Direction;
 				DrawMenuOption(std::format("Camera v0: {:.2f} {:.2f} {:.2f}", camMatrix.x.x, camMatrix.x.y, camMatrix.x.z));
 				DrawMenuOption(std::format("Camera v1: {:.2f} {:.2f} {:.2f}", camMatrix.y.x, camMatrix.y.y, camMatrix.y.z));
 				DrawMenuOption(std::format("Camera v2: {:.2f} {:.2f} {:.2f}", camMatrix.z.x, camMatrix.z.y, camMatrix.z.z));
+				DrawMenuOption(std::format("Camera v3: {:.2f} {:.2f} {:.2f}", camMatrix.p.x, camMatrix.p.y, camMatrix.p.z));
+				DrawMenuOption(std::format("Camera Position: {:.2f} {:.2f} {:.2f}", camPos.x, camPos.y, camPos.z));
+				DrawMenuOption(std::format("Camera Direction: {:.2f} {:.2f} {:.2f}", camDir.x, camDir.y, camDir.z));
+				auto jolly = Camera::JollyRancherResponse.CamMatrix;
+				DrawMenuOption(std::format("Jolly Rancher Position: {:.2f} {:.2f} {:.2f}", jolly._v3.x, jolly._v3.y, jolly._v3.z));
 				DrawMenuOption(std::format("InGameBreaker: {}", ply->InGameBreaker()));
 				DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
 				DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
@@ -252,6 +251,9 @@ void ChaosModMenu() {
 				if (GRaceStatus::fObj && GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing) {
 					DrawMenuOption(std::format("Race Completion: {:.2f}", GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete));
 				}
+				if (DrawMenuOption("Debug Camera")) {
+					CameraAI::SetAction(1, "CDActionDebug");
+				}
 				//DrawMenuOption(std::format("Race Context: {}", (int)GRaceStatus::fObj->mRaceContext));
 			}
 			else {
@@ -265,7 +267,7 @@ void ChaosModMenu() {
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("GroovySpeed", Effect_GroovyCars::GroovySpeed);
-			QuickValueEditor("LiftOffset", Effect_LiftCamera::LiftOffset);
+			//QuickValueEditor("LiftOffset", Effect_LiftCamera::LiftOffset);
 			QuickValueEditor("XOffset", Effect_GTCamera::XOffset);
 			QuickValueEditor("YOffset", Effect_GTCamera::YOffset);
 			QuickValueEditor("ZOffset", Effect_GTCamera::ZOffset);

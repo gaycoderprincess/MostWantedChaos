@@ -1,9 +1,10 @@
 namespace CustomCamera {
-	bool bEnabled = false;
 	bool bReset = false;
 	IVehicle* pTargetPlayerVehicle = nullptr;
 	IRigidBody* pTargetPlayerBody = nullptr;
 	IRBVehicle* pTargetPlayerRBVehicle = nullptr;
+	IVehicle* pTargetPlayerSecondPerson = nullptr;
+	IRigidBody* pTargetPlayerBodySecondPerson = nullptr;
 
 	const float fPanSpeedBase = 0.005;
 
@@ -67,6 +68,18 @@ namespace CustomCamera {
 
 	void SetRotation() {
 		auto plyPos = GetTargetPosition(pTargetPlayerBody);
+		if (!plyPos) return;
+
+		auto lookat = *plyPos - vPos;
+		lookat.Normalize();
+		auto mat = NyaMat4x4::LookAt(lookat);
+		mat.p = vPos;
+		mat = WorldToRenderMatrix(mat);
+		ApplyCameraMatrix(mat);
+	}
+
+	void SetRotationSecondPerson() {
+		auto plyPos = GetTargetPosition(pTargetPlayerBodySecondPerson);
 		if (!plyPos) return;
 
 		auto lookat = *plyPos - vPos;
@@ -181,7 +194,12 @@ namespace CustomCamera {
 			pTargetPlayerBody = GetLocalPlayerInterface<IRigidBody>();
 			pTargetPlayerRBVehicle = GetLocalPlayerInterface<IRBVehicle>();
 		}
-		if (!bEnabled || !follow || IsInLoadingScreen() || IsInNIS()) {
+		if (pTargetPlayerSecondPerson && !IsVehicleValidAndActive(pTargetPlayerSecondPerson)) {
+			pTargetPlayerSecondPerson = nullptr;
+			pTargetPlayerBodySecondPerson = nullptr;
+			bReset = true;
+		}
+		if (!follow || IsInLoadingScreen() || IsInNIS()) {
 			bReset = true;
 			return;
 		}
@@ -197,11 +215,27 @@ namespace CustomCamera {
 		SetRotation();
 		DoMovement();
 		SetRotation();
+		SetRotationSecondPerson();
 
 		if (fMouse[0] != 0.0 || fMouse[1] != 0.0) {
 			fMouseTimer = fStringResetTime;
 		}
 		fMouse[0] = 0;
 		fMouse[1] = 0;
+	}
+
+	void SetTargetCar(IVehicle* pCar, IVehicle* pSecondPersonCar) {
+		if (!pCar) {
+			pTargetPlayerVehicle = nullptr;
+			pTargetPlayerBody = nullptr;
+			pTargetPlayerRBVehicle = nullptr;
+			return;
+		}
+		if (pCar != pTargetPlayerVehicle) bReset = true;
+		pTargetPlayerVehicle = pCar;
+		pTargetPlayerBody = pCar->mCOMObject->Find<IRigidBody>();
+		pTargetPlayerRBVehicle = pCar->mCOMObject->Find<IRBVehicle>();
+		pTargetPlayerSecondPerson = pSecondPersonCar;
+		pTargetPlayerBodySecondPerson = pSecondPersonCar ? pSecondPersonCar->mCOMObject->Find<IRigidBody>() : nullptr;
 	}
 }

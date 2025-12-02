@@ -456,5 +456,8 @@ NyaMat4x4 PrepareCameraMatrix() {
 
 // world to view
 void ApplyCameraMatrix(NyaMat4x4 mat) {
-	*(NyaMat4x4*)&GetLocalPlayerCamera()->CurrentKey.Matrix = mat.Invert();
+	Camera::JollyRancherResponse.UseMatrix = 1;
+	auto inv = mat.Invert();
+	inv.p *= 100;
+	Camera::JollyRancherResponse.CamMatrix = *(bMatrix4*)&inv;
 }
