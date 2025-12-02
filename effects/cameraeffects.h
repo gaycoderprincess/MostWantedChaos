@@ -121,7 +121,7 @@ public:
 class Effect_CinematicCamera : public ChaosEffect {
 public:
 	Effect_CinematicCamera() : ChaosEffect() {
-		sName = "Cinematic Camera";
+		sName = "Wheel Camera";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
 		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
@@ -148,3 +148,84 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_CinematicCamera;
+
+class Effect_ReplayCamera : public ChaosEffect {
+public:
+	Effect_ReplayCamera() : ChaosEffect() {
+		sName = "Cinematic Camera";
+		fTimerLength = 45;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	void InitFunction() override {
+		Tweak_ForceICEReplay = true;
+		NyaHookLib::PatchRelative(NyaHookLib::JMP, 0x479B96, 0x479CD5);
+	}
+	void DeinitFunction() override {
+		Tweak_ForceICEReplay = false;
+		NyaHookLib::Patch<uint64_t>(0x479B96, 0x5E3900000139850F);
+	}
+	bool HasTimer() override { return true; }
+} E_ReplayCamera;
+
+class Effect_TopDownCamera : public ChaosEffect {
+public:
+	float speed = 0;
+
+	Effect_TopDownCamera() : ChaosEffect() {
+		sName = "Top-Down Camera";
+		fTimerLength = 90;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	static inline float yOffset = 10;
+	static inline float yOffsetScale = 0.5;
+	static inline float fwdOffsetScale = 0.3;
+	static inline float speedDecay = 5;
+	static inline float speedCap = 200;
+
+	void InitFunction() override {
+		speed = 0;
+	}
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
+		auto ply = GetLocalPlayerInterface<IRigidBody>();
+		NyaMat4x4 playerMatrix;
+		ply->GetMatrix4((UMath::Matrix4*)&playerMatrix);
+		playerMatrix.p = *(NyaVec3*)ply->GetPosition();
+		NyaVec3 fwd;
+		ply->GetForwardVector((UMath::Vector3*)&fwd);
+		auto velocity = *(NyaVec3*)ply->GetLinearVelocity();
+		fwd.y = 0;
+		fwd.Normalize();
+		velocity.y = 0;
+		if (velocity.length() > TOMPS(speedCap)) {
+			velocity.Normalize();
+			velocity *= TOMPS(speedCap);
+		}
+
+		float currSpeed = velocity.length() > 1 ? abs(fwd.Dot(velocity)) : 0;
+		if (currSpeed != speed) {
+			if (currSpeed > speed) {
+				speed += speedDecay * delta * abs(currSpeed - speed);
+				if (currSpeed < speed) speed = currSpeed;
+			}
+			else if (currSpeed < speed) {
+				speed -= speedDecay * delta * abs(currSpeed - speed);
+				if (currSpeed > speed) speed = currSpeed;
+			}
+		}
+		playerMatrix.p.y += yOffset;
+		playerMatrix.p.y += speed * yOffsetScale;
+		playerMatrix.p += speed * fwdOffsetScale * fwd;
+
+		NyaMat4x4 offsetMatrix;
+		offsetMatrix.Rotate(NyaVec3(-90 * 0.01745329, 0, 0));
+		playerMatrix.x = offsetMatrix.x;
+		playerMatrix.y = offsetMatrix.y;
+		playerMatrix.z = offsetMatrix.z;
+		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(playerMatrix));
+	}
+	bool HasTimer() override { return true; }
+} E_TopDownCamera;

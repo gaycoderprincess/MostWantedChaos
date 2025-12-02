@@ -8,6 +8,7 @@ public:
 	std::vector<uint32_t> IncompatibilityGroups;
 	std::vector<uint32_t> ActivateIncompatibilityGroups; // checks IncompatibilityGroups but doesn't deactivate for effects that only share ActivateIncompatibilityGroups
 	bool DebugNeverPick = false;
+	const char* sEffectAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
 
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;

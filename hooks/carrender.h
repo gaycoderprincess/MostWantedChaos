@@ -2,6 +2,7 @@ bool CarRender_Truncate = false;
 float CarRender_TruncateAccuracy = 2;
 bool CarRender_TruncateRotation = false;
 float CarRender_TruncateRotationAccuracy = 10;
+bool CarRender_Billboard = false;
 
 float TruncateFloat(float in, int accuracy) {
 	in *= accuracy;
@@ -13,6 +14,22 @@ float TruncateFloat(float in, int accuracy) {
 static inline auto CarGetVisibleStateOrig = (int(__thiscall*)(eView*, const bVector3*, const bVector3*, bMatrix4*))nullptr;
 int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVector3* a3, bMatrix4* a4) {
 	auto carMatrix = (NyaMat4x4*)a4;
+	if (CarRender_Billboard) {
+		auto cameraMatrix = PrepareCameraMatrix(eViews[EVIEW_PLAYER1].pCamera);
+		auto cameraPos = cameraMatrix.p;
+		auto carPos = carMatrix->p;
+
+		auto lookat = carPos - cameraPos;
+		lookat.Normalize();
+		auto lookatMatrix = NyaMat4x4::LookAt(lookat, {0,0,1});
+		carMatrix->x = lookatMatrix.x;
+		carMatrix->y = lookatMatrix.y;
+		carMatrix->z = lookatMatrix.z;
+
+		NyaMat4x4 offsetMatrix;
+		offsetMatrix.Rotate(NyaVec3(90 * 0.01745329, 0 * 0.01745329, -90 * 0.01745329));
+		*carMatrix = *carMatrix * offsetMatrix;
+	}
 	if (CarRender_TruncateRotation) {
 		double lengths[3] = {
 				carMatrix->x.length(),
@@ -47,4 +64,6 @@ int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVe
 
 ChloeHook Hook_CarRender([]() {
 	CarGetVisibleStateOrig = (int(__thiscall*)(eView*, const bVector3*, const bVector3*, bMatrix4*))NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x74E346, &CarGetVisibleStateHooked);
+	NyaHookLib::PatchRelative(NyaHookLib::JMP, 0x73786A, 0x73790A); // don't reset CarScaleMatrix when exiting to menu
+	NyaHooks::aLateInitFuncs.push_back([]() { CarScaleMatrix = UMath::Matrix4::kIdentity; });
 });

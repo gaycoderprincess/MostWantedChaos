@@ -572,3 +572,20 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_LaggyLookingCars2;
+
+class Effect_BillboardCars : public ChaosEffect {
+public:
+	Effect_BillboardCars() : ChaosEffect() {
+		sName = "Cars Stare At You";
+		fTimerLength = 30;
+	}
+
+	void InitFunction() override {
+		CarRender_Billboard = true;
+	}
+	void DeinitFunction() override {
+		CarRender_Billboard = false;
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_BillboardCars;

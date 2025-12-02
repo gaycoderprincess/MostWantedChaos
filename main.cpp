@@ -273,6 +273,11 @@ void ChaosModMenu() {
 			QuickValueEditor("CinematicCamera::rx", Effect_CinematicCamera::rx);
 			QuickValueEditor("CinematicCamera::ry", Effect_CinematicCamera::ry);
 			QuickValueEditor("CinematicCamera::rz", Effect_CinematicCamera::rz);
+			QuickValueEditor("Effect_TopDownCamera::yOffset", Effect_TopDownCamera::yOffset);
+			QuickValueEditor("Effect_TopDownCamera::yOffsetScale", Effect_TopDownCamera::yOffsetScale);
+			QuickValueEditor("Effect_TopDownCamera::fwdOffsetScale", Effect_TopDownCamera::fwdOffsetScale);
+			QuickValueEditor("Effect_TopDownCamera::speedDecay", Effect_TopDownCamera::speedDecay);
+			QuickValueEditor("Effect_TopDownCamera::speedCap", Effect_TopDownCamera::speedCap);
 			ChloeMenuLib::EndMenu();
 		}
 
@@ -401,7 +406,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::PlaceCameraMoverHook();
 			NyaHooks::aCameraMoverFuncs.push_back(CameraHook);
 			//NyaHooks::aCameraFuncs.push_back(CameraHook);
-			//NyaHooks::PlaceLateInitHook();
+			NyaHooks::PlaceLateInitHook();
 			//NyaHooks::aLateInitFuncs.push_back([](){ NyaHooks::PlaceCameraHook(); }); // x360stuff is incredibly and insanely rude
 		} break;
 		default:
