@@ -2,6 +2,10 @@ namespace TextHook {
 	bool bReverseText = false;
 	bool bRandomText = false;
 	const char* pReplaceText = nullptr;
+	bool bShuffledText = false;
+	const char* pInterspersedText = nullptr;
+	const char* pInterspersedTextUpper = nullptr;
+	const char* pInterspersedTextProper = nullptr;
 
 	bool CanStringBeReversed(const std::string& str) {
 		for (auto& c : str) {
@@ -11,6 +15,14 @@ namespace TextHook {
 	}
 
 	bool CanStringBeRandomized(const std::string& str) {
+		return CanStringBeReversed(str);
+	}
+
+	bool CanStringBeShuffled(const std::string& str) {
+		return CanStringBeReversed(str);
+	}
+
+	bool CanStringBeInterspersed(const std::string& str) {
 		return CanStringBeReversed(str);
 	}
 
@@ -27,6 +39,8 @@ namespace TextHook {
 		char* newString;
 	};
 	std::vector<tReverseTextAssoc> ReverseTextCache;
+	std::vector<tReverseTextAssoc> ShuffledTextCache;
+	std::vector<tReverseTextAssoc> InterspersedTextCache;
 
 	bool IsRandomTextHashUsed(uint32_t hash) {
 		if (!RandomTextNoRepeats) return false;
@@ -70,6 +84,87 @@ namespace TextHook {
 		return text;
 	}
 
+	std::vector<std::string> SplitStringIntoWords(const std::string& in) {
+		std::string tmp = in;
+		std::vector<std::string> words;
+
+		size_t pos = 0;
+		while ((pos = tmp.find(" ")) != std::string::npos) {
+			words.push_back(tmp.substr(0, pos));
+			tmp.erase(0, pos + 1);
+		}
+		if (!tmp.empty()) words.push_back(tmp);
+		return words;
+	}
+
+	const char* GetShuffledText(uint32_t hash) {
+		for (auto& cache : ShuffledTextCache) {
+			if (cache.origHash == hash) return cache.newString;
+		}
+
+		auto words = SplitStringIntoWords(SearchForString(nullptr, hash));
+		std::string str;
+		for (auto& word : words) {
+			if (CanStringBeShuffled(word)) {
+				std::random_shuffle(word.begin(), word.end());
+			}
+			str += word;
+			if (&word != &words[words.size()-1]) str += " ";
+		}
+
+		auto text = new char[str.length()+1];
+		strcpy_s(text, str.length()+1, str.c_str());
+		ShuffledTextCache.push_back({hash, text});
+		return text;
+	}
+
+	std::string DoIntersperseWord(std::string origWord) {
+		if (std::all_of(origWord.begin(), origWord.end(), [](unsigned char c){ return std::isupper(c); })) {
+			return pInterspersedTextUpper;
+		}
+		if (std::isupper(origWord[0])) {
+			return pInterspersedTextProper;
+		}
+		return pInterspersedText;
+	}
+
+	const char* GetInterspersedText(uint32_t hash) {
+		for (auto& cache : InterspersedTextCache) {
+			if (cache.origHash == hash) return cache.newString;
+		}
+
+		auto words = SplitStringIntoWords(SearchForString(nullptr, hash));
+		int numWordsChanged = 0;
+		std::string str;
+		for (auto& word : words) {
+			if (CanStringBeInterspersed(word)) {
+				if (rand() % 100 < 10) {
+					word = DoIntersperseWord(word);
+					numWordsChanged++;
+				}
+			}
+		}
+		if (!numWordsChanged) {
+			auto& word = words[rand()%words.size()];
+			word = DoIntersperseWord(word);
+			numWordsChanged++;
+		}
+
+		// don't always replace one-word strings
+		if (words.size() == 1 && rand() % 100 > 25) {
+			str = SearchForString(nullptr, hash);
+		}
+		else for (auto& word : words) {
+			str += word;
+			if (&word != &words[words.size()-1]) str += " ";
+		}
+
+		auto text = new char[str.length()+1];
+		strcpy_s(text, str.length()+1, str.c_str());
+		InterspersedTextCache.push_back({hash, text});
+		return text;
+	}
+
 	const char* __fastcall SearchForStringHooked(void* a1, uint32_t a2) {
 		auto str = SearchForString(a1, a2);
 		if (!str) return nullptr;
@@ -79,6 +174,12 @@ namespace TextHook {
 		if (pReplaceText) str = pReplaceText;
 		if (bReverseText && CanStringBeReversed(str)) {
 			str = GetReversedText(a2);
+		}
+		if (bShuffledText) {
+			str = GetShuffledText(a2);
+		}
+		if (pInterspersedText) {
+			str = GetInterspersedText(a2);
 		}
 		return str;
 	}

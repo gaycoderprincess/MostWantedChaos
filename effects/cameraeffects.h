@@ -193,21 +193,24 @@ public:
 	}
 	void TickFunctionCamera(Camera* pCamera, double delta) override {
 		auto ply = GetLocalPlayerInterface<IRigidBody>();
-		UMath::Matrix4 playerMatrix;
-		ply->GetMatrix4(&playerMatrix);
-		playerMatrix.p = *ply->GetPosition();
+
+		UMath::Matrix4 camMatrix;
+		camMatrix.Rotate(NyaVec3(-90 * 0.01745329, 0, 0));
+		camMatrix.p = *ply->GetPosition();
+
 		UMath::Vector3 fwd;
 		ply->GetForwardVector(&fwd);
-		auto velocity = *ply->GetLinearVelocity();
 		fwd.y = 0;
 		fwd.Normalize();
+
+		auto velocity = *ply->GetLinearVelocity();
 		velocity.y = 0;
 		if (velocity.length() > TOMPS(speedCap)) {
 			velocity.Normalize();
 			velocity *= TOMPS(speedCap);
 		}
 
-		float currSpeed = velocity.length() > 1 ? abs(fwd.Dot(velocity)) : 0;
+		float currSpeed = velocity.length() > 1 ? fwd.Dot(velocity) : 0;
 		if (currSpeed != speed) {
 			if (currSpeed > speed) {
 				speed += speedDecay * delta * abs(currSpeed - speed);
@@ -218,16 +221,11 @@ public:
 				if (currSpeed > speed) speed = currSpeed;
 			}
 		}
-		playerMatrix.p.y += yOffset;
-		playerMatrix.p.y += speed * yOffsetScale;
-		playerMatrix.p += speed * fwdOffsetScale * fwd;
 
-		NyaMat4x4 offsetMatrix;
-		offsetMatrix.Rotate(NyaVec3(-90 * 0.01745329, 0, 0));
-		playerMatrix.x = offsetMatrix.x;
-		playerMatrix.y = offsetMatrix.y;
-		playerMatrix.z = offsetMatrix.z;
-		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(playerMatrix));
+		camMatrix.p.y += yOffset;
+		camMatrix.p.y += abs(speed) * yOffsetScale;
+		camMatrix.p += speed * fwdOffsetScale * fwd;
+		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(camMatrix));
 	}
 	bool HasTimer() override { return true; }
 } E_TopDownCamera;

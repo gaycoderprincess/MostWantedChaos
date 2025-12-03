@@ -14,7 +14,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel -s -static")
 
 link_directories(${CMAKE_SOURCE_DIR}/../nya-common/lib32)
 
-add_compile_definitions(IMGUI_USER_CONFIG="../../nya_imconfig.h" NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
+add_compile_definitions(IMGUI_USER_CONFIG="../../nya_imconfig.h" CWOEECHAOS_VERSION="1.50" NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
 add_library(NFSMWChaos SHARED
         ../nya-common/3rdparty/imgui/imgui.cpp
         ../nya-common/3rdparty/imgui/backends/imgui_impl_dx9.cpp

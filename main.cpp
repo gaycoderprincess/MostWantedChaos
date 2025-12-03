@@ -146,7 +146,23 @@ void ChaosLoop() {
 	ProcessChaosEffects(gTimer.fDeltaTime, inMenu);
 	if (inMenu) return;
 
+	static ChaosEffect TempEffect("DUMMY");
+	TempEffect.DebugNeverPick = true;
+	if (!TempEffect.sName) {
+		static char tmp[256];
+		strcpy_s(tmp, 256, std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str());
+		TempEffect.sName = tmp;
+		AddRunningEffect(&TempEffect);
+	}
+
 	if (bTimerEnabled) {
+		static ChaosEffect TempEffect("DUMMY");
+		TempEffect.DebugNeverPick = true;
+		if (!TempEffect.sName) {
+			TempEffect.sName = "mod active! awruff :3";
+			AddRunningEffect(&TempEffect);
+		}
+
 		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
 		static auto textureL = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
 		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");

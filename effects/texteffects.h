@@ -61,3 +61,39 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_RandomText;
+
+class Effect_ShuffleText : public ChaosEffect {
+public:
+	Effect_ShuffleText() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Shuffled Letters";
+		fTimerLength = 90;
+	}
+
+	void InitFunction() override {
+		TextHook::bShuffledText = true;
+	}
+	void DeinitFunction() override {
+		TextHook::bShuffledText = false;
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_ShuffleText;
+
+class Effect_InterspersedText : public ChaosEffect {
+public:
+	Effect_InterspersedText() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Cocksbot";
+		fTimerLength = 120;
+	}
+
+	void InitFunction() override {
+		TextHook::pInterspersedText = "cock";
+		TextHook::pInterspersedTextUpper = "COCK";
+		TextHook::pInterspersedTextProper = "Cock";
+	}
+	void DeinitFunction() override {
+		TextHook::pInterspersedText = nullptr;
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_InterspersedText;
