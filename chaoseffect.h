@@ -31,6 +31,7 @@ public:
 	virtual void InitFunction() {}
 	virtual void TickFunction(double delta) {}
 	virtual void TickFunctionCamera(Camera* pCamera, double delta) {}
+	virtual void TickFunction3D(double delta) {}
 	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
@@ -183,6 +184,16 @@ public:
 
 		pEffect->EffectInstance = this;
 		pEffect->TickFunctionCamera(pCamera, delta);
+		pEffect->EffectInstance = nullptr;
+	}
+
+	void OnTick3D(double delta) {
+		if (IsHidden()) return;
+		if (bFirstFrame) return;
+		if (!IsActive()) return;
+
+		pEffect->EffectInstance = this;
+		pEffect->TickFunction3D(delta);
 		pEffect->EffectInstance = nullptr;
 	}
 
@@ -355,6 +366,7 @@ bool RunningEffectsCleanup() {
 #include "effects/physicseffects.h"
 #include "effects/spawneffects.h"
 #include "effects/cameraeffects.h"
+#include "effects/rendereffects.h"
 #include "effects/effect_safehouse.h"
 #include "effects/effect_leaktank.h"
 #include "effects/effect_flashbacks.h"

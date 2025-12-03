@@ -4,6 +4,12 @@
 #include <mutex>
 #include <random>
 #include <toml++/toml.hpp>
+#include "assimp/Importer.hpp"
+#include "assimp/Exporter.hpp"
+#include "assimp/Logger.hpp"
+#include "assimp/DefaultLogger.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
 #include "nya_dx9_hookbase.h"
 #include "nya_commonhooklib.h"
@@ -39,6 +45,7 @@ bool DisableChaosHUD = false;
 #include "util.h"
 #include "components/achievements.h"
 #include "components/customcamera.h"
+#include "components/render3d.h"
 namespace FlatOutHUD {
 	#include "components/fo1hud/common.h"
 	#include "components/fo1hud/ingame.h"
@@ -187,6 +194,55 @@ void ChaosLoop() {
 	}
 }
 
+void Render3DLoop() {
+	static IDirect3DStateBlock9* state = nullptr;
+	if (g_pd3dDevice->CreateStateBlock(D3DSBT_ALL, &state) != D3D_OK) {
+		return;
+	}
+
+	if (state->Capture() < 0) {
+		state->Release();
+		return;
+	}
+
+	static CNyaTimer gTimer;
+	gTimer.Process();
+
+	/*static auto models = Render3D::CreateModels("sharj.fbx");
+	for (auto& model : models) {
+		auto mat = UMath::Matrix4::kIdentity;
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			ply->GetMatrix4(&mat);
+			UMath::Vector3 dim;
+			ply->GetDimension(&dim);
+			mat.p = *ply->GetPosition();
+		}
+		mat.x *= 1;
+		mat.y *= 1;
+		mat.z *= 1;
+
+		UMath::Matrix4 rotation;
+		//rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+		mat = (UMath::Matrix4)(mat * rotation);
+		model->RenderAt(WorldToRenderMatrix(mat));
+	}*/
+
+	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) {
+		state->Apply();
+		state->Release();
+		return;
+	}
+
+	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		effect.OnTick3D(gTimer.fDeltaTime);
+	}
+
+	state->Apply();
+	state->Release();
+}
+
 void ChaosModMenu() {
 	ChloeMenuLib::BeginMenu();
 
@@ -311,6 +367,13 @@ void ChaosModMenu() {
 			QuickValueEditor("FontSize_Regular18", FlatOutHUD::FontSize_Regular18);
 			QuickValueEditor("FontOffset_Regular18", FlatOutHUD::FontOffset_Regular18);
 			QuickValueEditor("FontOutline_Regular18", FlatOutHUD::FontOutline_Regular18);
+			QuickValueEditor("Effect_Shark::rX", Effect_Shark::rX);
+			QuickValueEditor("Effect_Shark::rY", Effect_Shark::rY);
+			QuickValueEditor("Effect_Shark::rZ", Effect_Shark::rZ);
+			QuickValueEditor("Effect_Shark::offX", Effect_Shark::offX);
+			QuickValueEditor("Effect_Shark::offY", Effect_Shark::offY);
+			QuickValueEditor("Effect_Shark::offZ", Effect_Shark::offZ);
+			QuickValueEditor("Effect_Shark::scale", Effect_Shark::scale);
 			ChloeMenuLib::EndMenu();
 		}
 
@@ -430,9 +493,9 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::PlaceInputBlockerHook();
 			NyaHooks::PlaceCameraMoverHook();
 			NyaHooks::aCameraMoverFuncs.push_back(CameraHook);
-			//NyaHooks::aCameraFuncs.push_back(CameraHook);
 			NyaHooks::PlaceLateInitHook();
-			//NyaHooks::aLateInitFuncs.push_back([](){ NyaHooks::PlaceCameraHook(); }); // x360stuff is incredibly and insanely rude
+			NyaHooks::PlaceRenderHook();
+			NyaHooks::aRenderFuncs.push_back(Render3DLoop);
 		} break;
 		default:
 			break;
