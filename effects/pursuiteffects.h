@@ -367,9 +367,7 @@ public:
 		auto cars = GetActiveVehicles(DRIVER_COP);
 		IVehicle* bottom = nullptr;
 		for (auto& car : cars) {
-			if (!strcmp(car->GetVehicleName(), "copheli")) continue;
-
-			if (bottom) {
+			if (bottom && strcmp(car->GetVehicleName(), "copheli")) {
 				DoPiggyback(bottom, car);
 			}
 			bottom = car;

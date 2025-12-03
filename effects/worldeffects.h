@@ -34,6 +34,7 @@ public:
 		sName = "Slow Motion";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
+		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
 	void TickFunction(double delta) override {
@@ -55,6 +56,7 @@ public:
 		sName = "Fast Motion";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
+		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
 	void TickFunction(double delta) override {
@@ -76,6 +78,7 @@ public:
 		sName = "Reverse Superhot";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
+		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
 	void TickFunction(double delta) override {
