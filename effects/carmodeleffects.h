@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Car Model"
+
 class Effect_OpponentsRazor : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsRazor() : EffectBase_NotInPursuitConditional() {
+	Effect_OpponentsRazor() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Are BMWs";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
@@ -21,7 +23,7 @@ public:
 
 class Effect_OpponentsGolf : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsGolf() : EffectBase_NotInPursuitConditional() {
+	Effect_OpponentsGolf() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Are Golfs";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
@@ -42,7 +44,7 @@ public:
 
 class Effect_OpponentsPlayer : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsPlayer() : EffectBase_NotInPursuitConditional() {
+	Effect_OpponentsPlayer() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Copy Your Car";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
@@ -61,7 +63,7 @@ public:
 
 class Effect_OpponentsPlayerRandom : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsPlayerRandom() : EffectBase_NotInPursuitConditional() {
+	Effect_OpponentsPlayerRandom() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Steal Your Cars";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
@@ -80,7 +82,7 @@ public:
 
 class Effect_OpponentsJunkman : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_OpponentsJunkman() : EffectBase_NotInPursuitConditional() {
+	Effect_OpponentsJunkman() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Are Junkman";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_tune"));
@@ -99,7 +101,7 @@ public:
 
 class Effect_AllTrafficPizza : public ChaosEffect {
 public:
-	Effect_AllTrafficPizza() : ChaosEffect() {
+	Effect_AllTrafficPizza() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "All Traffic Is TRAFPIZZA";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("traffic_car_model"));
@@ -121,7 +123,7 @@ public:
 
 /*class Effect_AllTrafficTruck : public ChaosEffect {
 public:
-	Effect_AllTrafficTruck() : ChaosEffect() {
+	Effect_AllTrafficTruck() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "All Traffic Is Trucks";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("traffic_car_model");
@@ -138,7 +140,7 @@ public:
 
 class Effect_PlayerCarCopCorvette : public EffectBase_TriggerInMenu {
 public:
-	Effect_PlayerCarCopCorvette() : EffectBase_TriggerInMenu() {
+	Effect_PlayerCarCopCorvette() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Player As Cop Corvette";
 		fTimerLength = 120;
 		fUnhideTime = 0;
@@ -156,7 +158,7 @@ public:
 
 class Effect_PlayerCarStockPunto : public EffectBase_TriggerInMenu {
 public:
-	Effect_PlayerCarStockPunto() : EffectBase_TriggerInMenu() {
+	Effect_PlayerCarStockPunto() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Player As Stock Punto";
 		fTimerLength = 120;
 		fUnhideTime = 0;

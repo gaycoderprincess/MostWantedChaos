@@ -1,6 +1,6 @@
 class Effect_Safehouse : public ChaosEffect {
 public:
-	Effect_Safehouse() : ChaosEffect() {
+	Effect_Safehouse() : ChaosEffect("Uncategorized") {
 		sName = "Exit To Main Menu";
 	}
 

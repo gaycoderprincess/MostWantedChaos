@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Opponents"
+
 class Effect_BlowEngineOpponents : public EffectBase_MultiOpponentAliveInRaceConditional {
 public:
-	Effect_BlowEngineOpponents() : EffectBase_MultiOpponentAliveInRaceConditional() {
+	Effect_BlowEngineOpponents() : EffectBase_MultiOpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Blow Opponents' Engines";
 	}
 
@@ -18,7 +20,7 @@ public:
 
 class Effect_BlowEngineOpponents1 : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_BlowEngineOpponents1() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_BlowEngineOpponents1() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Blow One Opponent's Engine";
 	}
 
@@ -35,7 +37,7 @@ public:
 
 class Effect_LaunchCarFwdOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarFwdOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_LaunchCarFwdOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Forward";
 	}
 
@@ -51,7 +53,7 @@ public:
 
 class Effect_LaunchCarBwdOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarBwdOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_LaunchCarBwdOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Backwards";
 	}
 
@@ -67,7 +69,7 @@ public:
 
 class Effect_LaunchCarSideOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarSideOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_LaunchCarSideOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Sideways";
 	}
 
@@ -89,7 +91,7 @@ public:
 
 class Effect_LaunchCarUpOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_LaunchCarUpOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_LaunchCarUpOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Up";
 	}
 
@@ -109,7 +111,7 @@ public:
 
 class Effect_SpinningOpponents : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_SpinningOpponents() : EffectBase_OpponentInRaceConditional() {
+	Effect_SpinningOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Spinning Opponents";
 		fTimerLength = 30;
 	}
@@ -130,7 +132,7 @@ public:
 
 class Effect_RubberbandOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_RubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_RubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "FUCKING RUBBERBAND";
 		sFriendlyName = "Opponents Rubberband";
 		fTimerLength = 45;
@@ -153,7 +155,7 @@ public:
 
 class Effect_NoRubberbandOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_NoRubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_NoRubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Rubberbanding";
 		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("rubberband"));
@@ -175,7 +177,7 @@ public:
 
 class Effect_SpikeAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SpikeAllOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_SpikeAllOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Puncture Opponents' Tires";
 	}
 
@@ -195,7 +197,7 @@ public:
 
 /*class Effect_SendOffAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SendOffAllOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_SendOffAllOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Make All Opponents Leave";
 	}
 
@@ -212,7 +214,7 @@ public:
 
 class Effect_SetOpponentMass0 : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SetOpponentMass0() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_SetOpponentMass0() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Zero Opponent Mass";
 		fTimerLength = 60;
 	}
@@ -241,7 +243,7 @@ public:
 
 class Effect_SetOpponentPittable : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_SetOpponentPittable() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_SetOpponentPittable() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Pittable Opponents";
 		fTimerLength = 90;
 	}
@@ -272,7 +274,7 @@ public:
 
 class Effect_NoNitroOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
-	Effect_NoNitroOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_NoNitroOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Opponents' Nitro";
 		fTimerLength = 90;
 	}
@@ -297,7 +299,7 @@ public:
 	};
 	std::vector<tCarAssoc> lastStates;
 
-	Effect_LockOpponents() : EffectBase_OpponentAliveInRaceConditional() {
+	Effect_LockOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Lock Opponents In Place";
 		fTimerLength = 15;
 	}

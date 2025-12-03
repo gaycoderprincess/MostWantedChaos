@@ -1,7 +1,9 @@
+#define EFFECT_CATEGORY_TEMP "Text"
+
 // mostly the same as zolikas but replaces more things
 class Effect_TransRights : public ChaosEffect {
 public:
-	Effect_TransRights() : ChaosEffect() {
+	Effect_TransRights() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Trans Rights";
 		fTimerLength = 120;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("string_replace"));
@@ -27,7 +29,7 @@ public:
 
 class Effect_ReverseText : public ChaosEffect {
 public:
-	Effect_ReverseText() : ChaosEffect() {
+	Effect_ReverseText() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Reverse Text";
 		fTimerLength = 120;
 	}
@@ -44,7 +46,7 @@ public:
 
 class Effect_RandomText : public ChaosEffect {
 public:
-	Effect_RandomText() : ChaosEffect() {
+	Effect_RandomText() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Random Text";
 		fTimerLength = 120;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("string_replace"));

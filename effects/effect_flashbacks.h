@@ -13,7 +13,7 @@ public:
 	const float fCaptureInterval = 1.0 / 60.0;
 	const float fRewindTime = 2 / fCaptureInterval;
 
-	Effect_Flashbacks() : ChaosEffect() {
+	Effect_Flashbacks() : ChaosEffect("Uncategorized") {
 		sName = "Forza Rewind";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));

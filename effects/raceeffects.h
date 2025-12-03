@@ -1,3 +1,5 @@
+#define EFFECT_CATEGORY_TEMP "Race"
+
 uint8_t* GetRaceNumLaps() {
 	auto race = GRaceStatus::fObj;
 	if (!race) return nullptr;
@@ -33,7 +35,7 @@ int GetLocalPlayerCurrentLap() {
 
 /*class Effect_RemoveLapProgress : public ChaosEffect {
 public:
-	Effect_RemoveLapProgress() : ChaosEffect() {
+	Effect_RemoveLapProgress() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Revert Progress By A Lap";
 	}
 
@@ -50,7 +52,7 @@ public:
 
 class Effect_RemoveLap : public ChaosEffect {
 public:
-	Effect_RemoveLap() : ChaosEffect() {
+	Effect_RemoveLap() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Remove A Lap";
 	}
 
@@ -75,7 +77,7 @@ public:
 
 class Effect_AddLap : public ChaosEffect {
 public:
-	Effect_AddLap() : ChaosEffect() {
+	Effect_AddLap() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Lap";
 	}
 
@@ -100,7 +102,7 @@ public:
 
 class Effect_Add3Laps : public ChaosEffect {
 public:
-	Effect_Add3Laps() : ChaosEffect() {
+	Effect_Add3Laps() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 3 Laps";
 	}
 
@@ -125,7 +127,7 @@ public:
 
 class Effect_RestartRace : public ChaosEffect {
 public:
-	Effect_RestartRace() : ChaosEffect() {
+	Effect_RestartRace() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Restart Race";
 	}
 
@@ -144,7 +146,7 @@ public:
 
 class Effect_DisableBarriers : public ChaosEffect {
 public:
-	Effect_DisableBarriers() : ChaosEffect() {
+	Effect_DisableBarriers() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Race Barriers";
 	}
 

@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Camera"
+
 /*class Effect_LiftCamera : public ChaosEffect {
 public:
-	Effect_LiftCamera() : ChaosEffect() {
+	Effect_LiftCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Lift Camera Up";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
@@ -19,7 +21,7 @@ public:
 
 class Effect_LowerCamera : public ChaosEffect {
 public:
-	Effect_LowerCamera() : ChaosEffect() {
+	Effect_LowerCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Low Camera Height";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
@@ -38,7 +40,7 @@ public:
 
 class Effect_RoofCamera : public ChaosEffect {
 public:
-	Effect_RoofCamera() : ChaosEffect() {
+	Effect_RoofCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "00Roof Camera";
 		fTimerLength = 60;
 		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
@@ -60,7 +62,7 @@ public:
 
 class Effect_GTCamera : public ChaosEffect {
 public:
-	Effect_GTCamera() : ChaosEffect() {
+	Effect_GTCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Gran Turismo Camera";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
@@ -86,7 +88,7 @@ public:
 
 class Effect_FreezeCamera : public ChaosEffect {
 public:
-	Effect_FreezeCamera() : ChaosEffect() {
+	Effect_FreezeCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Freeze Camera";
 		fTimerLength = 10;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
@@ -104,7 +106,7 @@ public:
 
 class Effect_SecondPersonCamera : public ChaosEffect {
 public:
-	Effect_SecondPersonCamera() : ChaosEffect() {
+	Effect_SecondPersonCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Second Person View";
 		fTimerLength = 45;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
@@ -120,7 +122,7 @@ public:
 
 class Effect_CinematicCamera : public ChaosEffect {
 public:
-	Effect_CinematicCamera() : ChaosEffect() {
+	Effect_CinematicCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Wheel Camera";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
@@ -151,7 +153,7 @@ public:
 
 class Effect_ReplayCamera : public ChaosEffect {
 public:
-	Effect_ReplayCamera() : ChaosEffect() {
+	Effect_ReplayCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cinematic Camera";
 		fTimerLength = 45;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
@@ -173,7 +175,7 @@ class Effect_TopDownCamera : public ChaosEffect {
 public:
 	float speed = 0;
 
-	Effect_TopDownCamera() : ChaosEffect() {
+	Effect_TopDownCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Top-Down Camera";
 		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));

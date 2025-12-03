@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Profile"
+
 class Effect_EnableMomentCam : public ChaosEffect {
 public:
-	Effect_EnableMomentCam() : ChaosEffect() {
+	Effect_EnableMomentCam() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Enable Game Moment Camera";
 	}
 
@@ -16,7 +18,7 @@ public:
 
 class Effect_NoAutosave : public ChaosEffect {
 public:
-	Effect_NoAutosave() : ChaosEffect() {
+	Effect_NoAutosave() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Autosave";
 		fTimerLength = 240;
 	}
@@ -37,7 +39,7 @@ public:
 
 class Effect_NoVisualTreatment : public ChaosEffect {
 public:
-	Effect_NoVisualTreatment() : ChaosEffect() {
+	Effect_NoVisualTreatment() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Visual Treatment";
 		fTimerLength = 60;
 	}
@@ -59,7 +61,7 @@ public:
 
 class Effect_Millionaire : public ChaosEffect {
 public:
-	Effect_Millionaire() : ChaosEffect() {
+	Effect_Millionaire() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Millionaire";
 	}
 
@@ -70,7 +72,7 @@ public:
 
 class Effect_Millionaire2 : public ChaosEffect {
 public:
-	Effect_Millionaire2() : ChaosEffect() {
+	Effect_Millionaire2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Anti-Millionaire";
 	}
 
@@ -86,7 +88,7 @@ public:
 
 class Effect_ManualTrans : public ChaosEffect {
 public:
-	Effect_ManualTrans() : ChaosEffect() {
+	Effect_ManualTrans() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Manual Transmission";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
@@ -108,7 +110,7 @@ public:
 
 class Effect_AutoTrans : public ChaosEffect {
 public:
-	Effect_AutoTrans() : ChaosEffect() {
+	Effect_AutoTrans() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Automatic Transmission";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
@@ -130,7 +132,7 @@ public:
 
 class Effect_PlayerCarRandomTuning : public EffectBase_TriggerInMenu {
 public:
-	Effect_PlayerCarRandomTuning() : EffectBase_TriggerInMenu() {
+	Effect_PlayerCarRandomTuning() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Randomize Active Car's Visuals";
 		fUnhideTime = 0;
 	}
@@ -153,7 +155,7 @@ public:
 
 class Effect_PlayerCarImpoundStrike : public ChaosEffect {
 public:
-	Effect_PlayerCarImpoundStrike() : ChaosEffect() {
+	Effect_PlayerCarImpoundStrike() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Strike To Active Career Car";
 	}
 
@@ -174,7 +176,7 @@ public:
 
 class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
 public:
-	Effect_PlayerCarImpoundStrikeRemove() : ChaosEffect() {
+	Effect_PlayerCarImpoundStrikeRemove() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Remove A Strike From Active Career Car";
 	}
 
@@ -200,7 +202,7 @@ public:
 
 class Effect_PlayerCarImpoundMarker : public ChaosEffect {
 public:
-	Effect_PlayerCarImpoundMarker() : ChaosEffect() {
+	Effect_PlayerCarImpoundMarker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add Extra Impound Slot To Active Career Car";
 	}
 
@@ -221,7 +223,7 @@ public:
 
 class Effect_AddRandomTuningMarker : public ChaosEffect {
 public:
-	Effect_AddRandomTuningMarker() : ChaosEffect() {
+	Effect_AddRandomTuningMarker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Random Tuning Marker";
 	}
 
@@ -258,7 +260,7 @@ public:
 
 class Effect_AddRandomBonusMarker : public ChaosEffect {
 public:
-	Effect_AddRandomBonusMarker() : ChaosEffect() {
+	Effect_AddRandomBonusMarker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Random Bonus Marker";
 	}
 
@@ -338,7 +340,7 @@ public:
 public:
 	bool chanceFired = false;
 
-	Effect_SkipChance() : ChaosEffect() {
+	Effect_SkipChance() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "10% Chance Of Boss Skip";
 	}
 

@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Global Car"
+
 class Effect_DestroyRandomCar : public EffectBase_ActiveCarsConditional {
 public:
-	Effect_DestroyRandomCar() : EffectBase_ActiveCarsConditional() {
+	Effect_DestroyRandomCar() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Destroy Random Car";
 	}
 	
@@ -21,7 +23,7 @@ class Effect_CarMagnetRandom : public EffectBase_ActiveCarsConditional {
 public:
 	IVehicle* pRandomCar = nullptr;
 
-	Effect_CarMagnetRandom() : EffectBase_ActiveCarsConditional() {
+	Effect_CarMagnetRandom() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Magnet On Random Car";
 		fTimerLength = 15;
 	}
@@ -50,7 +52,7 @@ class Effect_CarForcefieldRandom : public EffectBase_ActiveCarsConditional {
 public:
 	IVehicle* pRandomCar = nullptr;
 
-	Effect_CarForcefieldRandom() : EffectBase_ActiveCarsConditional() {
+	Effect_CarForcefieldRandom() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Forcefield On Random Car";
 		fTimerLength = 60;
 	}
@@ -78,7 +80,7 @@ public:
 class Effect_CarBouncy : public ChaosEffect {
 public:
 
-	Effect_CarBouncy() : ChaosEffect() {
+	Effect_CarBouncy() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Bouncy Cars";
 		fTimerLength = 15;
 	}
@@ -105,7 +107,7 @@ public:
 class Effect_CarTumbly : public ChaosEffect {
 public:
 
-	Effect_CarTumbly() : ChaosEffect() {
+	Effect_CarTumbly() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Tumbling Cars";
 		fTimerLength = 15;
 	}
@@ -129,7 +131,7 @@ public:
 class Effect_CarFlippy : public ChaosEffect {
 public:
 
-	Effect_CarFlippy() : ChaosEffect() {
+	Effect_CarFlippy() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Flippy Cars";
 		fTimerLength = 15;
 	}
@@ -153,7 +155,7 @@ public:
 class Effect_CarFloaty : public ChaosEffect {
 public:
 
-	Effect_CarFloaty() : ChaosEffect() {
+	Effect_CarFloaty() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cars Float Away";
 		fTimerLength = 15;
 	}
@@ -179,7 +181,7 @@ public:
 
 class Effect_WreckOnFlip : public ChaosEffect {
 public:
-	Effect_WreckOnFlip() : ChaosEffect() {
+	Effect_WreckOnFlip() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cars Wreck When Flipped";
 		fTimerLength = 120;
 	}
@@ -213,7 +215,7 @@ public:
 	std::vector<tCarAssoc> lastStates;
 	double timer = 0;
 
-	Effect_FreezeEveryone() : EffectBase_ActiveCarsConditional() {
+	Effect_FreezeEveryone() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "DDOS The Server";
 		sFriendlyName = "Lag For All Cars";
 		fTimerLength = 60;
@@ -275,7 +277,7 @@ public:
 	std::vector<tCarAssoc> lastStates;
 	double timer = 0;
 
-	Effect_FreezeEveryoneNoPlayer() : EffectBase_ActiveCarsConditional() {
+	Effect_FreezeEveryoneNoPlayer() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Lag For All Other Cars";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
@@ -341,9 +343,9 @@ public:
 	std::vector<CwoeeCarPhysicalState> lastStates;
 	double timer = 0;
 
-	Effect_SnakeCars() : EffectBase_ActiveCarsConditional() {
+	Effect_SnakeCars() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Snake";
-		sFriendlyName = "All Cars Follow Player";
+		sFriendlyName = "Cars Follow Player";
 		fTimerLength = 45;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
 	}
@@ -392,7 +394,7 @@ public:
 
 class Effect_BouncyMod : public EffectBase_ActiveCarsConditional {
 public:
-	Effect_BouncyMod() : EffectBase_ActiveCarsConditional() {
+	Effect_BouncyMod() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Bouncy Mod";
 		fTimerLength = 90;
 	}
@@ -445,7 +447,7 @@ public:
 
 class Effect_WideCars : public ChaosEffect {
 public:
-	Effect_WideCars() : ChaosEffect() {
+	Effect_WideCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Wide Cars";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
@@ -472,7 +474,7 @@ public:
 
 	static inline float GroovySpeed = 4.5;
 
-	Effect_GroovyCars() : ChaosEffect() {
+	Effect_GroovyCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Why's This Dealer?";
 		sFriendlyName = "Groovy Cars";
 		fTimerLength = 60;
@@ -520,7 +522,7 @@ public:
 
 class Effect_TeleportAllCars : public EffectBase_ActiveCarsConditional {
 public:
-	Effect_TeleportAllCars() : EffectBase_ActiveCarsConditional() {
+	Effect_TeleportAllCars() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Teleport All Cars To Player";
 	}
 
@@ -538,7 +540,7 @@ public:
 
 class Effect_LaggyLookingCars : public ChaosEffect {
 public:
-	Effect_LaggyLookingCars() : ChaosEffect() {
+	Effect_LaggyLookingCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Snap To Grid";
 		sFriendlyName = "Shaky Cars";
 		fTimerLength = 60;
@@ -558,7 +560,7 @@ public:
 
 class Effect_LaggyLookingCars2 : public ChaosEffect {
 public:
-	Effect_LaggyLookingCars2() : ChaosEffect() {
+	Effect_LaggyLookingCars2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Low Quality Movement";
 		fTimerLength = 60;
 	}
@@ -575,7 +577,7 @@ public:
 
 class Effect_BillboardCars : public ChaosEffect {
 public:
-	Effect_BillboardCars() : ChaosEffect() {
+	Effect_BillboardCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cars Stare At You";
 		fTimerLength = 30;
 	}

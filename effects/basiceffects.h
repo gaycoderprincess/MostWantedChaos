@@ -1,3 +1,5 @@
+#define EFFECT_CATEGORY_TEMP "Basic"
+
 float GetEffectFadeInOut(ChaosEffect* effect, float time, bool ease) {
 	float fade = effect->EffectInstance->fTimer > time ? 1 : effect->EffectInstance->fTimer / time;
 	if (effect->EffectInstance->fTimer > effect->fTimerLength - time) {
@@ -8,7 +10,7 @@ float GetEffectFadeInOut(ChaosEffect* effect, float time, bool ease) {
 
 class Effect_Blind : public ChaosEffect {
 public:
-	Effect_Blind() : ChaosEffect() {
+	Effect_Blind() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Blind";
 		fTimerLength = 10;
 	}
@@ -21,7 +23,7 @@ public:
 
 class Effect_Flash : public ChaosEffect {
 public:
-	Effect_Flash() : ChaosEffect() {
+	Effect_Flash() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Flashbang";
 		fTimerLength = 4;
 	}
@@ -35,7 +37,7 @@ public:
 
 class Effect_PortraitMode : public ChaosEffect {
 public:
-	Effect_PortraitMode() : ChaosEffect() {
+	Effect_PortraitMode() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Portrait Mode";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
@@ -52,7 +54,7 @@ public:
 
 class Effect_43Borders : public ChaosEffect {
 public:
-	Effect_43Borders() : ChaosEffect() {
+	Effect_43Borders() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "4:3 Letterboxed";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
@@ -78,7 +80,7 @@ public:
 
 class Effect_WidescreenMode : public ChaosEffect {
 public:
-	Effect_WidescreenMode() : ChaosEffect() {
+	Effect_WidescreenMode() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Widescreen Borders";
 		fTimerLength = 60;
 	}
@@ -94,7 +96,7 @@ public:
 
 class Effect_FakeCrash : public ChaosEffect {
 public:
-	Effect_FakeCrash() : ChaosEffect() {
+	Effect_FakeCrash() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Fake Crash";
 	}
 
@@ -111,7 +113,7 @@ public:
 
 class Effect_Lag : public ChaosEffect {
 public:
-	Effect_Lag() : ChaosEffect() {
+	Effect_Lag() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Real Frame Drops";
 		fTimerLength = 15;
 	}
@@ -134,7 +136,7 @@ class Effect_CrashChance : public ChaosEffect {
 public:
 	bool chanceFired = false;
 
-	Effect_CrashChance() : ChaosEffect() {
+	Effect_CrashChance() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "10% Chance Of Game Crash";
 	}
 
@@ -157,14 +159,14 @@ public:
 
 class Effect_Nothing : public ChaosEffect {
 public:
-	Effect_Nothing() : ChaosEffect() {
+	Effect_Nothing() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Nothing Happens";
 	}
 } E_Nothing;
 
 class Effect_BlockyCover : public ChaosEffect {
 public:
-	Effect_BlockyCover() : ChaosEffect() {
+	Effect_BlockyCover() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Chess Board";
 		sFriendlyName = "Chess Board Screen Overlay";
 		fTimerLength = 30;
@@ -187,7 +189,7 @@ public:
 
 class Effect_BlockyCoverMissing : public ChaosEffect {
 public:
-	Effect_BlockyCoverMissing() : ChaosEffect() {
+	Effect_BlockyCoverMissing() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Missing Texture";
 		sFriendlyName = "Missing Texture Screen Overlay";
 		fTimerLength = 60;
@@ -212,7 +214,7 @@ public:
 
 class Effect_NoChaosHUD : public ChaosEffect {
 public:
-	Effect_NoChaosHUD() : ChaosEffect() {
+	Effect_NoChaosHUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Chaos Mod HUD";
 		fTimerLength = 60;
 	}
@@ -229,7 +231,7 @@ public:
 
 class Effect_PunchHole : public ChaosEffect {
 public:
-	Effect_PunchHole() : ChaosEffect() {
+	Effect_PunchHole() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Punch-Hole";
 		sFriendlyName = "Punch-Hole Screen Overlay";
 		fTimerLength = 30;
@@ -244,7 +246,7 @@ public:
 
 class Effect_RandomChaosTimer : public ChaosEffect {
 public:
-	Effect_RandomChaosTimer() : ChaosEffect() {
+	Effect_RandomChaosTimer() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Chaos For Your Chaos";
 		sFriendlyName = "Randomized Chaos Timer";
 		fTimerLength = 120;
@@ -261,7 +263,7 @@ public:
 
 class Effect_SFXPursuitBreaker : public ChaosEffect {
 public:
-	Effect_SFXPursuitBreaker() : ChaosEffect() {
+	Effect_SFXPursuitBreaker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Pursuit Breaker Sound Effect";
 	}
 

@@ -1,14 +1,15 @@
 class ChaosEffectInstance;
 class ChaosEffect {
 public:
-	const char* sName;
+	const char* sName = nullptr;
 	const char* sFriendlyName = nullptr;
 	double fTimerLength = 15;
 	double fUnhideTime = 3;
 	std::vector<uint32_t> IncompatibilityGroups;
 	std::vector<uint32_t> ActivateIncompatibilityGroups; // checks IncompatibilityGroups but doesn't deactivate for effects that only share ActivateIncompatibilityGroups
 	bool DebugNeverPick = false;
-	const char* sEffectAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
+	const char* sListCategory = nullptr;
+	const char* sAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
 
 	double fLastTriggerTime = 99999;
 	bool bTriggeredThisCycle = false;
@@ -17,7 +18,8 @@ public:
 	static inline std::vector<ChaosEffect*> aEffects;
 
 	//ChaosEffect(const std::string& name, double length) : sName(name), fTimerLength(length) {
-	ChaosEffect() {
+	ChaosEffect(const char* category) {
+		sListCategory = category;
 		aEffects.push_back(this);
 	};
 

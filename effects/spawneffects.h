@@ -1,8 +1,10 @@
+#define EFFECT_CATEGORY_TEMP "Spawn"
+
 class Effect_SpawnCarRandomized : public ChaosEffect {
 public:
 	bool abort = false;
 
-	Effect_SpawnCarRandomized() : ChaosEffect() {
+	Effect_SpawnCarRandomized() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Eldritch Monstrosity";
 		sFriendlyName = "Spawn Glitched Golf";
 	}
@@ -39,7 +41,7 @@ class Effect_SpawnCarTruck : public ChaosEffect {
 public:
 	bool abort = false;
 
-	Effect_SpawnCarTruck() : ChaosEffect() {
+	Effect_SpawnCarTruck() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Obligatory Truck Effect";
 		sFriendlyName = "Spawn Truck In Front Of Player";
 	}

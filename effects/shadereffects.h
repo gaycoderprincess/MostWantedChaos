@@ -1,3 +1,5 @@
+#define EFFECT_CATEGORY_TEMP "Shader"
+
 class EffectBase_ScreenShader : public ChaosEffect {
 public:
 	// todo add this to the d3d reset handler
@@ -6,7 +8,7 @@ public:
 	bool bEasedTimer = true;
 	bool bInvertTimerAtEnd = true;
 
-	EffectBase_ScreenShader() : ChaosEffect() {
+	EffectBase_ScreenShader(const char* category) : ChaosEffect(category) {
 		IncompatibilityGroups.push_back(Attrib::StringHash32("screenshader"));
 	};
 	
@@ -47,7 +49,7 @@ public:
 
 class Effect_ShaderMirror : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderMirror() : EffectBase_ScreenShader() {
+	Effect_ShaderMirror() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "British";
 		sFriendlyName = "Mirror The Screen";
 		fTimerLength = 60;
@@ -59,7 +61,7 @@ public:
 
 class Effect_ShaderPixel : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderPixel() : EffectBase_ScreenShader() {
+	Effect_ShaderPixel() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Pixelate The Screen";
 		fTimerLength = 30;
 		sFileName = "pixelate";
@@ -71,7 +73,7 @@ public:
 
 class Effect_ShaderDisco : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderDisco() : EffectBase_ScreenShader() {
+	Effect_ShaderDisco() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Disco Time";
 		sFriendlyName = "Disco Screen Overlay";
 		fTimerLength = 60;
@@ -87,7 +89,7 @@ public:
 
 class Effect_ShaderSquared : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderSquared() : EffectBase_ScreenShader() {
+	Effect_ShaderSquared() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "High Contrast";
 		fTimerLength = 60;
 		sFileName = "squared";
@@ -98,7 +100,7 @@ public:
 
 class Effect_ShaderSqrt : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderSqrt() : EffectBase_ScreenShader() {
+	Effect_ShaderSqrt() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Low Contrast";
 		fTimerLength = 60;
 		sFileName = "sqrt";
@@ -109,7 +111,7 @@ public:
 
 class Effect_ShaderInverted : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderInverted() : EffectBase_ScreenShader() {
+	Effect_ShaderInverted() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Inverted Colors";
 		fTimerLength = 60;
 		sFileName = "invert";
@@ -120,7 +122,7 @@ public:
 
 class Effect_ShaderBlue : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderBlue() : EffectBase_ScreenShader() {
+	Effect_ShaderBlue() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Da Ba Dee";
 		sFriendlyName = "Blue Screen Overlay";
 		fTimerLength = 60;
@@ -132,7 +134,7 @@ public:
 
 class Effect_ShaderWide : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderWide() : EffectBase_ScreenShader() {
+	Effect_ShaderWide() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "4:3 Stretched";
 		fTimerLength = 60;
 		sFileName = "wide";
@@ -143,7 +145,7 @@ public:
 
 class Effect_ShaderTikTok : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderTikTok() : EffectBase_ScreenShader() {
+	Effect_ShaderTikTok() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Tik Tok Mode";
 		sFriendlyName = "Tik Tok Screen Overlay";
 		fTimerLength = 60;
@@ -155,7 +157,7 @@ public:
 
 class Effect_ShaderZoomIn : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderZoomIn() : EffectBase_ScreenShader() {
+	Effect_ShaderZoomIn() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Tunnel Vision";
 		fTimerLength = 30;
 		sFileName = "zoom";
@@ -166,7 +168,7 @@ public:
 
 /*class Effect_ShaderRed : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderRed() : EffectBase_ScreenShader() {
+	Effect_ShaderRed() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Ketchup";
 		sFriendlyName = "Ketchup Screen Overlay";
 		fTimerLength = 60;
@@ -178,7 +180,7 @@ public:
 
 class Effect_ShaderUpsideDown : public EffectBase_ScreenShader {
 public:
-	Effect_ShaderUpsideDown() : EffectBase_ScreenShader() {
+	Effect_ShaderUpsideDown() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Meanwhile In Australia";
 		sFriendlyName = "Upside Down Screen";
 		fTimerLength = 45;

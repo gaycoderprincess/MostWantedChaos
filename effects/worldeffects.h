@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "World"
+
 class Effect_ResetProps : public ChaosEffect {
 public:
-	Effect_ResetProps() : ChaosEffect() {
+	Effect_ResetProps() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Respawn Props And Pursuit Breakers";
 	}
 
@@ -11,7 +13,7 @@ public:
 
 class Effect_NoTraffic : public ChaosEffect {
 public:
-	Effect_NoTraffic() : ChaosEffect() {
+	Effect_NoTraffic() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Traffic";
 		fTimerLength = 60;
 	}
@@ -28,7 +30,7 @@ public:
 
 class Effect_SpeedSlow : public ChaosEffect {
 public:
-	Effect_SpeedSlow() : ChaosEffect() {
+	Effect_SpeedSlow() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Slow Motion";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
@@ -49,7 +51,7 @@ public:
 
 class Effect_SpeedFast : public ChaosEffect {
 public:
-	Effect_SpeedFast() : ChaosEffect() {
+	Effect_SpeedFast() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Fast Motion";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
@@ -70,7 +72,7 @@ public:
 
 class Effect_SpeedSpeedBased : public ChaosEffect {
 public:
-	Effect_SpeedSpeedBased() : ChaosEffect() {
+	Effect_SpeedSpeedBased() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Reverse Superhot";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
@@ -98,7 +100,7 @@ public:
 
 class Effect_InvisibleWorld : public ChaosEffect {
 public:
-	Effect_InvisibleWorld() : ChaosEffect() {
+	Effect_InvisibleWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Invisible World";
 		fTimerLength = 30;
 	}
@@ -116,7 +118,7 @@ public:
 
 class Effect_WireframeWorld : public ChaosEffect {
 public:
-	Effect_WireframeWorld() : ChaosEffect() {
+	Effect_WireframeWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Wireframe World";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
@@ -133,7 +135,7 @@ public:
 
 class Effect_LaserScanWorld : public ChaosEffect {
 public:
-	Effect_LaserScanWorld() : ChaosEffect() {
+	Effect_LaserScanWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Laser-Scanned World";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
@@ -162,7 +164,7 @@ public:
 	};
 	std::vector<tBackup> backups;
 
-	Effect_SlipperyWorld() : ChaosEffect() {
+	Effect_SlipperyWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Slippery World";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("simsurface_friction"));
@@ -211,7 +213,7 @@ public:
 	};
 	std::vector<tBackup> backups;
 
-	Effect_GrippyWorld() : ChaosEffect() {
+	Effect_GrippyWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Grippy World";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("simsurface_friction"));

@@ -1,8 +1,10 @@
+#define EFFECT_CATEGORY_TEMP "Traffic"
+
 class Effect_RacerAITraffic : public EffectBase_ActiveTrafficConditional {
 public:
 	double fTimer = 0;
 
-	Effect_RacerAITraffic() : EffectBase_ActiveTrafficConditional() {
+	Effect_RacerAITraffic() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Racer AI For Traffic";
 		fTimerLength = 120;
 	}
@@ -32,7 +34,7 @@ public:
 
 class Effect_LobotomyTraffic : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_LobotomyTraffic() : EffectBase_ActiveTrafficConditional() {
+	Effect_LobotomyTraffic() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Lobotomized Traffic";
 		fTimerLength = 60;
 	}
@@ -50,7 +52,7 @@ public:
 
 class Effect_SpinningTraffic : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_SpinningTraffic() : EffectBase_ActiveTrafficConditional() {
+	Effect_SpinningTraffic() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Spinning Traffic";
 		fTimerLength = 60;
 	}
@@ -71,7 +73,7 @@ public:
 
 class Effect_SetTrafficMassInf : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_SetTrafficMassInf() : EffectBase_ActiveTrafficConditional() {
+	Effect_SetTrafficMassInf() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Traffic Mass";
 		fTimerLength = 60;
 	}
@@ -100,7 +102,7 @@ public:
 
 /*class Effect_HeavyTraffic : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_HeavyTraffic() : EffectBase_NotInPursuitConditional() {
+	Effect_HeavyTraffic() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Rush Hour Traffic";
 		fTimerLength = 90;
 	}

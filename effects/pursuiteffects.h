@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Pursuit"
+
 /*class Effect_SpawnCop : public ChaosEffect {
 public:
-	Effect_SpawnCop() : ChaosEffect() {
+	Effect_SpawnCop() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Cops";
 	}
 
@@ -28,7 +30,7 @@ public:
 
 class Effect_Pursuit : public ChaosEffect {
 public:
-	Effect_Pursuit() : ChaosEffect() {
+	Effect_Pursuit() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Trigger Police Pursuit";
 	}
 
@@ -48,7 +50,7 @@ public:
 
 /*class Effect_ClearCostToState : public EffectBase_PursuitConditional {
 public:
-	Effect_ClearCostToState() : EffectBase_PursuitConditional() {
+	Effect_ClearCostToState() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Reset Cost To State";
 	}
 
@@ -62,7 +64,7 @@ public:
 
 class Effect_AddCostToState : public EffectBase_PursuitConditional {
 public:
-	Effect_AddCostToState() : EffectBase_PursuitConditional() {
+	Effect_AddCostToState() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 100K Cost To State";
 	}
 
@@ -77,7 +79,7 @@ public:
 // needs a way to force cooldown
 /*class Effect_HiddenFromCops : public EffectBase_PursuitConditional {
 public:
-	Effect_HiddenFromCops() : EffectBase_PursuitConditional() {
+	Effect_HiddenFromCops() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Player Hidden From Cops";
 	}
 
@@ -96,7 +98,7 @@ public:
 
 class Effect_NeverBusted : public EffectBase_PursuitConditional {
 public:
-	Effect_NeverBusted() : EffectBase_PursuitConditional() {
+	Effect_NeverBusted() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Never Busted";
 		fTimerLength = 60;
 	}
@@ -112,7 +114,7 @@ public:
 // todo this softlocks the game when starting a milestone or bounty event
 class Effect_NoCops : public ChaosEffect {
 public:
-	Effect_NoCops() : ChaosEffect() {
+	Effect_NoCops() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Cops";
 		fTimerLength = 60;
 	}
@@ -133,7 +135,7 @@ public:
 
 class Effect_NoHidingSpots : public EffectBase_PursuitConditional {
 public:
-	Effect_NoHidingSpots() : EffectBase_PursuitConditional() {
+	Effect_NoHidingSpots() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Hiding Spots";
 		fTimerLength = 120;
 	}
@@ -151,7 +153,7 @@ public:
 
 class Effect_SetCopMassInf : public EffectBase_ActiveCopsConditional {
 public:
-	Effect_SetCopMassInf() : EffectBase_ActiveCopsConditional() {
+	Effect_SetCopMassInf() : EffectBase_ActiveCopsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Police Mass";
 		fTimerLength = 60;
 	}
@@ -182,7 +184,7 @@ class Effect_GetBusted : public EffectBase_PursuitConditional {
 public:
 	bool pass = false;
 
-	Effect_GetBusted() : EffectBase_PursuitConditional() {
+	Effect_GetBusted() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "10% Chance Of Getting Busted";
 		fTimerLength = 2;
 	}
@@ -210,7 +212,7 @@ public:
 
 class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
 public:
-	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional() {
+	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Ruthless Cop Spawns";
 		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
@@ -248,7 +250,7 @@ public:
 
 class Effect_RuthlessCopCross : public EffectBase_PursuitConditional {
 public:
-	Effect_RuthlessCopCross() : EffectBase_PursuitConditional() {
+	Effect_RuthlessCopCross() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "It's Cross";
 		sFriendlyName = "Ruthless Cross Spawns";
 		fTimerLength = 90;
@@ -274,7 +276,7 @@ public:
 
 class Effect_NoCopSpawns : public EffectBase_PursuitConditional {
 public:
-	Effect_NoCopSpawns() : EffectBase_PursuitConditional() {
+	Effect_NoCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Cop Spawns";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
@@ -297,7 +299,7 @@ public:
 
 /*class Effect_EnterCooldown : public EffectBase_PursuitConditional {
 public:
-	Effect_EnterCooldown() : EffectBase_PursuitConditional() {
+	Effect_EnterCooldown() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Enter Pursuit Cooldown";
 	}
 
@@ -311,7 +313,7 @@ public:
 
 class Effect_InvincibleTires : public EffectBase_PursuitConditional {
 public:
-	Effect_InvincibleTires() : EffectBase_PursuitConditional() {
+	Effect_InvincibleTires() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Invincible Player Tires";
 		fTimerLength = 60;
 	}

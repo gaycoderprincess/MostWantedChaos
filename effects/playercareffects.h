@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Player"
+
 class Effect_StopCar : public ChaosEffect {
 public:
-	Effect_StopCar() : ChaosEffect() {
+	Effect_StopCar() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Stop Player Car";
 	}
 
@@ -13,7 +15,7 @@ public:
 
 class Effect_LaunchCarFwd : public ChaosEffect {
 public:
-	Effect_LaunchCarFwd() : ChaosEffect() {
+	Effect_LaunchCarFwd() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Player Forward";
 	}
 
@@ -26,7 +28,7 @@ public:
 
 class Effect_LaunchCarBwd : public ChaosEffect {
 public:
-	Effect_LaunchCarBwd() : ChaosEffect() {
+	Effect_LaunchCarBwd() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Player Backwards";
 	}
 
@@ -39,7 +41,7 @@ public:
 
 class Effect_LaunchCarSide : public ChaosEffect {
 public:
-	Effect_LaunchCarSide() : ChaosEffect() {
+	Effect_LaunchCarSide() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Player Sideways";
 	}
 
@@ -57,7 +59,7 @@ public:
 
 class Effect_LaunchCarUp : public ChaosEffect {
 public:
-	Effect_LaunchCarUp() : ChaosEffect() {
+	Effect_LaunchCarUp() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Player Up";
 	}
 
@@ -72,7 +74,7 @@ public:
 
 class Effect_LaunchCarDown : public ChaosEffect {
 public:
-	Effect_LaunchCarDown() : ChaosEffect() {
+	Effect_LaunchCarDown() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Player Down";
 	}
 
@@ -90,7 +92,7 @@ public:
 
 class Effect_SpinCar : public ChaosEffect {
 public:
-	Effect_SpinCar() : ChaosEffect() {
+	Effect_SpinCar() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spin Player Out";
 	}
 
@@ -105,7 +107,7 @@ public:
 
 class Effect_SpinCar2 : public ChaosEffect {
 public:
-	Effect_SpinCar2() : ChaosEffect() {
+	Effect_SpinCar2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spin Player Rapidly";
 	}
 
@@ -120,7 +122,7 @@ public:
 
 class Effect_InfGameBreaker : public ChaosEffect {
 public:
-	Effect_InfGameBreaker() : ChaosEffect() {
+	Effect_InfGameBreaker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Speedbreaker";
 		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 		fTimerLength = 60;
@@ -136,7 +138,7 @@ public:
 
 class Effect_InfNitro : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_InfNitro() : EffectBase_PlayerCarHasNitro() {
+	Effect_InfNitro() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Player Nitro";
 		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro"));
 		fTimerLength = 60;
@@ -153,7 +155,7 @@ public:
 
 class Effect_NoGameBreaker : public ChaosEffect {
 public:
-	Effect_NoGameBreaker() : ChaosEffect() {
+	Effect_NoGameBreaker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Speedbreaker";
 		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
@@ -169,7 +171,7 @@ public:
 
 class Effect_NoNitro : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_NoNitro() : EffectBase_PlayerCarHasNitro() {
+	Effect_NoNitro() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Player Nitro";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro"));
@@ -186,7 +188,7 @@ public:
 
 class Effect_SetHeat1 : public ChaosEffect {
 public:
-	Effect_SetHeat1() : ChaosEffect() {
+	Effect_SetHeat1() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Set Heat Level to 1";
 	}
 
@@ -199,7 +201,7 @@ public:
 
 class Effect_SetHeat5 : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_SetHeat5() : EffectBase_NotInPursuitConditional() {
+	Effect_SetHeat5() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Set Heat Level to 5";
 	}
 
@@ -217,7 +219,7 @@ public:
 // max heat level doesn't seem to apply when in the middle of an active pursuit
 class Effect_SetHeat6 : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_SetHeat6() : EffectBase_NotInPursuitConditional() {
+	Effect_SetHeat6() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Set Heat Level to 6";
 	}
 
@@ -234,7 +236,7 @@ public:
 
 class Effect_SetHeatDown : public ChaosEffect {
 public:
-	Effect_SetHeatDown() : ChaosEffect() {
+	Effect_SetHeatDown() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Decrease Heat Level";
 	}
 
@@ -247,7 +249,7 @@ public:
 
 class Effect_SetHeatUp : public ChaosEffect {
 public:
-	Effect_SetHeatUp() : ChaosEffect() {
+	Effect_SetHeatUp() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Increase Heat Level";
 	}
 
@@ -263,7 +265,7 @@ public:
 
 class Effect_BlowEngine : public ChaosEffect {
 public:
-	Effect_BlowEngine() : ChaosEffect() {
+	Effect_BlowEngine() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Blow Player's Engine";
 	}
 
@@ -276,7 +278,7 @@ public:
 
 class Effect_AutoDrive : public ChaosEffect {
 public:
-	Effect_AutoDrive() : ChaosEffect() {
+	Effect_AutoDrive() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Auto-Drive";
 		IncompatibilityGroups.push_back(Attrib::StringHash32("autodrive"));
 		fTimerLength = 30;
@@ -297,7 +299,7 @@ public:
 
 /*class Effect_AutoDrive2 : public ChaosEffect {
 public:
-	Effect_AutoDrive2() : ChaosEffect() {
+	Effect_AutoDrive2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Auto-Drive (Traffic)";
 		fTimerLength = 15;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("autodrive"));
@@ -322,7 +324,7 @@ public:
 
 /*class Effect_911 : public ChaosEffect {
 public:
-	Effect_911() : ChaosEffect() {
+	Effect_911() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Call 911";
 	}
 
@@ -342,7 +344,7 @@ public:
 // todo this one could use audio
 class Effect_PlayerCarSpin : public ChaosEffect {
 public:
-	Effect_PlayerCarSpin() : ChaosEffect() {
+	Effect_PlayerCarSpin() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spain but the A is silent";
 		sFriendlyName = "Make Player Spin";
 		fTimerLength = 10;
@@ -360,7 +362,7 @@ public:
 
 class Effect_PlayerCarTuneAero : public ChaosEffect {
 public:
-	Effect_PlayerCarTuneAero() : ChaosEffect() {
+	Effect_PlayerCarTuneAero() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Aerodynamics +100";
 		fTimerLength = 15;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("aerodynamics"));
@@ -385,7 +387,7 @@ public:
 
 class Effect_PlayerCarTuneHandling : public ChaosEffect {
 public:
-	Effect_PlayerCarTuneHandling() : ChaosEffect() {
+	Effect_PlayerCarTuneHandling() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Handling +10";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
@@ -410,7 +412,7 @@ public:
 
 class Effect_PlayerCarTuneHandling2 : public ChaosEffect {
 public:
-	Effect_PlayerCarTuneHandling2() : ChaosEffect() {
+	Effect_PlayerCarTuneHandling2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Handling -10";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
@@ -435,7 +437,7 @@ public:
 
 /*class Effect_PlayerCarTuneHeight : public ChaosEffect {
 public:
-	Effect_PlayerCarTuneHeight() : ChaosEffect() {
+	Effect_PlayerCarTuneHeight() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Stanced Suspension";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
@@ -460,7 +462,7 @@ public:
 
 /*class Effect_PlayerCarTuneHeight2 : public ChaosEffect {
 public:
-	Effect_PlayerCarTuneHeight2() : ChaosEffect() {
+	Effect_PlayerCarTuneHeight2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Super Stanced Suspension";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
@@ -485,7 +487,7 @@ public:
 
 class Effect_PlayerCarTuneHeight3 : public ChaosEffect {
 public:
-	Effect_PlayerCarTuneHeight3() : ChaosEffect() {
+	Effect_PlayerCarTuneHeight3() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Monster Truck Suspension";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
@@ -513,7 +515,7 @@ public:
 	double state = 0;
 	bool goBack = false;
 
-	Effect_PlayerCarTuneHeight4() : ChaosEffect() {
+	Effect_PlayerCarTuneHeight4() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Bouncy Suspension";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
@@ -545,7 +547,7 @@ public:
 
 class Effect_PlayerCarTuneNitro : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_PlayerCarTuneNitro() : EffectBase_PlayerCarHasNitro() {
+	Effect_PlayerCarTuneNitro() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Weak Nitro";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
@@ -571,7 +573,7 @@ public:
 
 class Effect_PlayerCarTuneNitro2 : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_PlayerCarTuneNitro2() : EffectBase_PlayerCarHasNitro() {
+	Effect_PlayerCarTuneNitro2() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Strong Nitro";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
@@ -600,7 +602,7 @@ public:
 
 class Effect_PlayerCarReset : public ChaosEffect {
 public:
-	Effect_PlayerCarReset() : ChaosEffect() {
+	Effect_PlayerCarReset() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Reset Player";
 	}
 
@@ -613,7 +615,7 @@ public:
 
 class Effect_PlayerCarSpike1 : public ChaosEffect {
 public:
-	Effect_PlayerCarSpike1() : ChaosEffect() {
+	Effect_PlayerCarSpike1() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Puncture One Player Tire";
 	}
 
@@ -626,7 +628,7 @@ public:
 
 class Effect_PlayerCarSpikeAll : public ChaosEffect {
 public:
-	Effect_PlayerCarSpikeAll() : ChaosEffect() {
+	Effect_PlayerCarSpikeAll() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Puncture Player's Tires";
 		fTimerLength = 10;
 	}
@@ -650,7 +652,7 @@ public:
 
 class Effect_FixPlayerCar : public ChaosEffect {
 public:
-	Effect_FixPlayerCar() : ChaosEffect() {
+	Effect_FixPlayerCar() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Fix Player's Tires";
 	}
 
@@ -673,7 +675,7 @@ public:
 
 class Effect_NoReset : public ChaosEffect {
 public:
-	Effect_NoReset() : ChaosEffect() {
+	Effect_NoReset() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Resetting";
 		fTimerLength = 120;
 	}
@@ -689,7 +691,7 @@ public:
 
 class Effect_ResetImmune : public EffectBase_PursuitConditional {
 public:
-	Effect_ResetImmune() : EffectBase_PursuitConditional() {
+	Effect_ResetImmune() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Instant Bust On Reset";
 		fTimerLength = 120;
 	}
@@ -744,7 +746,7 @@ void DoCarForcefield(IVehicle* source) {
 
 class Effect_CarMagnet : public ChaosEffect {
 public:
-	Effect_CarMagnet() : ChaosEffect() {
+	Effect_CarMagnet() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Player Car Magnet";
 		fTimerLength = 30;
 	}
@@ -757,7 +759,7 @@ public:
 
 class Effect_CarForcefield : public ChaosEffect {
 public:
-	Effect_CarForcefield() : ChaosEffect() {
+	Effect_CarForcefield() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Player Car Forcefield";
 		fTimerLength = 60;
 	}
@@ -770,7 +772,7 @@ public:
 
 class Effect_NoInput : public ChaosEffect {
 public:
-	Effect_NoInput() : ChaosEffect() {
+	Effect_NoInput() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Player Input";
 		fTimerLength = 15;
 	}
@@ -785,7 +787,7 @@ public:
 
 /*class Effect_NoInputMash : public ChaosEffect {
 public:
-	Effect_NoInputMash() : ChaosEffect() {
+	Effect_NoInputMash() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Mash To Drive";
 		fTimerLength = 15;
 	}
@@ -805,7 +807,7 @@ public:
 
 class Effect_PlayerCarGear1 : public ChaosEffect {
 public:
-	Effect_PlayerCarGear1() : ChaosEffect() {
+	Effect_PlayerCarGear1() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Player To Gear 1";
 		fTimerLength = 15;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
@@ -825,7 +827,7 @@ public:
 
 class Effect_PlayerCarGearTop : public ChaosEffect {
 public:
-	Effect_PlayerCarGearTop() : ChaosEffect() {
+	Effect_PlayerCarGearTop() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Top Gear";
 		sFriendlyName = "Force Player To Top Gear";
 		fTimerLength = 30;
@@ -846,7 +848,7 @@ public:
 
 class Effect_PlayerCarGearR : public ChaosEffect {
 public:
-	Effect_PlayerCarGearR() : ChaosEffect() {
+	Effect_PlayerCarGearR() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Player To Reverse Gear";
 		fTimerLength = 15;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
@@ -866,7 +868,7 @@ public:
 
 class Effect_SetCarTRAFPIZZA : public ChaosEffect {
 public:
-	Effect_SetCarTRAFPIZZA() : ChaosEffect() {
+	Effect_SetCarTRAFPIZZA() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "It's Pizza Time";
 		sFriendlyName = "Change Car To TRAFPIZZA";
 	}
@@ -891,7 +893,7 @@ public:
 
 class Effect_SetCarRazor : public EffectBase_SafelyChangePlayerCar {
 public:
-	Effect_SetCarRazor() : EffectBase_SafelyChangePlayerCar() {
+	Effect_SetCarRazor() : EffectBase_SafelyChangePlayerCar(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Razor's Mustang";
 	}
 
@@ -903,7 +905,7 @@ public:
 
 class Effect_SetCarRandom : public EffectBase_SafelyChangePlayerCar {
 public:
-	Effect_SetCarRandom() : EffectBase_SafelyChangePlayerCar() {
+	Effect_SetCarRandom() : EffectBase_SafelyChangePlayerCar(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Random Model";
 	}
 
@@ -923,7 +925,7 @@ public:
 
 class Effect_SetCarMassInf : public ChaosEffect {
 public:
-	Effect_SetCarMassInf() : ChaosEffect() {
+	Effect_SetCarMassInf() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Player Mass";
 		fTimerLength = 90;
 	}
@@ -943,7 +945,7 @@ public:
 
 class Effect_SetCarMass0 : public ChaosEffect {
 public:
-	Effect_SetCarMass0() : ChaosEffect() {
+	Effect_SetCarMass0() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Zero Player Mass";
 		fTimerLength = 60;
 	}
@@ -963,7 +965,7 @@ public:
 
 class Effect_Piggyback : public EffectBase_ActiveCarsConditional {
 public:
-	Effect_Piggyback() : EffectBase_ActiveCarsConditional() {
+	Effect_Piggyback() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Piggyback Ride";
 		sFriendlyName = "Place Player Onto Closest Car";
 		fTimerLength = 15;
@@ -994,7 +996,7 @@ class Effect_LockPlayer : public ChaosEffect {
 public:
 	UMath::Vector3 position;
 
-	Effect_LockPlayer() : ChaosEffect() {
+	Effect_LockPlayer() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Lock Player In Place";
 		fTimerLength = 10;
 	}
@@ -1012,7 +1014,7 @@ class Effect_LockPlayerOrient : public ChaosEffect {
 public:
 	UMath::Vector4 orient;
 
-	Effect_LockPlayerOrient() : ChaosEffect() {
+	Effect_LockPlayerOrient() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Lock Player Rotation";
 		fTimerLength = 10;
 	}
@@ -1029,7 +1031,7 @@ public:
 class Effect_SwapPlayerWithOpponent : public EffectBase_OpponentInRaceOrRoamingConditional {
 public:
 
-	Effect_SwapPlayerWithOpponent() : EffectBase_OpponentInRaceOrRoamingConditional() {
+	Effect_SwapPlayerWithOpponent() : EffectBase_OpponentInRaceOrRoamingConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Swap Places With Random Opponent";
 	}
 
@@ -1049,7 +1051,7 @@ public:
 
 class Effect_PlayerResetTransform : public ChaosEffect {
 public:
-	Effect_PlayerResetTransform() : ChaosEffect() {
+	Effect_PlayerResetTransform() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Player Physics";
 		fTimerLength = 15;
 		fUnhideTime = 1;
@@ -1092,7 +1094,7 @@ public:
 
 class Effect_PlayerNoBrakes : public ChaosEffect {
 public:
-	Effect_PlayerNoBrakes() : ChaosEffect() {
+	Effect_PlayerNoBrakes() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "They Just Slow Us Down";
 		sFriendlyName = "Disable Player Brakes";
 		fTimerLength = 60;
@@ -1109,7 +1111,7 @@ public:
 
 class Effect_PlayerNoSteering : public ChaosEffect {
 public:
-	Effect_PlayerNoSteering() : ChaosEffect() {
+	Effect_PlayerNoSteering() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Broken Steering Wheel";
 		sFriendlyName = "Disable Player Steering";
 		fTimerLength = 15;
@@ -1128,7 +1130,7 @@ public:
 	CwoeeCarPhysicalState lastState;
 	double timer = 0;
 
-	Effect_PlayerLag() : ChaosEffect() {
+	Effect_PlayerLag() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Connection Problem";
 		sFriendlyName = "Laggy Player";
 		fTimerLength = 30;
@@ -1155,7 +1157,7 @@ public:
 
 class Effect_PlayerTPHidingSpot : public ChaosEffect {
 public:
-	Effect_PlayerTPHidingSpot() : ChaosEffect() {
+	Effect_PlayerTPHidingSpot() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Teleport To Perfect Hiding Spot";
 	}
 
@@ -1167,7 +1169,7 @@ public:
 // this technically affects all cars but it's here in playercareffects since it mostly only affects the player
 class Effect_NOSBoost : public EffectBase_PlayerCarHasNitro {
 public:
-	Effect_NOSBoost() : EffectBase_PlayerCarHasNitro() {
+	Effect_NOSBoost() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Nitro Boosting";
 		fTimerLength = 45;
 	}
@@ -1187,7 +1189,7 @@ public:
 
 class Effect_CruiseControl : public ChaosEffect {
 public:
-	Effect_CruiseControl() : ChaosEffect() {
+	Effect_CruiseControl() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cruise Control";
 		fTimerLength = 15;
 	}
@@ -1206,7 +1208,7 @@ public:
 
 class Effect_Skyfall : public ChaosEffect {
 public:
-	Effect_Skyfall() : ChaosEffect() {
+	Effect_Skyfall() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Skyfall";
 		fTimerLength = 20;
 	}

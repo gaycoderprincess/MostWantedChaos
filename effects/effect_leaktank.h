@@ -5,7 +5,7 @@ public:
 
 	static inline float TankDrainRate = 0.015;
 
-	Effect_LeakTank() : ChaosEffect() {
+	Effect_LeakTank() : ChaosEffect("Uncategorized") {
 		sName = "Leaking Gas Tank";
 	}
 

@@ -1,6 +1,6 @@
 class EffectBase_PlayerCarHasNitro : public ChaosEffect {
 public:
-	EffectBase_PlayerCarHasNitro() : ChaosEffect() {
+	EffectBase_PlayerCarHasNitro(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Player Has Nitro";
 	}
 
@@ -15,7 +15,7 @@ public:
 
 class EffectBase_OpponentInRaceOrRoamingConditional : public ChaosEffect {
 public:
-	EffectBase_OpponentInRaceOrRoamingConditional() : ChaosEffect() {
+	EffectBase_OpponentInRaceOrRoamingConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Opponent In Race Or Roaming Conditional";
 	}
 
@@ -27,7 +27,7 @@ public:
 
 class EffectBase_OpponentInRaceConditional : public ChaosEffect {
 public:
-	EffectBase_OpponentInRaceConditional() : ChaosEffect() {
+	EffectBase_OpponentInRaceConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Opponent In Race Conditional";
 	}
 
@@ -39,7 +39,7 @@ public:
 
 class EffectBase_OpponentAliveInRaceConditional : public ChaosEffect {
 public:
-	EffectBase_OpponentAliveInRaceConditional() : ChaosEffect() {
+	EffectBase_OpponentAliveInRaceConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Opponent Alive & In Race Conditional";
 	}
 
@@ -57,7 +57,7 @@ public:
 
 class EffectBase_MultiOpponentAliveInRaceConditional : public ChaosEffect {
 public:
-	EffectBase_MultiOpponentAliveInRaceConditional() : ChaosEffect() {
+	EffectBase_MultiOpponentAliveInRaceConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Multiple Opponents Alive & In Race Conditional";
 	}
 
@@ -79,7 +79,7 @@ public:
 
 class EffectBase_PursuitConditional : public ChaosEffect {
 public:
-	EffectBase_PursuitConditional() : ChaosEffect() {
+	EffectBase_PursuitConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Pursuit Conditional";
 	}
 
@@ -94,7 +94,7 @@ public:
 
 class EffectBase_NotInPursuitConditional : public ChaosEffect {
 public:
-	EffectBase_NotInPursuitConditional() : ChaosEffect() {
+	EffectBase_NotInPursuitConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Not In Pursuit Conditional";
 	}
 
@@ -109,7 +109,7 @@ public:
 
 class EffectBase_ActiveCarsConditional : public ChaosEffect {
 public:
-	EffectBase_ActiveCarsConditional() : ChaosEffect() {
+	EffectBase_ActiveCarsConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Active Cars Conditional";
 	}
 
@@ -121,7 +121,7 @@ public:
 
 class EffectBase_ActiveTrafficConditional : public ChaosEffect {
 public:
-	EffectBase_ActiveTrafficConditional() : ChaosEffect() {
+	EffectBase_ActiveTrafficConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Active Traffic Conditional";
 	}
 
@@ -133,7 +133,7 @@ public:
 
 class EffectBase_ActiveCopsConditional : public ChaosEffect {
 public:
-	EffectBase_ActiveCopsConditional() : ChaosEffect() {
+	EffectBase_ActiveCopsConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Active Cops Conditional";
 	}
 
@@ -149,7 +149,7 @@ public:
 
 class EffectBase_TriggerInMenu : public ChaosEffect {
 public:
-	EffectBase_TriggerInMenu() : ChaosEffect() {
+	EffectBase_TriggerInMenu(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Trigger In Menu";
 	}
 
@@ -163,7 +163,7 @@ public:
 
 class EffectBase_SafelyChangePlayerCar : public ChaosEffect {
 public:
-	EffectBase_SafelyChangePlayerCar() : ChaosEffect() {
+	EffectBase_SafelyChangePlayerCar(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Safely Change Player Car";
 		fUnhideTime = 3.5;
 	}

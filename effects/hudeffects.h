@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "HUD"
+
 class Effect_DragHUD : public ChaosEffect {
 public:
-	Effect_DragHUD() : ChaosEffect() {
+	Effect_DragHUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Drag HUD";
 	}
 
@@ -13,7 +15,7 @@ public:
 
 class Effect_ChallengeCam : public ChaosEffect {
 public:
-	Effect_ChallengeCam() : ChaosEffect() {
+	Effect_ChallengeCam() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Challenge Series Camera";
 	}
 
@@ -24,7 +26,7 @@ public:
 
 class Effect_NoHUD : public ChaosEffect {
 public:
-	Effect_NoHUD() : ChaosEffect() {
+	Effect_NoHUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable HUD";
 		sFriendlyName = "Disable Game HUD";
 		fTimerLength = 60;
@@ -45,7 +47,7 @@ public:
 
 class Effect_PauseMenu : public ChaosEffect {
 public:
-	Effect_PauseMenu() : ChaosEffect() {
+	Effect_PauseMenu() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Open Pause Menu";
 	}
 

@@ -61,7 +61,7 @@ void OnWinRace() {
 }
 
 void MoneyChecker() {
-	static ChaosEffect TempEffect;
+	static ChaosEffect TempEffect("DUMMY");
 	TempEffect.DebugNeverPick = true;
 	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) MONEY CHANGE";
 
@@ -286,36 +286,27 @@ void ChaosModMenu() {
 		}
 
 		if (DrawMenuOption("Add Effect")) {
-			ChloeMenuLib::BeginMenu();
+			std::vector<std::string> categories;
 			for (auto& effect : ChaosEffect::aEffects) {
 				if (effect->DebugNeverPick) continue;
-				if (DrawMenuOption(effect->GetFriendlyName())) {
-					AddRunningEffect(effect);
+				if (std::find(categories.begin(), categories.end(), effect->sListCategory) == categories.end()) {
+					categories.push_back(effect->sListCategory);
 				}
 			}
-			ChloeMenuLib::EndMenu();
-		}
+			std::sort(categories.begin(), categories.end());
 
-		if (DrawMenuOption("Hideable Effects")) {
 			ChloeMenuLib::BeginMenu();
-			for (auto& effect : ChaosEffect::aEffects) {
-				if (effect->DebugNeverPick) continue;
-				if (!effect->IsConditionallyAvailable()) continue;
-				if (effect->AbortOnConditionFailed()) continue;
-				if (DrawMenuOption(effect->GetFriendlyName())) {
-					AddRunningEffect(effect);
-				}
-			}
-			ChloeMenuLib::EndMenu();
-		}
-
-		if (DrawMenuOption("Rehideable Effects")) {
-			ChloeMenuLib::BeginMenu();
-			for (auto& effect : ChaosEffect::aEffects) {
-				if (effect->DebugNeverPick) continue;
-				if (!effect->IsRehideable()) continue;
-				if (DrawMenuOption(effect->GetFriendlyName())) {
-					AddRunningEffect(effect);
+			for (auto& cat : categories) {
+				if (DrawMenuOption(cat)) {
+					ChloeMenuLib::BeginMenu();
+					for (auto& effect : ChaosEffect::aEffects) {
+						if (effect->DebugNeverPick) continue;
+						if (effect->sListCategory != cat) continue;
+						if (DrawMenuOption(effect->GetFriendlyName())) {
+							AddRunningEffect(effect);
+						}
+					}
+					ChloeMenuLib::EndMenu();
 				}
 			}
 			ChloeMenuLib::EndMenu();

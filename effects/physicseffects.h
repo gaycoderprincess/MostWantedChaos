@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Physics"
+
 class Effect_NoTirePhysics : public ChaosEffect {
 public:
-	Effect_NoTirePhysics() : ChaosEffect() {
+	Effect_NoTirePhysics() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Break Tire Physics";
 		fTimerLength = 15;
 	}
@@ -16,7 +18,7 @@ public:
 
 class Effect_NoWallCollision : public ChaosEffect {
 public:
-	Effect_NoWallCollision() : ChaosEffect() {
+	Effect_NoWallCollision() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Wall Collision";
 		fTimerLength = 90;
 	}
@@ -35,7 +37,7 @@ public:
 
 class Effect_NoCollision : public ChaosEffect {
 public:
-	Effect_NoCollision() : ChaosEffect() {
+	Effect_NoCollision() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable World Collision";
 		fTimerLength = 30;
 	}
@@ -54,7 +56,7 @@ public:
 
 class Effect_NoCarCarCollision : public ChaosEffect {
 public:
-	Effect_NoCarCarCollision() : ChaosEffect() {
+	Effect_NoCarCarCollision() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Car To Car Collision";
 		fTimerLength = 90;
 	}
