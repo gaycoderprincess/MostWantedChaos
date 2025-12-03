@@ -101,6 +101,6 @@ public:
 	bool IsAvailable() override {
 		return (GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms) || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
 	}
+	bool IsRehideable() override { return true; }
 	bool IsConditionallyAvailable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_FO1HUD;

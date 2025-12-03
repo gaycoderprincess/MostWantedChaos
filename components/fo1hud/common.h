@@ -117,61 +117,6 @@ public:
 		return (0.75 + 0.25 * (std::cos(timer * 3.141592 * 2) + 1.0) / 2) * 255;
 	}
 
-	struct tHUDData {
-		std::string name;
-		ImVec2 min;
-		ImVec2 max;
-	};
-
-	// todo
-	/*static std::vector<tHUDData> LoadHUDData(const char* path, const char* name) {
-		size_t size;
-		auto file = (char*)ReadFileFromBfs(path, size);
-		if (!file) return {};
-
-		std::vector<tHUDData> vec;
-
-		auto ss = std::stringstream(file);
-
-		int sizes[2] = {1,1};
-
-		for (std::string line; std::getline(ss, line); ) {
-			while (line[0] == '\t') line.erase(line.begin());
-			if (line.starts_with("--")) continue;
-			if (line.length() > 64) continue;
-
-			if (line.starts_with(std::format("{}_size = ", name))) {
-				sscanf(line.c_str(), std::format("{}_size = {{ %d, %d }}", name).c_str(), &sizes[0], &sizes[1]);
-			}
-			else if (!line.empty() && !line.starts_with(std::format("{} = {{", name))) {
-				tHUDData data;
-				int x = 0, y = 0, sizex = 0, sizey = 0;
-
-				char varName[64] = "";
-				sscanf(line.c_str(), "%s = { %d, %d, %d, %d, },", varName, &x, &y, &sizex, &sizey);
-				if (!varName[0]) continue;
-				if (x == 0 && y == 0 && sizex == 0 && sizey == 0) continue;
-
-				data.name = varName;
-				data.min.x = x / (double)sizes[0];
-				data.min.y = y / (double)sizes[1];
-				data.max.x = data.min.x + (sizex / (double)sizes[0]);
-				data.max.y = data.min.y + (sizey / (double)sizes[1]);
-
-				vec.push_back(data);
-			}
-		}
-
-		return vec;
-	}*/
-
-	static tHUDData* GetHUDData(std::vector<tHUDData>& hud, const std::string& name) {
-		for (auto& data : hud) {
-			if (data.name == name) return &data;
-		}
-		return nullptr;
-	}
-
 	virtual void Init() {}
 	virtual void InitHooks() {}
 	virtual void Reset() {}

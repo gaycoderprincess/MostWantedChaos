@@ -252,5 +252,3 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_GrippyWorld;
-
-// todo change ColourBloomTint in visuallook for a rainbow world thing?

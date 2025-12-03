@@ -79,7 +79,7 @@ public:
 class Effect_AddBounty : public EffectBase_PursuitConditional {
 public:
 	Effect_AddBounty() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Add 100K Bounty";
+		sName = "Add 100K Pursuit Bounty";
 	}
 
 	void InitFunction() override {
@@ -89,6 +89,20 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_AddBounty;
+
+class Effect_SubtractBounty : public EffectBase_PursuitConditional {
+public:
+	Effect_SubtractBounty() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Subtract 100K Pursuit Bounty";
+	}
+
+	void InitFunction() override {
+		if (auto pursuit = GetLocalPlayerInterface<IPerpetrator>()) {
+			pursuit->AddToPendingRepPointsNormal(-100000);
+		}
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_SubtractBounty;
 
 // needs a way to force cooldown
 /*class Effect_HiddenFromCops : public EffectBase_PursuitConditional {
@@ -168,7 +182,7 @@ public:
 class Effect_SetCopMassInf : public EffectBase_ActiveCopsConditional {
 public:
 	Effect_SetCopMassInf() : EffectBase_ActiveCopsConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Infinite Police Mass";
+		sName = "Infinite Cop Mass";
 		fTimerLength = 60;
 	}
 
@@ -291,7 +305,7 @@ public:
 class Effect_NoCopSpawns : public EffectBase_PursuitConditional {
 public:
 	Effect_NoCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Disable Cop Spawns";
+		sName = "Disable Cop Spawning";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
 	}
@@ -342,4 +356,26 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_InvincibleTires;
 
-// todo police jenga
+class Effect_CopJenga : public EffectBase_ManyActiveCopsConditional {
+public:
+	Effect_CopJenga() : EffectBase_ManyActiveCopsConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Cop Jenga Tower";
+		fTimerLength = 45;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles(DRIVER_COP);
+		IVehicle* bottom = nullptr;
+		for (auto& car : cars) {
+			if (!strcmp(car->GetVehicleName(), "copheli")) continue;
+
+			if (bottom) {
+				DoPiggyback(bottom, car);
+			}
+			bottom = car;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_CopJenga;

@@ -38,6 +38,7 @@ namespace Achievements {
 		new CAchievement("LAPS_1", "Lap Glitch", "Lower a race to 1 lap"),
 		new CAchievement("RESTART_LATE", "Trolled", "Have a race restart at over 90% complete"),
 		new CAchievement("DESTROY_RANDOM_PLAYER", "Millions To One", "Get totaled from Destroy Random Car"),
+		new CAchievement("EVADE_WRECKED", "100% Skilled Luck", "Escape a pursuit while totaled"),
 	};
 
 	const float fSpriteBGX = 960;
@@ -355,9 +356,17 @@ namespace Achievements {
 			}
 		}
 
-		//if (pLoadingScreen) return;
+		if (IsInLoadingScreen()) return;
 
 		DrawUnlockUI();
+
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
+			if (auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
+				if (pursuit->GetPursuitStatus() == ePursuitStatus::PS_EVADED && IsCarDestroyed(GetLocalPlayerVehicle())) {
+					AwardAchievement(GetAchievement("EVADE_WRECKED"));
+				}
+			}
+		}
 	}
 
 	ChloeHook Init([]() {

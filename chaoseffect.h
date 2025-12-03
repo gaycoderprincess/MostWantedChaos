@@ -358,3 +358,8 @@ bool RunningEffectsCleanup() {
 #include "effects/effect_safehouse.h"
 #include "effects/effect_leaktank.h"
 #include "effects/effect_flashbacks.h"
+
+// todo voting effects:
+// rigged - lowest voted wins
+// all of the above - simultaneously activate every other voting option
+// streamer votes - streamer can press 1/2/3/4/etc to select the next effect or two

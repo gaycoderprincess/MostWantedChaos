@@ -963,6 +963,16 @@ public:
 	bool HasTimer() override { return true; }
 } E_SetCarMass0;
 
+void DoPiggyback(IVehicle* bottom, IVehicle* top) {
+	auto playerPos = *top->GetPosition();
+	auto targetPos = *bottom->GetPosition();
+	playerPos.x = targetPos.x;
+	playerPos.z = targetPos.z;
+	if (playerPos.y < targetPos.y) playerPos.y = targetPos.y + 3;
+	top->mCOMObject->Find<IRigidBody>()->SetPosition(&playerPos);
+	top->mCOMObject->Find<IRBVehicle>()->EnableObjectCollisions(true);
+}
+
 class Effect_Piggyback : public EffectBase_ActiveCarsConditional {
 public:
 	Effect_Piggyback() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
@@ -976,13 +986,7 @@ public:
 	}
 	void TickFunction(double delta) override {
 		if (auto target = GetClosestActiveVehicle(GetLocalPlayerVehicle())) {
-			auto playerPos = *GetLocalPlayerVehicle()->GetPosition();
-			auto targetPos = *target->GetPosition();
-			playerPos.x = targetPos.x;
-			playerPos.z = targetPos.z;
-			if (playerPos.y < targetPos.y) playerPos.y = targetPos.y + 3;
-			GetLocalPlayerInterface<IRigidBody>()->SetPosition(&playerPos);
-			GetLocalPlayerInterface<IRBVehicle>()->EnableObjectCollisions(true);
+			DoPiggyback(target, GetLocalPlayerVehicle());
 		}
 	}
 	void DeinitFunction() override {

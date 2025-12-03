@@ -138,11 +138,19 @@ public:
 	}
 
 	bool IsAvailable() override {
-		auto cars = GetActiveVehicles();
-		for (auto& car : cars) {
-			if (car->GetDriverClass() == DRIVER_COP) return true;
-		}
-		return false;
+		return !GetActiveVehicles(DRIVER_COP).empty();
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
+class EffectBase_ManyActiveCopsConditional : public ChaosEffect {
+public:
+	EffectBase_ManyActiveCopsConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) Many Active Cops Conditional";
+	}
+
+	bool IsAvailable() override {
+		return GetActiveVehicles(DRIVER_COP).size() >= 3;
 	}
 	bool IsConditionallyAvailable() override { return true; }
 };
