@@ -316,10 +316,10 @@ public:
 				captureChance = 60;
 
 				// this effect makes cooldowns essentially free, disable during cooldowns
-				// todo how do i get the player's IPursuit?
-				//if (ICopMgr::mInstance->IsPlayerPursuitActive() && GetLocalPlayerInterface<IPursuit>()->GetPursuitStatus() == PS_COOL_DOWN) {
-				//	return;
-				//}
+				auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit();
+				if (pursuit && pursuit->GetPursuitStatus() == PS_COOL_DOWN) {
+					return;
+				}
 			}
 
 			if (rand() % 100 < applyChance) {
@@ -593,3 +593,21 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_BillboardCars;
+
+class Effect_InvisCars : public ChaosEffect {
+public:
+	Effect_InvisCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Invisible Cars";
+		fTimerLength = 60;
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
+	}
+
+	void InitFunction() override {
+		DrawCars = false;
+	}
+	void DeinitFunction() override {
+		DrawCars = true;
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+} E_InvisCars;

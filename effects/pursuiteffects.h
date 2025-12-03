@@ -8,7 +8,7 @@ public:
 
 	void InitFunction() override {
 		ICopMgr::mDisableCops = false;
-		if (auto pursuit = GetLocalPlayerInterface<IPursuit>()) {
+		if (auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
 			for (int i = 0; i < 8; i++) {
 				AICopManager::SpawnCopCarNow(TheOneCopManager, pursuit);
 			}
@@ -55,12 +55,12 @@ public:
 	}
 
 	void InitFunction() override {
-		if (auto pursuit = GetLocalPlayerInterface<IPursuit>()) {
-			pursuit->NotifyPropertyDamaged(100000);
+		if (auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
+			pursuit->NotifyPropertyDamaged(-100000);
 		}
 	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_ClearCostToState;
+} E_ClearCostToState;*/
 
 class Effect_AddCostToState : public EffectBase_PursuitConditional {
 public:
@@ -69,12 +69,26 @@ public:
 	}
 
 	void InitFunction() override {
-		if (auto pursuit = GetLocalPlayerInterface<IPursuit>()) {
+		if (auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
 			pursuit->NotifyPropertyDamaged(100000);
 		}
 	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_AddCostToState;*/
+} E_AddCostToState;
+
+class Effect_AddBounty : public EffectBase_PursuitConditional {
+public:
+	Effect_AddBounty() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Add 100K Bounty";
+	}
+
+	void InitFunction() override {
+		if (auto pursuit = GetLocalPlayerInterface<IPerpetrator>()) {
+			pursuit->AddToPendingRepPointsNormal(100000);
+		}
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_AddBounty;
 
 // needs a way to force cooldown
 /*class Effect_HiddenFromCops : public EffectBase_PursuitConditional {

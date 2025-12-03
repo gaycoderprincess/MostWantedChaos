@@ -459,3 +459,27 @@ void ApplyCameraMatrix(Camera* pCamera, NyaMat4x4 mat) {
 	pCamera->bClearVelocity = true;
 	Camera::SetCameraMatrix(pCamera, (bMatrix4*)&inv, 0);
 }
+
+// todo this is probably bad
+IVehicle* GetRacerFromHandle(HSIMABLE handle) {
+	auto cars = GetActiveVehicles();
+	for (auto& car : cars) {
+		if (car->mCOMObject->Find<ISimable>()->GetOwnerHandle() == handle) return car;
+	}
+	return nullptr;
+}
+
+bool IsLocalPlayerStaging() {
+	return GetLocalPlayerVehicle() && GetLocalPlayerVehicle()->IsStaging();
+}
+
+uint8_t* GetRaceNumLaps() {
+	auto race = GRaceStatus::fObj;
+	if (!race) return nullptr;
+	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return nullptr;
+	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return nullptr;
+	if (auto index = race->mRaceParms->mIndex) {
+		return &index->mNumLaps;
+	}
+	return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+}

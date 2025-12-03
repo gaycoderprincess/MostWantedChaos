@@ -30,6 +30,7 @@ public:
 		sName = "Disable HUD";
 		sFriendlyName = "Disable Game HUD";
 		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("hud_replace"));
 	}
 
 	static uint32_t __thiscall DetermineHudFeaturesHooked(IHud* pThis, IPlayer* a2) {
@@ -55,3 +56,51 @@ public:
 		aMainLoopFunctionsOnce.push_back([]() { EPause::Create(0, 0, 0); });
 	}
 } E_PauseMenu;
+
+class Effect_FO1HUD : public ChaosEffect {
+public:
+	Effect_FO1HUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "FlatOut Style HUD";
+		fTimerLength = 120;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("hud_replace"));
+	}
+
+	static uint32_t __thiscall DetermineHudFeaturesHooked(IHud* pThis, IPlayer* a2) {
+		//auto flags = 0x39FF5C12; // freeroam hud features, no race overlays
+
+		auto flags = IHud::DetermineHudFeatures(pThis, a2);
+		// remove RaceInformation
+		flags &= ~0x4000000;
+		// remove LeaderBoard
+		flags &= ~8;
+		flags &= ~0x10;
+		// remove MilestoneBoard
+		//flags &= ~4;
+		// remove PursuitBoard
+		flags &= ~0x100000;
+		// remove CostToState
+		flags &= ~0x1000;
+		// remove Minimap
+		//flags &= ~0x10000;
+		return flags;
+	}
+
+	void InitFunction() override {
+		FlatOutHUD::NewGameHud::OnReset();
+	}
+	void TickFunction(double delta) override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, &DetermineHudFeaturesHooked);
+		FlatOutHUD::NewGameHud::OnHUDTick();
+		NyaHookLib::Patch<uint8_t>(0x57CFA8, 0xEB); // remove MilestoneBoard
+	}
+	void DeinitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, 0x57CA60);
+		NyaHookLib::Patch<uint8_t>(0x57CFA8, 0x74);
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		return (GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms) || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_FO1HUD;

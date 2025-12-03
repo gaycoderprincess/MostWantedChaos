@@ -1,16 +1,5 @@
 #define EFFECT_CATEGORY_TEMP "Race"
 
-uint8_t* GetRaceNumLaps() {
-	auto race = GRaceStatus::fObj;
-	if (!race) return nullptr;
-	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return nullptr;
-	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return nullptr;
-	if (auto index = race->mRaceParms->mIndex) {
-		return &index->mNumLaps;
-	}
-	return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
-}
-
 void SetRaceNumLaps(int lapCount) {
 	auto race = GRaceStatus::fObj;
 	if (!race) return;

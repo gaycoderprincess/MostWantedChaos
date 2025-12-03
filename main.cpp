@@ -39,6 +39,10 @@ bool DisableChaosHUD = false;
 #include "util.h"
 #include "components/achievements.h"
 #include "components/customcamera.h"
+namespace FlatOutHUD {
+	#include "components/fo1hud/common.h"
+	#include "components/fo1hud/ingame.h"
+}
 #include "hooks/fixes.h"
 #include "hooks/noreset.h"
 #include "hooks/gamespeed.h"
@@ -298,6 +302,15 @@ void ChaosModMenu() {
 			QuickValueEditor("Effect_TopDownCamera::fwdOffsetScale", Effect_TopDownCamera::fwdOffsetScale);
 			QuickValueEditor("Effect_TopDownCamera::speedDecay", Effect_TopDownCamera::speedDecay);
 			QuickValueEditor("Effect_TopDownCamera::speedCap", Effect_TopDownCamera::speedCap);
+			QuickValueEditor("FontSize_Condensed12", FlatOutHUD::FontSize_Condensed12);
+			QuickValueEditor("FontOffset_Condensed12", FlatOutHUD::FontOffset_Condensed12);
+			QuickValueEditor("FontOutline_Condensed12", FlatOutHUD::FontOutline_Condensed12);
+			QuickValueEditor("FontSize_Italic24", FlatOutHUD::FontSize_Italic24);
+			QuickValueEditor("FontOffset_Italic24", FlatOutHUD::FontOffset_Italic24);
+			QuickValueEditor("FontOutline_Italic24", FlatOutHUD::FontOutline_Italic24);
+			QuickValueEditor("FontSize_Regular18", FlatOutHUD::FontSize_Regular18);
+			QuickValueEditor("FontOffset_Regular18", FlatOutHUD::FontOffset_Regular18);
+			QuickValueEditor("FontOutline_Regular18", FlatOutHUD::FontOutline_Regular18);
 			ChloeMenuLib::EndMenu();
 		}
 
@@ -403,6 +416,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			ChloeMenuLib::RegisterMenu("Cwoee Chaos", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
+			WriteLog(std::format("Initialized {} effects", ChaosEffect::aEffects.size()));
 
 			NyaHooks::PlaceD3DHooks(true);
 			NyaHooks::aEndSceneFuncs.push_back(D3DHookMain);

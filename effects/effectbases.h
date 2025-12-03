@@ -175,3 +175,15 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 };
+
+class EffectBase_InRaceConditional : public ChaosEffect {
+public:
+	EffectBase_InRaceConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) In Race Conditional";
+	}
+
+	bool IsAvailable() override {
+		return GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
