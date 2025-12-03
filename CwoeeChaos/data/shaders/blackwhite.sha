@@ -1,0 +1,18 @@
+uniform sampler2D pTexture : register(s0);
+float4 reg_timer : register(c1);
+
+struct PS_INPUT {
+	float4 Color : COLOR;
+	float2 UV : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : COLOR {
+	float4 outColor = tex2D(pTexture, input.UV) * input.Color;
+	float avg = (outColor.x + outColor.y + outColor.z) / 3.0;
+	if (avg < 0.5) avg = 0.0;
+	if (avg > 0.5) avg = 1.0;
+	outColor.x = avg;
+	outColor.y = avg;
+	outColor.z = avg;
+	return outColor;
+}

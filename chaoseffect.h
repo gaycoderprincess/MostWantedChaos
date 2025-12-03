@@ -37,7 +37,8 @@ public:
 	virtual bool IsConditionallyAvailable() { return false; };
 	virtual bool IsRehideable() { return false; };
 	virtual bool AbortOnConditionFailed() { return false; };
-	virtual bool RunInMenus() { return false; }
+	virtual bool RunInMenus() { return false; } // frontend specifically
+	virtual bool RunWhenBlocked() { return false; } // pause menu, race end screen, etc.
 	virtual bool InfiniteTimer() { return false; }
 	virtual bool ShouldAbort() { return false; }
 	virtual bool IgnoreHUDState() { return false; }

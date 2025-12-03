@@ -44,6 +44,8 @@ public:
 		if (bInvertTimerAtEnd && EffectInstance->fTimer < 1) bShaderTimerInvert = true;
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 	bool ShouldAbort() override { return !pShader; }
 };
 
@@ -55,8 +57,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "mirror";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderMirror;
 
 class Effect_ShaderPixel : public EffectBase_ScreenShader {
@@ -67,8 +67,6 @@ public:
 		sFileName = "pixelate";
 		//bEasedTimer = false;
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderPixel;
 
 class Effect_ShaderDisco : public EffectBase_ScreenShader {
@@ -84,7 +82,6 @@ public:
 		bShaderDisco = true;
 		EffectBase_ScreenShader::TickFunction(delta);
 	}
-	bool RunInMenus() override { return true; }
 } E_ShaderDisco;
 
 class Effect_ShaderSquared : public EffectBase_ScreenShader {
@@ -94,8 +91,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "squared";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderSquared;
 
 class Effect_ShaderSqrt : public EffectBase_ScreenShader {
@@ -105,8 +100,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "sqrt";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderSqrt;
 
 class Effect_ShaderInverted : public EffectBase_ScreenShader {
@@ -116,8 +109,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "invert";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderInverted;
 
 class Effect_ShaderBlue : public EffectBase_ScreenShader {
@@ -128,8 +119,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "blue";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderBlue;
 
 class Effect_ShaderWide : public EffectBase_ScreenShader {
@@ -139,8 +128,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "wide";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderWide;
 
 class Effect_ShaderTikTok : public EffectBase_ScreenShader {
@@ -151,8 +138,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "portrait";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderTikTok;
 
 class Effect_ShaderZoomIn : public EffectBase_ScreenShader {
@@ -162,8 +147,6 @@ public:
 		fTimerLength = 30;
 		sFileName = "zoom";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderZoomIn;
 
 /*class Effect_ShaderRed : public EffectBase_ScreenShader {
@@ -174,8 +157,6 @@ public:
 		fTimerLength = 60;
 		sFileName = "red";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderRed;*/
 
 class Effect_ShaderUpsideDown : public EffectBase_ScreenShader {
@@ -186,6 +167,24 @@ public:
 		fTimerLength = 45;
 		sFileName = "flip";
 	}
-
-	bool RunInMenus() override { return true; }
 } E_ShaderUpsideDown;
+
+class Effect_ShaderGray : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderGray() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
+		sName = "Grayscale";
+		sFriendlyName = "Grayscale Screen Overlay";
+		fTimerLength = 60;
+		sFileName = "gray";
+	}
+} E_ShaderGray;
+
+class Effect_ShaderBW : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderBW() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
+		sName = "Black & White";
+		sFriendlyName = "Black & White Screen Overlay";
+		fTimerLength = 30;
+		sFileName = "blackwhite";
+	}
+} E_ShaderBW;

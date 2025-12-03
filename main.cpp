@@ -104,16 +104,18 @@ void CameraHook(CameraMover* pMover) {
 	}
 }
 
-void ProcessChaosEffects(double fDeltaTime, bool inMenu) {
+void ProcessChaosEffects(double fDeltaTime, bool inMenu, bool blockedByOtherMeans) {
 	// run effects first, then draw the chaos HUD over top
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
 		effect.OnTick(fDeltaTime, inMenu);
 	}
 
 	float y = 0;
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
 		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
 		effect.Draw(y, inMenu);
 		y += 1 - (inMenu ? 1 : effect.GetOffscreenPercentage());
@@ -141,10 +143,12 @@ void ChaosLoop() {
 		effect->fLastTriggerTime += gTimer.fDeltaTime;
 	}
 
-	bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-	if (IsChaosBlocked() && !inMenu) return;
-	ProcessChaosEffects(gTimer.fDeltaTime, inMenu);
-	if (inMenu) return;
+	if (IsChaosBlocked()) {
+		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+		ProcessChaosEffects(gTimer.fDeltaTime, inMenu, !inMenu);
+		return;
+	}
+	ProcessChaosEffects(gTimer.fDeltaTime, false, false);
 
 	static ChaosEffect TempEffect("DUMMY");
 	TempEffect.DebugNeverPick = true;

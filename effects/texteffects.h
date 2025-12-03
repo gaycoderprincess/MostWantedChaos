@@ -93,6 +93,8 @@ public:
 	}
 	void DeinitFunction() override {
 		TextHook::pInterspersedText = nullptr;
+		TextHook::pInterspersedTextUpper = nullptr;
+		TextHook::pInterspersedTextProper = nullptr;
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
