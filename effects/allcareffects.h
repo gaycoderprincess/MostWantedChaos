@@ -465,6 +465,7 @@ public:
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_WideCars;
 
 class Effect_GroovyCars : public ChaosEffect {
@@ -518,6 +519,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_GroovyCars;
 
 class Effect_TeleportAllCars : public EffectBase_ActiveCarsConditional {
