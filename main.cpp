@@ -129,7 +129,7 @@ void ProcessChaosEffects(double fDeltaTime, bool inMenu, bool blockedByOtherMean
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
 		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
-		effect.OnTick(fDeltaTime, inMenu);
+		effect.OnTick(fDeltaTime, inMenu || blockedByOtherMeans);
 	}
 
 	float y = 0;
@@ -137,7 +137,7 @@ void ProcessChaosEffects(double fDeltaTime, bool inMenu, bool blockedByOtherMean
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
 		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
 		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
-		effect.Draw(y, inMenu);
+		effect.Draw(y, inMenu || blockedByOtherMeans);
 		y += 1 - (inMenu ? 0 : effect.GetOffscreenPercentage());
 	}
 
@@ -425,8 +425,10 @@ void ChaosModMenu() {
 			//QuickValueEditor("Effect_Pep::wheelOffY", gCustomCar_Pepper.vWheelMoveOffset.y);
 			QuickValueEditor("detachThreshold", CustomCarPart::detachThreshold);
 			QuickValueEditor("unlatchThreshold", CustomCarPart::unlatchThreshold);
-			QuickValueEditor("latchMoveFactor", CustomCarPart::latchMoveFactor);
-			QuickValueEditor("latchRotateFactor", CustomCarPart::latchRotateFactor);
+			QuickValueEditor("latchMoveFactor[0]", CustomCarPart::latchMoveFactor[0]);
+			QuickValueEditor("latchMoveFactor[1]", CustomCarPart::latchMoveFactor[1]);
+			QuickValueEditor("latchMoveFactor[2]", CustomCarPart::latchMoveFactor[2]);
+			QuickValueEditor("latchInitialDetachFactor", CustomCarPart::latchInitialDetachFactor);
 			QuickValueEditor("latchBounceFactor", CustomCarPart::latchBounceFactor);
 			QuickValueEditor("latchDecayFactor", CustomCarPart::latchDecayFactor);
 			auto v = CustomCarPart::lastPassedCol;

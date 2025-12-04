@@ -19,6 +19,7 @@ public:
 	NyaVec3 DetachedTurnVelocity = {0,0,0};
 	NyaVec3 UnlatchedRotation = {0,0,0};
 	NyaVec3 UnlatchedVelocity = {0,0,0};
+	NyaVec3 InitialDetachTurnVelocity = {0,0,0};
 
 	CustomCarPart(const std::string& name, bool detachable, UMath::Vector3 restPosition, bool hinged = false, UMath::Vector3 hingePosition = {0,0,0}, UMath::Vector3 hingeMin = {0,0,0}, UMath::Vector3 hingeMax = {0,0,0}, const std::string& parentName = "") : sModelName(name), bPartDetachable(detachable), RestPosition(restPosition), bPartHinged(hinged), HingePosition(hingePosition), HingeMin(hingeMin), HingeMax(hingeMax), sParentName(parentName) {
 		auto temp = RestPosition;
@@ -52,6 +53,7 @@ public:
 		DetachedTurnVelocity = {0,0,0};
 		UnlatchedRotation = {0,0,0};
 		UnlatchedVelocity = {0,0,0};
+		InitialDetachTurnVelocity = {0,0,0};
 	}
 
 	void Load() {
@@ -101,11 +103,14 @@ public:
 		return false;
 	}
 
-	static inline float latchMoveFactor = 3.0;
-	static inline float latchRotateFactor = 15;
+	static inline float latchMoveFactor[3] = {3.0, 3.0, 1.0};
+	static inline float latchInitialDetachFactor = 0.01;
 	static inline float latchBounceFactor = 0.5;
 	static inline float latchDecayFactor = 3.0;
-	virtual void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocityChange, const NyaVec3& angularVelocity, double delta) {
+	virtual void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocityChange, double delta) {
+		InitialDetachTurnVelocity.x = playerVelocityChange.z * latchInitialDetachFactor;
+		InitialDetachTurnVelocity.y = playerVelocityChange.y * latchInitialDetachFactor;
+		InitialDetachTurnVelocity.z = playerVelocityChange.x * latchInitialDetachFactor;
 		if (bIsDetached && DetachedTransform.p.y > -500) {
 			DetachedVelocity.y -= 9.8 * delta;
 			DetachedTurnVelocity *= 1.0 - (latchDecayFactor * delta);
@@ -113,14 +118,16 @@ public:
 			DetachedTransform.p += DetachedVelocity * delta;
 		}
 		if (!bIsDetached && bIsUnlatched) {
-			UnlatchedVelocity.x += playerVelocityChange.z * latchMoveFactor * delta;
-			UnlatchedVelocity.y += playerVelocityChange.y * latchMoveFactor * delta;
-			UnlatchedVelocity.z += playerVelocityChange.x * latchMoveFactor * delta;
-			UnlatchedVelocity.z += angularVelocity.y * latchRotateFactor * delta;
+			UnlatchedVelocity.x += playerVelocityChange.z * latchMoveFactor[0] * delta;
+			UnlatchedVelocity.y += playerVelocityChange.y * latchMoveFactor[1] * delta;
+			UnlatchedVelocity.z += playerVelocityChange.x * latchMoveFactor[2] * delta;
 			UnlatchedVelocity *= 1.0 - (latchDecayFactor * delta);
 
 			UnlatchedRotation += UnlatchedVelocity * delta;
-			if (CheckHingeBroken()) Detach(absPlayerVelocity);
+			if (CheckHingeBroken()) {
+				Detach(absPlayerVelocity);
+				DetachedTurnVelocity = UnlatchedVelocity;
+			}
 			else {
 				if (UnlatchedRotation.x > HingeMax.x) { UnlatchedRotation.x = HingeMax.x; UnlatchedVelocity.x *= -latchBounceFactor; }
 				if (UnlatchedRotation.y > HingeMax.y) { UnlatchedRotation.y = HingeMax.y; UnlatchedVelocity.y *= -latchBounceFactor; }
@@ -143,6 +150,7 @@ public:
 		bIsDetached = true;
 		DetachedTransform = LastRawTransform;
 		DetachedVelocity = playerVelocity;
+		DetachedTurnVelocity = InitialDetachTurnVelocity;
 	}
 
 	static inline float detachThreshold = 16.0;
@@ -197,8 +205,8 @@ public:
 		}
 	}
 
-	void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocityChange, const NyaVec3& angularVelocity, double delta) override {
-		CustomCarPart::Update(playerCar, absPlayerVelocity, playerVelocityChange, angularVelocity, delta);
+	void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocityChange, double delta) override {
+		CustomCarPart::Update(playerCar, absPlayerVelocity, playerVelocityChange, delta);
 
 		auto sus = playerCar->mCOMObject->Find<ISuspension>();
 		fRotation += sus->GetWheelAngularVelocity(nWheelID) * delta;
@@ -288,6 +296,15 @@ public:
 			}
 		}
 
+		for (auto& part : aParts) {
+			if (auto parent = GetParentPart(part)) {
+				part->UpdateChild(parent);
+			}
+			else {
+				part->Update(parentCar, currentVelocity, (GetRelativeCarOffset(parentCar, currentVelocity) - GetRelativeCarOffset(parentCar, vLastVelocity)) / delta, delta);
+			}
+		}
+
 		if (vLastVelocity.length() > currentVelocity.length() && currentVelocity.length() > 0.1) {
 			auto colVelocity = (vLastVelocity - currentVelocity);
 			colVelocity = GetRelativeCarOffset(parentCar, colVelocity);
@@ -295,15 +312,6 @@ public:
 			colVelocity.z *= -1;
 			for (auto& part : aParts) {
 				part->OnCollision((UMath::Vector3)colVelocity, currentVelocity, colVelocity.length());
-			}
-		}
-
-		for (auto& part : aParts) {
-			if (auto parent = GetParentPart(part)) {
-				part->UpdateChild(parent);
-			}
-			else {
-				part->Update(parentCar, currentVelocity, (GetRelativeCarOffset(parentCar, currentVelocity) - GetRelativeCarOffset(parentCar, vLastVelocity)) / delta, GetRelativeCarOffset(parentCar, *veh->GetAngularVelocity()), delta);
 			}
 		}
 		vLastVelocity = currentVelocity;
