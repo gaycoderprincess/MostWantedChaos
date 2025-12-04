@@ -16,6 +16,7 @@ public:
 	UMath::Matrix4 LastRawTransform = UMath::Matrix4::kIdentity;
 	UMath::Matrix4 DetachedTransform = UMath::Matrix4::kIdentity;
 	NyaVec3 DetachedVelocity = {0,0,0};
+	NyaVec3 DetachedTurnVelocity = {0,0,0};
 	NyaVec3 UnlatchedRotation = {0,0,0};
 	NyaVec3 UnlatchedVelocity = {0,0,0};
 
@@ -48,6 +49,7 @@ public:
 		LastRawTransform = UMath::Matrix4::kIdentity;
 		DetachedTransform = UMath::Matrix4::kIdentity;
 		DetachedVelocity = {0,0,0};
+		DetachedTurnVelocity = {0,0,0};
 		UnlatchedRotation = {0,0,0};
 		UnlatchedVelocity = {0,0,0};
 	}
@@ -99,19 +101,23 @@ public:
 		return false;
 	}
 
-	static inline float latchMoveFactor = 1;
+	static inline float latchMoveFactor = 3.0;
 	static inline float latchRotateFactor = 15;
 	static inline float latchBounceFactor = 0.5;
-	virtual void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocity, const NyaVec3& angularVelocity, double delta) {
+	static inline float latchDecayFactor = 3.0;
+	virtual void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocityChange, const NyaVec3& angularVelocity, double delta) {
 		if (bIsDetached && DetachedTransform.p.y > -500) {
 			DetachedVelocity.y -= 9.8 * delta;
+			DetachedTurnVelocity *= 1.0 - (latchDecayFactor * delta);
+			DetachedTransform.Rotate(DetachedTurnVelocity * delta);
 			DetachedTransform.p += DetachedVelocity * delta;
 		}
-		if (bIsUnlatched) {
-			UnlatchedVelocity.x += playerVelocity.z * latchMoveFactor * delta;
-			UnlatchedVelocity.y += playerVelocity.y * latchMoveFactor * delta;
-			UnlatchedVelocity.z += playerVelocity.x * latchMoveFactor * delta;
+		if (!bIsDetached && bIsUnlatched) {
+			UnlatchedVelocity.x += playerVelocityChange.z * latchMoveFactor * delta;
+			UnlatchedVelocity.y += playerVelocityChange.y * latchMoveFactor * delta;
+			UnlatchedVelocity.z += playerVelocityChange.x * latchMoveFactor * delta;
 			UnlatchedVelocity.z += angularVelocity.y * latchRotateFactor * delta;
+			UnlatchedVelocity *= 1.0 - (latchDecayFactor * delta);
 
 			UnlatchedRotation += UnlatchedVelocity * delta;
 			if (CheckHingeBroken()) Detach(absPlayerVelocity);
@@ -161,9 +167,9 @@ class CustomCarTire : public CustomCarPart {
 public:
 	int nWheelID = 0;
 	float fRotation = 0;
-	UMath::Vector3 vMoveOffset = {0,0,0};
+	float fMoveOffset = 0;
 
-	CustomCarTire(int wheelID, const std::string& name, UMath::Vector3 restPosition, UMath::Vector3 moveOffset) : CustomCarPart(name, false, restPosition), nWheelID(wheelID), vMoveOffset(moveOffset) { }
+	CustomCarTire(int wheelID, const std::string& name, UMath::Vector3 restPosition, float moveOffset) : CustomCarPart(name, false, restPosition), nWheelID(wheelID), fMoveOffset(moveOffset) { }
 
 	void Reset() override {
 		fRotation = 0;
@@ -176,17 +182,23 @@ public:
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(-fRotation, 0, playerCar->mCOMObject->Find<ISuspension>()->GetWheelSteer(nWheelID) * 4));
 			rotation.p = RestPosition;
+
+			UMath::Vector3 wheelPos;
+			playerCar->mCOMObject->Find<ISuspension>()->GetWheelCenterPos(&wheelPos, nWheelID);
+			playerCar->mCOMObject->Find<IRigidBody>()->ConvertWorldToLocal(&wheelPos, true);
+
 			//rotation.p.y = -sus->GetWheelLocalPos(i)->y;
 			//rotation.p += vMoveOffset;
-			rotation.p.y = vMoveOffset.y;
+			//rotation.p.y = vMoveOffset.y + wheelPos.y;
+			rotation.p.y = fMoveOffset + wheelPos.y;
 			auto partMat = (UMath::Matrix4)(carMatrix * rotation);
 			LastRawTransform = partMat;
 			model->RenderAt(WorldToRenderMatrix(partMat));
 		}
 	}
 
-	void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocity, const NyaVec3& angularVelocity, double delta) override {
-		CustomCarPart::Update(playerCar, absPlayerVelocity, playerVelocity, angularVelocity, delta);
+	void Update(IVehicle* playerCar, const NyaVec3& absPlayerVelocity, const NyaVec3& playerVelocityChange, const NyaVec3& angularVelocity, double delta) override {
+		CustomCarPart::Update(playerCar, absPlayerVelocity, playerVelocityChange, angularVelocity, delta);
 
 		auto sus = playerCar->mCOMObject->Find<ISuspension>();
 		fRotation += sus->GetWheelAngularVelocity(nWheelID) * delta;
@@ -202,6 +214,7 @@ public:
 	UMath::Vector3 vMoveOffset = {0,0.01,0};
 
 	UMath::Vector3 vLastVelocity = {0,0,0};
+	UMath::Vector3 vLastRelativeVelocity = {0,0,0};
 
 	std::string MakeRelativeModelPath(std::string modelPath) {
 		return std::format("{}/{}.fbx", sBasePath, modelPath);
@@ -284,16 +297,16 @@ public:
 				part->OnCollision((UMath::Vector3)colVelocity, currentVelocity, colVelocity.length());
 			}
 		}
-		vLastVelocity = currentVelocity;
 
 		for (auto& part : aParts) {
 			if (auto parent = GetParentPart(part)) {
 				part->UpdateChild(parent);
 			}
 			else {
-				part->Update(parentCar, currentVelocity, GetRelativeCarOffset(parentCar, currentVelocity), GetRelativeCarOffset(parentCar, *veh->GetAngularVelocity()), delta);
+				part->Update(parentCar, currentVelocity, (GetRelativeCarOffset(parentCar, currentVelocity) - GetRelativeCarOffset(parentCar, vLastVelocity)) / delta, GetRelativeCarOffset(parentCar, *veh->GetAngularVelocity()), delta);
 			}
 		}
+		vLastVelocity = currentVelocity;
 	}
 
 	void Reset() {
@@ -330,8 +343,8 @@ auto gCustomCar_Pepper = CustomCar("pep", {180,0,0}, {0,0.01,0}, {
 	//CustomCarPart("steering_wheel_lo", false, {}), // todo!
 	new CustomCarPart("susp_rear", false, {-0.000909, -1.07368, 0.13446}),
 	new CustomCarPart("trunk", true, {0, -1.6189, 0.583304}, true, {0, -1.49874, 0.786098}, {-45,0,0}, {0,0,0}),
-	new CustomCarTire(0, "tire_l", {-0.662652, 1.1281, 0.154147}, {0,-0.1,0}),
-	new CustomCarTire(1, "tire_r", {0.662652, 1.1281, 0.154147}, {0,-0.1,0}),
-	new CustomCarTire(2, "tire_l", {-0.663914, -1.10693, 0.142167}, {0,-0.1,0}),
-	new CustomCarTire(3, "tire_r", {0.663914, -1.10693, 0.142167}, {0,-0.1,0}),
+	new CustomCarTire(0, "tire_l", {-0.662652, 1.1281, 0.154147}, 0.37),
+	new CustomCarTire(1, "tire_r", {0.662652, 1.1281, 0.154147}, 0.37),
+	new CustomCarTire(2, "tire_l", {-0.663914, -1.10693, 0.142167}, 0.37),
+	new CustomCarTire(3, "tire_r", {0.663914, -1.10693, 0.142167}, 0.37),
 });

@@ -25,6 +25,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_TransRights;
 
 class Effect_ReverseText : public ChaosEffect {
@@ -42,6 +43,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_ReverseText;
 
 class Effect_RandomText : public ChaosEffect {
@@ -60,6 +62,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_RandomText;
 
 class Effect_ShuffleText : public ChaosEffect {
@@ -77,6 +80,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_ShuffleText;
 
 class Effect_InterspersedText : public ChaosEffect {
@@ -98,4 +102,5 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_InterspersedText;

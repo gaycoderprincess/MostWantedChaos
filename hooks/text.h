@@ -120,15 +120,21 @@ namespace TextHook {
 
 	std::string DoIntersperseWord(std::string origWord) {
 		std::string str = pInterspersedText;
-		if (std::all_of(origWord.begin(), origWord.end(), [](unsigned char c){ return std::isupper(c); })) {
+		std::string ending;
+		while (origWord.ends_with('.') || origWord.ends_with(',') || origWord.ends_with(':') || origWord.ends_with('\n')) {
+			ending = origWord[origWord.length()-1] + ending;
+			origWord.pop_back();
+		}
+		if (std::all_of(origWord.begin(), origWord.end(), [](unsigned char c){ return std::isdigit(c); })) {
+			str = rand() % 100 > 50 ? pInterspersedTextUpper : pInterspersedText;
+		}
+		else if (std::all_of(origWord.begin(), origWord.end(), [](unsigned char c){ return std::isupper(c); })) {
 			str = pInterspersedTextUpper;
 		}
 		else if (std::isupper(origWord[0])) {
 			str = pInterspersedTextProper;
 		}
-		if (origWord.ends_with('.')) str += ".";
-		if (origWord.ends_with(',')) str += ",";
-		if (origWord.ends_with(':')) str += ":";
+		str += ending;
 		return str;
 	}
 

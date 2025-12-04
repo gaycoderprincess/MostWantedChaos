@@ -428,6 +428,7 @@ void ChaosModMenu() {
 			QuickValueEditor("latchMoveFactor", CustomCarPart::latchMoveFactor);
 			QuickValueEditor("latchRotateFactor", CustomCarPart::latchRotateFactor);
 			QuickValueEditor("latchBounceFactor", CustomCarPart::latchBounceFactor);
+			QuickValueEditor("latchDecayFactor", CustomCarPart::latchDecayFactor);
 			auto v = CustomCarPart::lastPassedCol;
 			DrawMenuOption(std::format("lastPassedCol: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			v.Normalize();
