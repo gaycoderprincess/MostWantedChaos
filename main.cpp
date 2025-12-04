@@ -49,6 +49,7 @@ bool DisableChaosHUD = false;
 #include "components/customcamera.h"
 #include "components/render3d.h"
 #include "components/render3d_objects.h"
+#include "components/customcar.h"
 namespace FlatOutHUD {
 	#include "components/fo1hud/common.h"
 	#include "components/fo1hud/ingame.h"
@@ -418,13 +419,15 @@ void ChaosModMenu() {
 			QuickValueEditor("Effect_Pep::offX", gCustomCar_Pepper.vMoveOffset.x);
 			QuickValueEditor("Effect_Pep::offY", gCustomCar_Pepper.vMoveOffset.y);
 			QuickValueEditor("Effect_Pep::offZ", gCustomCar_Pepper.vMoveOffset.z);
-			QuickValueEditor("Effect_Pep::wheelOffY", gCustomCar_Pepper.vWheelMoveOffset.y);
+			//QuickValueEditor("Effect_Pep::wheelOffY", gCustomCar_Pepper.vWheelMoveOffset.y);
 			QuickValueEditor("detachThreshold", CustomCarPart::detachThreshold);
 			QuickValueEditor("unlatchThreshold", CustomCarPart::unlatchThreshold);
 			QuickValueEditor("latchMoveFactor", CustomCarPart::latchMoveFactor);
 			QuickValueEditor("latchRotateFactor", CustomCarPart::latchRotateFactor);
 			QuickValueEditor("latchBounceFactor", CustomCarPart::latchBounceFactor);
-			auto v = CustomCarPart::lastPassedColNorm;
+			auto v = CustomCarPart::lastPassedCol;
+			DrawMenuOption(std::format("lastPassedCol: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
+			v.Normalize();
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			ChloeMenuLib::EndMenu();
