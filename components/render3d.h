@@ -8,10 +8,15 @@ namespace Render3D {
 		float vUV[2];
 	};
 
-	struct tModel {
-		IDirect3DIndexBuffer9* pIndexBuffer;
-		IDirect3DVertexBuffer9* pVertexBuffer;
+	struct tTextureInfo {
+		std::string sFile;
 		IDirect3DTexture9* pTexture;
+	};
+
+	struct tModel {
+		IDirect3DIndexBuffer9* pIndexBuffer = nullptr;
+		IDirect3DVertexBuffer9* pVertexBuffer = nullptr;
+		IDirect3DTexture9* pTexture = nullptr;
 		std::string sTextureName;
 		uint32_t nVertexCount;
 		uint32_t nFaceCount;
@@ -65,7 +70,7 @@ namespace Render3D {
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -96,6 +101,7 @@ namespace Render3D {
 		}
 	};
 	std::vector<tModel*> aAllModels;
+	std::vector<tTextureInfo> aAllTextures;
 
 	std::string GetMaterialFilename(aiMaterial* material) {
 		aiString tmp;
@@ -175,12 +181,21 @@ namespace Render3D {
 		model->pIndexBuffer->Unlock();
 
 		auto textureName = GetMaterialFilename(material);
-		if (auto tex = LoadTexture(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
-			model->pTexture = tex;
-			model->sTextureName = textureName;
+		model->sTextureName = textureName;
+
+		for (auto& texture : aAllTextures) {
+			if (texture.sFile == textureName) {
+				model->pTexture = texture.pTexture;
+				break;
+			}
 		}
-		else {
-			MessageBoxA(nullptr, std::format("Failed to load texture {}", textureName).c_str(), "nya?!~", MB_ICONERROR);
+		if (!model->pTexture) {
+			if (auto tex = LoadTexture(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
+				model->pTexture = tex;
+				aAllTextures.push_back({textureName, model->pTexture});
+			} else {
+				MessageBoxA(nullptr, std::format("Failed to load texture {}", textureName).c_str(), "nya?!~", MB_ICONERROR);
+			}
 		}
 
 		aAllModels.push_back(model);

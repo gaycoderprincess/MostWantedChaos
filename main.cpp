@@ -335,6 +335,10 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Wheel Center Position: {:.2f} {:.2f} {:.2f}", wheelPos.x, wheelPos.y, wheelPos.z));
 				DrawMenuOption(std::format("Wheel Velocity: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetWheelAngularVelocity(0)));
 				DrawMenuOption(std::format("Wheel Steer: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetWheelSteer(0)));
+				auto relativeVelocity = GetRelativeCarOffset(GetLocalPlayerVehicle(), *GetLocalPlayerInterface<IRigidBody>()->GetLinearVelocity());
+				DrawMenuOption(std::format("Relative Velocity: {:.2f} {:.2f} {:.2f}", relativeVelocity.x, relativeVelocity.y, relativeVelocity.z));
+				relativeVelocity = GetRelativeCarOffset(GetLocalPlayerVehicle(), *GetLocalPlayerInterface<IRigidBody>()->GetAngularVelocity());
+				DrawMenuOption(std::format("Relative Turn Velocity: {:.2f} {:.2f} {:.2f}", relativeVelocity.x, relativeVelocity.y, relativeVelocity.z));
 				DrawMenuOption(std::format("Suspension Height 1: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetRideHeight(0)));
 				DrawMenuOption(std::format("Suspension Height 2: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetRideHeight(1)));
 				DrawMenuOption(std::format("Suspension Render Motion: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetRenderMotion()));
@@ -415,6 +419,14 @@ void ChaosModMenu() {
 			QuickValueEditor("Effect_Pep::offY", Effect_Pep::offY);
 			QuickValueEditor("Effect_Pep::offZ", Effect_Pep::offZ);
 			QuickValueEditor("Effect_Pep::wheelOffY", Effect_Pep::wheelOffY);
+			QuickValueEditor("detachThreshold", tCustomCarPart::detachThreshold);
+			QuickValueEditor("unlatchThreshold", tCustomCarPart::unlatchThreshold);
+			QuickValueEditor("doorTest", tCustomCarPart::doorTest);
+			QuickValueEditor("latchMoveFactor", tCustomCarPart::latchMoveFactor);
+			QuickValueEditor("latchRotateFactor", tCustomCarPart::latchRotateFactor);
+			QuickValueEditor("latchBounceFactor", tCustomCarPart::latchBounceFactor);
+			auto v = tCustomCarPart::lastPassedColNorm;
+			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			ChloeMenuLib::EndMenu();
 		}
@@ -538,6 +550,8 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::PlaceLateInitHook();
 			NyaHooks::PlaceRenderHook();
 			NyaHooks::aRenderFuncs.push_back(Render3DLoop);
+
+			*(bool*)0x926064 = 1;
 		} break;
 		default:
 			break;

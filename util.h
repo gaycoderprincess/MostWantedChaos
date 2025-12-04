@@ -483,3 +483,9 @@ uint8_t* GetRaceNumLaps() {
 	}
 	return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
 }
+
+NyaVec3 GetRelativeCarOffset(IVehicle* veh, NyaVec3 v) {
+	UMath::Matrix4 mat;
+	GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&mat);
+	return mat.Invert() * v;
+}
