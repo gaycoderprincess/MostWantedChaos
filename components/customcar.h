@@ -66,11 +66,13 @@ public:
 		Load();
 
 		for (auto& model : aModels) {
+			int effect = EEFFECT_WORLD;
+			//if (model->sTextureName == "skin1.dds") effect = EEFFECT_CAR;
 			if (windows != (model->sTextureName == "windows.dds")) continue;
 
 			if (bIsDetached) {
 				if (DetachedTransform.p.y > -500) {
-					model->RenderAt(WorldToRenderMatrix(DetachedTransform), model->sTextureName == "windows.dds");
+					model->RenderAt(WorldToRenderMatrix(DetachedTransform), model->sTextureName == "windows.dds", effect);
 				}
 			}
 			else {
@@ -87,7 +89,7 @@ public:
 				}
 				auto partMat = (UMath::Matrix4)(carMatrix * offset);
 				LastRawTransform = partMat;
-				model->RenderAt(WorldToRenderMatrix(partMat), model->sTextureName == "windows.dds");
+				model->RenderAt(WorldToRenderMatrix(partMat), model->sTextureName == "windows.dds", effect);
 			}
 		}
 	}

@@ -432,6 +432,67 @@ void ChaosModMenu() {
 			v.Normalize();
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
+			auto effect = eEffects[EEFFECT_CAR];
+			static D3DXHANDLE handles[] = {
+				effect->hD3DXEffect->GetParameterByName(0, "RVMSkyBrightness"),
+				effect->hD3DXEffect->GetParameterByName(0, "RVMWorldBrightness"),
+				effect->hD3DXEffect->GetParameterByName(0, "ShadowColour"),
+				//effect->hD3DXEffect->GetParameterByName(0, "SpecularPower"),
+				//effect->hD3DXEffect->GetParameterByName(0, "EnvmapPower"),
+				//effect->hD3DXEffect->GetParameterByName(0, "MetallicScale"),
+				//effect->hD3DXEffect->GetParameterByName(0, "SpecularHotSpot"),
+				//effect->hD3DXEffect->GetParameterByName(0, "Desaturation"),
+				//effect->hD3DXEffect->GetParameterByName(0, "CombinedBrightness"),
+				//effect->hD3DXEffect->GetParameterByName(0, "FocalRange"),
+				//effect->hD3DXEffect->GetParameterByName(0, "DiffuseMin"),
+				//effect->hD3DXEffect->GetParameterByName(0, "DiffuseRange"),
+				//effect->hD3DXEffect->GetParameterByName(0, "SpecularMin"),
+				//effect->hD3DXEffect->GetParameterByName(0, "SpecularRange"),
+			};
+			const char* handleNames[] = {
+				"RVMSkyBrightness",
+				"RVMWorldBrightness",
+				"ShadowColour",
+				//"SpecularPower",
+				//"EnvmapPower",
+				//"MetallicScale",
+				//"SpecularHotSpot",
+				//"Desaturation",
+				//"CombinedBrightness",
+				//"FocalRange",
+				//"DiffuseMin",
+				//"DiffuseRange",
+				//"SpecularMin",
+				//"SpecularRange",
+			};
+			int handleId = 0;
+			//std::ofstream file("test.txt");
+			for (auto& handle : handles) {
+				if (handle) {
+					auto name = handleNames[handleId];
+					//file << name;
+					//file << " - ";
+
+					if (handleId >= 2) {
+						D3DXVECTOR4 f;
+						effect->hD3DXEffect->GetVector(handle, &f);
+						QuickValueEditor(name, f[0]);
+						QuickValueEditor(name, f[1]);
+						QuickValueEditor(name, f[2]);
+						QuickValueEditor(name, f[3]);
+
+						//file << std::format("{{{}, {}, {}, {}}}\n", f[0], f[1], f[2], f[3]);
+					}
+					else {
+						float f;
+						effect->hD3DXEffect->GetFloat(handle, &f);
+						QuickValueEditor(name, f);
+
+						//file << std::format("{}\n", f);
+					}
+				}
+				handleId++;
+			}
 			//QuickValueEditor("fWorldTopLeft[0]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[0]);
 			//QuickValueEditor("fWorldTopLeft[1]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[1]);
 			//QuickValueEditor("fWorldBottomRight[0]", FlatOutHUD::CHUD_Minimap::fWorldBottomRight[0]);

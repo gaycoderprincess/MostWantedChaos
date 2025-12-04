@@ -6,6 +6,7 @@ namespace Render3D {
 		float vNormals[3];
 		uint32_t Color;
 		float vUV[2];
+		float vTangents[3];
 	};
 
 	struct tTextureInfo {
@@ -22,7 +23,7 @@ namespace Render3D {
 		uint32_t nFaceCount;
 		bool bInvalidated = false;
 
-		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false) const {
+		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD) const {
 			if (bInvalidated) return;
 
 #ifdef RENDER3D_NOEFFECT
@@ -35,7 +36,7 @@ namespace Render3D {
 			g_pd3dDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&proj);
 #else
 
-			eEffectStaticState::pCurrentEffect = eEffects[EEFFECT_WORLD];
+			eEffectStaticState::pCurrentEffect = eEffects[effectId];
 			auto effect = eEffectStaticState::pCurrentEffect;
 
 			effect->Start();
@@ -67,6 +68,51 @@ namespace Render3D {
 			};
 			if (BLENDSTATE) effect->hD3DXEffect->SetIntArray(BLENDSTATE, blendStates, 5);
 			if (BLENDSTATE2) effect->hD3DXEffect->SetIntArray(BLENDSTATE2, blendStates, 5);
+
+			// desperate attempts to make stuff not carry over from the last drawn car (which is almost always traffic)
+			// none of this worked
+			/*if (effectId == EEFFECT_CAR) {
+				static D3DXHANDLE SpecularPower = effect->hD3DXEffect->GetParameterByName(0, "SpecularPower");
+				if (SpecularPower) {
+					effect->hD3DXEffect->SetFloat(SpecularPower, 2.5);
+				}
+				static D3DXHANDLE EnvmapPower = effect->hD3DXEffect->GetParameterByName(0, "EnvmapPower");
+				if (EnvmapPower) {
+					effect->hD3DXEffect->SetFloat(EnvmapPower, 1.0);
+				}
+				static D3DXHANDLE SpecularHotSpot = effect->hD3DXEffect->GetParameterByName(0, "SpecularHotSpot");
+				if (SpecularHotSpot) {
+					effect->hD3DXEffect->SetFloat(SpecularHotSpot, 1.0);
+				}
+				static D3DXHANDLE Desaturation = effect->hD3DXEffect->GetParameterByName(0, "Desaturation");
+				if (Desaturation) {
+					effect->hD3DXEffect->SetFloat(Desaturation, 0.0);
+				}
+				static D3DXHANDLE DiffuseMin = effect->hD3DXEffect->GetParameterByName(0, "DiffuseMin");
+				if (DiffuseMin) {
+					D3DXVECTOR4 v = {1,1,1,1};
+					effect->hD3DXEffect->SetVector(DiffuseMin, &v);
+				}
+				static D3DXHANDLE DiffuseRange = effect->hD3DXEffect->GetParameterByName(0, "DiffuseRange");
+				if (DiffuseRange) {
+					D3DXVECTOR4 v = {0,0,0,-0.65};
+					effect->hD3DXEffect->SetVector(DiffuseRange, &v);
+				}
+				static D3DXHANDLE SpecularMin = effect->hD3DXEffect->GetParameterByName(0, "SpecularMin");
+				if (SpecularMin) {
+					D3DXVECTOR4 v = {0,0,0,0};
+					effect->hD3DXEffect->SetVector(SpecularMin, &v);
+				}
+				static D3DXHANDLE SpecularRange = effect->hD3DXEffect->GetParameterByName(0, "SpecularRange");
+				if (SpecularRange) {
+					D3DXVECTOR4 v = {0,0,0,0};
+					effect->hD3DXEffect->SetVector(SpecularRange, &v);
+				}
+				static D3DXHANDLE g_bDoCarShadowMap = effect->hD3DXEffect->GetParameterByName(0, "g_bDoCarShadowMap");
+				if (g_bDoCarShadowMap) {
+					effect->hD3DXEffect->SetInt(g_bDoCarShadowMap, 1);
+				}
+			}*/
 
 			effect->hD3DXEffect->Begin(nullptr, 0);
 			effect->hD3DXEffect->BeginPass(0);
@@ -157,6 +203,7 @@ namespace Render3D {
 		for (int i = 0; i < mesh->mNumVertices; i++) {
 			auto src = &mesh->mVertices[i];
 			auto srcNormal = &mesh->mNormals[i];
+			auto srcTangent = &mesh->mTangents[i];
 			auto srcUV = &mesh->mTextureCoords[0][i];
 			auto dest = &vertices[i];
 			dest->vPos[0] = src->x;
@@ -165,6 +212,9 @@ namespace Render3D {
 			dest->vNormals[0] = srcNormal->x;
 			dest->vNormals[1] = srcNormal->y;
 			dest->vNormals[2] = srcNormal->z;
+			dest->vTangents[0] = srcTangent->x;
+			dest->vTangents[1] = srcTangent->y;
+			dest->vTangents[2] = srcTangent->z;
 			//dest->Color = 0xFF7F7F7F;
 			dest->Color = 0xFF404040;
 			dest->vUV[0] = srcUV->x;
