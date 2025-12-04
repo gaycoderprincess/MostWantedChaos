@@ -1,20 +1,12 @@
 namespace Render3D {
-#define RENDER3D_NOEFFECT
+//#define RENDER3D_NOEFFECT
 
-#ifdef RENDER3D_NOEFFECT
-	struct CwoeeVertexData {
-		float vPos[3];
-		float vNormals[3];
-		float vUV[2];
-	};
-#else
 	struct CwoeeVertexData {
 		float vPos[3];
 		float vNormals[3];
 		uint32_t Color;
-		float vUV[4];
+		float vUV[2];
 	};
-#endif
 
 	struct tModel {
 		IDirect3DIndexBuffer9* pIndexBuffer;
@@ -41,7 +33,14 @@ namespace Render3D {
 			effect->Start();
 
 			g_pd3dDevice->SetVertexDeclaration(effect->VertexDecl);
-			ParticleSetTransform((UMath::Matrix4*)&matrix, EVIEW_PLAYER1);
+
+			// this is kinda nasty but this function will refuse to update the matrix if its pointer is identical to the previous caller's
+			static UMath::Matrix4 matrixTemp[2];
+			static bool matrixTempSecond = false;
+			UMath::Matrix4* pMatrix = matrixTempSecond ? &matrixTemp[1] : &matrixTemp[0];
+			*pMatrix = (UMath::Matrix4)matrix;
+			matrixTempSecond = !matrixTempSecond;
+			ParticleSetTransform(pMatrix, EVIEW_PLAYER1);
 
 			effect->hD3DXEffect->Begin(nullptr, 0);
 			effect->hD3DXEffect->BeginPass(0);
@@ -64,7 +63,7 @@ namespace Render3D {
 
 #ifdef RENDER3D_NOEFFECT
 			g_pd3dDevice->SetTransform(D3DTS_WORLD, (D3DMATRIX*)&matrix);
-			g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
+			g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 #endif
 			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
 			g_pd3dDevice->SetIndices(pIndexBuffer);
@@ -99,7 +98,7 @@ namespace Render3D {
 
 		size_t vertexTotalSize = mesh->mNumVertices * sizeof(CwoeeVertexData);
 		size_t indexTotalSize = mesh->mNumFaces * 3 * 4;
-		auto hr = g_pd3dDevice->CreateVertexBuffer(vertexTotalSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1, D3DPOOL_DEFAULT, &model->pVertexBuffer, nullptr);
+		auto hr = g_pd3dDevice->CreateVertexBuffer(vertexTotalSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1, D3DPOOL_DEFAULT, &model->pVertexBuffer, nullptr);
 		if (hr != D3D_OK) {
 			delete model;
 			return nullptr;
@@ -139,16 +138,9 @@ namespace Render3D {
 			dest->vNormals[0] = srcNormal->x;
 			dest->vNormals[1] = srcNormal->y;
 			dest->vNormals[2] = srcNormal->z;
-#ifndef RENDER3D_NOEFFECT
 			dest->Color = 0xFF7F7F7F;
 			dest->vUV[0] = srcUV->x;
 			dest->vUV[1] = srcUV->y * -1;
-			dest->vUV[2] = 0;
-			dest->vUV[3] = 1;
-#else
-			dest->vUV[0] = srcUV->x;
-			dest->vUV[1] = srcUV->y * -1;
-#endif
 		}
 
 		int indexCount = 0;
