@@ -95,7 +95,8 @@ public:
 	}
 } E_Teddie;
 
-struct tCustomCarPart {
+class CustomCarPart {
+public:
 	std::string sModelName;
 	bool bPartDetachable = false;
 	bool bPartHinged = false;
@@ -115,7 +116,7 @@ struct tCustomCarPart {
 	NyaVec3 UnlatchedRotation = {0,0,0};
 	NyaVec3 UnlatchedVelocity = {0,0,0};
 
-	tCustomCarPart(const std::string& name, bool detachable, UMath::Vector3 restPosition, bool hinged = false, UMath::Vector3 hingePosition = {0,0,0}, UMath::Vector3 hingeMin = {0,0,0}, UMath::Vector3 hingeMax = {0,0,0}, const std::string& parentName = "") : sModelName(name), bPartDetachable(detachable), RestPosition(restPosition), bPartHinged(hinged), HingePosition(hingePosition), HingeMin(hingeMin), HingeMax(hingeMax), sParentName(parentName) {
+	CustomCarPart(const std::string& name, bool detachable, UMath::Vector3 restPosition, bool hinged = false, UMath::Vector3 hingePosition = {0,0,0}, UMath::Vector3 hingeMin = {0,0,0}, UMath::Vector3 hingeMax = {0,0,0}, const std::string& parentName = "") : sModelName(name), bPartDetachable(detachable), RestPosition(restPosition), bPartHinged(hinged), HingePosition(hingePosition), HingeMin(hingeMin), HingeMax(hingeMax), sParentName(parentName) {
 		auto temp = RestPosition;
 		RestPosition.x = temp.x;
 		RestPosition.y = -temp.z;
@@ -148,20 +149,14 @@ struct tCustomCarPart {
 		UnlatchedVelocity = {0,0,0};
 	}
 
-	tCustomCarPart* GetParent(tCustomCarPart* list) {
-		if (sParentName.empty()) return nullptr;
-
-		while (true) {
-			if (list->sModelName == sParentName) return list;
-			list++;
-		}
-	}
-
-	static inline float doorTest = 45;
-	void Render(NyaMat4x4 carMatrix, double delta, bool windows) {
+	void Load() {
 		if (aModels.empty() || aModels[0]->bInvalidated) {
 			aModels = Render3D::CreateModels(sModelName);
 		}
+	}
+
+	void Render(NyaMat4x4 carMatrix, bool windows) {
+		Load();
 
 		for (auto& model : aModels) {
 			if (windows != (model->sTextureName == "windows.dds")) continue;
@@ -190,7 +185,7 @@ struct tCustomCarPart {
 		}
 	}
 
-	static inline float latchBreakageThreshold = 10;
+	static inline float latchBreakageThreshold = 5;
 	bool CheckHingeBroken() {
 		if (HingeMax.x != 0 && UnlatchedRotation.x > HingeMax.x && UnlatchedVelocity.x > latchBreakageThreshold) return true;
 		if (HingeMax.y != 0 && UnlatchedRotation.y > HingeMax.y && UnlatchedVelocity.y > latchBreakageThreshold) return true;
@@ -228,7 +223,7 @@ struct tCustomCarPart {
 		}
 	}
 
-	void UpdateChild(tCustomCarPart* parent) {
+	void UpdateChild(CustomCarPart* parent) {
 		if (parent->bIsDetached && !bIsDetached) Detach(parent->DetachedVelocity);
 		bIsUnlatched = parent->bIsUnlatched;
 		UnlatchedRotation = parent->UnlatchedRotation;
@@ -259,132 +254,67 @@ struct tCustomCarPart {
 	}
 };
 
-class Effect_Pep : public ChaosEffect {
+class CustomCar {
 public:
-	Effect_Pep() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Pep";
-		sFriendlyName = "Change Car To FO1 Pepper";
-		fTimerLength = 120;
-	}
+	std::string sBasePath;
+	std::vector<CustomCarPart*> aParts;
+	std::string sTireLPath;
+	std::string sTireRPath;
 
-	static inline tCustomCarPart aCarParts[] = {
-		tCustomCarPart("pep/body.fbx", false, {0,0,0}),
-		tCustomCarPart("pep/coolingfan_1.fbx", false, {-0.01, 1.56308, 0.415157}),
-		tCustomCarPart("pep/dash_lo.fbx", false, {0,0,0}),
-		tCustomCarPart("pep/door_l.fbx", true, {-0.6605, 0.17438, 0.65242}, true, {-0.692432, 0.68049, 0.338087}, {0,0,0}, {0,0,60}),
-		tCustomCarPart("pep/door_r.fbx", true, {0.6605, 0.17438, 0.65242}, true, {0.692432, 0.68049, 0.338087}, {0,0,-60}, {0,0,0}),
-		tCustomCarPart("pep/driveshaft.fbx", false, {-0.000871, 0.776944, 0.134779}),
-		tCustomCarPart("pep/engine_1.fbx", false, {0.034055, 1.09684, 0.353421}),
-		tCustomCarPart("pep/exhaust_l.fbx", false, {-0.3485, -1.3371, 0.134766}),
-		tCustomCarPart("pep/hood.fbx", true, {0, 1.23717, 0.696299}, true, {0, 0.788376, 0.703607}, {0,0,0}, {80,0,0}),
-		tCustomCarPart("pep/nitro.fbx", false, {0.226277, -1.54027, 0.392936}),
-		tCustomCarPart("pep/part_1_grille.fbx", true, {0, 1.70436, 0.497551}),
-		tCustomCarPart("pep/part_2_mask.fbx", true, {0, 1.68417, 0.450264}),
-		tCustomCarPart("pep/part_3_frontspoiler.fbx", true, {0, 1.57301, 0.154975}),
-		tCustomCarPart("pep/part_4_rearbumper.fbx", true, {0, -1.60887, 0.181289}),
-		tCustomCarPart("pep/part_5_frontbumper.fbx", true, {0, 1.707, 0.246704}), // todo rotate 180 degrees
-		tCustomCarPart("pep/part_6_roofspoiler.fbx", true, {0, -1.11109, 1.13381}),
-		tCustomCarPart("pep/part_7_mirror_l.fbx", true, {-0.754491, 0.454667, 0.742712}, true, {-0.692432, 0.68049, 0.338087}, {0,0,0}, {0,0,60}, "pep/door_l.fbx"),
-		tCustomCarPart("pep/part_8_mirror_r.fbx", true, {0.754491, 0.454667, 0.742712}, true, {0.692432, 0.68049, 0.338087}, {0,0,-60}, {0,0,0}, "pep/door_r.fbx"),
-		tCustomCarPart("pep/part_9_fenderleft.fbx", true, {-0.691875, 1.16569, 0.384644}),
-		tCustomCarPart("pep/part_10_fenderright.fbx", true, {0.691875, 1.16569, 0.384644}),
-		tCustomCarPart("pep/part_11_wheelarc_l.fbx", true, {-0.489442, 1.15724, 0.318175}),
-		tCustomCarPart("pep/part_12_wheelarc_r.fbx", true, {0.489442, 1.15724, 0.318175}),
-		tCustomCarPart("pep/part_13_lightframe.fbx", true, {0, 1.66222, 0.489103}),
-		//tCustomCarPart("pep/steering_wheel_lo.fbx", false, {}), // todo!
-		tCustomCarPart("pep/susp_rear.fbx", false, {-0.000909, -1.07368, 0.13446}),
-		tCustomCarPart("pep/trunk.fbx", true, {0, -1.6189, 0.583304}, true, {0, -1.49874, 0.786098}, {-45,0,0}, {0,0,0}),
-	};
+	std::vector<Render3D::tModel*> TireL;
+	std::vector<Render3D::tModel*> TireR;
 
-	std::vector<Render3D::tModel*> model_tire_l;
-	std::vector<Render3D::tModel*> model_tire_r;
-
-	static inline float rX = 180;
-	static inline float rY = 0;
-	static inline float rZ = 0;
-	static inline float offX = 0;
-	static inline float offY = 0.01;
-	static inline float offZ = 0;
-	static inline float wheelOffY = -0.1;
-
-	UMath::Vector3 LastPlayerVelocity = {0,0,0};
+	UMath::Vector3 vRotateOffset = {180,0,0};
+	UMath::Vector3 vMoveOffset = {0,0.01,0};
+	UMath::Vector3 vWheelMoveOffset = {0,-0.1,0};
 
 	double fWheelState[4] = {};
+	UMath::Vector3 vLastVelocity = {0,0,0};
 
-	void InitFunction() override {
-		for (auto& part : aCarParts) {
-			part.Reset();
-		}
-		CarRender_DontRenderPlayer = true;
-		DrawLightFlares = false;
-		LastPlayerVelocity = {0,0,0};
+	std::string MakeRelativeModelPath(std::string modelPath) {
+		return std::format("{}/{}.fbx", sBasePath, modelPath);
 	}
-	void TickFunction3D(double delta) override {
-		auto veh = GetLocalPlayerInterface<IRigidBody>();
-		auto currentPlayerVelocity = *veh->GetLinearVelocity();
-		if (IsInLoadingScreen() || IsInNIS()) {
-			for (auto& part : aCarParts) {
-				part.Reset();
-			}
-			LastPlayerVelocity = currentPlayerVelocity;
-		}
 
-		if (model_tire_l.empty() || model_tire_l[0]->bInvalidated) {
-			model_tire_l = Render3D::CreateModels("pep_wheel_l.fbx");
+	CustomCar(const std::string& basePath, const std::string& tireLPath, const std::string& tireRPath, const UMath::Vector3& rotateOffset, const UMath::Vector3& moveOffset, const UMath::Vector3& wheelMoveOffset, const std::vector<CustomCarPart*>& partList) : sBasePath(basePath), sTireLPath(tireLPath), sTireRPath(tireRPath), vRotateOffset(rotateOffset), vMoveOffset(moveOffset), vWheelMoveOffset(wheelMoveOffset), aParts(partList) {
+		for (auto& part : aParts) {
+			part->sModelName = MakeRelativeModelPath(part->sModelName);
 		}
-		if (model_tire_r.empty() || model_tire_r[0]->bInvalidated) {
-			model_tire_r = Render3D::CreateModels("pep_wheel_r.fbx");
-		}
+		vRotateOffset *= 0.01745329;
+	}
 
-		if (IsCarDestroyed(GetLocalPlayerVehicle())) {
-			for (auto& part : aCarParts) {
-				if (!part.bPartDetachable) continue;
-				if (part.bIsDetached) continue;
-				part.Detach(*veh->GetLinearVelocity());
-			}
+	void Load() {
+		if (TireL.empty() || TireL[0]->bInvalidated) {
+			TireL = Render3D::CreateModels(MakeRelativeModelPath(sTireLPath));
 		}
+		if (TireR.empty() || TireR[0]->bInvalidated) {
+			TireR = Render3D::CreateModels(MakeRelativeModelPath(sTireRPath));
+		}
+		for (auto part : aParts) {
+			part->Load();
+		}
+	}
 
-		if (LastPlayerVelocity.length() > currentPlayerVelocity.length() && currentPlayerVelocity.length() > 0.1) {
-			auto colVelocity = (LastPlayerVelocity - currentPlayerVelocity);
-			colVelocity = GetRelativeCarOffset(GetLocalPlayerVehicle(), colVelocity);
-			colVelocity *= -1;
-			for (auto& part : aCarParts) {
-				part.OnCollision((UMath::Vector3)colVelocity, currentPlayerVelocity, colVelocity.length());
-			}
-		}
-		LastPlayerVelocity = currentPlayerVelocity;
+	void Render(IVehicle* parentCar) {
+		Load();
 
-		for (auto& part : aCarParts) {
-			if (auto parent = part.GetParent(aCarParts)) {
-				part.UpdateChild(parent);
-			}
-			else {
-				part.Update(currentPlayerVelocity, GetRelativeCarOffset(GetLocalPlayerVehicle(), currentPlayerVelocity), GetRelativeCarOffset(GetLocalPlayerVehicle(), *veh->GetAngularVelocity()), delta);
-			}
-		}
-
-		auto sus = GetLocalPlayerInterface<ISuspension>();
-		if (!FEManager::mPauseRequest) {
-			for (int i = 0; i < 4; i++) {
-				fWheelState[i] += sus->GetWheelAngularVelocity(i) * delta;
-			}
-		}
+		auto rb = parentCar->mCOMObject->Find<IRigidBody>();
+		auto sus = parentCar->mCOMObject->Find<ISuspension>();
 
 		auto mat = UMath::Matrix4::kIdentity;
-		veh->GetMatrix4(&mat);
-		mat.p = *veh->GetPosition();
+		rb->GetMatrix4(&mat);
+		mat.p = *rb->GetPosition();
 		mat.p.y += sus->GetWheelLocalPos(0)->y;
-		mat.p += mat.x * offX;
-		mat.p += mat.y * offY;
-		mat.p += mat.z * offZ;
+		mat.p += mat.x * vMoveOffset.x;
+		mat.p += mat.y * vMoveOffset.y;
+		mat.p += mat.z * vMoveOffset.z;
 		UMath::Matrix4 rotation;
-		rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+		rotation.Rotate(vRotateOffset);
 		mat = (UMath::Matrix4)(mat * rotation);
-		for (auto& part : aCarParts) {
-			part.Render(mat, delta, false);
+		for (auto& part : aParts) {
+			part->Render(mat, false);
 		}
-		for (auto& part : aCarParts) {
-			part.Render(mat, delta, true);
+		for (auto& part : aParts) {
+			part->Render(mat, true);
 		}
 
 		NyaVec3 wheelOffsets[] = {
@@ -394,17 +324,127 @@ public:
 				{0.006639, 0.0, 0.011069}, // rr
 		};
 		for (int i = 0; i < 4; i++) {
-			std::vector<Render3D::tModel*>* models = i % 2 == 0 ? &model_tire_l : &model_tire_r;
+			std::vector<Render3D::tModel*>* models = i % 2 == 0 ? &TireL : &TireR;
 			for (auto& model : *models) {
 				UMath::Matrix4 rotation;
 				rotation.Rotate(NyaVec3(-fWheelState[i], 0, sus->GetWheelSteer(i) * 4));
 				rotation.p = wheelOffsets[i] * 100;
 				//rotation.p.y = -sus->GetWheelLocalPos(i)->y;
-				rotation.p.y += wheelOffY;
+				rotation.p += vWheelMoveOffset;
 				auto wheelMat = (UMath::Matrix4)(mat * rotation);
 				model->RenderAt(WorldToRenderMatrix(wheelMat));
 			}
 		}
+	}
+
+	CustomCarPart* GetParentPart(CustomCarPart* child) {
+		if (child->sParentName.empty()) return nullptr;
+
+		for (auto& part : aParts) {
+			if (part->sModelName == child->sParentName) return part;
+		}
+		return nullptr;
+	}
+
+	void Update(IVehicle* parentCar, double delta) {
+		auto veh = parentCar->mCOMObject->Find<IRigidBody>();
+		auto currentVelocity = *veh->GetLinearVelocity();
+		if (IsInLoadingScreen() || IsInNIS()) {
+			for (auto& part : aParts) {
+				part->Reset();
+			}
+			vLastVelocity = currentVelocity;
+			return;
+		}
+		if (FEManager::mPauseRequest) return;
+
+		if (IsCarDestroyed(parentCar)) {
+			for (auto& part : aParts) {
+				if (!part->bPartDetachable) continue;
+				if (part->bIsDetached) continue;
+				part->Detach(*veh->GetLinearVelocity());
+			}
+		}
+
+		if (vLastVelocity.length() > currentVelocity.length() && currentVelocity.length() > 0.1) {
+			auto colVelocity = (vLastVelocity - currentVelocity);
+			colVelocity = GetRelativeCarOffset(parentCar, colVelocity);
+			colVelocity.y *= -1;
+			colVelocity.z *= -1;
+			for (auto& part : aParts) {
+				part->OnCollision((UMath::Vector3)colVelocity, currentVelocity, colVelocity.length());
+			}
+		}
+		vLastVelocity = currentVelocity;
+
+		for (auto& part : aParts) {
+			if (auto parent = GetParentPart(part)) {
+				part->UpdateChild(parent);
+			}
+			else {
+				part->Update(currentVelocity, GetRelativeCarOffset(parentCar, currentVelocity), GetRelativeCarOffset(parentCar, *veh->GetAngularVelocity()), delta);
+			}
+		}
+
+		auto sus = parentCar->mCOMObject->Find<ISuspension>();
+		for (int i = 0; i < 4; i++) {
+			fWheelState[i] += sus->GetWheelAngularVelocity(i) * delta;
+		}
+	}
+
+	void Reset() {
+		for (auto& part : aParts) {
+			part->Reset();
+		}
+		memset(fWheelState, 0, sizeof(fWheelState));
+		vLastVelocity = {0,0,0};
+	}
+};
+auto gCustomCar_Pepper = CustomCar("pep", "tire_l", "tire_r", {180,0,0}, {0,0.01,0}, {0,-0.1,0}, {
+	new CustomCarPart("body", false, {0,0,0}),
+	new CustomCarPart("coolingfan_1", false, {-0.01, 1.56308, 0.415157}),
+	new CustomCarPart("dash_lo", false, {0,0,0}),
+	new CustomCarPart("door_l", true, {-0.6605, 0.17438, 0.65242}, true, {-0.692432, 0.68049, 0.338087}, {0,0,0}, {0,0,60}),
+	new CustomCarPart("door_r", true, {0.6605, 0.17438, 0.65242}, true, {0.692432, 0.68049, 0.338087}, {0,0,-60}, {0,0,0}),
+	new CustomCarPart("driveshaft", false, {-0.000871, 0.776944, 0.134779}),
+	new CustomCarPart("engine_1", false, {0.034055, 1.09684, 0.353421}),
+	new CustomCarPart("exhaust_l", false, {-0.3485, -1.3371, 0.134766}),
+	new CustomCarPart("hood", true, {0, 1.23717, 0.696299}, true, {0, 0.788376, 0.703607}, {0,0,0}, {80,0,0}),
+	new CustomCarPart("nitro", false, {0.226277, -1.54027, 0.392936}),
+	new CustomCarPart("part_1_grille", true, {0, 1.70436, 0.497551}),
+	new CustomCarPart("part_2_mask", true, {0, 1.68417, 0.450264}),
+	new CustomCarPart("part_3_frontspoiler", true, {0, 1.57301, 0.154975}),
+	new CustomCarPart("part_4_rearbumper", true, {0, -1.60887, 0.181289}),
+	new CustomCarPart("part_5_frontbumper", true, {0, 1.707, 0.246704}),
+	new CustomCarPart("part_6_roofspoiler", true, {0, -1.11109, 1.13381}),
+	new CustomCarPart("part_7_mirror_l", true, {-0.754491, 0.454667, 0.742712}, true, {-0.692432, 0.68049, 0.338087}, {0,0,0}, {0,0,60}, "door_l"),
+	new CustomCarPart("part_8_mirror_r", true, {0.754491, 0.454667, 0.742712}, true, {0.692432, 0.68049, 0.338087}, {0,0,-60}, {0,0,0}, "door_r"),
+	new CustomCarPart("part_9_fenderleft", true, {-0.691875, 1.16569, 0.384644}),
+	new CustomCarPart("part_10_fenderright", true, {0.691875, 1.16569, 0.384644}),
+	new CustomCarPart("part_11_wheelarc_l", true, {-0.489442, 1.15724, 0.318175}),
+	new CustomCarPart("part_12_wheelarc_r", true, {0.489442, 1.15724, 0.318175}),
+	new CustomCarPart("part_13_lightframe", true, {0, 1.66222, 0.489103}),
+	//CustomCarPart("steering_wheel_lo", false, {}), // todo!
+	new CustomCarPart("susp_rear", false, {-0.000909, -1.07368, 0.13446}),
+	new CustomCarPart("trunk", true, {0, -1.6189, 0.583304}, true, {0, -1.49874, 0.786098}, {-45,0,0}, {0,0,0}),
+});
+
+class Effect_Pep : public ChaosEffect {
+public:
+	Effect_Pep() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Pep";
+		sFriendlyName = "Change Car To FO1 Pepper";
+		fTimerLength = 120;
+	}
+
+	void InitFunction() override {
+		gCustomCar_Pepper.Reset();
+		CarRender_DontRenderPlayer = true;
+		DrawLightFlares = false;
+	}
+	void TickFunction3D(double delta) override {
+		gCustomCar_Pepper.Update(GetLocalPlayerVehicle(), delta);
+		gCustomCar_Pepper.Render(GetLocalPlayerVehicle());
 	}
 	void DeinitFunction() override {
 		CarRender_DontRenderPlayer = false;

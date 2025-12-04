@@ -221,12 +221,13 @@ namespace Render3D {
 		flags |= aiProcess_GenBoundingBoxes;
 
 		static Assimp::Importer importer;
-		auto scene = importer.ReadFile(fullPath.c_str(), flags);
-		for (int i = 0; i < scene->mNumMeshes; i++) {
-			auto mesh = scene->mMeshes[i];
-			auto model = CreateOneModel(mesh, scene->mMaterials[mesh->mMaterialIndex]);
-			if (!model) continue;
-			models.push_back(model);
+		if (auto scene = importer.ReadFile(fullPath.c_str(), flags)) {
+			for (int i = 0; i < scene->mNumMeshes; i++) {
+				auto mesh = scene->mMeshes[i];
+				auto model = CreateOneModel(mesh, scene->mMaterials[mesh->mMaterialIndex]);
+				if (!model) continue;
+				models.push_back(model);
+			}
 		}
 		return models;
 	}
