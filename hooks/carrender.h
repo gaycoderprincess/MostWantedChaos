@@ -3,6 +3,7 @@ float CarRender_TruncateAccuracy = 2;
 bool CarRender_TruncateRotation = false;
 float CarRender_TruncateRotationAccuracy = 10;
 bool CarRender_Billboard = false;
+bool CarRender_DontRenderPlayer = false;
 
 float TruncateFloat(float in, int accuracy) {
 	in *= accuracy;
@@ -14,6 +15,14 @@ float TruncateFloat(float in, int accuracy) {
 static inline auto CarGetVisibleStateOrig = (int(__thiscall*)(eView*, const bVector3*, const bVector3*, bMatrix4*))nullptr;
 int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVector3* a3, bMatrix4* a4) {
 	auto carMatrix = (NyaMat4x4*)a4;
+	if (CarRender_DontRenderPlayer && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen()) {
+		auto dist = (RenderToWorldCoords(carMatrix->p) - *GetLocalPlayerVehicle()->GetPosition()).length();
+		if (dist < 1) {
+			// hacky solution!! it works but checking some CarRenderInfo ptr against the player and disabling DrawCars would be way better
+			carMatrix->p = {0,0,0};
+			return CarGetVisibleStateOrig(a1, a2, a3, a4);
+		}
+	}
 	if (CarRender_Billboard) {
 		auto cameraMatrix = PrepareCameraMatrix(eViews[EVIEW_PLAYER1].pCamera);
 		auto cameraPos = cameraMatrix.p;

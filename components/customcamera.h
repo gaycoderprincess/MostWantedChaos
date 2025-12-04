@@ -1,4 +1,5 @@
 namespace CustomCamera {
+	bool bRunCustom = false;
 	bool bReset = false;
 	IVehicle* pTargetPlayerVehicle = nullptr;
 	IRigidBody* pTargetPlayerBody = nullptr;

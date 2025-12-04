@@ -12,11 +12,12 @@ namespace Render3D {
 		IDirect3DIndexBuffer9* pIndexBuffer;
 		IDirect3DVertexBuffer9* pVertexBuffer;
 		IDirect3DTexture9* pTexture;
+		std::string sTextureName;
 		uint32_t nVertexCount;
 		uint32_t nFaceCount;
 		bool bInvalidated = false;
 
-		void RenderAt(NyaMat4x4 matrix) const {
+		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false) const {
 			if (bInvalidated) return;
 
 #ifdef RENDER3D_NOEFFECT
@@ -44,6 +45,20 @@ namespace Render3D {
 			matrixTempSecond = !matrixTempSecond;
 			ParticleSetTransform(pMatrix, EVIEW_PLAYER1);
 
+			static D3DXHANDLE TextureOffset = effect->hD3DXEffect->GetParameterByName(0, "TextureOffset");
+			D3DXVECTOR4 textureOffset = {0,0,0,0};
+			effect->hD3DXEffect->SetVector(TextureOffset, &textureOffset);
+
+			static D3DXHANDLE BLENDSTATE = effect->hD3DXEffect->GetParameterByName(0, "Blend_State");
+			int blendStates[] = {
+					0, // alphatestenable
+					0, // alpharef
+					useAlpha, // alphablendenable
+					D3DBLEND_SRCALPHA, // srcblend
+					D3DBLEND_INVSRCALPHA, // destblend
+			};
+			effect->hD3DXEffect->SetIntArray(BLENDSTATE, blendStates, 5);
+
 			effect->hD3DXEffect->Begin(nullptr, 0);
 			effect->hD3DXEffect->BeginPass(0);
 #endif
@@ -55,9 +70,9 @@ namespace Render3D {
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
@@ -162,6 +177,7 @@ namespace Render3D {
 		auto textureName = GetMaterialFilename(material);
 		if (auto tex = LoadTexture(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
 			model->pTexture = tex;
+			model->sTextureName = textureName;
 		}
 		else {
 			MessageBoxA(nullptr, std::format("Failed to load texture {}", textureName).c_str(), "nya?!~", MB_ICONERROR);

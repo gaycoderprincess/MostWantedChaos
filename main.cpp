@@ -112,6 +112,11 @@ void CameraHook(CameraMover* pMover) {
 	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) return;
 
 	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	if (!inMenu && CustomCamera::bRunCustom) {
+		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), nullptr);
+		CustomCamera::ProcessCam(pMover->pCamera, gTimer.fDeltaTime);
+	}
+
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
 		effect.OnTickCamera(pMover->pCamera, gTimer.fDeltaTime);
@@ -239,15 +244,11 @@ void Render3DLoop() {
 	}
 	aDrawing3DLoopFunctionsOnce.clear();
 
-	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) {
-		state->Apply();
-		state->Release();
-		return;
-	}
-
 	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	auto isBlocked = IsChaosBlocked();
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
 		effect.OnTick3D(gTimer.fDeltaTime);
 	}
 
@@ -326,7 +327,17 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Sim Timestep: {:.2f}", Sim::Internal::mSystem->mTimeStep));
 				DrawMenuOption(std::format("Sim Speed: {:.2f}", Sim::Internal::mSystem->mSpeed));
 				DrawMenuOption(std::format("Sim Target Speed: {:.2f}", Sim::Internal::mSystem->mTargetSpeed));
+				auto wheelPos = *GetLocalPlayerInterface<ISuspension>()->GetWheelPos(0);
+				DrawMenuOption(std::format("Wheel Position: {:.2f} {:.2f} {:.2f}", wheelPos.x, wheelPos.y, wheelPos.z));
+				wheelPos = *GetLocalPlayerInterface<ISuspension>()->GetWheelLocalPos(0);
+				DrawMenuOption(std::format("Wheel Local Position: {:.2f} {:.2f} {:.2f}", wheelPos.x, wheelPos.y, wheelPos.z));
+				GetLocalPlayerInterface<ISuspension>()->GetWheelCenterPos(&wheelPos, 0);
+				DrawMenuOption(std::format("Wheel Center Position: {:.2f} {:.2f} {:.2f}", wheelPos.x, wheelPos.y, wheelPos.z));
 				DrawMenuOption(std::format("Wheel Velocity: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetWheelAngularVelocity(0)));
+				DrawMenuOption(std::format("Wheel Steer: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetWheelSteer(0)));
+				DrawMenuOption(std::format("Suspension Height 1: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetRideHeight(0)));
+				DrawMenuOption(std::format("Suspension Height 2: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetRideHeight(1)));
+				DrawMenuOption(std::format("Suspension Render Motion: {:.2f}", GetLocalPlayerInterface<ISuspension>()->GetRenderMotion()));
 				DrawMenuOption(std::format("Racers: {}", VEHICLE_LIST::GetList(VEHICLE_AIRACERS).size()));
 				DrawMenuOption(std::format("Cops: {}", VEHICLE_LIST::GetList(VEHICLE_AICOPS).size()));
 				DrawMenuOption(std::format("Traffic: {}", VEHICLE_LIST::GetList(VEHICLE_AITRAFFIC).size()));
@@ -352,6 +363,9 @@ void ChaosModMenu() {
 
 		if (DrawMenuOption("Effect Debug")) {
 			ChloeMenuLib::BeginMenu();
+			if (DrawMenuOption("Toggle Custom Camera")) {
+				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
+			}
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("GroovyCars::GroovySpeed", Effect_GroovyCars::GroovySpeed);
@@ -394,6 +408,13 @@ void ChaosModMenu() {
 			QuickValueEditor("Effect_Teddie::offZ", Effect_Teddie::offZ);
 			QuickValueEditor("Effect_Teddie::scale", Effect_Teddie::scale);
 			QuickValueEditor("Effect_Teddie::colScale", Effect_Teddie::colScale);
+			QuickValueEditor("Effect_Pep::rX", Effect_Pep::rX);
+			QuickValueEditor("Effect_Pep::rY", Effect_Pep::rY);
+			QuickValueEditor("Effect_Pep::rZ", Effect_Pep::rZ);
+			QuickValueEditor("Effect_Pep::offX", Effect_Pep::offX);
+			QuickValueEditor("Effect_Pep::offY", Effect_Pep::offY);
+			QuickValueEditor("Effect_Pep::offZ", Effect_Pep::offZ);
+			QuickValueEditor("Effect_Pep::wheelOffY", Effect_Pep::wheelOffY);
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			ChloeMenuLib::EndMenu();
 		}
