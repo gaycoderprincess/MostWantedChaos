@@ -11,7 +11,8 @@ public:
 	const char* sListCategory = nullptr;
 	const char* sAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
 
-	double fLastTriggerTime = 99999;
+	std::time_t LastTriggerTime = 0;
+	uint32_t nTotalTimesActivated = 0;
 	bool bTriggeredThisCycle = false;
 	ChaosEffectInstance* EffectInstance;
 
@@ -268,9 +269,41 @@ public:
 };
 static inline std::vector<ChaosEffectInstance> aRunningEffects;
 
+void DoChaosSave() {
+	std::ofstream file("CwoeeChaos/effects.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int num = ChaosEffect::aEffects.size();
+	file.write((char*)&num, sizeof(num));
+
+	for (auto& effect : ChaosEffect::aEffects) {
+		file.write((char*)&effect->bTriggeredThisCycle, sizeof(effect->bTriggeredThisCycle));
+		file.write((char*)&effect->LastTriggerTime, sizeof(effect->LastTriggerTime));
+		file.write((char*)&effect->nTotalTimesActivated, sizeof(effect->nTotalTimesActivated));
+	}
+}
+
+void DoChaosLoad() {
+	std::ifstream file("CwoeeChaos/effects.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int num = 0;
+	file.read((char*)&num, sizeof(num));
+	if (num != ChaosEffect::aEffects.size()) return;
+
+	for (auto& effect : ChaosEffect::aEffects) {
+		file.read((char*)&effect->bTriggeredThisCycle, sizeof(effect->bTriggeredThisCycle));
+		file.read((char*)&effect->LastTriggerTime, sizeof(effect->LastTriggerTime));
+		file.read((char*)&effect->nTotalTimesActivated, sizeof(effect->nTotalTimesActivated));
+	}
+}
+
 void AddRunningEffect(ChaosEffect* effect) {
+	DoChaosSave();
+
 	effect->bTriggeredThisCycle = true;
-	effect->fLastTriggerTime = 0;
+	effect->LastTriggerTime = std::time(0);
+	effect->nTotalTimesActivated++;
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
 	WriteLog(std::format("Activating {}", effect->sName));
 

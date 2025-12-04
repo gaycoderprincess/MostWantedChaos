@@ -159,10 +159,6 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
-	for (auto& effect : ChaosEffect::aEffects) {
-		effect->fLastTriggerTime += gTimer.fDeltaTime;
-	}
-
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 		ProcessChaosEffects(gTimer.fDeltaTime, inMenu, !inMenu);
@@ -544,6 +540,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				static auto config = toml::parse_file(configName);
 				bDarkMode = config["main"]["dark_mode"].value_or(false);
 			}
+			DoChaosLoad();
 
 			for (auto& func : ChloeHook::aHooks) {
 				func();

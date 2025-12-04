@@ -175,30 +175,40 @@ class CustomCarTire : public CustomCarPart {
 public:
 	int nWheelID = 0;
 	float fRotation = 0;
-	float fMoveOffset = 0;
+	float fRadius = 0;
+	float fSuspensionMaxLength = 0.35;
 
-	CustomCarTire(int wheelID, const std::string& name, UMath::Vector3 restPosition, float moveOffset) : CustomCarPart(name, false, restPosition), nWheelID(wheelID), fMoveOffset(moveOffset) { }
+	CustomCarTire(int wheelID, const std::string& name, UMath::Vector3 restPosition, float radius, float suspMaxLength = 0.35) : CustomCarPart(name, false, restPosition), nWheelID(wheelID), fRadius(radius), fSuspensionMaxLength(suspMaxLength) { }
 
 	void Reset() override {
+		CustomCarPart::Reset();
 		fRotation = 0;
 	}
 
 	void Render(IVehicle* playerCar, NyaMat4x4 carMatrix, bool windows) override {
 		Load();
 
+		auto sus = playerCar->mCOMObject->Find<ISuspension>();
 		for (auto& model : aModels) {
 			UMath::Matrix4 rotation;
-			rotation.Rotate(NyaVec3(-fRotation, 0, playerCar->mCOMObject->Find<ISuspension>()->GetWheelSteer(nWheelID) * 4));
+			rotation.Rotate(NyaVec3(-fRotation, 0, sus->GetWheelSteer(nWheelID) * 4));
 			rotation.p = RestPosition;
 
-			UMath::Vector3 wheelPos;
-			playerCar->mCOMObject->Find<ISuspension>()->GetWheelCenterPos(&wheelPos, nWheelID);
+			auto wheelPos = *sus->GetWheelPos(nWheelID);
+			auto wheelPos2 = *sus->GetWheelLocalPos(nWheelID);
 			playerCar->mCOMObject->Find<IRigidBody>()->ConvertWorldToLocal(&wheelPos, true);
 
 			//rotation.p.y = -sus->GetWheelLocalPos(i)->y;
 			//rotation.p += vMoveOffset;
 			//rotation.p.y = vMoveOffset.y + wheelPos.y;
-			rotation.p.y = fMoveOffset + wheelPos.y;
+			if (sus->IsWheelOnGround(nWheelID)) {
+				rotation.p.y = -fRadius + (wheelPos2.y - wheelPos.y);
+			}
+			else {
+				float f = -sus->GetWheelRoadHeight(nWheelID);
+				if (f > fSuspensionMaxLength) f = fSuspensionMaxLength;
+				rotation.p.y = -fRadius + f;
+			}
 			auto partMat = (UMath::Matrix4)(carMatrix * rotation);
 			LastRawTransform = partMat;
 			model->RenderAt(WorldToRenderMatrix(partMat));
@@ -351,8 +361,8 @@ auto gCustomCar_Pepper = CustomCar("pep", {180,0,0}, {0,0.01,0}, {
 	//CustomCarPart("steering_wheel_lo", false, {}), // todo!
 	new CustomCarPart("susp_rear", false, {-0.000909, -1.07368, 0.13446}),
 	new CustomCarPart("trunk", true, {0, -1.6189, 0.583304}, true, {0, -1.49874, 0.786098}, {-45,0,0}, {0,0,0}),
-	new CustomCarTire(0, "tire_l", {-0.662652, 1.1281, 0.154147}, 0.37),
-	new CustomCarTire(1, "tire_r", {0.662652, 1.1281, 0.154147}, 0.37),
-	new CustomCarTire(2, "tire_l", {-0.663914, -1.10693, 0.142167}, 0.37),
-	new CustomCarTire(3, "tire_r", {0.663914, -1.10693, 0.142167}, 0.37),
+	new CustomCarTire(0, "tire_l", {-0.662652, 1.1281, 0.154147}, 0.29),
+	new CustomCarTire(1, "tire_r", {0.662652, 1.1281, 0.154147}, 0.29),
+	new CustomCarTire(2, "tire_l", {-0.663914, -1.10693, 0.142167}, 0.29),
+	new CustomCarTire(3, "tire_r", {0.663914, -1.10693, 0.142167}, 0.29),
 });
