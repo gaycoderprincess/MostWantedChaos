@@ -23,7 +23,7 @@ namespace TextHook {
 	}
 
 	bool CanStringBeInterspersed(const std::string& str) {
-		return CanStringBeReversed(str);
+		return CanStringBeReversed(str) && str != ">";
 	}
 
 	struct tRandomizeTextAssoc {
@@ -119,13 +119,17 @@ namespace TextHook {
 	}
 
 	std::string DoIntersperseWord(std::string origWord) {
+		std::string str = pInterspersedText;
 		if (std::all_of(origWord.begin(), origWord.end(), [](unsigned char c){ return std::isupper(c); })) {
-			return pInterspersedTextUpper;
+			str = pInterspersedTextUpper;
 		}
-		if (std::isupper(origWord[0])) {
-			return pInterspersedTextProper;
+		else if (std::isupper(origWord[0])) {
+			str = pInterspersedTextProper;
 		}
-		return pInterspersedText;
+		if (origWord.ends_with('.')) str += ".";
+		if (origWord.ends_with(',')) str += ",";
+		if (origWord.ends_with(':')) str += ":";
+		return str;
 	}
 
 	const char* GetInterspersedText(uint32_t hash) {
@@ -135,6 +139,7 @@ namespace TextHook {
 
 		auto words = SplitStringIntoWords(SearchForString(nullptr, hash));
 		int numWordsChanged = 0;
+		int numWordsChangeable = 0;
 		std::string str;
 		for (auto& word : words) {
 			if (CanStringBeInterspersed(word)) {
@@ -142,12 +147,19 @@ namespace TextHook {
 					word = DoIntersperseWord(word);
 					numWordsChanged++;
 				}
+				numWordsChangeable++;
 			}
 		}
-		if (!numWordsChanged) {
-			auto& word = words[rand()%words.size()];
-			word = DoIntersperseWord(word);
-			numWordsChanged++;
+		if (!numWordsChanged && numWordsChangeable > 0) {
+			bool changed = false;
+			while (!changed) {
+				auto &word = words[rand() % words.size()];
+				if (CanStringBeInterspersed(word)) {
+					word = DoIntersperseWord(word);
+					numWordsChanged++;
+					changed = true;
+				}
+			}
 		}
 
 		// don't always replace one-word strings

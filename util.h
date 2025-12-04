@@ -71,6 +71,10 @@ void QuickValueEditor(const char* name, float& value) {
 	if (DrawMenuOption(std::format("{} - {}", name, value))) { ValueEditorMenu(value); }
 }
 
+void QuickValueEditor(const char* name, bool& value) {
+	if (DrawMenuOption(std::format("{} - {}", name, value))) { value = !value; }
+}
+
 inline float TOMPS(float kmh) { return kmh / 3.6; }
 inline float TOKMH(float mps) { return mps * 3.6; }
 

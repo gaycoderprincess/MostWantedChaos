@@ -138,7 +138,7 @@ void ProcessChaosEffects(double fDeltaTime, bool inMenu, bool blockedByOtherMean
 		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
 		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
 		effect.Draw(y, inMenu);
-		y += 1 - (inMenu ? 1 : effect.GetOffscreenPercentage());
+		y += 1 - (inMenu ? 0 : effect.GetOffscreenPercentage());
 	}
 
 	while (RunningEffectsCleanup()) {}
@@ -193,8 +193,11 @@ void ChaosLoop() {
 		auto texture = bDarkMode ? textureD : textureL;
 		NyaDrawing::CNyaRGBA32 rgb = bDarkMode ? NyaDrawing::CNyaRGBA32(133,122,168,255) : NyaDrawing::CNyaRGBA32(243,138,175,255);
 		if (!DisableChaosHUD) DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, rgb, texture);
-		if (fTimeSinceLastEffect >= fEffectCycleTimer) {
-			fTimeSinceLastEffect -= fEffectCycleTimer;
+
+		// add a lil bit of extra time so effects don't overlap each other by a frame or two
+		float cycleTimer = fEffectCycleTimer + 0.1;
+		if (fTimeSinceLastEffect >= cycleTimer) {
+			fTimeSinceLastEffect -= cycleTimer;
 			AddRunningEffect(GetRandomEffect());
 		}
 	}
@@ -430,6 +433,16 @@ void ChaosModMenu() {
 			v.Normalize();
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
+			//QuickValueEditor("fWorldTopLeft[0]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[0]);
+			//QuickValueEditor("fWorldTopLeft[1]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[1]);
+			//QuickValueEditor("fWorldBottomRight[0]", FlatOutHUD::CHUD_Minimap::fWorldBottomRight[0]);
+			//QuickValueEditor("fWorldBottomRight[1]", FlatOutHUD::CHUD_Minimap::fWorldBottomRight[1]);
+			//QuickValueEditor("bInvertDirX", FlatOutHUD::CHUD_Minimap::bInvertDirX);
+			//QuickValueEditor("bInvertDirZ", FlatOutHUD::CHUD_Minimap::bInvertDirZ);
+			//QuickValueEditor("bSwapDir", FlatOutHUD::CHUD_Minimap::bSwapDir);
+			//QuickValueEditor("bInvertPosX", FlatOutHUD::CHUD_Minimap::bInvertPosX);
+			//QuickValueEditor("bInvertPosZ", FlatOutHUD::CHUD_Minimap::bInvertPosZ);
+			//QuickValueEditor("bSwapPos", FlatOutHUD::CHUD_Minimap::bSwapPos);
 			ChloeMenuLib::EndMenu();
 		}
 
@@ -553,7 +566,8 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::PlaceRenderHook();
 			NyaHooks::aRenderFuncs.push_back(Render3DLoop);
 
-			*(bool*)0x926064 = 1;
+			// SkipFE
+			//*(bool*)0x926064 = 1;
 		} break;
 		default:
 			break;

@@ -77,7 +77,7 @@ public:
 				continue;
 			}
 			auto ply = &GRaceStatus::fObj->mRacerInfo[i];
-			bool wrecked = ply->mDNF || ply->mTotalled || ply->mEngineBlown || ply->mKnockedOut || ply->mBusted;
+			bool wrecked = IsRacerKOd(ply);
 			if (wrecked && !bWrecked[i]) {
 				if (ply->mKnockedOut) AddKONotif(ply);
 				else AddWreckedNotif(ply);

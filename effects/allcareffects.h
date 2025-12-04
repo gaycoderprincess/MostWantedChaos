@@ -581,14 +581,16 @@ class Effect_BillboardCars : public ChaosEffect {
 public:
 	Effect_BillboardCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cars Stare At You";
-		fTimerLength = 30;
+		fTimerLength = 60;
 	}
 
 	void InitFunction() override {
 		CarRender_Billboard = true;
+		DrawLightFlares = false;
 	}
 	void DeinitFunction() override {
 		CarRender_Billboard = false;
+		DrawLightFlares = true;
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
@@ -604,9 +606,11 @@ public:
 
 	void InitFunction() override {
 		DrawCars = false;
+		DrawLightFlares = false;
 	}
 	void DeinitFunction() override {
 		DrawCars = true;
+		DrawLightFlares = true;
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }

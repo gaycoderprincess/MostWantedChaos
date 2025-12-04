@@ -51,10 +51,13 @@ namespace Render3D {
 			ParticleSetTransform(pMatrix, EVIEW_PLAYER1);
 
 			static D3DXHANDLE TextureOffset = effect->hD3DXEffect->GetParameterByName(0, "TextureOffset");
+			static D3DXHANDLE TextureOffset2 = effect->hD3DXEffect->GetParameterByName(0, "TEXTUREOFFSET");
 			D3DXVECTOR4 textureOffset = {0,0,0,0};
-			effect->hD3DXEffect->SetVector(TextureOffset, &textureOffset);
+			if (TextureOffset) effect->hD3DXEffect->SetVector(TextureOffset, &textureOffset);
+			if (TextureOffset2) effect->hD3DXEffect->SetVector(TextureOffset2, &textureOffset);
 
 			static D3DXHANDLE BLENDSTATE = effect->hD3DXEffect->GetParameterByName(0, "Blend_State");
+			static D3DXHANDLE BLENDSTATE2 = effect->hD3DXEffect->GetParameterByName(0, "BLENDSTATE");
 			int blendStates[] = {
 					0, // alphatestenable
 					0, // alpharef
@@ -62,7 +65,8 @@ namespace Render3D {
 					D3DBLEND_SRCALPHA, // srcblend
 					D3DBLEND_INVSRCALPHA, // destblend
 			};
-			effect->hD3DXEffect->SetIntArray(BLENDSTATE, blendStates, 5);
+			if (BLENDSTATE) effect->hD3DXEffect->SetIntArray(BLENDSTATE, blendStates, 5);
+			if (BLENDSTATE2) effect->hD3DXEffect->SetIntArray(BLENDSTATE2, blendStates, 5);
 
 			effect->hD3DXEffect->Begin(nullptr, 0);
 			effect->hD3DXEffect->BeginPass(0);

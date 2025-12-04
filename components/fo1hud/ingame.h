@@ -55,6 +55,10 @@ bool IsInPursuit() {
 	return false;
 }
 
+bool IsRacerKOd(GRacerInfo* ply) {
+	return ply->mDNF || ply->mTotalled || ply->mEngineBlown || ply->mKnockedOut || ply->mBusted;
+}
+
 std::vector<GRacerInfo*> GetSortedPlayerScores() {
 	std::vector<GRacerInfo*> racers;
 	if (!GRaceStatus::fObj) return racers;

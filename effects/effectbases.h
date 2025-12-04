@@ -179,7 +179,7 @@ public:
 	bool IsAvailable() override {
 		// if there's 3 opponents, the car usually spawns with an invisible skin
 		auto cars = GetActiveVehicles(DRIVER_RACER);
-		return cars.size() < 3;
+		return cars.size() < 2;
 	}
 	bool IsConditionallyAvailable() override { return true; }
 };

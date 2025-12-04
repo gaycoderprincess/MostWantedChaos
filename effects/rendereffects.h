@@ -101,14 +101,16 @@ public:
 		sName = "Pep";
 		sFriendlyName = "Change Car To FO1 Pepper";
 		fTimerLength = 180;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 
 	void InitFunction() override {
 		gCustomCar_Pepper.Reset();
-		CarRender_DontRenderPlayer = true;
-		DrawLightFlares = false;
 	}
 	void TickFunction3D(double delta) override {
+		CarRender_DontRenderPlayer = true;
+		DrawLightFlares = false;
+
 		gCustomCar_Pepper.Update(GetLocalPlayerVehicle(), delta);
 		gCustomCar_Pepper.Render(GetLocalPlayerVehicle());
 	}

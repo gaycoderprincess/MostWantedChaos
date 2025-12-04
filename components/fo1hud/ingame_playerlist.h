@@ -66,7 +66,7 @@ public:
 			else {
 				data.SetColor(GetPaletteColor(COLOR_MENU_WHITE));
 			}
-			if (ply->mDNF || ply->mTotalled || ply->mEngineBlown || ply->mKnockedOut || ply->mBusted) {
+			if (IsRacerKOd(ply)) {
 				data.SetColor(64,64,64,255);
 			}
 			data.XRightAlign = true;

@@ -88,7 +88,7 @@ public:
 		}
 	}
 
-	static inline float latchBreakageThreshold = 5; // todo this needs tweaked
+	static inline float latchBreakageThreshold = 10; // todo this needs tweaked
 	bool CheckHingeBroken() {
 		if (HingeMax.x != 0 && UnlatchedRotation.x > HingeMax.x && UnlatchedVelocity.x > latchBreakageThreshold) return true;
 		if (HingeMax.y != 0 && UnlatchedRotation.y > HingeMax.y && UnlatchedVelocity.y > latchBreakageThreshold) return true;
@@ -133,7 +133,7 @@ public:
 		UnlatchedVelocity = parent->UnlatchedVelocity;
 	}
 
-	void Detach(NyaVec3 playerVelocity) {
+	void Detach(const NyaVec3& playerVelocity) {
 		bIsDetached = true;
 		DetachedTransform = LastRawTransform;
 		DetachedVelocity = playerVelocity;
@@ -221,6 +221,8 @@ public:
 	}
 
 	void Render(IVehicle* parentCar) {
+		if (!DrawCars) return;
+
 		Load();
 
 		auto rb = parentCar->mCOMObject->Find<IRigidBody>();
