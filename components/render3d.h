@@ -17,6 +17,8 @@ namespace Render3D {
 		bool bInvalidated = false;
 
 		void RenderAt(NyaMat4x4 matrix) const {
+			if (bInvalidated) return;
+
 #ifdef RENDER3D_NOEFFECT
 			g_pd3dDevice->SetPixelShader(nullptr);
 			g_pd3dDevice->SetVertexShader(nullptr);
@@ -138,7 +140,8 @@ namespace Render3D {
 			dest->vNormals[0] = srcNormal->x;
 			dest->vNormals[1] = srcNormal->y;
 			dest->vNormals[2] = srcNormal->z;
-			dest->Color = 0xFF7F7F7F;
+			//dest->Color = 0xFF7F7F7F;
+			dest->Color = 0xFF404040;
 			dest->vUV[0] = srcUV->x;
 			dest->vUV[1] = srcUV->y * -1;
 		}

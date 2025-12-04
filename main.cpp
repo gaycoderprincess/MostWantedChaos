@@ -24,6 +24,8 @@ std::vector<void(*)()> aDrawingLoopFunctions;
 std::vector<void(*)()> aDrawingLoopFunctionsOnce;
 std::vector<void(*)()> aDrawingGameUILoopFunctions;
 std::vector<void(*)()> aDrawingGameUILoopFunctionsOnce;
+std::vector<void(*)()> aDrawing3DLoopFunctions;
+std::vector<void(*)()> aDrawing3DLoopFunctionsOnce;
 void MainLoop() {
 	for (auto& func : aMainLoopFunctions) {
 		func();
@@ -46,6 +48,7 @@ bool DisableChaosHUD = false;
 #include "components/achievements.h"
 #include "components/customcamera.h"
 #include "components/render3d.h"
+#include "components/render3d_objects.h"
 namespace FlatOutHUD {
 	#include "components/fo1hud/common.h"
 	#include "components/fo1hud/ingame.h"
@@ -208,7 +211,7 @@ void Render3DLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
-	/*static auto models = Render3D::CreateModels("sharj.fbx");
+	/*static auto models = Render3D::CreateModels("shork.fbx");
 	for (auto& model : models) {
 		auto mat = UMath::Matrix4::kIdentity;
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
@@ -226,6 +229,15 @@ void Render3DLoop() {
 		mat = (UMath::Matrix4)(mat * rotation);
 		model->RenderAt(WorldToRenderMatrix(mat));
 	}*/
+
+	for (auto& func : aDrawing3DLoopFunctions) {
+		func();
+	}
+
+	for (auto& func : aDrawing3DLoopFunctionsOnce) {
+		func();
+	}
+	aDrawing3DLoopFunctionsOnce.clear();
 
 	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) {
 		state->Apply();
@@ -374,6 +386,15 @@ void ChaosModMenu() {
 			QuickValueEditor("Effect_Shark::offY", Effect_Shark::offY);
 			QuickValueEditor("Effect_Shark::offZ", Effect_Shark::offZ);
 			QuickValueEditor("Effect_Shark::scale", Effect_Shark::scale);
+			QuickValueEditor("Effect_Teddie::rX", Effect_Teddie::rX);
+			QuickValueEditor("Effect_Teddie::rY", Effect_Teddie::rY);
+			QuickValueEditor("Effect_Teddie::rZ", Effect_Teddie::rZ);
+			QuickValueEditor("Effect_Teddie::offX", Effect_Teddie::offX);
+			QuickValueEditor("Effect_Teddie::offY", Effect_Teddie::offY);
+			QuickValueEditor("Effect_Teddie::offZ", Effect_Teddie::offZ);
+			QuickValueEditor("Effect_Teddie::scale", Effect_Teddie::scale);
+			QuickValueEditor("Effect_Teddie::colScale", Effect_Teddie::colScale);
+			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			ChloeMenuLib::EndMenu();
 		}
 
