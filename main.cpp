@@ -389,6 +389,8 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			QuickValueEditor("bFO2Minimap", FlatOutHUD::CHUD_Minimap::bFO2Minimap);
+			QuickValueEditor("Effect_TikTok::fWordFrequency", Effect_TikTok::fWordFrequency);
+			QuickValueEditor("Effect_TikTok::fWordTimerSpeed", Effect_TikTok::fWordTimerSpeed);
 			ChloeMenuLib::EndMenu();
 		}
 

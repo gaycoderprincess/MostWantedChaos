@@ -130,7 +130,7 @@ public:
 	}
 } E_ShaderWide;
 
-class Effect_ShaderTikTok : public EffectBase_ScreenShader {
+/*class Effect_ShaderTikTok : public EffectBase_ScreenShader {
 public:
 	Effect_ShaderTikTok() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Tik Tok Mode";
@@ -138,7 +138,7 @@ public:
 		fTimerLength = 60;
 		sFileName = "portrait";
 	}
-} E_ShaderTikTok;
+} E_ShaderTikTok;*/
 
 class Effect_ShaderZoomIn : public EffectBase_ScreenShader {
 public:
