@@ -7,7 +7,6 @@ public:
 	double fUnhideTime = 3;
 	std::vector<uint32_t> IncompatibilityGroups;
 	std::vector<uint32_t> ActivateIncompatibilityGroups; // checks IncompatibilityGroups but doesn't deactivate for effects that only share ActivateIncompatibilityGroups
-	bool DebugNeverPick = false;
 	const char* sListCategory = nullptr;
 	const char* sAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
 
@@ -19,9 +18,11 @@ public:
 	static inline std::vector<ChaosEffect*> aEffects;
 
 	//ChaosEffect(const std::string& name, double length) : sName(name), fTimerLength(length) {
-	ChaosEffect(const char* category) {
+	ChaosEffect(const char* category, bool neverPick = false) {
 		sListCategory = category;
-		aEffects.push_back(this);
+		if (neverPick) {
+			aEffects.push_back(this);
+		}
 	};
 
 	const char* GetFriendlyName() const {
@@ -299,13 +300,13 @@ void DoChaosLoad() {
 }
 
 void AddRunningEffect(ChaosEffect* effect) {
-	DoChaosSave();
-
 	effect->bTriggeredThisCycle = true;
 	effect->LastTriggerTime = std::time(0);
 	effect->nTotalTimesActivated++;
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
 	WriteLog(std::format("Activating {}", effect->sName));
+
+	DoChaosSave();
 
 	for (auto& running : aRunningEffects) {
 		running.pEffect->OnAnyEffectTriggered();
@@ -346,7 +347,6 @@ int GetRandomNumber(int min, int max) {
 ChaosEffect* GetRandomEffect() {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
-		if (effect->DebugNeverPick) continue;
 		if (effect->bTriggeredThisCycle) continue;
 		if (IsEffectRunning(effect)) continue;
 		bool incompatible = false;

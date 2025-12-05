@@ -76,8 +76,7 @@ void OnWinRace() {
 }
 
 void MoneyChecker() {
-	static ChaosEffect TempEffect("DUMMY");
-	TempEffect.DebugNeverPick = true;
+	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) MONEY CHANGE";
 
 	static int cash = 0;
@@ -166,8 +165,7 @@ void ChaosLoop() {
 	}
 	ProcessChaosEffects(gTimer.fDeltaTime, false, false);
 
-	static ChaosEffect TempEffect("DUMMY");
-	TempEffect.DebugNeverPick = true;
+	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) {
 		static char tmp[256];
 		strcpy_s(tmp, 256, std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str());
@@ -176,8 +174,7 @@ void ChaosLoop() {
 	}
 
 	if (bTimerEnabled) {
-		static ChaosEffect TempEffect("DUMMY");
-		TempEffect.DebugNeverPick = true;
+		static ChaosEffect TempEffect("DUMMY", true);
 		if (!TempEffect.sName) {
 			TempEffect.sName = "mod active! awruff :3";
 			AddRunningEffect(&TempEffect);
@@ -432,67 +429,6 @@ void ChaosModMenu() {
 			v.Normalize();
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
-			auto effect = eEffects[EEFFECT_CAR];
-			static D3DXHANDLE handles[] = {
-				effect->hD3DXEffect->GetParameterByName(0, "RVMSkyBrightness"),
-				effect->hD3DXEffect->GetParameterByName(0, "RVMWorldBrightness"),
-				effect->hD3DXEffect->GetParameterByName(0, "ShadowColour"),
-				//effect->hD3DXEffect->GetParameterByName(0, "SpecularPower"),
-				//effect->hD3DXEffect->GetParameterByName(0, "EnvmapPower"),
-				//effect->hD3DXEffect->GetParameterByName(0, "MetallicScale"),
-				//effect->hD3DXEffect->GetParameterByName(0, "SpecularHotSpot"),
-				//effect->hD3DXEffect->GetParameterByName(0, "Desaturation"),
-				//effect->hD3DXEffect->GetParameterByName(0, "CombinedBrightness"),
-				//effect->hD3DXEffect->GetParameterByName(0, "FocalRange"),
-				//effect->hD3DXEffect->GetParameterByName(0, "DiffuseMin"),
-				//effect->hD3DXEffect->GetParameterByName(0, "DiffuseRange"),
-				//effect->hD3DXEffect->GetParameterByName(0, "SpecularMin"),
-				//effect->hD3DXEffect->GetParameterByName(0, "SpecularRange"),
-			};
-			const char* handleNames[] = {
-				"RVMSkyBrightness",
-				"RVMWorldBrightness",
-				"ShadowColour",
-				//"SpecularPower",
-				//"EnvmapPower",
-				//"MetallicScale",
-				//"SpecularHotSpot",
-				//"Desaturation",
-				//"CombinedBrightness",
-				//"FocalRange",
-				//"DiffuseMin",
-				//"DiffuseRange",
-				//"SpecularMin",
-				//"SpecularRange",
-			};
-			int handleId = 0;
-			//std::ofstream file("test.txt");
-			for (auto& handle : handles) {
-				if (handle) {
-					auto name = handleNames[handleId];
-					//file << name;
-					//file << " - ";
-
-					if (handleId >= 2) {
-						D3DXVECTOR4 f;
-						effect->hD3DXEffect->GetVector(handle, &f);
-						QuickValueEditor(name, f[0]);
-						QuickValueEditor(name, f[1]);
-						QuickValueEditor(name, f[2]);
-						QuickValueEditor(name, f[3]);
-
-						//file << std::format("{{{}, {}, {}, {}}}\n", f[0], f[1], f[2], f[3]);
-					}
-					else {
-						float f;
-						effect->hD3DXEffect->GetFloat(handle, &f);
-						QuickValueEditor(name, f);
-
-						//file << std::format("{}\n", f);
-					}
-				}
-				handleId++;
-			}
 			//QuickValueEditor("fWorldTopLeft[0]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[0]);
 			//QuickValueEditor("fWorldTopLeft[1]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[1]);
 			//QuickValueEditor("fWorldBottomRight[0]", FlatOutHUD::CHUD_Minimap::fWorldBottomRight[0]);
@@ -513,7 +449,6 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Add Effect")) {
 			std::vector<std::string> categories;
 			for (auto& effect : ChaosEffect::aEffects) {
-				if (effect->DebugNeverPick) continue;
 				if (std::find(categories.begin(), categories.end(), effect->sListCategory) == categories.end()) {
 					categories.push_back(effect->sListCategory);
 				}
@@ -525,7 +460,6 @@ void ChaosModMenu() {
 				if (DrawMenuOption(cat)) {
 					ChloeMenuLib::BeginMenu();
 					for (auto& effect : ChaosEffect::aEffects) {
-						if (effect->DebugNeverPick) continue;
 						if (effect->sListCategory != cat) continue;
 						if (DrawMenuOption(effect->GetFriendlyName())) {
 							AddRunningEffect(effect);
@@ -549,7 +483,6 @@ void ChaosModMenu() {
 			std::ofstream fout("cwoee_effects.txt", std::ios::out);
 			if (fout.is_open()) {
 				for (auto& effect : ChaosEffect::aEffects) {
-					if (effect->DebugNeverPick) continue;
 					fout << effect->GetFriendlyName();
 					if (effect->sFriendlyName) fout << std::format(" ({})", effect->sName);
 					fout << "\n";

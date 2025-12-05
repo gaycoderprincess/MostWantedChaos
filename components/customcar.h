@@ -105,7 +105,7 @@ public:
 		return false;
 	}
 
-	static inline float latchMoveFactor[3] = {3.0, 3.0, 1.0};
+	static inline float latchMoveFactor[3] = {2.0, 2.0, 1.0};
 	static inline float latchInitialDetachFactor = 0.01;
 	static inline float latchBounceFactor = 0.5;
 	static inline float latchDecayFactor = 3.0;
