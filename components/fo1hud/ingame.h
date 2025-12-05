@@ -210,7 +210,7 @@ namespace NewGameHud {
 #include "ingame_damagemeter.h"
 #include "ingame_wrecked.h"
 #include "ingame_laptime.h"
-//#include "ingame_minimap.h"
+#include "ingame_minimap.h"
 //#include "ingame_derby_overhead.h"
 //#include "ingame_multiplayer_overhead.h" // todo after i get 3d to 2d in mw
 #include "ingame_timetrial.h"

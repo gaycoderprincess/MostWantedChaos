@@ -159,7 +159,7 @@ public:
 	bool active = false;
 
 	Effect_RestartRaceOn99() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Restart Race Before The Very End";
+		sName = "Exit To Menu At 99% Completion";
 	}
 
 	void InitFunction() override {
@@ -169,7 +169,8 @@ public:
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
 			if (IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) {
-				aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
+				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+				//aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
 			}
 		}
@@ -182,4 +183,5 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
+	bool RunInMenus() override { return active; }
 } E_RestartRaceOn99;

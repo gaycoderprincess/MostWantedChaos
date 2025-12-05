@@ -118,3 +118,20 @@ public:
 	bool IsRehideable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_HeavyTraffic;*/
+
+class Effect_NoTraffic : public ChaosEffect {
+public:
+	Effect_NoTraffic() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Disable Traffic";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
+			car->Deactivate();
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_NoTraffic;

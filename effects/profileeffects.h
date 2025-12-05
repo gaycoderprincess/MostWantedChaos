@@ -35,6 +35,7 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_NoAutosave;
 
 class Effect_NoVisualTreatment : public ChaosEffect {
@@ -56,6 +57,7 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_NoVisualTreatment;
 
 

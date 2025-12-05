@@ -11,23 +11,6 @@ public:
 	}
 } E_ResetProps;
 
-class Effect_NoTraffic : public ChaosEffect {
-public:
-	Effect_NoTraffic() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Disable Traffic";
-		fTimerLength = 60;
-	}
-
-	void TickFunction(double delta) override {
-		auto cars = GetActiveVehicles();
-		for (auto& car : cars) {
-			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
-			car->Deactivate();
-		}
-	}
-	bool HasTimer() override { return true; }
-} E_NoTraffic;
-
 class Effect_SpeedSlow : public ChaosEffect {
 public:
 	Effect_SpeedSlow() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

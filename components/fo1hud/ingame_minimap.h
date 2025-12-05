@@ -16,8 +16,8 @@ public:
 
 	static inline float fWorldTopLeft[2] = {-5065,5445};
 	static inline float fWorldBottomRight[2] = {1595,-1215};
-	static inline float fScreenPos[2] = {0,0};
-	static inline float fScreenSize[2] = {0,0};
+	static inline float fScreenPos[2] = {32,300};
+	static inline float fScreenSize[2] = {128,128};
 
 	static NyaDrawing::CNyaRGBA32 GetPlayerColor(bool isPlayer) {
 		if (isPlayer) return {253,193,114,255};
@@ -101,24 +101,10 @@ public:
 		}
 	}
 
-	static inline bool bInvertDirX = false;
-	static inline bool bInvertDirZ = true;
-	static inline bool bInvertPosX = false;
-	static inline bool bInvertPosZ = false;
-	static inline bool bSwapDir = false;
-	static inline bool bSwapPos = false;
 	static float GetDirection(UMath::Matrix4 plyMatrix) {
-		if (bInvertDirX) plyMatrix.z.x *= -1;
-		if (bInvertDirZ) plyMatrix.z.z *= -1;
-
-		if (bSwapDir) return std::atan2(plyMatrix.z.z, plyMatrix.z.x);
 		return std::atan2(plyMatrix.z.x, plyMatrix.z.z);
 	}
 	static UMath::Vector3 GetFOPosition(UMath::Vector3 position) {
-		if (bInvertPosX) position.x *= -1;
-		if (bInvertPosZ) position.z *= -1;
-
-		if (bSwapPos) return {position.z, position.y, position.x};
 		return {position.x, position.y, position.z};
 	}
 
@@ -156,7 +142,6 @@ public:
 
 		bool bIsDerby = false;
 		fFO2MapSize = bIsDerby ? fFO2MapSizeDerby : fFO2MapSizeRace;
-		bFO2Minimap = true;
 
 		UMath::Matrix4 plyMatrix;
 		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&plyMatrix);
@@ -218,11 +203,7 @@ public:
 		//	DrawCheckpointOnMap(gArcadeCheckpoint);
 		//}
 
-		for (int i = 0; i < GRaceStatus::fObj->mRacerCount; i++) {
-			auto ply = &GRaceStatus::fObj->mRacerInfo[i];
-			if (ply->mIndex != 0) continue;
-			DrawPlayerOnMap(GetRacerFromHandle(ply->mhSimable), true);
-		}
+		DrawPlayerOnMap(GetLocalPlayerVehicle(), true);
 
 		if (bFO2Minimap && !bIsDerby) {
 			DrawCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) { ImGui::GetForegroundDrawList()->PopClipRect(); }, true);

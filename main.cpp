@@ -370,52 +370,11 @@ void ChaosModMenu() {
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("GroovyCars::GroovySpeed", Effect_GroovyCars::GroovySpeed);
-			//QuickValueEditor("LiftCamera::LiftOffset", Effect_LiftCamera::LiftOffset);
-			QuickValueEditor("GTCamera::XOffset", Effect_GTCamera::XOffset);
-			QuickValueEditor("GTCamera::YOffset", Effect_GTCamera::YOffset);
-			QuickValueEditor("GTCamera::ZOffset", Effect_GTCamera::ZOffset);
-			QuickValueEditor("CinematicCamera::x", Effect_CinematicCamera::x);
-			QuickValueEditor("CinematicCamera::y", Effect_CinematicCamera::y);
-			QuickValueEditor("CinematicCamera::z", Effect_CinematicCamera::z);
-			QuickValueEditor("CinematicCamera::rx", Effect_CinematicCamera::rx);
-			QuickValueEditor("CinematicCamera::ry", Effect_CinematicCamera::ry);
-			QuickValueEditor("CinematicCamera::rz", Effect_CinematicCamera::rz);
 			QuickValueEditor("Effect_TopDownCamera::yOffset", Effect_TopDownCamera::yOffset);
 			QuickValueEditor("Effect_TopDownCamera::yOffsetScale", Effect_TopDownCamera::yOffsetScale);
 			QuickValueEditor("Effect_TopDownCamera::fwdOffsetScale", Effect_TopDownCamera::fwdOffsetScale);
 			QuickValueEditor("Effect_TopDownCamera::speedDecay", Effect_TopDownCamera::speedDecay);
 			QuickValueEditor("Effect_TopDownCamera::speedCap", Effect_TopDownCamera::speedCap);
-			QuickValueEditor("FontSize_Condensed12", FlatOutHUD::FontSize_Condensed12);
-			QuickValueEditor("FontOffset_Condensed12", FlatOutHUD::FontOffset_Condensed12);
-			QuickValueEditor("FontOutline_Condensed12", FlatOutHUD::FontOutline_Condensed12);
-			QuickValueEditor("FontSize_Italic24", FlatOutHUD::FontSize_Italic24);
-			QuickValueEditor("FontOffset_Italic24", FlatOutHUD::FontOffset_Italic24);
-			QuickValueEditor("FontOutline_Italic24", FlatOutHUD::FontOutline_Italic24);
-			QuickValueEditor("FontSize_Regular18", FlatOutHUD::FontSize_Regular18);
-			QuickValueEditor("FontOffset_Regular18", FlatOutHUD::FontOffset_Regular18);
-			QuickValueEditor("FontOutline_Regular18", FlatOutHUD::FontOutline_Regular18);
-			QuickValueEditor("Effect_Shark::rX", Effect_Shark::rX);
-			QuickValueEditor("Effect_Shark::rY", Effect_Shark::rY);
-			QuickValueEditor("Effect_Shark::rZ", Effect_Shark::rZ);
-			QuickValueEditor("Effect_Shark::offX", Effect_Shark::offX);
-			QuickValueEditor("Effect_Shark::offY", Effect_Shark::offY);
-			QuickValueEditor("Effect_Shark::offZ", Effect_Shark::offZ);
-			QuickValueEditor("Effect_Shark::scale", Effect_Shark::scale);
-			QuickValueEditor("Effect_Teddie::rX", Effect_Teddie::rX);
-			QuickValueEditor("Effect_Teddie::rY", Effect_Teddie::rY);
-			QuickValueEditor("Effect_Teddie::rZ", Effect_Teddie::rZ);
-			QuickValueEditor("Effect_Teddie::offX", Effect_Teddie::offX);
-			QuickValueEditor("Effect_Teddie::offY", Effect_Teddie::offY);
-			QuickValueEditor("Effect_Teddie::offZ", Effect_Teddie::offZ);
-			QuickValueEditor("Effect_Teddie::scale", Effect_Teddie::scale);
-			QuickValueEditor("Effect_Teddie::colScale", Effect_Teddie::colScale);
-			QuickValueEditor("Effect_Pep::rX", gCustomCar_Pepper.vRotateOffset.x);
-			QuickValueEditor("Effect_Pep::rY", gCustomCar_Pepper.vRotateOffset.y);
-			QuickValueEditor("Effect_Pep::rZ", gCustomCar_Pepper.vRotateOffset.z);
-			QuickValueEditor("Effect_Pep::offX", gCustomCar_Pepper.vMoveOffset.x);
-			QuickValueEditor("Effect_Pep::offY", gCustomCar_Pepper.vMoveOffset.y);
-			QuickValueEditor("Effect_Pep::offZ", gCustomCar_Pepper.vMoveOffset.z);
-			//QuickValueEditor("Effect_Pep::wheelOffY", gCustomCar_Pepper.vWheelMoveOffset.y);
 			QuickValueEditor("detachThreshold", CustomCarPart::detachThreshold);
 			QuickValueEditor("unlatchThreshold", CustomCarPart::unlatchThreshold);
 			QuickValueEditor("latchMoveFactor[0]", CustomCarPart::latchMoveFactor[0]);
@@ -429,16 +388,7 @@ void ChaosModMenu() {
 			v.Normalize();
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
-			//QuickValueEditor("fWorldTopLeft[0]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[0]);
-			//QuickValueEditor("fWorldTopLeft[1]", FlatOutHUD::CHUD_Minimap::fWorldTopLeft[1]);
-			//QuickValueEditor("fWorldBottomRight[0]", FlatOutHUD::CHUD_Minimap::fWorldBottomRight[0]);
-			//QuickValueEditor("fWorldBottomRight[1]", FlatOutHUD::CHUD_Minimap::fWorldBottomRight[1]);
-			//QuickValueEditor("bInvertDirX", FlatOutHUD::CHUD_Minimap::bInvertDirX);
-			//QuickValueEditor("bInvertDirZ", FlatOutHUD::CHUD_Minimap::bInvertDirZ);
-			//QuickValueEditor("bSwapDir", FlatOutHUD::CHUD_Minimap::bSwapDir);
-			//QuickValueEditor("bInvertPosX", FlatOutHUD::CHUD_Minimap::bInvertPosX);
-			//QuickValueEditor("bInvertPosZ", FlatOutHUD::CHUD_Minimap::bInvertPosZ);
-			//QuickValueEditor("bSwapPos", FlatOutHUD::CHUD_Minimap::bSwapPos);
+			QuickValueEditor("bFO2Minimap", FlatOutHUD::CHUD_Minimap::bFO2Minimap);
 			ChloeMenuLib::EndMenu();
 		}
 
@@ -534,7 +484,6 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				static auto config = toml::parse_file(configName);
 				bDarkMode = config["main"]["dark_mode"].value_or(false);
 			}
-			DoChaosLoad();
 
 			for (auto& func : ChloeHook::aHooks) {
 				func();
@@ -543,6 +492,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			ChloeMenuLib::RegisterMenu("Cwoee Chaos", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
 			WriteLog(std::format("Initialized {} effects", ChaosEffect::aEffects.size()));
+			DoChaosLoad();
 
 			NyaHooks::PlaceD3DHooks(true);
 			NyaHooks::aEndSceneFuncs.push_back(D3DHookMain);

@@ -114,10 +114,19 @@ public:
 	}
 
 	void TickFunctionCamera(Camera* pCamera, double delta) override {
-		CustomCamera::SetTargetCar(GetClosestActiveVehicle(GetLocalPlayerVehicle()), GetLocalPlayerVehicle());
+		auto closest = GetClosestActiveVehicle(GetLocalPlayerVehicle());
+		if (!IsAvailable()) return;
+		CustomCamera::SetTargetCar(closest, GetLocalPlayerVehicle());
 		CustomCamera::ProcessCam(pCamera, delta);
 	}
 	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		auto closest = GetClosestActiveVehicle(GetLocalPlayerVehicle());
+		if (!closest || (*closest->GetPosition() - *GetLocalPlayerVehicle()->GetPosition()).length() > 150) return false;
+		return true;
+	}
+	bool IsRehideable() override { return true; }
+	bool IsConditionallyAvailable() override { return true; }
 } E_SecondPersonCamera;
 
 class Effect_CinematicCamera : public ChaosEffect {

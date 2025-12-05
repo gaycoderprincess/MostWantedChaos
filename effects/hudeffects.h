@@ -81,7 +81,7 @@ public:
 		// remove CostToState
 		flags &= ~0x1000;
 		// remove Minimap
-		//flags &= ~0x10000;
+		flags &= ~0x10000;
 		return flags;
 	}
 
@@ -98,9 +98,9 @@ public:
 		NyaHookLib::Patch<uint8_t>(0x57CFA8, 0x74);
 	}
 	bool HasTimer() override { return true; }
-	bool IsAvailable() override {
-		return IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
-	}
-	bool IsRehideable() override { return true; }
-	bool IsConditionallyAvailable() override { return true; }
+	//bool IsAvailable() override {
+	//	return IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
+	//}
+	//bool IsRehideable() override { return true; }
+	//bool IsConditionallyAvailable() override { return true; }
 } E_FO1HUD;

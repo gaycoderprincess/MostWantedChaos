@@ -302,20 +302,6 @@ void DoChaosLoad() {
 	}
 }
 
-void AddRunningEffect(ChaosEffect* effect) {
-	effect->bTriggeredThisCycle = true;
-	effect->LastTriggerTime = std::time(0);
-	effect->nTotalTimesActivated++;
-	aRunningEffects.push_back(ChaosEffectInstance(effect));
-	WriteLog(std::format("Activating {}", effect->sName));
-
-	DoChaosSave();
-
-	for (auto& running : aRunningEffects) {
-		running.pEffect->OnAnyEffectTriggered();
-	}
-}
-
 bool IsEffectRunning(ChaosEffect* effect) {
 	for (auto& running : aRunningEffects) {
 		if (!running.IsActive()) continue;
@@ -338,6 +324,22 @@ bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup, bool includeActivat
 		}
 	}
 	return false;
+}
+
+void AddRunningEffect(ChaosEffect* effect) {
+	if (IsEffectRunning(effect)) return;
+
+	effect->bTriggeredThisCycle = true;
+	effect->LastTriggerTime = std::time(0);
+	effect->nTotalTimesActivated++;
+	aRunningEffects.push_back(ChaosEffectInstance(effect));
+	WriteLog(std::format("Activating {}", effect->sName));
+
+	DoChaosSave();
+
+	for (auto& running : aRunningEffects) {
+		running.pEffect->OnAnyEffectTriggered();
+	}
 }
 
 int GetRandomNumber(int min, int max) {
@@ -407,6 +409,7 @@ bool RunningEffectsCleanup() {
 #include "effects/effect_leaktank.h"
 #include "effects/effect_flashbacks.h"
 #include "effects/effect_qte.h"
+#include "effects/effect_disableall.h"
 
 // todo voting effects:
 // rigged - lowest voted wins

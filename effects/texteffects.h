@@ -69,7 +69,7 @@ class Effect_ShuffleText : public ChaosEffect {
 public:
 	Effect_ShuffleText() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Shuffled Letters";
-		fTimerLength = 90;
+		fTimerLength = 120;
 	}
 
 	void InitFunction() override {

@@ -241,7 +241,8 @@ public:
 class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
 public:
 	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Ruthless Cop Spawns";
+		sName = "EVERYONE!!!";
+		sFriendlyName = "Ruthless Cop Spawns";
 		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
 	}
