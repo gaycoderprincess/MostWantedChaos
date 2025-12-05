@@ -20,7 +20,7 @@ public:
 
 		auto playerSpeed = GetLocalPlayerVehicle()->GetSpeed();
 		if (playerSpeed < 5) playerSpeed = 5;
-		tankAmount -= TankDrainRate * playerSpeed * delta;
+		tankAmount -= TankDrainRate * playerSpeed * Sim::Internal::mSystem->mSpeed * delta;
 		if (tankAmount <= 0) {
 			if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
 				ply->Sabotage(3);

@@ -39,6 +39,7 @@ public:
 	virtual bool IsAvailable() { return true; };
 	virtual bool IsConditionallyAvailable() { return false; };
 	virtual bool IsRehideable() { return false; };
+	virtual bool HideFromPlayer() { return false; };
 	virtual bool AbortOnConditionFailed() { return false; };
 	virtual bool RunInMenus() { return false; } // frontend specifically
 	virtual bool RunWhenBlocked() { return false; } // pause menu, race end screen, etc.
@@ -92,6 +93,7 @@ public:
 		if (!IsActive()) return false;
 		if (bFirstFrame) return false;
 		if (IsHidden()) return false;
+		if (pEffect->HideFromPlayer()) return false;
 		return true;
 	}
 
@@ -403,6 +405,7 @@ bool RunningEffectsCleanup() {
 #include "effects/effect_safehouse.h"
 #include "effects/effect_leaktank.h"
 #include "effects/effect_flashbacks.h"
+#include "effects/effect_qte.h"
 
 // todo voting effects:
 // rigged - lowest voted wins

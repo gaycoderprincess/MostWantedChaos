@@ -299,6 +299,7 @@ public:
 			return;
 		}
 		if (FEManager::mPauseRequest) return;
+		delta *= Sim::Internal::mSystem->mSpeed;
 
 		if (IsCarDestroyed(parentCar)) {
 			for (auto& part : aParts) {

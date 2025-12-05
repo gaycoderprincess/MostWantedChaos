@@ -153,3 +153,33 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_DisableBarriers;
+
+class Effect_RestartRaceOn99 : public ChaosEffect {
+public:
+	bool active = false;
+
+	Effect_RestartRaceOn99() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Restart Race Before The Very End";
+	}
+
+	void InitFunction() override {
+		active = false;
+	}
+	void TickFunction(double delta) override {
+		if (!active) {
+			EffectInstance->fTimer = fTimerLength;
+			if (GRaceStatus::fObj->mRaceParms && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) {
+				aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
+				active = true;
+			}
+		}
+	}
+	bool HideFromPlayer() override {
+		return !active;
+	}
+	bool IsAvailable() override {
+		return GRaceStatus::fObj->mRaceParms;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_RestartRaceOn99;
