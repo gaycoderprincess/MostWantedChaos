@@ -311,7 +311,7 @@ public:
 		if (timer > 1) {
 			int applyChance = 25;
 			int captureChance = 50;
-			if (!GRaceStatus::fObj->mRaceParms && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
+			if (!IsInNormalRace() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
 				applyChance = 40;
 				captureChance = 60;
 

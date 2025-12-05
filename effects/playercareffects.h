@@ -635,10 +635,17 @@ public:
 
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<ISpikeable>()) {
-			ply->Puncture(0);
-			ply->Puncture(1);
-			ply->Puncture(2);
-			ply->Puncture(3);
+			for (int i = 0; i < 4; i++) {
+				ply->Puncture(i);
+			}
+		}
+	}
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<ISpikeable>()) {
+			for (int i = 0; i < 4; i++) {
+				if (ply->GetTireDamage(i) < TIRE_DAMAGE_PUNCTURED) ply->Puncture(i);
+			}
 		}
 	}
 

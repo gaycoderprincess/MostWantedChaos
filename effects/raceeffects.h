@@ -168,7 +168,7 @@ public:
 	void TickFunction(double delta) override {
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
-			if (GRaceStatus::fObj->mRaceParms && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) {
+			if (IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) {
 				aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
 			}
@@ -178,7 +178,7 @@ public:
 		return !active;
 	}
 	bool IsAvailable() override {
-		return GRaceStatus::fObj->mRaceParms;
+		return IsInNormalRace();
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }

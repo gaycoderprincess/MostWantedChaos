@@ -493,3 +493,11 @@ NyaVec3 GetRelativeCarOffset(IVehicle* veh, NyaVec3 v) {
 	GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&mat);
 	return mat.Invert() * v;
 }
+
+// returns false in pursuit races
+bool IsInNormalRace() {
+	if (!GRaceStatus::fObj) return false;
+	if (!GRaceStatus::fObj->mRaceParms) return false;
+	if (GRaceParameters::GetIsPursuitRace(GRaceStatus::fObj->mRaceParms)) return false;
+	return true;
+}

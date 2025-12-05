@@ -99,7 +99,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
-		return (GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms) || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
+		return IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
 	}
 	bool IsRehideable() override { return true; }
 	bool IsConditionallyAvailable() override { return true; }

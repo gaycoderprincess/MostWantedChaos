@@ -92,6 +92,21 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
+class EffectBase_PursuitNoRaceConditional : public ChaosEffect {
+public:
+	EffectBase_PursuitNoRaceConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) Pursuit No Race Conditional";
+	}
+
+	bool IsAvailable() override {
+		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+			return ply->IsBeingPursued() && !IsInNormalRace();
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};
+
 class EffectBase_NotInPursuitConditional : public ChaosEffect {
 public:
 	EffectBase_NotInPursuitConditional(const char* category) : ChaosEffect(category) {

@@ -43,9 +43,7 @@ void DrawStringFO2_Regular18(const tNyaStringData& data, const std::string& str)
 }
 
 bool IsInRace() {
-	if (!GRaceStatus::fObj) return false;
-	if (!GRaceStatus::fObj->mRaceParms) return false;
-	return true;
+	return IsInNormalRace();
 }
 
 bool IsInPursuit() {

@@ -121,6 +121,7 @@ public:
 
 	void Draw(float y, bool inMenu) const {
 		if (!IsNameOnScreen() && !inMenu) return;
+		if (!IsActive() && inMenu) return;
 
 		auto x = fEffectX;
 		x = 1 - x;

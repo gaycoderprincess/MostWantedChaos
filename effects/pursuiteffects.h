@@ -48,9 +48,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_Pursuit;
 
-/*class Effect_ClearCostToState : public EffectBase_PursuitConditional {
+/*class Effect_ClearCostToState : public EffectBase_PursuitNoRaceConditional {
 public:
-	Effect_ClearCostToState() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_ClearCostToState() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Reset Cost To State";
 	}
 
@@ -62,9 +62,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_ClearCostToState;*/
 
-class Effect_AddCostToState : public EffectBase_PursuitConditional {
+class Effect_AddCostToState : public EffectBase_PursuitNoRaceConditional {
 public:
-	Effect_AddCostToState() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_AddCostToState() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 100K Cost To State";
 	}
 
@@ -76,9 +76,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_AddCostToState;
 
-class Effect_AddBounty : public EffectBase_PursuitConditional {
+class Effect_AddBounty : public EffectBase_PursuitNoRaceConditional {
 public:
-	Effect_AddBounty() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_AddBounty() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 100K Pursuit Bounty";
 	}
 
@@ -90,9 +90,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_AddBounty;
 
-class Effect_SubtractBounty : public EffectBase_PursuitConditional {
+class Effect_SubtractBounty : public EffectBase_PursuitNoRaceConditional {
 public:
-	Effect_SubtractBounty() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_SubtractBounty() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Subtract 100K Pursuit Bounty";
 	}
 
