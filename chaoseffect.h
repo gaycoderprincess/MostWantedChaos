@@ -20,7 +20,7 @@ public:
 	//ChaosEffect(const std::string& name, double length) : sName(name), fTimerLength(length) {
 	ChaosEffect(const char* category, bool neverPick = false) {
 		sListCategory = category;
-		if (neverPick) {
+		if (!neverPick) {
 			aEffects.push_back(this);
 		}
 	};

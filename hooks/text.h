@@ -190,14 +190,14 @@ namespace TextHook {
 			str = SearchForString(a1, GetRandomizedText(a2));
 		}
 		if (pReplaceText) str = pReplaceText;
+		if (pInterspersedText) {
+			str = GetInterspersedText(a2);
+		}
 		if (bReverseText && CanStringBeReversed(str)) {
 			str = GetReversedText(a2);
 		}
 		if (bShuffledText) {
 			str = GetShuffledText(a2);
-		}
-		if (pInterspersedText) {
-			str = GetInterspersedText(a2);
 		}
 		return str;
 	}
