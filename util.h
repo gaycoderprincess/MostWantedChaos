@@ -482,6 +482,7 @@ uint8_t* GetRaceNumLaps() {
 	if (!race) return nullptr;
 	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return nullptr;
 	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return nullptr;
+	if (GRaceParameters::GetIsPursuitRace(race->mRaceParms)) return nullptr;
 	if (auto index = race->mRaceParms->mIndex) {
 		return &index->mNumLaps;
 	}

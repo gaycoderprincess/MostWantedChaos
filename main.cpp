@@ -345,7 +345,7 @@ void ChaosModMenu() {
 				if (auto tune = GetLocalPlayerVehicle()->GetTunings()) {
 					DrawMenuOption(std::format("Aerodynamics: {:.2f}", tune->Value[Physics::Tunings::AERODYNAMICS]));
 				}
-				if (GRaceStatus::fObj && GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing) {
+				if (GRaceStatus::fObj && IsInNormalRace()) {
 					DrawMenuOption(std::format("Race Completion: {:.2f}", GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete));
 				}
 				if (DrawMenuOption("Debug Camera")) {

@@ -2,9 +2,8 @@ class CHUD_Minimap : public CIngameHUDElement {
 public:
 	static inline IDirect3DTexture9* pMapTexture = nullptr;
 	static constexpr float fArrowSize = 0.011;
-	static constexpr float fResetSize = 0.015;
 
-	static inline bool bFO2Minimap = true;
+	static inline bool bFO2Minimap = false;
 	static inline NyaVec3 vLocalPlayerPosition = {0, 0, 0};
 	static inline float fLocalPlayerHeading = 0;
 
@@ -180,7 +179,7 @@ public:
 			else {
 				float left, right, top, bottom;
 				GetMapExtents(&left, &right, &top, &bottom);
-				DrawRectangle(left, right, top, bottom, {255,255,255,255}, 0, pMapTexture);
+				DrawRectangle(left, right, top, bottom, {255,255,255,255}, 0, pMapTexture, -fLocalPlayerHeading);
 			}
 		}
 

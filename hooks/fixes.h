@@ -22,9 +22,9 @@ EAX_CarState* GetClosestPlayerCarFixed(bVector3* a1) {
 void FixIndexLapCount() {
 	auto race = GRaceStatus::fObj;
 	if (!race) return;
-	//if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return;
 	if (!race->mRaceParms) return;
 	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
+	if (GRaceParameters::GetIsPursuitRace(race->mRaceParms)) return;
 	if (auto index = race->mRaceParms->mIndex) {
 		index->mNumLaps = *(uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
 	}

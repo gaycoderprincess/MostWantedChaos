@@ -22,7 +22,7 @@ public:
 		lastStates = state;
 	}
 
-	int GetCashRewardForCarModel(const char* model) {
+	static int GetCashRewardForCarModel(const char* model) {
 		if (auto collection = Attrib::FindCollection(Attrib::StringHash32("aivehicle"), Attrib::StringHash32(model))) {
 			if (auto rep = Attrib::Collection::GetData(collection, Attrib::StringHash32("RepPointsForDestroying"), 0)) {
 				return *(int*)rep;

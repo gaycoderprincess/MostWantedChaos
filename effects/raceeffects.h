@@ -5,6 +5,7 @@ void SetRaceNumLaps(int lapCount) {
 	if (!race) return;
 	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return;
 	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
+	if (GRaceParameters::GetIsPursuitRace(race->mRaceParms)) return;
 
 	if (auto index = race->mRaceParms->mIndex) {
 		index->mNumLaps = lapCount;
@@ -127,7 +128,7 @@ public:
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
 	bool IsAvailable() override {
-		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;
+		return IsInNormalRace();
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
@@ -143,12 +144,12 @@ public:
 		GRaceStatus::DisableBarriers();
 	}
 	void DeinitFunction() override {
-		if (GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing) {
+		if (IsInNormalRace()) {
 			GRaceStatus::EnableBarriers(GRaceStatus::fObj);
 		}
 	}
 	bool IsAvailable() override {
-		return GRaceStatus::fObj->mPlayMode == GRaceStatus::kPlayMode_Racing;
+		return IsInNormalRace();
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
