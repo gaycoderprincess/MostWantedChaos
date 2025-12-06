@@ -1,5 +1,8 @@
 namespace Render3D {
 //#define RENDER3D_NOEFFECT
+	const uint32_t nDefaultVertexColor = 0xFF404040;
+	uint32_t nVertexColorValue = nDefaultVertexColor;
+	std::string sTextureSubdir;
 
 	struct CwoeeVertexData {
 		float vPos[3];
@@ -209,16 +212,21 @@ namespace Render3D {
 			dest->vPos[0] = src->x;
 			dest->vPos[1] = src->y;
 			dest->vPos[2] = src->z;
-			dest->vNormals[0] = srcNormal->x;
-			dest->vNormals[1] = srcNormal->y;
-			dest->vNormals[2] = srcNormal->z;
-			dest->vTangents[0] = srcTangent->x;
-			dest->vTangents[1] = srcTangent->y;
-			dest->vTangents[2] = srcTangent->z;
-			//dest->Color = 0xFF7F7F7F;
-			dest->Color = 0xFF404040;
-			dest->vUV[0] = srcUV->x;
-			dest->vUV[1] = srcUV->y * -1;
+			if (mesh->mNormals) {
+				dest->vNormals[0] = srcNormal->x;
+				dest->vNormals[1] = srcNormal->y;
+				dest->vNormals[2] = srcNormal->z;
+			}
+			if (mesh->mTangents) {
+				dest->vTangents[0] = srcTangent->x;
+				dest->vTangents[1] = srcTangent->y;
+				dest->vTangents[2] = srcTangent->z;
+			}
+			dest->Color = nVertexColorValue;
+			if (mesh->mTextureCoords[0]) {
+				dest->vUV[0] = srcUV->x;
+				dest->vUV[1] = srcUV->y * -1;
+			}
 		}
 
 		int indexCount = 0;
@@ -234,7 +242,7 @@ namespace Render3D {
 		model->pVertexBuffer->Unlock();
 		model->pIndexBuffer->Unlock();
 
-		auto textureName = GetMaterialFilename(material);
+		auto textureName = sTextureSubdir + GetMaterialFilename(material);
 		model->sTextureName = textureName;
 
 		for (auto& texture : aAllTextures) {

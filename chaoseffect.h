@@ -349,21 +349,24 @@ int GetRandomNumber(int min, int max) {
 	return distr(randGen);
 }
 
+bool CanEffectActivate(ChaosEffect* effect) {
+	if (IsEffectRunning(effect)) return false;
+	for (auto& group : effect->IncompatibilityGroups) {
+		if (IsEffectRunningFromGroup(group, true)) return false;
+	}
+	for (auto& group : effect->ActivateIncompatibilityGroups) {
+		if (IsEffectRunningFromGroup(group, false)) return false;
+	}
+	if (effect->IsConditionallyAvailable() && effect->AbortOnConditionFailed() && !effect->IsAvailable()) return false;
+	return true;
+}
+
 ChaosEffect* GetRandomEffect() {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
 		if (effect->bTriggeredThisCycle) continue;
-		if (IsEffectRunning(effect)) continue;
-		bool incompatible = false;
-		for (auto& group : effect->IncompatibilityGroups) {
-			if (IsEffectRunningFromGroup(group, true)) incompatible = true;
-		}
-		for (auto& group : effect->ActivateIncompatibilityGroups) {
-			if (IsEffectRunningFromGroup(group, false)) incompatible = true;
-		}
-		if (incompatible) continue;
-		if (effect->IsConditionallyAvailable() && effect->AbortOnConditionFailed() && !effect->IsAvailable()) continue;
 		//if (effect->fLastTriggerTime) // todo
+		if (!CanEffectActivate(effect)) continue;
 		availableEffects.push_back(effect);
 	}
 	if (availableEffects.empty()) {

@@ -212,3 +212,30 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_Pep;
+
+class Effect_Greenwood : public ChaosEffect {
+public:
+	Effect_Greenwood() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Bucket-Ass Car";
+		sFriendlyName = "Change Car To GTA Greenwood";
+		fTimerLength = 120;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+	}
+
+	void InitFunction() override {
+		gCustomCar_Greenwood.Reset();
+	}
+	void TickFunction3D(double delta) override {
+		CarRender_DontRenderPlayer = true;
+		DrawLightFlares = false;
+
+		gCustomCar_Greenwood.Update(GetLocalPlayerVehicle(), delta);
+		gCustomCar_Greenwood.Render(GetLocalPlayerVehicle());
+	}
+	void DeinitFunction() override {
+		CarRender_DontRenderPlayer = false;
+		DrawLightFlares = true;
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_Greenwood;

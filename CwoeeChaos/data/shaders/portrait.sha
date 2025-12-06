@@ -10,20 +10,20 @@ float4 main(PS_INPUT input) : COLOR {
 	float2 outUV = input.UV;
 	float4 outColor;
 	if (outUV.x < 0.333333 || outUV.x > 0.666666) {
-		outUV.x = outUV.x - 0.5;
-		outUV.x = outUV.x / 3;
-		outUV.x = outUV.x + 0.5;
-		outUV.y = outUV.y - 0.5;
-		outUV.y = outUV.y / 3;
-		outUV.y = outUV.y + 0.5;
+		outUV.x -= 0.5;
+		outUV.x /= 3;
+		outUV.x += 0.5;
+		outUV.y -= 0.5;
+		outUV.y /= 3;
+		outUV.y += 0.5;
 		outColor = tex2D(pTexture, outUV) * input.Color;
 	}
 	else {
 		outColor = tex2D(pTexture, outUV) * input.Color;
-		float f = sqrt((outColor.x) * (outColor.x) * 0.299 + (outColor.y) * (outColor.y) * 0.587 + (outColor.z) * (outColor.z) * 0.114);
-		outColor.x = f + ((outColor.x) - f) * 3;
-		outColor.y = f + ((outColor.y) - f) * 3;
-		outColor.z = f + ((outColor.z) - f) * 3;
+		float f = sqrt(outColor.x * outColor.x * 0.299 + outColor.y * outColor.y * 0.587 + outColor.z * outColor.z * 0.114);
+		outColor.x = f + (outColor.x - f) * 3;
+		outColor.y = f + (outColor.y - f) * 3;
+		outColor.z = f + (outColor.z - f) * 3;
 	}
 	return outColor;
 }

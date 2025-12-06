@@ -395,6 +395,12 @@ void ChaosModMenu() {
 			QuickValueEditor("bFO2Minimap", FlatOutHUD::CHUD_Minimap::bFO2Minimap);
 			QuickValueEditor("Effect_TikTok::fWordFrequency", Effect_TikTok::fWordFrequency);
 			QuickValueEditor("Effect_TikTok::fWordTimerSpeed", Effect_TikTok::fWordTimerSpeed);
+			QuickValueEditor("vMoveOffset.x", gCustomCar_Greenwood.vMoveOffset.x);
+			QuickValueEditor("vMoveOffset.y", gCustomCar_Greenwood.vMoveOffset.y);
+			QuickValueEditor("vMoveOffset.z", gCustomCar_Greenwood.vMoveOffset.z);
+			QuickValueEditor("vRotateOffset.x", gCustomCar_Greenwood.vRotateOffset.x);
+			QuickValueEditor("vRotateOffset.y", gCustomCar_Greenwood.vRotateOffset.y);
+			QuickValueEditor("vRotateOffset.z", gCustomCar_Greenwood.vRotateOffset.z);
 			ChloeMenuLib::EndMenu();
 		}
 

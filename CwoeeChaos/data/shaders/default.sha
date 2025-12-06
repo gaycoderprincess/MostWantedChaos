@@ -7,6 +7,5 @@ struct PS_INPUT {
 };
 
 float4 main(PS_INPUT input) : COLOR {
-	float4 outColor = tex2D(pTexture, input.UV) * input.Color;
-	return outColor;
+	return tex2D(pTexture, input.UV) * input.Color;
 }

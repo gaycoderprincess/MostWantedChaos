@@ -12,8 +12,8 @@ float4 main(PS_INPUT input) : COLOR {
 	if (time < 100.0) time = 100.0;
 	outUV.x = (int)(outUV.x * time);
 	outUV.y = (int)(outUV.y * time);
-	outUV.x = outUV.x / time;
-	outUV.y = outUV.y / time;
+	outUV.x /= time;
+	outUV.y /= time;
 	float4 outColor = tex2D(pTexture, outUV) * input.Color;
 	return outColor;
 }

@@ -76,11 +76,14 @@ public:
 		sFriendlyName = "Disco Screen Overlay";
 		fTimerLength = 60;
 		sFileName = "default";
+		IncompatibilityGroups.clear();
 	}
 
 	void TickFunction(double delta) override {
 		bShaderDisco = true;
-		EffectBase_ScreenShader::TickFunction(delta);
+		if (!pShaderToDraw) {
+			EffectBase_ScreenShader::TickFunction(delta);
+		}
 	}
 } E_ShaderDisco;
 

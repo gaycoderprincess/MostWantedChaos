@@ -1,6 +1,7 @@
 class CustomCarPart {
 public:
 	std::string sModelName;
+	std::string sModelBasePath;
 	bool bPartDetachable = false;
 	bool bPartHinged = false;
 	UMath::Vector3 RestPosition = {0,0,0};
@@ -56,9 +57,11 @@ public:
 		InitialDetachTurnVelocity = {0,0,0};
 	}
 
-	void Load() {
+	virtual void Load() {
 		if (aModels.empty() || aModels[0]->bInvalidated) {
+			Render3D::sTextureSubdir = sModelBasePath + "/";
 			aModels = Render3D::CreateModels(sModelName);
+			Render3D::sTextureSubdir = "";
 		}
 	}
 
@@ -225,6 +228,36 @@ public:
 	}
 };
 
+class CustomCarBrakelight : public CustomCarPart {
+public:
+	std::vector<Render3D::tModel*> aLitModels;
+
+	CustomCarBrakelight(const std::string& name, bool detachable, UMath::Vector3 restPosition) : CustomCarPart(name, detachable, restPosition) { }
+
+	void Load() override {
+		CustomCarPart::Load();
+		if (aLitModels.empty() || aLitModels[0]->bInvalidated) {
+			Render3D::nVertexColorValue = 0xFFFFFFFF;
+			Render3D::sTextureSubdir = sModelBasePath + "/";
+			aLitModels = Render3D::CreateModels(sModelName);
+			Render3D::sTextureSubdir = "";
+			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+		}
+	}
+
+	void Render(IVehicle* playerCar, NyaMat4x4 carMatrix, bool windows) override {
+		if (playerCar->mCOMObject->Find<IInput>()->GetControls()->fBrake > 0.5) {
+			auto bak = aModels;
+			aModels = aLitModels;
+			CustomCarPart::Render(playerCar, carMatrix, windows);
+			aModels = bak;
+		}
+		else {
+			CustomCarPart::Render(playerCar, carMatrix, windows);
+		}
+	}
+};
+
 class CustomCar {
 public:
 	std::string sBasePath;
@@ -243,6 +276,7 @@ public:
 	CustomCar(const std::string& basePath, const UMath::Vector3& rotateOffset, const UMath::Vector3& moveOffset, const std::vector<CustomCarPart*>& partList) : sBasePath(basePath), vRotateOffset(rotateOffset), vMoveOffset(moveOffset), aParts(partList) {
 		for (auto& part : aParts) {
 			part->sModelName = MakeRelativeModelPath(part->sModelName);
+			part->sModelBasePath = sBasePath;
 		}
 		vRotateOffset *= 0.01745329;
 	}
@@ -337,6 +371,7 @@ public:
 		vLastVelocity = {0,0,0};
 	}
 };
+
 auto gCustomCar_Pepper = CustomCar("pep", {180,0,0}, {0,0.01,0}, {
 	new CustomCarPart("body", false, {0,0,0}),
 	new CustomCarPart("coolingfan_1", false, {-0.01, 1.56308, 0.415157}),
@@ -368,4 +403,22 @@ auto gCustomCar_Pepper = CustomCar("pep", {180,0,0}, {0,0.01,0}, {
 	new CustomCarTire(1, "tire_r", {0.662652, 1.1281, 0.154147}, 0.29),
 	new CustomCarTire(2, "tire_l", {-0.663914, -1.10693, 0.142167}, 0.29),
 	new CustomCarTire(3, "tire_r", {0.663914, -1.10693, 0.142167}, 0.29),
+});
+
+auto gCustomCar_Greenwood = CustomCar("greenwood", {180,0,0}, {0,0.01,0}, {
+	new CustomCarPart("body", false, {0,1.71,-0.35 + 0.55}),
+	//new CustomCarPart("window_front", false, {0,0.70407,-0.55293 + 0.55}),
+	new CustomCarPart("bumper_f", true, {0.85, 2.62961,-0.302589 + 0.55}, true, {0.85, 2.62961,-0.302589 + 0.55}, {0,0,-1}, {0,3,1}),
+	new CustomCarPart("bumper_r", true, {0.85,-2.90231,-0.287549 + 0.55}, true, {0.85,-2.90231,-0.287549 + 0.55}, {0,0,-1}, {0,3,1}),
+	new CustomCarPart("door_fl", true, {-1.0292, 0.944064, -0.182083 + 0.55}, true, {-1.0292, 0.944064, -0.182083 + 0.55}, {0,0,0}, {0,0,60}),
+	new CustomCarPart("door_fr", true, {1.0292, 0.944064, -0.182083 + 0.55}, true, {1.0292, 0.944064, -0.182083 + 0.55}, {0,0,-60}, {0,0,0}),
+	new CustomCarPart("door_rl", true, {-1.0292, -0.367358, -0.182083 + 0.55}, true, {-1.0292, -0.367358, -0.182083 + 0.55}, {0,0,0}, {0,0,60}),
+	new CustomCarPart("door_rr", true, {1.0292, -0.367358, -0.182083 + 0.55}, true, {1.0292, -0.367358, -0.182083 + 0.55}, {0,0,-60}, {0,0,0}),
+	new CustomCarPart("hood", true, {0,0.958169,0.309367 + 0.55}, true, {0,0.958169,0.309367 + 0.55}, {0,0,0}, {80,0,0}),
+	new CustomCarPart("trunk", true, {0,-2.05209,0.301473 + 0.55}, true, {0,-2.05209,0.301473 + 0.55}, {-45,0,0}, {0,0,0}),
+	new CustomCarBrakelight("brakelight", false, {0,1.71,-0.35 + 0.55}),
+	new CustomCarTire(0, "tire_l", {-0.925, 1.70959, 0.35}, 0.35),
+	new CustomCarTire(1, "tire_r", {0.925, 1.70959, 0.35}, 0.35),
+	new CustomCarTire(2, "tire_l", {-0.925, -1.70959, 0.35}, 0.35),
+	new CustomCarTire(3, "tire_r", {0.925, -1.70959, 0.35}, 0.35),
 });

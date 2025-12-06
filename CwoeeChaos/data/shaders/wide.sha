@@ -9,9 +9,9 @@ struct PS_INPUT {
 float4 main(PS_INPUT input) : COLOR {
 	float2 outUV = input.UV;
 	float time = reg_timer.x;
-	outUV.x = outUV.x - 0.5;
-	outUV.x = outUV.x / (1 + 0.33333333 * time);
-	outUV.x = outUV.x + 0.5;
+	outUV.x -= 0.5;
+	outUV.x /= (1 + 0.33333333 * time);
+	outUV.x += 0.5;
 	float4 outColor = tex2D(pTexture, outUV) * input.Color;
 	return outColor;
 }

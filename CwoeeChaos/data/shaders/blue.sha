@@ -9,7 +9,7 @@ struct PS_INPUT {
 float4 main(PS_INPUT input) : COLOR {
 	float4 outColor = tex2D(pTexture, input.UV) * input.Color;
 	float time = reg_timer.x;
-	outColor.x = outColor.x * (1 - time);
-	outColor.y = outColor.y * (1 - time);
+	outColor.x *= (1 - time);
+	outColor.y *= (1 - time);
 	return outColor;
 }
