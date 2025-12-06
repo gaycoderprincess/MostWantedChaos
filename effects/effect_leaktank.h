@@ -36,3 +36,19 @@ public:
 		return abort;
 	}
 } E_LeakTank;
+
+class Effect_LeakTankRefuel : public ChaosEffect {
+public:
+	Effect_LeakTankRefuel() : ChaosEffect("Uncategorized") {
+		sName = "Refuel Player Car";
+	}
+
+	void InitFunction() override {
+		E_LeakTank.tankAmount = 100;
+	}
+	bool IsAvailable() override {
+		return IsEffectRunning(&E_LeakTank);
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_LeakTankRefuel;

@@ -1313,6 +1313,16 @@ public:
 			ply->SetLinearVelocity(&UMath::Vector3::kZero);
 		}
 	}
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			auto vel = *ply->GetLinearVelocity();
+			if (vel.y < -2) {
+				vel.x = 0;
+				vel.z = 0;
+				ply->SetLinearVelocity(&vel);
+			}
+		}
+	}
 	void DeinitFunction() override {
 		NoResetCount--;
 	}

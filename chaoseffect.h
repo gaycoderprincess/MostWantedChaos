@@ -388,8 +388,6 @@ bool RunningEffectsCleanup() {
 	return false;
 }
 
-#include <numbers>
-
 #include "effects/effectbases.h"
 #include "effects/basiceffects.h"
 #include "effects/shadereffects.h"

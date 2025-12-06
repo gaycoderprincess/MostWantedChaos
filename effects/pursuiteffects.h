@@ -371,11 +371,11 @@ public:
 		}
 
 		NyaHookLib::Patch<uint8_t>(0x6B6769, 0xEB); // DamageCopCar::CheckUpright
-		NyaHookLib::Patch(0x8AD460, 0x69CAC7); // DamageCopCar::OnImpact
+		NyaHookLib::Patch<uint8_t>(0x42E930, 0xC3); // AICopManager::ApplyBreakerZones
 	}
 	void DeinitFunction() override {
 		NyaHookLib::Patch<uint8_t>(0x6B6769, 0x75);
-		NyaHookLib::Patch(0x8AD460, 0x69CA30);
+		NyaHookLib::Patch<uint8_t>(0x42E930, 0x83);
 	}
 	bool HasTimer() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }

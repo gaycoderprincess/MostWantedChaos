@@ -138,6 +138,7 @@ class Effect_DisableBarriers : public ChaosEffect {
 public:
 	Effect_DisableBarriers() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Race Barriers";
+		fTimerLength = 120;
 	}
 
 	void TickFunction(double delta) override {

@@ -204,8 +204,8 @@ public:
 class Effect_ShaderBlur : public EffectBase_ScreenShader {
 public:
 	Effect_ShaderBlur() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
-		sName = "Out Of Focus";
-		sFriendlyName = "Blur The Screen Slightly";
+		sName = "Where's My Glasses?";
+		sFriendlyName = "Blur The Screen";
 		fTimerLength = 60;
 		sFileName = "blur";
 	}
