@@ -188,3 +188,32 @@ public:
 		sFileName = "blackwhite";
 	}
 } E_ShaderBW;
+
+class Effect_ShaderSaturate : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderSaturate() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
+		sName = "Saturate The Screen";
+		fTimerLength = 60;
+		sFileName = "saturate";
+	}
+} E_ShaderSaturate;
+
+class Effect_ShaderBlur : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderBlur() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
+		sName = "Out Of Focus";
+		sFriendlyName = "Blur The Screen Slightly";
+		fTimerLength = 60;
+		sFileName = "blur";
+	}
+} E_ShaderBlur;
+
+class Effect_ShaderBlur2 : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderBlur2() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
+		sName = "Drunk Mode";
+		sFriendlyName = "Drunk Screen Overlay";
+		fTimerLength = 30;
+		sFileName = "drunk";
+	}
+} E_ShaderBlur2;

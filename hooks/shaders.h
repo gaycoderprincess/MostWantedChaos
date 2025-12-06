@@ -47,6 +47,8 @@ void DoScreenShaders() {
 			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE); // the render target may have alpha baked in!
 			g_pd3dDevice->SetPixelShader(pShader);
 			g_pd3dDevice->SetPixelShaderConstantF(1, bShaderTimerEase1 ? fTimeEased : fTime, 1);
+			float temp[] = {(float)nResX, (float)nResY, 0, 0};
+			g_pd3dDevice->SetPixelShaderConstantF(2, temp, 1);
 		}, false);
 		if (bShaderDisco) {
 			static double r = 0;
