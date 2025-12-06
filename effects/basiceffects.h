@@ -277,3 +277,16 @@ public:
 		}
 	}
 } E_SFXPursuitBreaker;
+
+class Effect_3Effects : public ChaosEffect {
+public:
+	Effect_3Effects() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Activate 3 Effects";
+	}
+
+	void InitFunction() override {
+		AddRunningEffect(GetRandomEffect());
+		AddRunningEffect(GetRandomEffect());
+		AddRunningEffect(GetRandomEffect());
+	}
+} E_3Effects;

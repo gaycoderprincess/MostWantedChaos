@@ -256,3 +256,37 @@ public:
 		DoTopDownCamera(pCamera, delta, true);
 	}
 } E_TopDownCamera2;
+
+class Effect_ReverseCamera : public ChaosEffect {
+public:
+	Effect_ReverseCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Forced Rear View";
+		fTimerLength = 30;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	static inline float rx = 0;
+	static inline float ry = 0;
+	static inline float rz = 180;
+	static inline float x = 0;
+	static inline float y = 1;
+	static inline float z = -1;
+
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
+		if (!GetLocalPlayerVehicle()) return;
+
+		UMath::Matrix4 playerMatrix;
+		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&playerMatrix);
+		playerMatrix.p = *GetLocalPlayerVehicle()->GetPosition();
+		NyaMat4x4 offsetMatrix;
+		offsetMatrix.Rotate(NyaVec3(rx * 0.01745329, ry * 0.01745329, rz * 0.01745329));
+		offsetMatrix.p.x = x;
+		offsetMatrix.p.y = y;
+		offsetMatrix.p.z = z;
+		playerMatrix = (UMath::Matrix4)(playerMatrix * offsetMatrix);
+		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(playerMatrix));
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_ReverseCamera;

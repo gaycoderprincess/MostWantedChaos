@@ -5,7 +5,7 @@ public:
 	Effect_Shark() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Friends Of Blahaj";
 		sFriendlyName = "Blahaj Roof Racks";
-		fTimerLength = 60;
+		fTimerLength = 90;
 	}
 
 	std::vector<Render3D::tModel*> models;
@@ -48,7 +48,98 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_Shark;
+
+class Effect_Shark2 : public ChaosEffect {
+public:
+	Effect_Shark2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Become Fish";
+		sFriendlyName = "All Cars Are Blahaj";
+		fTimerLength = 60;
+	}
+
+	std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 0;
+	static inline float rY = 180;
+	static inline float rZ = 90;
+	static inline float offX = 0;
+	static inline float offY = -0.9;
+	static inline float offZ = -0.5;
+	static inline float scale = 1.5;
+
+	static inline float stareX = 0;
+	static inline float stareY = 0;
+	static inline float stareZ = 90;
+
+	void DrawAFish(const Render3D::tModel* model, UMath::Matrix4 mat) {
+		mat.p += mat.x * offX;
+		mat.p += mat.y * offY;
+		mat.p += mat.z * offZ;
+		mat.x *= scale;
+		mat.y *= scale;
+		mat.z *= scale;
+
+		UMath::Matrix4 rotation;
+		rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+		mat = (UMath::Matrix4)(mat * rotation);
+
+		auto carMatrix = WorldToRenderMatrix(mat);
+		if (CarRender_Billboard) {
+			auto cameraMatrix = PrepareCameraMatrix(eViews[EVIEW_PLAYER1].pCamera);
+			auto cameraPos = cameraMatrix.p;
+			auto carPos = carMatrix.p;
+
+			auto lookat = carPos - cameraPos;
+			lookat.Normalize();
+			auto lookatMatrix = NyaMat4x4::LookAt(lookat, {0, 0, 1});
+			carMatrix.x = lookatMatrix.x;
+			carMatrix.y = lookatMatrix.y;
+			carMatrix.z = lookatMatrix.z;
+
+			NyaMat4x4 offsetMatrix;
+			offsetMatrix.Rotate(NyaVec3(stareX * 0.01745329, stareY * 0.01745329, stareZ * 0.01745329));
+			carMatrix = carMatrix * offsetMatrix;
+		}
+		model->RenderAt(carMatrix);
+	}
+
+	void TickFunction3D(double delta) override {
+		DrawCars = false;
+
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("shork.fbx");
+		}
+
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+			for (auto& model : models) {
+				auto mat = UMath::Matrix4::kIdentity;
+				mat.p.y += 1;
+				DrawAFish(model, mat);
+			}
+		}
+		else {
+			auto cars = GetActiveVehicles();
+			for (auto& model : models) {
+				for (auto& car : cars) {
+					if (auto veh = car->mCOMObject->Find<IRigidBody>()) {
+						auto mat = UMath::Matrix4::kIdentity;
+						veh->GetMatrix4(&mat);
+						mat.p = *veh->GetPosition();
+						DrawAFish(model, mat);
+					}
+				}
+			}
+		}
+	}
+	void DeinitFunction() override {
+		DrawCars = true;
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_Shark2;
 
 class Effect_Teddie : public ChaosEffect {
 public:

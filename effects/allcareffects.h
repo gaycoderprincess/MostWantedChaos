@@ -593,6 +593,7 @@ public:
 		DrawLightFlares = true;
 	}
 	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_BillboardCars;
 
