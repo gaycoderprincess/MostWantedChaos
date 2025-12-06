@@ -62,6 +62,7 @@ namespace FlatOutHUD {
 #include "hooks/text.h"
 #include "hooks/shaders.h"
 #include "hooks/carrender.h"
+#include "hooks/eventwin.h"
 #include "chaoseffect.h"
 
 void OnWinRace() {
@@ -90,10 +91,6 @@ void MoneyChecker() {
 			name = std::format("Money changed (${} -> ${})", cash, currentCash);
 			TempEffect.sName = name.c_str();
 			AddRunningEffect(&TempEffect);
-			// todo this is an unreliable hack
-			if (currentCash > cash && currentCash < cash + 15000) {
-				OnWinRace();
-			}
 			if (currentCash >= 2000000) {
 				Achievements::AwardAchievement(GetAchievement("MILLIONAIRE"));
 			}
