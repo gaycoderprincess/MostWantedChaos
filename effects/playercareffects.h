@@ -920,6 +920,7 @@ public:
 			auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
 			for (auto &car: cars->CarTable) {
 				if (car.Handle == 0xFFFFFFFF) continue;
+				if (car.VehicleKey == Attrib::StringHash32("copcross")) continue;
 				validCars.push_back(&car);
 			}
 			auto car = validCars[rand() % validCars.size()];
@@ -985,6 +986,7 @@ public:
 	}
 } E_SetCarRandomAI;
 
+// this can crash sometimes?
 class Effect_SetCarRandomOpponent : public EffectBase_OpponentInRaceConditional {
 public:
 	Effect_SetCarRandomOpponent() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
@@ -1011,6 +1013,7 @@ public:
 	Effect_SetCarMassInf() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Player Mass";
 		fTimerLength = 90;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("playermass"));
 	}
 
 	void TickFunction(double delta) override {
@@ -1031,6 +1034,7 @@ public:
 	Effect_SetCarMass0() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Zero Player Mass";
 		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("playermass"));
 	}
 
 	void TickFunction(double delta) override {

@@ -98,6 +98,9 @@ namespace TextHook {
 	}
 
 	const char* GetShuffledText(uint32_t hash) {
+		static std::random_device rd;
+		static std::mt19937 g(rd());
+
 		for (auto& cache : ShuffledTextCache) {
 			if (cache.origHash == hash) return cache.newString;
 		}
@@ -106,7 +109,7 @@ namespace TextHook {
 		std::string str;
 		for (auto& word : words) {
 			if (CanStringBeShuffled(word)) {
-				std::random_shuffle(word.begin(), word.end());
+				std::shuffle(word.begin(), word.end(), g);
 			}
 			str += word;
 			if (&word != &words[words.size()-1]) str += " ";

@@ -357,6 +357,30 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_InvincibleTires;
 
+class Effect_InvincibleCops : public EffectBase_PursuitConditional {
+public:
+	Effect_InvincibleCops() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Invincible Cops";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto cars = GetActiveVehicles(DRIVER_COP);
+		for (auto& car : cars) {
+			car->mCOMObject->Find<IDamageable>()->ResetDamage();
+		}
+
+		NyaHookLib::Patch<uint8_t>(0x6B6769, 0xEB); // DamageCopCar::CheckUpright
+		NyaHookLib::Patch(0x8AD460, 0x69CAC7); // DamageCopCar::OnImpact
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x6B6769, 0x75);
+		NyaHookLib::Patch(0x8AD460, 0x69CA30);
+	}
+	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_InvincibleCops;
+
 class Effect_CopJenga : public EffectBase_ManyActiveCopsConditional {
 public:
 	Effect_CopJenga() : EffectBase_ManyActiveCopsConditional(EFFECT_CATEGORY_TEMP) {

@@ -582,6 +582,7 @@ public:
 	Effect_BillboardCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cars Stare At You";
 		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("carstare"));
 	}
 
 	void InitFunction() override {
@@ -603,6 +604,7 @@ public:
 		sName = "Staredown";
 		sFriendlyName = "Cars Stare At Each Other";
 		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("carstare"));
 	}
 
 	void InitFunction() override {
