@@ -195,3 +195,18 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 };
+
+class EffectBase_HasTuningConditional : public ChaosEffect {
+public:
+	EffectBase_HasTuningConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) Has Tuning Conditional";
+	}
+
+	bool IsAvailable() override {
+		if (auto ply = GetLocalPlayerVehicle()) {
+			return ply->GetTunings() != nullptr;
+		}
+		return false;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+};

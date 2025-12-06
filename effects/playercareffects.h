@@ -360,9 +360,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_PlayerCarSpin;
 
-class Effect_PlayerCarTuneAero : public ChaosEffect {
+class Effect_PlayerCarTuneAero : public EffectBase_HasTuningConditional {
 public:
-	Effect_PlayerCarTuneAero() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarTuneAero() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Aerodynamics +100";
 		fTimerLength = 15;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("aerodynamics"));
@@ -383,11 +383,12 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneAero;
 
-class Effect_PlayerCarTuneHandling : public ChaosEffect {
+class Effect_PlayerCarTuneHandling : public EffectBase_HasTuningConditional {
 public:
-	Effect_PlayerCarTuneHandling() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarTuneHandling() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Handling +10";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
@@ -408,11 +409,12 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHandling;
 
-class Effect_PlayerCarTuneHandling2 : public ChaosEffect {
+class Effect_PlayerCarTuneHandling2 : public EffectBase_HasTuningConditional {
 public:
-	Effect_PlayerCarTuneHandling2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarTuneHandling2() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Handling -10";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
@@ -433,11 +435,12 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHandling2;
 
-/*class Effect_PlayerCarTuneHeight : public ChaosEffect {
+/*class Effect_PlayerCarTuneHeight : public EffectBase_HasTuningConditional {
 public:
-	Effect_PlayerCarTuneHeight() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarTuneHeight() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Stanced Suspension";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
@@ -458,11 +461,12 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight;*/
 
-/*class Effect_PlayerCarTuneHeight2 : public ChaosEffect {
+/*class Effect_PlayerCarTuneHeight2 : public EffectBase_HasTuningConditional {
 public:
-	Effect_PlayerCarTuneHeight2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarTuneHeight2() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Super Stanced Suspension";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
@@ -483,11 +487,12 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight2;*/
 
-class Effect_PlayerCarTuneHeight3 : public ChaosEffect {
+class Effect_PlayerCarTuneHeight3 : public EffectBase_HasTuningConditional {
 public:
-	Effect_PlayerCarTuneHeight3() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarTuneHeight3() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Monster Truck Suspension";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
@@ -508,14 +513,15 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight3;
 
-class Effect_PlayerCarTuneHeight4 : public ChaosEffect {
+class Effect_PlayerCarTuneHeight4 : public EffectBase_HasTuningConditional {
 public:
 	double state = 0;
 	bool goBack = false;
 
-	Effect_PlayerCarTuneHeight4() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarTuneHeight4() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Bouncy Suspension";
 		fTimerLength = 30;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
@@ -543,6 +549,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight4;
 
 class Effect_PlayerCarTuneNitro : public EffectBase_PlayerCarHasNitro {
