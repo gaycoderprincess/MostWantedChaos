@@ -923,6 +923,61 @@ public:
 	}
 } E_SetCarRandom;
 
+class Effect_SetCarRandomAI : public ChaosEffect {
+public:
+	Effect_SetCarRandomAI() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Change Car To AI Traffic/Police Car";
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() {
+			std::vector<const char*> carModels = {
+				"copgto",
+				"copgtoghost",
+				"copmidsize",
+				"copghost",
+				//"copsport",
+				"copcross",
+				"copsportghost",
+				"copsporthench",
+				"copsuv",
+				"copsuvl",
+				"copsuvpatrol",
+				"semi",
+				"semia",
+				"semib",
+				"semicmt",
+				"semicon",
+				"semicrate",
+				"semilog",
+				"traf4dseda",
+				"traf4dsedb",
+				"traf4dsedc",
+				"trafcourt",
+				"trafficcoup",
+				"trafha",
+				"trafpizza",
+				"trafstwag",
+				"traftaxi",
+				"trafamb",
+				"trafcemtr",
+				"trafdmptr",
+				"traffire",
+				"trafgarb",
+				//"trafcamper",
+				"trafminivan",
+				"trafnews",
+				"trafpickupa",
+				"trafsuva",
+				"trafvanb",
+			};
+
+			uint32_t model = Attrib::StringHash32(carModels[rand()%carModels.size()]);
+			ChangePlayerCarInWorld(model, nullptr);
+		});
+	}
+} E_SetCarRandomAI;
+
 class Effect_SetCarRandomOpponent : public EffectBase_OpponentInRaceConditional {
 public:
 	Effect_SetCarRandomOpponent() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {

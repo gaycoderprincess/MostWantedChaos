@@ -245,7 +245,7 @@ public:
 	Effect_Mona() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Not A Cat";
 		sFriendlyName = "Change Car To Morgana";
-		fTimerLength = 120;
+		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 

@@ -30,6 +30,16 @@ void FixIndexLapCount() {
 	}
 }
 
+// always unlock all cars in the career garage
+auto IsCarUnlockedOrig = (bool(__cdecl*)(void* a1, uint32_t a2, int a3))nullptr;
+bool IsCarUnlockedFixed(void* a1, uint32_t a2, int a3) {
+	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	if (auto rec = FEPlayerCarDB::GetCarRecordByHandle(cars, a2)) {
+		if (FEPlayerCarDB::GetCareerRecordByHandle(cars, rec->CareerHandle) != nullptr) return true;
+	}
+	return IsCarUnlockedOrig(a1, a2, a3);
+}
+
 ChloeHook Hook_GameFixes([]() {
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63C093, &TotalVehicleFixed);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63839A, &BlowEngineFixed);
@@ -38,6 +48,8 @@ ChloeHook Hook_GameFixes([]() {
 	// always reuse dummy_skin1 if there are no free skin slots left
 	NyaHookLib::Patch<uint16_t>(0x75D2B9, 0x9090);
 	NyaHookLib::Patch<uint64_t>(0x75D2BB, 0x9014EB00000001BA); // change UsePrecompositeVinyls path to set edx to 1 and jmp out
+
+	IsCarUnlockedOrig = (bool(__cdecl*)(void* a1, uint32_t a2, int a3))NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x7BF8A2, &IsCarUnlockedFixed);
 
 	aMainLoopFunctions.push_back(FixIndexLapCount);
 });

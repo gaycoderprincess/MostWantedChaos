@@ -235,6 +235,29 @@ FECarRecord* CreatePinkSlipPreset(const char* presetName) {
 	return FEPlayerCarDB::CreateNewPresetCar(cars, presetName);
 }
 
+FECarRecord* CreateStockCarRecord(const char* carModel) {
+	uint32_t rideHash = Attrib::StringHash32(carModel);
+	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	for (auto& car : cars->CarTable) {
+		if (car.VehicleKey == rideHash) {
+			return &car;
+		}
+	}
+
+	for (auto& car : cars->CarTable) {
+		if (car.Handle == 0xFFFFFFFF) {
+			car.Handle = rideHash;
+			car.FEKey = rideHash;
+			car.VehicleKey = rideHash;
+			car.FilterBits = 0x10001;
+			car.Customization = -1;
+			car.CareerHandle = -1;
+			return &car;
+		}
+	}
+	return nullptr;
+}
+
 IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, bool forceNOS = false) {
 	// really weird hack for transparent car skins, change to a non-skinnable car first
 	// works but crashes the game after a few attempts

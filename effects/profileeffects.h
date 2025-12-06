@@ -303,6 +303,7 @@ public:
 				{"Mia", "E3_DEMO_RX8", nullptr},//"rx8"}, // mia isn't actually a blacklist member, is this fine to have?
 				{"Razor - Mustang", "RAZORMUSTANG", nullptr},//"mustanggt"},
 				{"Ronnie - Supra", "DDAYSUPRA", nullptr},//"supra"},
+				{"Cross", nullptr, "copcross"},
 		};
 
 		std::vector<tPinkSlip> unearnedPinkSlips;
@@ -328,8 +329,15 @@ public:
 			Achievements::AwardAchievement(GetAchievement("WIN_PINKSLIP"));
 			auto ride = unearnedPinkSlips[rand() % unearnedPinkSlips.size()];
 			EffectInstance->sNameToDisplay = std::format("{} ({} - {})", sName, selectedMarker.name, ride.name);
-			CreatePinkSlipPreset(ride.preset);
-			FEPlayerCarDB::AwardRivalCar(&FEDatabase->mUserProfile->PlayersCarStable, FEngHashString(ride.preset));
+			if (ride.preset == nullptr) {
+				if (auto car = CreateStockCarRecord(ride.carType)) {
+					FEPlayerCarDB::CreateNewCareerCar(&FEDatabase->mUserProfile->PlayersCarStable, car->Handle);
+				}
+			}
+			else {
+				CreatePinkSlipPreset(ride.preset);
+				FEPlayerCarDB::AwardRivalCar(&FEDatabase->mUserProfile->PlayersCarStable, FEngHashString(ride.preset));
+			}
 		}
 		else {
 			FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
