@@ -197,14 +197,11 @@ public:
 	static inline float speedDecay = 5;
 	static inline float speedCap = 200;
 
-	void InitFunction() override {
-		speed = 0;
-	}
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void DoTopDownCamera(Camera* pCamera, double delta, bool upsidedown) {
 		auto ply = GetLocalPlayerInterface<IRigidBody>();
 
 		UMath::Matrix4 camMatrix;
-		camMatrix.Rotate(NyaVec3(-90 * 0.01745329, 0, 0));
+		camMatrix.Rotate(NyaVec3((upsidedown ? 90 : -90) * 0.01745329, 0, 0));
 		camMatrix.p = *ply->GetPosition();
 
 		UMath::Vector3 fwd;
@@ -231,10 +228,31 @@ public:
 			}
 		}
 
-		camMatrix.p.y += yOffset;
-		camMatrix.p.y += abs(speed) * yOffsetScale;
+		auto addY = yOffset + (abs(speed) * yOffsetScale);
+		camMatrix.p.y += upsidedown ? -addY : addY;
 		camMatrix.p += speed * fwdOffsetScale * fwd;
 		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(camMatrix));
 	}
+
+	void InitFunction() override {
+		speed = 0;
+	}
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
+		DoTopDownCamera(pCamera, delta, false);
+	}
 	bool HasTimer() override { return true; }
 } E_TopDownCamera;
+
+class Effect_TopDownCamera2 : public Effect_TopDownCamera {
+public:
+	Effect_TopDownCamera2() : Effect_TopDownCamera() {
+		sName = "Bottom-Up Camera";
+		fTimerLength = 30;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	void TickFunctionCamera(Camera* pCamera, double delta) override {
+		DoTopDownCamera(pCamera, delta, true);
+	}
+} E_TopDownCamera2;

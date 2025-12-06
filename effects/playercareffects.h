@@ -923,17 +923,18 @@ public:
 	}
 } E_SetCarRandom;
 
-class Effect_SetCarRandomOpponent : public EffectBase_OpponentInRaceOrRoamingConditional {
+class Effect_SetCarRandomOpponent : public EffectBase_OpponentInRaceConditional {
 public:
-	Effect_SetCarRandomOpponent() : EffectBase_OpponentInRaceOrRoamingConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Steal Car From Random Opponent";
+	Effect_SetCarRandomOpponent() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Grand Theft Auto";
+		sFriendlyName = "Steal Car From Random Opponent";
 	}
 
 	void InitFunction() override {
 		aMainLoopFunctionsOnce.push_back([]() {
 			auto cars = GetActiveVehicles(DRIVER_RACER);
 			if (cars.empty()) return;
-			
+
 			auto car = cars[rand()%cars.size()];
 			auto carModel = car->GetVehicleName();
 			auto carTuning = (FECustomizationRecord*)car->GetCustomizations();
