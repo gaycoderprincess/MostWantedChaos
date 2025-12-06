@@ -120,6 +120,21 @@ IVehicle* GetClosestActiveVehicle(IVehicle* toVehicle) {
 	return out;
 }
 
+IVehicle* GetClosestActiveVehicle(NyaVec3 toCoords) {
+	auto sourcePos = toCoords;
+	IVehicle* out = nullptr;
+	float distance = 99999;
+	auto cars = GetActiveVehicles();
+	for (auto& car : cars) {
+		auto targetPos = *car->GetPosition();
+		if ((sourcePos - targetPos).length() < distance) {
+			out = car;
+			distance = (sourcePos - targetPos).length();
+		}
+	}
+	return out;
+}
+
 class ChloeHook {
 public:
 	static inline std::vector<void(*)()> aHooks;

@@ -597,6 +597,26 @@ public:
 	bool RunInMenus() override { return true; }
 } E_BillboardCars;
 
+class Effect_BillboardCars2 : public EffectBase_ActiveCarsConditional {
+public:
+	Effect_BillboardCars2() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Staredown";
+		sFriendlyName = "Cars Stare At Each Other";
+		fTimerLength = 60;
+	}
+
+	void InitFunction() override {
+		CarRender_BillboardEachOther = true;
+		DrawLightFlares = false;
+	}
+	void DeinitFunction() override {
+		CarRender_BillboardEachOther = false;
+		DrawLightFlares = true;
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_BillboardCars2;
+
 class Effect_InvisCars : public ChaosEffect {
 public:
 	Effect_InvisCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

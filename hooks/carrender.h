@@ -4,6 +4,7 @@ bool CarRender_TruncateRotation = false;
 float CarRender_TruncateRotationAccuracy = 10;
 bool CarRender_Billboard = false;
 bool CarRender_DontRenderPlayer = false;
+bool CarRender_BillboardEachOther = false;
 
 float TruncateFloat(float in, int accuracy) {
 	in *= accuracy;
@@ -16,8 +17,7 @@ static inline auto CarGetVisibleStateOrig = (int(__thiscall*)(eView*, const bVec
 int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVector3* a3, bMatrix4* a4) {
 	auto carMatrix = (NyaMat4x4*)a4;
 	if (CarRender_DontRenderPlayer && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen()) {
-		auto dist = (RenderToWorldCoords(carMatrix->p) - *GetLocalPlayerVehicle()->GetPosition()).length();
-		if (dist < 1) {
+		if (GetClosestActiveVehicle(RenderToWorldCoords(carMatrix->p)) == GetLocalPlayerVehicle()) {
 			// hacky solution!! it works but checking some CarRenderInfo ptr against the player and disabling DrawCars would be way better
 			carMatrix->p = {0,0,0};
 			return CarGetVisibleStateOrig(a1, a2, a3, a4);
@@ -38,6 +38,30 @@ int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVe
 		NyaMat4x4 offsetMatrix;
 		offsetMatrix.Rotate(NyaVec3(90 * 0.01745329, 0 * 0.01745329, -90 * 0.01745329));
 		*carMatrix = *carMatrix * offsetMatrix;
+	}
+	if (CarRender_BillboardEachOther && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
+		if (auto renderVeh = GetClosestActiveVehicle(RenderToWorldCoords(carMatrix->p))) {
+			auto closest = (renderVeh->GetDriverClass() == DRIVER_COP && renderVeh->mCOMObject->Find<IVehicleAI>()->GetPursuit()) ? GetLocalPlayerVehicle() : GetClosestActiveVehicle(renderVeh);
+			if (closest) {
+				UMath::Matrix4 cameraMatrix;
+				closest->mCOMObject->Find<IRigidBody>()->GetMatrix4(&cameraMatrix);
+				cameraMatrix.p = *closest->GetPosition();
+
+				auto cameraPos = WorldToRenderCoords(cameraMatrix.p);
+				auto carPos = carMatrix->p;
+
+				auto lookat = carPos - cameraPos;
+				lookat.Normalize();
+				auto lookatMatrix = NyaMat4x4::LookAt(lookat, {0,0,1});
+				carMatrix->x = lookatMatrix.x;
+				carMatrix->y = lookatMatrix.y;
+				carMatrix->z = lookatMatrix.z;
+
+				NyaMat4x4 offsetMatrix;
+				offsetMatrix.Rotate(NyaVec3(90 * 0.01745329, 0 * 0.01745329, -90 * 0.01745329));
+				*carMatrix = *carMatrix * offsetMatrix;
+			}
+		}
 	}
 	if (CarRender_TruncateRotation) {
 		double lengths[3] = {
