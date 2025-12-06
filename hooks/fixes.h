@@ -34,5 +34,10 @@ ChloeHook Hook_GameFixes([]() {
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63C093, &TotalVehicleFixed);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63839A, &BlowEngineFixed);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x4F0E70, &GetClosestPlayerCarFixed);
+
+	// always reuse dummy_skin1 if there are no free skin slots left
+	NyaHookLib::Patch<uint16_t>(0x75D2B9, 0x9090);
+	NyaHookLib::Patch<uint64_t>(0x75D2BB, 0x9014EB00000001BA); // change UsePrecompositeVinyls path to set edx to 1 and jmp out
+
 	aMainLoopFunctions.push_back(FixIndexLapCount);
 });

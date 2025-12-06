@@ -881,54 +881,67 @@ public:
 	}
 
 	void InitFunction() override {
-		// copy tunings from the current car if applicable, all junkman if not
-		//auto customization = CreateStockCustomizations(Attrib::StringHash32("cs_clio_trafpizza"));
-		//if (auto car = GetCurrentCareerCar()) {
-		//	auto srcCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
-		//	if (!srcCustomization) return;
-		//	customization.InstalledPhysics = srcCustomization->InstalledPhysics;
-		//}
-		//else {
-		//	for (int i = 0; i < Physics::Upgrades::Package::PUT_MAX; i++) {
-		//		customization.InstalledPhysics.Part[i] = 4;
-		//	}
-		//	customization.InstalledPhysics.Junkman = 0xFFFFFFFF;
-		//}
-		ChangePlayerCarInWorld(Attrib::StringHash32("cs_clio_trafpizza"), nullptr);
+		aMainLoopFunctionsOnce.push_back([]() {
+			ChangePlayerCarInWorld(Attrib::StringHash32("cs_clio_trafpizza"), nullptr);
+		});
 	}
 } E_SetCarTRAFPIZZA;
 
-class Effect_SetCarRazor : public EffectBase_SafelyChangePlayerCar {
+class Effect_SetCarRazor : public ChaosEffect {
 public:
-	Effect_SetCarRazor() : EffectBase_SafelyChangePlayerCar(EFFECT_CATEGORY_TEMP) {
+	Effect_SetCarRazor() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Razor's Mustang";
 	}
 
 	void InitFunction() override {
-		auto car = CreatePinkSlipPreset("RAZORMUSTANG");
-		ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization), true);
+		aMainLoopFunctionsOnce.push_back([]() {
+			auto car = CreatePinkSlipPreset("RAZORMUSTANG");
+			ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization), true);
+		});
 	}
 } E_SetCarRazor;
 
-class Effect_SetCarRandom : public EffectBase_SafelyChangePlayerCar {
+class Effect_SetCarRandom : public ChaosEffect {
 public:
-	Effect_SetCarRandom() : EffectBase_SafelyChangePlayerCar(EFFECT_CATEGORY_TEMP) {
+	Effect_SetCarRandom() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Random Model";
 	}
 
 	void InitFunction() override {
-		std::vector<FECarRecord*> validCars;
-		auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
-		for (auto& car : cars->CarTable) {
-			if (car.Handle == 0xFFFFFFFF) continue;
-			validCars.push_back(&car);
-		}
-		auto car = validCars[rand()%validCars.size()];
-		auto pCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(cars, car->Customization);
-		auto customization = pCustomization ? *pCustomization : CreateRandomCustomizations(car->VehicleKey);
-		ChangePlayerCarInWorld(car->VehicleKey, &customization, true);
+		aMainLoopFunctionsOnce.push_back([]() {
+			std::vector<FECarRecord*> validCars;
+			auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+			for (auto &car: cars->CarTable) {
+				if (car.Handle == 0xFFFFFFFF) continue;
+				validCars.push_back(&car);
+			}
+			auto car = validCars[rand() % validCars.size()];
+			auto pCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(cars, car->Customization);
+			auto customization = pCustomization ? *pCustomization : CreateRandomCustomizations(car->VehicleKey);
+			ChangePlayerCarInWorld(car->VehicleKey, &customization, (car->FilterBits & 1) != 0); // add nitro if they're stock
+		});
 	}
 } E_SetCarRandom;
+
+class Effect_SetCarRandomOpponent : public EffectBase_OpponentInRaceOrRoamingConditional {
+public:
+	Effect_SetCarRandomOpponent() : EffectBase_OpponentInRaceOrRoamingConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Steal Car From Random Opponent";
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() {
+			auto cars = GetActiveVehicles(DRIVER_RACER);
+			if (cars.empty()) return;
+			
+			auto car = cars[rand()%cars.size()];
+			auto carModel = car->GetVehicleName();
+			auto carTuning = (FECustomizationRecord*)car->GetCustomizations();
+			ChangePlayerCarInWorld(Attrib::StringHash32(carModel), carTuning, true);
+		});
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_SetCarRandomOpponent;
 
 class Effect_SetCarMassInf : public ChaosEffect {
 public:

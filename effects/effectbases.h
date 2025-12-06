@@ -184,21 +184,6 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 };
 
-class EffectBase_SafelyChangePlayerCar : public ChaosEffect {
-public:
-	EffectBase_SafelyChangePlayerCar(const char* category) : ChaosEffect(category) {
-		sName = "(EFFECT BASE) Safely Change Player Car";
-		fUnhideTime = 3.5;
-	}
-
-	bool IsAvailable() override {
-		// if there's 3 opponents, the car usually spawns with an invisible skin
-		auto cars = GetActiveVehicles(DRIVER_RACER);
-		return cars.size() < 2;
-	}
-	bool IsConditionallyAvailable() override { return true; }
-};
-
 class EffectBase_InRaceConditional : public ChaosEffect {
 public:
 	EffectBase_InRaceConditional(const char* category) : ChaosEffect(category) {

@@ -7,5 +7,5 @@ void __cdecl AdjustStableImpound_EventWinHooked(int a1) {
 }
 
 ChloeHook Hook_OnWinRace([]() {
-	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x611C1D, &AdjustStableImpound_EventWinHooked);
+	AdjustStableImpound_EventWinOrig = (void(__cdecl*)(int))NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x611C1D, &AdjustStableImpound_EventWinHooked);
 });
