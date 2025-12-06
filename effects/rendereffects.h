@@ -196,7 +196,7 @@ public:
 	}
 
 	void InitFunction() override {
-		gCustomCar_Pepper.Reset();
+		gCustomCar_Pepper.Reset(GetLocalPlayerVehicle());
 	}
 	void TickFunction3D(double delta) override {
 		CarRender_DontRenderPlayer = true;
@@ -223,7 +223,7 @@ public:
 	}
 
 	void InitFunction() override {
-		gCustomCar_Greenwood.Reset();
+		gCustomCar_Greenwood.Reset(GetLocalPlayerVehicle());
 	}
 	void TickFunction3D(double delta) override {
 		CarRender_DontRenderPlayer = true;
@@ -239,3 +239,30 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_Greenwood;
+
+class Effect_Mona : public ChaosEffect {
+public:
+	Effect_Mona() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Not A Cat";
+		sFriendlyName = "Change Car To Morgana";
+		fTimerLength = 120;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+	}
+
+	void InitFunction() override {
+		gCustomCar_Mona.Reset(GetLocalPlayerVehicle());
+	}
+	void TickFunction3D(double delta) override {
+		CarRender_DontRenderPlayer = true;
+		DrawLightFlares = false;
+
+		gCustomCar_Mona.Update(GetLocalPlayerVehicle(), delta);
+		gCustomCar_Mona.Render(GetLocalPlayerVehicle());
+	}
+	void DeinitFunction() override {
+		CarRender_DontRenderPlayer = false;
+		DrawLightFlares = true;
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_Mona;

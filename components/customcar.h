@@ -352,7 +352,7 @@ public:
 			}
 		}
 
-		if (vLastVelocity.length() > currentVelocity.length() && currentVelocity.length() > 0.1) {
+		if (vLastVelocity.length() != currentVelocity.length() && currentVelocity.length() > 0.1) {
 			auto colVelocity = (vLastVelocity - currentVelocity);
 			colVelocity = GetRelativeCarOffset(parentCar, colVelocity);
 			colVelocity.y *= -1;
@@ -364,11 +364,17 @@ public:
 		vLastVelocity = currentVelocity;
 	}
 
-	void Reset() {
+	void Reset(IVehicle* parentCar) {
 		for (auto& part : aParts) {
 			part->Reset();
 		}
-		vLastVelocity = {0,0,0};
+
+		if (parentCar) {
+			vLastVelocity = *parentCar->mCOMObject->Find<IRigidBody>()->GetLinearVelocity();
+		}
+		else {
+			vLastVelocity = {0,0,0};
+		}
 	}
 };
 
@@ -406,19 +412,37 @@ auto gCustomCar_Pepper = CustomCar("pep", {180,0,0}, {0,0.01,0}, {
 });
 
 auto gCustomCar_Greenwood = CustomCar("greenwood", {180,0,0}, {0,0.01,0}, {
-	new CustomCarPart("body", false, {0,1.71,-0.35 + 0.55}),
-	//new CustomCarPart("window_front", false, {0,0.70407,-0.55293 + 0.55}),
-	new CustomCarPart("bumper_f", true, {0.85, 2.62961,-0.302589 + 0.55}, true, {0.85, 2.62961,-0.302589 + 0.55}, {0,0,-1}, {0,3,1}),
-	new CustomCarPart("bumper_r", true, {0.85,-2.90231,-0.287549 + 0.55}, true, {0.85,-2.90231,-0.287549 + 0.55}, {0,0,-1}, {0,3,1}),
-	new CustomCarPart("door_fl", true, {-1.0292, 0.944064, -0.182083 + 0.55}, true, {-1.0292, 0.944064, -0.182083 + 0.55}, {0,0,0}, {0,0,60}),
-	new CustomCarPart("door_fr", true, {1.0292, 0.944064, -0.182083 + 0.55}, true, {1.0292, 0.944064, -0.182083 + 0.55}, {0,0,-60}, {0,0,0}),
-	new CustomCarPart("door_rl", true, {-1.0292, -0.367358, -0.182083 + 0.55}, true, {-1.0292, -0.367358, -0.182083 + 0.55}, {0,0,0}, {0,0,60}),
-	new CustomCarPart("door_rr", true, {1.0292, -0.367358, -0.182083 + 0.55}, true, {1.0292, -0.367358, -0.182083 + 0.55}, {0,0,-60}, {0,0,0}),
-	new CustomCarPart("hood", true, {0,0.958169,0.309367 + 0.55}, true, {0,0.958169,0.309367 + 0.55}, {0,0,0}, {80,0,0}),
-	new CustomCarPart("trunk", true, {0,-2.05209,0.301473 + 0.55}, true, {0,-2.05209,0.301473 + 0.55}, {-45,0,0}, {0,0,0}),
-	new CustomCarBrakelight("brakelight", false, {0,1.71,-0.35 + 0.55}),
+	new CustomCarPart("body", false, {0,1.71,-0.35 + 0.6}),
+	//new CustomCarPart("window_front", false, {0,0.70407,-0.55293 + 0.6}),
+	new CustomCarPart("bumper_f", true, {0.85, 2.62961,-0.302589 + 0.6}, true, {0.85, 2.62961,-0.302589 + 0.6}, {0,0,-1}, {0,3,1}),
+	new CustomCarPart("bumper_r", true, {0.85,-2.90231,-0.287549 + 0.6}, true, {0.85,-2.90231,-0.287549 + 0.6}, {0,0,-1}, {0,3,1}),
+	new CustomCarPart("door_fl", true, {-1.0292, 0.944064, -0.182083 + 0.6}, true, {-1.0292, 0.944064, -0.182083 + 0.6}, {0,0,0}, {0,0,60}),
+	new CustomCarPart("door_fr", true, {1.0292, 0.944064, -0.182083 + 0.6}, true, {1.0292, 0.944064, -0.182083 + 0.6}, {0,0,-60}, {0,0,0}),
+	new CustomCarPart("door_rl", true, {-1.0292, -0.367358, -0.182083 + 0.6}, true, {-1.0292, -0.367358, -0.182083 + 0.6}, {0,0,0}, {0,0,60}),
+	new CustomCarPart("door_rr", true, {1.0292, -0.367358, -0.182083 + 0.6}, true, {1.0292, -0.367358, -0.182083 + 0.6}, {0,0,-60}, {0,0,0}),
+	new CustomCarPart("hood", true, {0,0.958169,0.309367 + 0.6}, true, {0,0.958169,0.309367 + 0.6}, {0,0,0}, {80,0,0}),
+	new CustomCarPart("trunk", true, {0,-2.05209,0.301473 + 0.6}, true, {0,-2.05209,0.301473 + 0.6}, {-45,0,0}, {0,0,0}),
+	new CustomCarBrakelight("brakelight", false, {0,1.71,-0.35 + 0.6}),
 	new CustomCarTire(0, "tire_l", {-0.925, 1.70959, 0.35}, 0.35),
 	new CustomCarTire(1, "tire_r", {0.925, 1.70959, 0.35}, 0.35),
 	new CustomCarTire(2, "tire_l", {-0.925, -1.70959, 0.35}, 0.35),
 	new CustomCarTire(3, "tire_r", {0.925, -1.70959, 0.35}, 0.35),
+});
+
+auto gCustomCar_Mona = CustomCar("mona", {180,0,0}, {0,0.01,0}, {
+	new CustomCarPart("body", false, {0,0,0}),
+	new CustomCarPart("bumper_f", true, {0, 1.93683, 0.140527}),
+	new CustomCarPart("ear_l", true, {-0.599918, 0.759461, 2.02469}),
+	new CustomCarPart("ear_r", true, {0.599918, 0.759461, 2.02469}),
+	new CustomCarPart("exhaust_1", true, {0, -1.57369, 0.036088}),
+	new CustomCarPart("light_l", true, {-0.565995, 1.80704, 0.837169}),
+	new CustomCarPart("light_r", true, {0.565995, 1.80704, 0.837169}),
+	new CustomCarPart("mirror_l", true, {-0.846525, 1.22704, 1.53296}),
+	new CustomCarPart("mirror_r", true, {0.846525, 1.22704, 1.53296}),
+	new CustomCarPart("plate_f", true, {0, 1.97382, 0.257175}),
+	new CustomCarPart("plate_r", true, {0.52094, -1.68703, 0.262028}),
+	new CustomCarTire(0, "tire_l", {-0.861393, 0.952418, 0.044909}, 0.3),
+	new CustomCarTire(1, "tire_r", {0.861393, 0.952418, 0.044909}, 0.3),
+	new CustomCarTire(2, "tire_l", {-0.861393, -1.12206, 0.044909}, 0.3),
+	new CustomCarTire(3, "tire_r", {0.861393, -1.12206, 0.044909}, 0.3),
 });
