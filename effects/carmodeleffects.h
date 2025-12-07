@@ -141,20 +141,94 @@ public:
 class Effect_PlayerCarCopCorvette : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarCopCorvette() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
-		sName = "Spawn Player As Cop Corvette";
+		sName = "Spawn Player As Random Cop Car";
 		fTimerLength = 120;
 		fUnhideTime = 0;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
 	}
 
+	struct tReplacedCar {
+		std::string baseVehicle;
+		std::string vehicleModel;
+	};
+	static inline std::vector<tReplacedCar> aCopCars = {
+		{"cs_viper_copmidsize", "COPMIDSIZE"},
+		{"cs_viper_copmidsize", "COPGHOST"},
+		{"cs_gto_copgto", "COPGTO"},
+		{"cs_gto_copgto", "COPGTOGHOST"},
+		{"cs_c6_copsporthench", "COPSPORTHENCH"},
+		{"cs_c6_copsporthench", "COPSPORTGHOST"},
+		{"cs_c6_copsporthench", "COPSPORT"},
+		{"cs_mustang_copsuv", "COPSUV"},
+		{"cs_mustang_copsuv", "COPSUVL"},
+	};
+	tReplacedCar* pCurrentReplacedCar = nullptr;
+
+	void InitFunction() override {
+		pCurrentReplacedCar = &aCopCars[rand()%aCopCars.size()];
+	}
 	void TickFunction(double delta) override {
-		ForcedPlayerVehicle = Attrib::StringHash32("cs_c6_copsporthench");
+		ForcedPlayerVehicle = Attrib::StringHash32(pCurrentReplacedCar->baseVehicle.c_str());
+		ForcedPlayerVehicleModel = pCurrentReplacedCar->vehicleModel;
 	}
 	void DeinitFunction() override {
 		ForcedPlayerVehicle = 0;
+		ForcedPlayerVehicleModel = "";
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarCopCorvette;
+
+class Effect_PlayerCarTraffic : public EffectBase_TriggerInMenu {
+public:
+	Effect_PlayerCarTraffic() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Player As Random Traffic Car";
+		fTimerLength = 120;
+		fUnhideTime = 0;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
+	}
+
+	struct tReplacedCar {
+		std::string baseVehicle;
+		std::string vehicleModel;
+	};
+	static inline std::vector<tReplacedCar> aTrafficCars = {
+		{"cs_clio_trafpizza", "PIZZA"},
+		{"cs_clio_traftaxi", "TAXI"},
+		{"cs_cts_traf_minivan", "MINIVAN"},
+		{"cs_cts_traffictruck", "PICKUPA"},
+		{"cs_trafcement", "CEMTR"},
+		{"cs_trafgarb", "GARB"},
+
+		// new cars
+		{"cs_cts_traffictruck", "TRAFAMB"},
+		{"cs_cts_traffictruck", "TRAFSUVA"},
+		{"cs_cts_traf_minivan", "TRAFNEWS"},
+		{"cs_cts_traf_minivan", "TRAFSTWAG"},
+		{"cs_cts_traf_minivan", "TRAFVANB"},
+		{"cs_clio_traftaxi", "TRAF4DSEDA"},
+		{"cs_clio_traftaxi", "TRAF4DSEDB"},
+		{"cs_clio_traftaxi", "TRAF4DSEDC"},
+		{"cs_clio_traftaxi", "TRAFCOURT"},
+		{"cs_clio_traftaxi", "TRAFFICCOUP"},
+		{"cs_clio_trafpizza", "TRAFHA"},
+		{"cs_trafcement", "TRAFDMPTR"},
+		{"cs_trafcement", "TRAFFIRE"},
+	};
+	tReplacedCar* pCurrentReplacedCar = nullptr;
+
+	void InitFunction() override {
+		pCurrentReplacedCar = &aTrafficCars[rand()%aTrafficCars.size()];
+	}
+	void TickFunction(double delta) override {
+		ForcedPlayerVehicle = Attrib::StringHash32(pCurrentReplacedCar->baseVehicle.c_str());
+		ForcedPlayerVehicleModel = pCurrentReplacedCar->vehicleModel;
+	}
+	void DeinitFunction() override {
+		ForcedPlayerVehicle = 0;
+		ForcedPlayerVehicleModel = "";
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerCarTraffic;
 
 class Effect_PlayerCarStockPunto : public EffectBase_TriggerInMenu {
 public:

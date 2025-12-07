@@ -541,6 +541,12 @@ bool IsInNormalRace() {
 	return true;
 }
 
+const char** GetPVehicleModelPointer(uint32_t pvehicleHash) {
+	auto collection = Attrib::FindCollection(Attrib::StringHash32("pvehicle"), pvehicleHash);
+	auto model = (uintptr_t)Attrib::Collection::GetData(collection, Attrib::StringHash32("MODEL"), 0);
+	return (const char**)(model + 0xC);
+}
+
 wchar_t gDLLDir[MAX_PATH];
 class DLLDirSetter {
 public:

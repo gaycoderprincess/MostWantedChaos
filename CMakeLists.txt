@@ -12,6 +12,8 @@ SET(CMAKE_CXX_STANDARD 20)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel -s -static")
 
+link_directories(${CMAKE_SOURCE_DIR}/../nya-common/lib32)
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     link_directories($ENV{VCPKG_ROOT}/installed/x86-mingw-static/lib)
 else()

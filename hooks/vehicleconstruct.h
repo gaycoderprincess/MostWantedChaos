@@ -1,4 +1,5 @@
 uint32_t ForcedPlayerVehicle = 0;
+std::string ForcedPlayerVehicleModel;
 uint32_t ForcedOpponentVehicle = 0;
 uint32_t ForcedTrafficVehicle = 0;
 bool PlayerFullyTuned = false;
@@ -15,9 +16,16 @@ bool LastOpponentPlayerCarRandom = 0;
 bool LastOpponentFullyTuned = 0;
 
 ISimable* VehicleConstructHooked(Sim::Param params) {
+	const char* modelBackup = nullptr;
+
 	auto vehicle = (VehicleParams*)params.mData;
 	if (vehicle->carClass == DRIVER_HUMAN) {
 		if (ForcedPlayerVehicle) {
+			if (!ForcedPlayerVehicleModel.empty()) {
+				auto model = GetPVehicleModelPointer(ForcedPlayerVehicle);
+				modelBackup = *model;
+				*model = ForcedPlayerVehicleModel.c_str();
+			}
 			vehicle->carType = ForcedPlayerVehicle;
 			vehicle->customization = nullptr;
 		}
@@ -95,9 +103,19 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 		vehicle->carType = ForcedTrafficVehicle;
 		vehicle->customization = nullptr;
 	}
-	return PVehicle::Construct(params);
+	auto simable = PVehicle::Construct(params);
+	if (modelBackup) {
+		auto model = GetPVehicleModelPointer(ForcedPlayerVehicle);
+		*model = modelBackup;
+	}
+	return simable;
 }
 
 ChloeHook Hook_VehicleConstruct([]() {
 	NyaHooks::aLateInitFuncs.push_back([]() { *(void**)0x92C534 = (void*)&VehicleConstructHooked; });
+
+	// use SuspensionRacer instead of SuspensionSimple for racers - fixes popped tire behavior
+	NyaHookLib::Patch(0x6380CB + 1, "SuspensionRacer");
+	NyaHookLib::Patch(0x67F353 + 1, "SuspensionRacer");
+	//NyaHooks::aLateInitFuncs.push_back([]() { *(uintptr_t*)0x938208 = 0x6B6A10; });
 });

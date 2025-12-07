@@ -313,6 +313,16 @@ void ChaosModMenu() {
 		ChloeMenuLib::BeginMenu();
 		if (DrawMenuOption("Player Debug")) {
 			ChloeMenuLib::BeginMenu();
+			if (DrawMenuOption("Change C6 to Cross")) {
+				if (auto model = GetPVehicleModelPointer(Attrib::StringHash32("cs_c6_copsporthench"))) {
+					*model = "COPSPORT";
+				}
+			}
+			if (DrawMenuOption("Change Pizza to Coup")) {
+				if (auto model = GetPVehicleModelPointer(Attrib::StringHash32("cs_clio_trafpizza"))) {
+					*model = "TRAFFICCOUP";
+				}
+			}
 			if (auto ply = GetLocalPlayer()) {
 				DrawMenuOption(std::format("IPlayer: {:X}", (uintptr_t)ply));
 				DrawMenuOption(std::format("ISimable: {:X}", (uintptr_t)ply->GetSimable()));
