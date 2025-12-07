@@ -22,18 +22,6 @@ else()
     endif()
 endif()
 
-# Windows Clang additions
-if(MSVC OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_include_directories(NFSMWChaos PUBLIC $ENV{DXSDK_DIR}Include)
-    target_link_directories(NFSMWChaos PUBLIC $ENV{DXSDK_DIR}Lib/x86)
-    target_compile_options(NFSMWChaos PRIVATE "-Wno-narrowing")
-    target_compile_options(NFSMWChaos PRIVATE
-            $<$<CONFIG:Debug>:/MTd>
-            $<$<CONFIG:Release>:/MT>
-            $<$<CONFIG:RelWithDebInfo>:/MT>
-    )
-endif()
-
 add_compile_definitions(IMGUI_USER_CONFIG="../../nya_imconfig.h" CWOEECHAOS_VERSION="1.80" NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
 add_library(NFSMWChaos SHARED
         ../nya-common/3rdparty/imgui/imgui.cpp
@@ -58,6 +46,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 else()
     target_include_directories(NFSMWChaos PUBLIC $ENV{VCPKG_ROOT}/installed/x86-windows-static/include)
 endif()
+
+# Windows Clang additions
+if(MSVC OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_include_directories(NFSMWChaos PUBLIC $ENV{DXSDK_DIR}Include)
+    target_link_directories(NFSMWChaos PUBLIC $ENV{DXSDK_DIR}Lib/x86)
+    target_compile_options(NFSMWChaos PRIVATE "-Wno-narrowing")
+    target_compile_options(NFSMWChaos PRIVATE
+            $<$<CONFIG:Debug>:/MTd>
+            $<$<CONFIG:Release>:/MT>
+            $<$<CONFIG:RelWithDebInfo>:/MT>
+    )
+endif()
+
 target_link_options(NFSMWChaos PRIVATE "-Wl,--exclude-all-symbols")
 
 set_target_properties(NFSMWChaos PROPERTIES PREFIX "")
