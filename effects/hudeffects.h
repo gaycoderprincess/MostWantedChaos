@@ -80,8 +80,10 @@ public:
 		flags &= ~0x100000;
 		// remove CostToState
 		flags &= ~0x1000;
-		// remove Minimap
-		flags &= ~0x10000;
+		if (IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued())) {
+			// remove Minimap
+			flags &= ~0x10000;
+		}
 		return flags;
 	}
 

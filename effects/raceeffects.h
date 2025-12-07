@@ -149,6 +149,7 @@ public:
 			GRaceStatus::EnableBarriers(GRaceStatus::fObj);
 		}
 	}
+	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
 		return IsInNormalRace();
 	}
