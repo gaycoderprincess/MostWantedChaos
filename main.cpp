@@ -368,18 +368,6 @@ void ChaosModMenu() {
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("GroovyCars::GroovySpeed", Effect_GroovyCars::GroovySpeed);
-			QuickValueEditor("Effect_TopDownCamera::yOffset", Effect_TopDownCamera::yOffset);
-			QuickValueEditor("Effect_TopDownCamera::yOffsetScale", Effect_TopDownCamera::yOffsetScale);
-			QuickValueEditor("Effect_TopDownCamera::fwdOffsetScale", Effect_TopDownCamera::fwdOffsetScale);
-			QuickValueEditor("Effect_TopDownCamera::speedDecay", Effect_TopDownCamera::speedDecay);
-			QuickValueEditor("Effect_TopDownCamera::speedCap", Effect_TopDownCamera::speedCap);
-			QuickValueEditor("Effect_Shark2::rX", Effect_Shark2::rX);
-			QuickValueEditor("Effect_Shark2::rY", Effect_Shark2::rY);
-			QuickValueEditor("Effect_Shark2::rZ", Effect_Shark2::rZ);
-			QuickValueEditor("Effect_Shark2::offX", Effect_Shark2::offX);
-			QuickValueEditor("Effect_Shark2::offY", Effect_Shark2::offY);
-			QuickValueEditor("Effect_Shark2::offZ", Effect_Shark2::offZ);
-			QuickValueEditor("Effect_Shark2::scale", Effect_Shark2::scale);
 			QuickValueEditor("detachThreshold", CustomCarPart::detachThreshold);
 			QuickValueEditor("unlatchThreshold", CustomCarPart::unlatchThreshold);
 			QuickValueEditor("latchMoveFactor[0]", CustomCarPart::latchMoveFactor[0]);
