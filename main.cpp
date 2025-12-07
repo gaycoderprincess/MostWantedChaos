@@ -67,6 +67,8 @@ namespace FlatOutHUD {
 #include "chaoseffect.h"
 
 void OnWinRace() {
+	DLLDirSetter _setdir;
+
 	Achievements::AwardAchievement(GetAchievement("WIN_RACE"));
 	if (IsEffectRunning(&E_LeakTank)) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_LEAKTANK"));
@@ -104,6 +106,8 @@ void MoneyChecker() {
 }
 
 void CameraHook(CameraMover* pMover) {
+	DLLDirSetter _setdir;
+
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
@@ -142,6 +146,8 @@ void ProcessChaosEffects(double fDeltaTime, bool inMenu, bool blockedByOtherMean
 }
 
 void ChaosLoop() {
+	DLLDirSetter _setdir;
+
 	MoneyChecker();
 
 	for (auto& func : aDrawingLoopFunctions) {
@@ -198,6 +204,8 @@ void ChaosLoop() {
 }
 
 void Render3DLoop() {
+	DLLDirSetter _setdir;
+
 	static IDirect3DStateBlock9* state = nullptr;
 	if (g_pd3dDevice->CreateStateBlock(D3DSBT_ALL, &state) != D3D_OK) {
 		return;
@@ -252,6 +260,8 @@ void Render3DLoop() {
 }
 
 void ChaosModMenu() {
+	DLLDirSetter _setdir;
+
 	ChloeMenuLib::BeginMenu();
 
 	if (DrawMenuOption(std::format("Chaos On - {}", bTimerEnabled))) {
@@ -483,6 +493,8 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			for (auto& func : ChloeHook::aHooks) {
 				func();
 			}
+
+			GetCurrentDirectoryW(MAX_PATH, gDLLDir);
 
 			ChloeMenuLib::RegisterMenu("Cwoee Chaos", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });

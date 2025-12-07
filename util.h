@@ -540,3 +540,17 @@ bool IsInNormalRace() {
 	if (GRaceParameters::GetIsPursuitRace(GRaceStatus::fObj->mRaceParms)) return false;
 	return true;
 }
+
+wchar_t gDLLDir[MAX_PATH];
+class DLLDirSetter {
+public:
+	wchar_t backup[MAX_PATH];
+
+	DLLDirSetter() {
+		GetCurrentDirectoryW(MAX_PATH, backup);
+		SetCurrentDirectoryW(gDLLDir);
+	}
+	~DLLDirSetter() {
+		SetCurrentDirectoryW(backup);
+	}
+};
