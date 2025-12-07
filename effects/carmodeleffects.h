@@ -200,16 +200,16 @@ public:
 		{"cs_trafgarb", "GARB"},
 
 		// new cars
-		{"cs_cts_traffictruck", "TRAFAMB"},
+		{"cs_cts_traffictruck", "TRAFAMB"}, // looks weird but then again the ambulance looks weird anyway
 		{"cs_cts_traffictruck", "TRAFSUVA"},
 		{"cs_cts_traf_minivan", "TRAFNEWS"},
-		{"cs_cts_traf_minivan", "TRAFSTWAG"},
+		{"cs_cts_traf_minivan", "TRAFSTWAG"}, // floating a bit? im sure noone will notice
 		{"cs_cts_traf_minivan", "TRAFVANB"},
 		{"cs_clio_traftaxi", "TRAF4DSEDA"},
 		{"cs_clio_traftaxi", "TRAF4DSEDB"},
 		{"cs_clio_traftaxi", "TRAF4DSEDC"},
 		{"cs_clio_traftaxi", "TRAFCOURT"},
-		{"cs_clio_traftaxi", "TRAFFICCOUP"},
+		//{"cs_clio_traftaxi", "TRAFFICCOUP"}, // looks weird, a bit under the floor
 		{"cs_clio_trafpizza", "TRAFHA"},
 		{"cs_trafcement", "TRAFDMPTR"},
 		{"cs_trafcement", "TRAFFIRE"},
@@ -220,6 +220,12 @@ public:
 		pCurrentReplacedCar = &aTrafficCars[rand()%aTrafficCars.size()];
 	}
 	void TickFunction(double delta) override {
+		// this should be rerollable, there are way too many bad traffic cars
+		// going back to the menu will randomize your car again
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+			InitFunction();
+		}
+
 		ForcedPlayerVehicle = Attrib::StringHash32(pCurrentReplacedCar->baseVehicle.c_str());
 		ForcedPlayerVehicleModel = pCurrentReplacedCar->vehicleModel;
 	}
