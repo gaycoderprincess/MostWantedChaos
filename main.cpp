@@ -257,6 +257,27 @@ void Render3DLoop() {
 
 	state->Apply();
 	state->Release();
+
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
+		effect.OnTickPost3D(gTimer.fDeltaTime);
+	}
+}
+
+void PreRender3DLoop() {
+	DLLDirSetter _setdir;
+
+	static CNyaTimer gTimer;
+	gTimer.Process();
+
+	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	auto isBlocked = IsChaosBlocked();
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
+		effect.OnTickPre3D(gTimer.fDeltaTime);
+	}
 }
 
 void ChaosModMenu() {
@@ -516,6 +537,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::aCameraMoverFuncs.push_back(CameraHook);
 			NyaHooks::PlaceLateInitHook();
 			NyaHooks::PlaceRenderHook();
+			NyaHooks::aPreRenderFuncs.push_back(PreRender3DLoop);
 			NyaHooks::aRenderFuncs.push_back(Render3DLoop);
 
 			// SkipFE

@@ -105,7 +105,7 @@ public:
 class Effect_WireframeWorld : public ChaosEffect {
 public:
 	Effect_WireframeWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Wireframe World";
+		sName = "Wireframe Mode";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
 	}
@@ -118,6 +118,24 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_WireframeWorld;
+
+class Effect_WireframeWorld2 : public ChaosEffect {
+public:
+	Effect_WireframeWorld2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Wireframe World";
+		fTimerLength = 90;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
+	}
+
+	void TickFunctionPre3D(double delta) override {
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	}
+	void TickFunctionPost3D(double delta) override {
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_WireframeWorld2;
 
 class Effect_LaserScanWorld : public ChaosEffect {
 public:
