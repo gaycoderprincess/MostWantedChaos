@@ -16,10 +16,20 @@ bool LastOpponentPlayerCarRandom = 0;
 bool LastOpponentFullyTuned = 0;
 
 ISimable* VehicleConstructHooked(Sim::Param params) {
+	uint32_t modelBackupHash = 0;
 	const char* modelBackup = nullptr;
 
 	auto vehicle = (VehicleParams*)params.mData;
 	if (vehicle->carClass == DRIVER_HUMAN) {
+		// hack for copcross in career garage
+		if (WorldTimeElapsed < 0.5 && vehicle->carType == Attrib::StringHash32("copcross")) {
+			auto vehAttrib = Attrib::StringHash32("cs_c6_copsporthench");
+			auto model = GetPVehicleModelPointer(vehAttrib);
+			modelBackup = *model;
+			*model = "COPSPORT";
+			vehicle->carType = vehAttrib;
+			modelBackupHash = vehAttrib;
+		}
 		if (ForcedPlayerVehicle) {
 			if (!ForcedPlayerVehicleModel.empty()) {
 				auto model = GetPVehicleModelPointer(ForcedPlayerVehicle);
@@ -28,6 +38,7 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 			}
 			vehicle->carType = ForcedPlayerVehicle;
 			vehicle->customization = nullptr;
+			modelBackupHash = ForcedPlayerVehicle;
 		}
 		if (PlayerFullyTuned) {
 			if (!vehicle->matched) vehicle->matched = new Physics::Info::Performance;
@@ -105,7 +116,7 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 	}
 	auto simable = PVehicle::Construct(params);
 	if (modelBackup) {
-		auto model = GetPVehicleModelPointer(ForcedPlayerVehicle);
+		auto model = GetPVehicleModelPointer(modelBackupHash);
 		*model = modelBackup;
 	}
 	return simable;

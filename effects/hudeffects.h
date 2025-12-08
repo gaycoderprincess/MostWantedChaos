@@ -13,17 +13,6 @@ public:
 	}
 } E_DragHUD;
 
-class Effect_ChallengeCam : public ChaosEffect {
-public:
-	Effect_ChallengeCam() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Challenge Series Camera";
-	}
-
-	void InitFunction() override {
-		Camera_SetGenericCamera("Cinematics", "Challenge");
-	}
-} E_Challenge;
-
 class Effect_NoHUD : public ChaosEffect {
 public:
 	Effect_NoHUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

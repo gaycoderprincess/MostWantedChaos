@@ -216,7 +216,7 @@ public:
 	double timer = 0;
 
 	Effect_FreezeEveryone() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "DDOS The Server";
+		sName = "Hosted by Cloudflare";
 		sFriendlyName = "Lag For All Cars";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
@@ -372,7 +372,7 @@ public:
 		lastStates.clear();
 	}
 	void TickFunction(double delta) override {
-		timer += delta;
+		timer += delta * Sim::Internal::mSystem->mSpeed;
 		if (timer > 1.0 / 60.0) {
 			lastStates.push_back(CwoeeCarPhysicalState(GetLocalPlayerVehicle()));
 			timer -= 1.0 / 60.0;

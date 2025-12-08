@@ -290,3 +290,16 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_ReverseCamera;
+
+class Effect_ChallengeCam : public ChaosEffect {
+public:
+	Effect_ChallengeCam() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Challenge Series Camera";
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	void InitFunction() override {
+		Camera_SetGenericCamera("Cinematics", "Challenge");
+	}
+} E_Challenge;

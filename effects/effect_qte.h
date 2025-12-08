@@ -30,7 +30,9 @@ public:
 	}
 	void DeinitFunction() override {
 		if (nNumPresses < numRequiredPresses) {
-			aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+			if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
+				ply->Sabotage(3);
+			}
 		}
 	}
 } E_QTE;
