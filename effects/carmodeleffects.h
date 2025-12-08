@@ -205,11 +205,11 @@ public:
 		{"cs_cts_traf_minivan", "TRAFNEWS"},
 		{"cs_cts_traf_minivan", "TRAFSTWAG"}, // floating a bit? im sure noone will notice
 		{"cs_cts_traf_minivan", "TRAFVANB"},
-		{"cs_clio_traftaxi", "TRAF4DSEDA"},
-		{"cs_clio_traftaxi", "TRAF4DSEDB"},
-		{"cs_clio_traftaxi", "TRAF4DSEDC"},
-		{"cs_clio_traftaxi", "TRAFCOURT"},
-		//{"cs_clio_traftaxi", "TRAFFICCOUP"}, // looks weird, a bit under the floor
+		{"cs_clio_trafpizza", "TRAF4DSEDA"},
+		{"cs_clio_trafpizza", "TRAF4DSEDB"},
+		{"cs_clio_trafpizza", "TRAF4DSEDC"},
+		{"cs_clio_trafpizza", "TRAFCOURT"},
+		{"cs_clio_trafpizza", "TRAFFICCOUP"},
 		{"cs_clio_trafpizza", "TRAFHA"},
 		{"cs_trafcement", "TRAFDMPTR"},
 		{"cs_trafcement", "TRAFFIRE"},
