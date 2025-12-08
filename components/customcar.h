@@ -305,6 +305,9 @@ public:
 		UMath::Matrix4 rotation;
 		rotation.Rotate(vRotateOffset);
 		mat = (UMath::Matrix4)(mat * rotation);
+		mat.x *= CarScaleMatrix.y.y;
+		mat.y *= CarScaleMatrix.z.z;
+		mat.z *= CarScaleMatrix.x.x;
 		for (auto& part : aParts) {
 			part->Render(parentCar, mat, false);
 		}

@@ -102,6 +102,9 @@ public:
 			offsetMatrix.Rotate(NyaVec3(stareX * 0.01745329, stareY * 0.01745329, stareZ * 0.01745329));
 			carMatrix = carMatrix * offsetMatrix;
 		}
+		carMatrix.x *= CarScaleMatrix.x.x;
+		carMatrix.y *= CarScaleMatrix.z.z;
+		carMatrix.z *= CarScaleMatrix.y.y;
 		model->RenderAt(carMatrix);
 	}
 
