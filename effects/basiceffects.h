@@ -28,6 +28,15 @@ public:
 		fTimerLength = 4;
 	}
 
+	NyaAudio::NyaSound sound = 0;
+
+	void InitFunction() override {
+		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/flashbang_explode2.wav");
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound);
+		}
+	}
 	void TickFunction(double delta) override {
 		uint8_t alpha = 255;
 		if (EffectInstance->fTimer < 2) alpha = (EffectInstance->fTimer * 0.5) * 255;

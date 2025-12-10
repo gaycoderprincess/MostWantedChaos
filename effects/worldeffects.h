@@ -84,6 +84,22 @@ public:
 	bool HasTimer() override { return true; }
 } E_SpeedSpeedBased;
 
+class Effect_RealTimeSpeedbrk : public ChaosEffect {
+public:
+	Effect_RealTimeSpeedbrk() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Real-Time Speedbreaker";
+		fTimerLength = 90;
+	}
+
+	void TickFunction(double delta) override {
+		IgnoreSpeedbreakerTime = true;
+	}
+	void DeinitFunction() override {
+		IgnoreSpeedbreakerTime = false;
+	}
+	bool HasTimer() override { return true; }
+} E_RealTimeSpeedbrk;
+
 class Effect_InvisibleWorld : public ChaosEffect {
 public:
 	Effect_InvisibleWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

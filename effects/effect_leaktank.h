@@ -52,3 +52,26 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_LeakTankRefuel;
+
+class Effect_LeakTankCash : public EffectBase_NotInPrologueConditional {
+public:
+	float TankTimer = 0;
+
+	static inline float TankDrainRate = 0.5;
+
+	Effect_LeakTankCash() : EffectBase_NotInPrologueConditional("Uncategorized") {
+		sName = "Realistic Fuel Prices";
+		fTimerLength = 60;
+	}
+
+	void TickFunction(double delta) override {
+		auto playerSpeed = GetLocalPlayerVehicle()->GetSpeed();
+		if (playerSpeed < 5) playerSpeed = 5;
+		TankTimer += playerSpeed * Sim::Internal::mSystem->mSpeed * delta;
+		while (TankTimer > TankDrainRate) {
+			FEDatabase->mUserProfile->TheCareerSettings.CurrentCash -= 1;
+			TankTimer -= TankDrainRate;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_LeakTankCash;

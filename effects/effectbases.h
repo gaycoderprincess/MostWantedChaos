@@ -210,3 +210,16 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 };
+
+class EffectBase_NotInPrologueConditional : public ChaosEffect {
+public:
+	EffectBase_NotInPrologueConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) Not In Prologue Conditional";
+	}
+
+	bool IsAvailable() override {
+		return FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) > 0;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+};

@@ -408,7 +408,9 @@ void ChaosModMenu() {
 			}
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
+			QuickValueEditor("LeakTankCash::TankDrainRate", Effect_LeakTankCash::TankDrainRate);
 			QuickValueEditor("GroovyCars::GroovySpeed", Effect_GroovyCars::GroovySpeed);
+			QuickValueEditor("HeatSteer::DeltaMult", Effect_HeatSteer::DeltaMult);
 			QuickValueEditor("detachThreshold", CustomCarPart::detachThreshold);
 			QuickValueEditor("unlatchThreshold", CustomCarPart::unlatchThreshold);
 			QuickValueEditor("latchMoveFactor[0]", CustomCarPart::latchMoveFactor[0]);
@@ -423,8 +425,6 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			QuickValueEditor("bFO2Minimap", FlatOutHUD::CHUD_Minimap::bFO2Minimap);
-			QuickValueEditor("Effect_TikTok::fWordFrequency", Effect_TikTok::fWordFrequency);
-			QuickValueEditor("Effect_TikTok::fWordTimerSpeed", Effect_TikTok::fWordTimerSpeed);
 			ChloeMenuLib::EndMenu();
 		}
 

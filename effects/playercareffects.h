@@ -285,9 +285,11 @@ public:
 	}
 
 	void TickFunction(double delta) override {
-		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
-			if (!ply->GetAiControl()) ply->SetAiControl(true);
-		}
+		aMainLoopFunctionsOnce.push_back([](){
+			if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
+				if (!ply->GetAiControl()) ply->SetAiControl(true);
+			}
+		});
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
@@ -1328,3 +1330,24 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_Skyfall;
+
+class Effect_HeatSteer : public ChaosEffect {
+public:
+	Effect_HeatSteer() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Heated Steering";
+		fTimerLength = 60;
+	}
+
+	static inline float DeltaMult = 0.002;
+
+	void TickFunction(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			auto heat = GetLocalPlayerInterface<IPerpetrator>()->GetHeat();
+			heat += (ply->GetControls()->fSteering * DeltaMult);
+			if (heat < 1.0) heat = 1.0;
+			if (heat > 10.0) heat = 10.0;
+			GetLocalPlayerInterface<IPerpetrator>()->SetHeat(heat);
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_HeatSteer;

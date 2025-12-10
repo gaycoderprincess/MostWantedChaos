@@ -2,7 +2,7 @@ class Effect_DropCash : public EffectBase_PursuitConditional {
 public:
 	Effect_DropCash() : EffectBase_PursuitConditional("Uncategorized") {
 		sName = "Cops Drop Cash";
-		fTimerLength = 60;
+		fTimerLength = 90;
 	}
 
 	struct tCarAssoc {

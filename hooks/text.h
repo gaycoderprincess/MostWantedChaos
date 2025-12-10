@@ -35,7 +35,7 @@ namespace TextHook {
 	bool RandomTextNoRepeats = true;
 
 	struct tReverseTextAssoc {
-		uint32_t origHash;
+		std::string origString;
 		char* newString;
 	};
 	std::vector<tReverseTextAssoc> ReverseTextCache;
@@ -70,17 +70,17 @@ namespace TextHook {
 		return newHash;
 	}
 
-	const char* GetReversedText(uint32_t hash) {
+	const char* GetReversedText(const std::string& origString) {
 		for (auto& cache : ReverseTextCache) {
-			if (cache.origHash == hash) return cache.newString;
+			if (cache.origString == origString) return cache.newString;
 		}
 
-		std::string reversed = SearchForString(nullptr, hash);
+		std::string reversed = origString;
 		std::reverse(reversed.begin(), reversed.end());
 
 		auto text = new char[reversed.length()+1];
 		strcpy_s(text, reversed.length()+1, reversed.c_str());
-		ReverseTextCache.push_back({hash, text});
+		ReverseTextCache.push_back({origString, text});
 		return text;
 	}
 
@@ -97,15 +97,15 @@ namespace TextHook {
 		return words;
 	}
 
-	const char* GetShuffledText(uint32_t hash) {
+	const char* GetShuffledText(const std::string& origString) {
 		static std::random_device rd;
 		static std::mt19937 g(rd());
 
 		for (auto& cache : ShuffledTextCache) {
-			if (cache.origHash == hash) return cache.newString;
+			if (cache.origString == origString) return cache.newString;
 		}
 
-		auto words = SplitStringIntoWords(SearchForString(nullptr, hash));
+		auto words = SplitStringIntoWords(origString);
 		std::string str;
 		for (auto& word : words) {
 			if (CanStringBeShuffled(word)) {
@@ -117,7 +117,7 @@ namespace TextHook {
 
 		auto text = new char[str.length()+1];
 		strcpy_s(text, str.length()+1, str.c_str());
-		ShuffledTextCache.push_back({hash, text});
+		ShuffledTextCache.push_back({origString, text});
 		return text;
 	}
 
@@ -141,12 +141,12 @@ namespace TextHook {
 		return str;
 	}
 
-	const char* GetInterspersedText(uint32_t hash) {
+	const char* GetInterspersedText(const std::string& origString) {
 		for (auto& cache : InterspersedTextCache) {
-			if (cache.origHash == hash) return cache.newString;
+			if (cache.origString == origString) return cache.newString;
 		}
 
-		auto words = SplitStringIntoWords(SearchForString(nullptr, hash));
+		auto words = SplitStringIntoWords(origString);
 		int numWordsChanged = 0;
 		int numWordsChangeable = 0;
 		std::string str;
@@ -173,7 +173,7 @@ namespace TextHook {
 
 		// don't always replace one-word strings
 		if (words.size() == 1 && rand() % 100 > 25) {
-			str = SearchForString(nullptr, hash);
+			str = origString;
 		}
 		else for (auto& word : words) {
 			str += word;
@@ -182,7 +182,7 @@ namespace TextHook {
 
 		auto text = new char[str.length()+1];
 		strcpy_s(text, str.length()+1, str.c_str());
-		InterspersedTextCache.push_back({hash, text});
+		InterspersedTextCache.push_back({origString, text});
 		return text;
 	}
 
@@ -194,13 +194,13 @@ namespace TextHook {
 		}
 		if (pReplaceText) str = pReplaceText;
 		if (pInterspersedText) {
-			str = GetInterspersedText(a2);
+			str = GetInterspersedText(str);
 		}
 		if (bReverseText && CanStringBeReversed(str)) {
-			str = GetReversedText(a2);
+			str = GetReversedText(str);
 		}
 		if (bShuffledText) {
-			str = GetShuffledText(a2);
+			str = GetShuffledText(str);
 		}
 		return str;
 	}

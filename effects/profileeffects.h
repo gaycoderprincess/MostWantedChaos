@@ -36,6 +36,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_NoAutosave;
 
 class Effect_NoVisualTreatment : public ChaosEffect {
@@ -58,6 +59,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_NoVisualTreatment;
 
 
@@ -72,20 +74,15 @@ public:
 	}
 } E_Millionaire;
 
-class Effect_Millionaire2 : public ChaosEffect {
+class Effect_Millionaire2 : public EffectBase_NotInPrologueConditional {
 public:
-	Effect_Millionaire2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_Millionaire2() : EffectBase_NotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Anti-Millionaire";
 	}
 
 	void InitFunction() override {
 		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash -= 1000000;
 	}
-	bool IsAvailable() override {
-		return FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) > 0;
-	}
-	bool IsConditionallyAvailable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_Millionaire2;
 
 class Effect_ManualTrans : public ChaosEffect {
