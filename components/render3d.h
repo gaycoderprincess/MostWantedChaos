@@ -60,18 +60,6 @@ namespace Render3D {
 			if (TextureOffset) effect->hD3DXEffect->SetVector(TextureOffset, &textureOffset);
 			if (TextureOffset2) effect->hD3DXEffect->SetVector(TextureOffset2, &textureOffset);
 
-			static D3DXHANDLE BLENDSTATE = effect->hD3DXEffect->GetParameterByName(0, "Blend_State");
-			static D3DXHANDLE BLENDSTATE2 = effect->hD3DXEffect->GetParameterByName(0, "BLENDSTATE");
-			int blendStates[] = {
-					0, // alphatestenable
-					0, // alpharef
-					useAlpha, // alphablendenable
-					D3DBLEND_SRCALPHA, // srcblend
-					D3DBLEND_INVSRCALPHA, // destblend
-			};
-			if (BLENDSTATE) effect->hD3DXEffect->SetIntArray(BLENDSTATE, blendStates, 5);
-			if (BLENDSTATE2) effect->hD3DXEffect->SetIntArray(BLENDSTATE2, blendStates, 5);
-
 			// desperate attempts to make stuff not carry over from the last drawn car (which is almost always traffic)
 			// none of this worked
 			/*if (effectId == EEFFECT_CAR) {

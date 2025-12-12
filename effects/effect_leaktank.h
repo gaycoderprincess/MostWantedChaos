@@ -1,3 +1,5 @@
+#define EFFECT_CATEGORY_TEMP "Fuel"
+
 class Effect_LeakTank : public ChaosEffect {
 public:
 	double tankAmount = 100;
@@ -5,7 +7,7 @@ public:
 
 	static inline float TankDrainRate = 0.015;
 
-	Effect_LeakTank() : ChaosEffect("Uncategorized") {
+	Effect_LeakTank() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Leaking Gas Tank";
 	}
 
@@ -39,12 +41,13 @@ public:
 
 class Effect_LeakTankRefuel : public ChaosEffect {
 public:
-	Effect_LeakTankRefuel() : ChaosEffect("Uncategorized") {
+	Effect_LeakTankRefuel() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Refuel Player Car";
 	}
 
 	void InitFunction() override {
 		E_LeakTank.tankAmount = 100;
+		Achievements::AwardAchievement(GetAchievement("REFUEL"));
 	}
 	bool IsAvailable() override {
 		return IsEffectRunning(&E_LeakTank);
@@ -59,7 +62,7 @@ public:
 
 	static inline float TankDrainRate = 0.5;
 
-	Effect_LeakTankCash() : EffectBase_NotInPrologueConditional("Uncategorized") {
+	Effect_LeakTankCash() : EffectBase_NotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Realistic Fuel Prices";
 		fTimerLength = 60;
 	}

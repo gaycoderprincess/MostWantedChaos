@@ -485,6 +485,8 @@ public:
 	NyaAudio::NyaSound sound = 0;
 
 	void InitFunction() override {
+		SetSoundControlState(true, SNDSTATE_STOP_MUSIC);
+
 		state = 0;
 
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/dealer.mp3");
@@ -512,6 +514,8 @@ public:
 		}
 	}
 	void DeinitFunction() override {
+		SetSoundControlState(false, SNDSTATE_STOP_MUSIC);
+
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
 
 		if (sound && !NyaAudio::IsFinishedPlaying(sound)) {

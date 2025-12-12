@@ -14,11 +14,16 @@ public:
 		NyaHookLib::Patch(0x723FA0, 0x530008C2);
 		NyaHookLib::Patch<uint8_t>(0x6DEF49, 0xEB); // FE
 
-		// traffic
+		// traffic & racers
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
-			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
-			car->Deactivate();
+			if (car->GetDriverClass() == DRIVER_TRAFFIC) {
+				car->Deactivate();
+			}
+			else {
+				car->mCOMObject->Find<IRigidBody>()->SetLinearVelocity(&UMath::Vector3::kZero);
+				car->mCOMObject->Find<IRigidBody>()->SetAngularVelocity(&UMath::Vector3::kZero);
+			}
 		}
 
 		// input
