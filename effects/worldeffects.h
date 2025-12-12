@@ -310,6 +310,7 @@ public:
 	Effect_BreakTextures() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Acid Trip";
 		fTimerLength = 30;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
 
 	void InitFunction() override {
@@ -326,6 +327,7 @@ public:
 	Effect_RainbowRoad() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Rainbow Road";
 		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
 
 	void TickFunctionPre3D(double delta) override {
