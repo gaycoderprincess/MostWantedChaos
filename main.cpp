@@ -64,6 +64,7 @@ namespace FlatOutHUD {
 #include "hooks/shaders.h"
 #include "hooks/carrender.h"
 #include "hooks/eventwin.h"
+#include "hooks/worldrender.h"
 #include "chaoseffect.h"
 
 void OnWinRace() {
@@ -406,6 +407,12 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
 			}
+			QuickValueEditor("SceneryScale.x", SceneryScale.x);
+			QuickValueEditor("SceneryScale.y", SceneryScale.y);
+			QuickValueEditor("SceneryScale.z", SceneryScale.z);
+			QuickValueEditor("SceneryMove.x", SceneryMove.x);
+			QuickValueEditor("SceneryMove.y", SceneryMove.y);
+			QuickValueEditor("SceneryMove.z", SceneryMove.z);
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("LeakTankCash::TankDrainRate", Effect_LeakTankCash::TankDrainRate);

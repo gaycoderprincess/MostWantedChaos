@@ -374,3 +374,22 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool IgnoreHUDState() override { return true; }
 } E_SkipChance;*/
+
+class Effect_SkipMusic : public ChaosEffect {
+public:
+	Effect_SkipMusic() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Skip Current Song";
+	}
+
+	void InitFunction() override {
+		auto obj = (SFXObj_PFEATrax*)EAXSound::GetSFXBase_Object(g_pEAXSound, 0x40010010);
+		if (!obj) return;
+		auto song = Songs[rand()%Songs.size()];
+		obj->StartLicensedMusic(song->PathEvent);
+	}
+	bool IsAvailable() override {
+		return FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_SkipMusic;

@@ -13,7 +13,7 @@ float TruncateFloat(float in, int accuracy) {
 	return in;
 }
 
-static inline auto CarGetVisibleStateOrig = (int(__thiscall*)(eView*, const bVector3*, const bVector3*, bMatrix4*))nullptr;
+auto CarGetVisibleStateOrig = (int(__thiscall*)(eView*, const bVector3*, const bVector3*, bMatrix4*))nullptr;
 int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVector3* a3, bMatrix4* a4) {
 	auto carMatrix = (NyaMat4x4*)a4;
 	if (CarRender_DontRenderPlayer && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen()) {

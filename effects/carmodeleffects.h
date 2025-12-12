@@ -168,6 +168,11 @@ public:
 		pCurrentReplacedCar = &aCopCars[rand()%aCopCars.size()];
 	}
 	void TickFunction(double delta) override {
+		// going back to the menu will randomize your car again
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+			InitFunction();
+		}
+
 		ForcedPlayerVehicle = Attrib::StringHash32(pCurrentReplacedCar->baseVehicle.c_str());
 		ForcedPlayerVehicleModel = pCurrentReplacedCar->vehicleModel;
 	}
@@ -220,7 +225,6 @@ public:
 		pCurrentReplacedCar = &aTrafficCars[rand()%aTrafficCars.size()];
 	}
 	void TickFunction(double delta) override {
-		// this should be rerollable, there are way too many bad traffic cars
 		// going back to the menu will randomize your car again
 		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
 			InitFunction();
