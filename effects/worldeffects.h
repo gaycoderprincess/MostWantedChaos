@@ -272,3 +272,69 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_GrippyWorld;
+
+class Effect_RoadsOnly : public ChaosEffect {
+public:
+	Effect_RoadsOnly() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Disable Buildings";
+		fTimerLength = 90;
+	}
+
+	void InitFunction() override {
+		SceneryRoadsOnly = true;
+	}
+	void DeinitFunction() override {
+		SceneryRoadsOnly = false;
+	}
+	bool HasTimer() override { return true; }
+} E_RoadsOnly;
+
+class Effect_SceneryBroken : public ChaosEffect {
+public:
+	Effect_SceneryBroken() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Inception";
+		fTimerLength = 30;
+	}
+
+	void InitFunction() override {
+		SceneryScale.z = 2;
+	}
+	void DeinitFunction() override {
+		SceneryScale.z = 1;
+	}
+	bool HasTimer() override { return true; }
+} E_SceneryBroken;
+
+class Effect_BreakTextures : public ChaosEffect {
+public:
+	Effect_BreakTextures() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Acid Trip";
+		fTimerLength = 30;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch<uint64_t>(0x6E05DB, 0x8B90909090909090);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint64_t>(0x6E05DB, 0x8B0000010491FF50);
+	}
+	bool HasTimer() override { return true; }
+} E_BreakTextures;
+
+class Effect_RainbowRoad : public ChaosEffect {
+public:
+	Effect_RainbowRoad() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Rainbow Road";
+		fTimerLength = 60;
+	}
+
+	void TickFunctionPre3D(double delta) override {
+		static auto texture = LoadTexture("CwoeeChaos/data/textures/rainbow.png");
+		pWorldTextureOverride = texture;
+	}
+	void TickFunctionPost3D(double delta) override {
+		pWorldTextureOverride = nullptr;
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_RainbowRoad;
