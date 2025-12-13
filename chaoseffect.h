@@ -405,13 +405,13 @@ bool RunningEffectsCleanup() {
 #include "effects/spawneffects.h"
 #include "effects/cameraeffects.h"
 #include "effects/rendereffects.h"
+#include "effects/timeeffects.h"
 #include "effects/effect_safehouse.h"
 #include "effects/effect_leaktank.h"
 #include "effects/effect_flashbacks.h"
 #include "effects/effect_qte.h"
 #include "effects/effect_disableall.h"
 #include "effects/effect_tiktok.h"
-#include "effects/effect_dropcash.h"
 
 // todo voting effects:
 // rigged - lowest voted wins

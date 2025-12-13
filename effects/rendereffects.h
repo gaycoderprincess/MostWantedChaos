@@ -59,6 +59,7 @@ public:
 		sName = "Become Fish";
 		sFriendlyName = "All Cars Are Blahaj";
 		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 
 	std::vector<Render3D::tModel*> models;

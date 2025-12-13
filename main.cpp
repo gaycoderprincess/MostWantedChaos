@@ -147,21 +147,16 @@ void ProcessChaosEffects_SetDir() {
 }
 
 void CameraHook(CameraMover* pMover) {
-	pMoverCamera = pMover->pCamera;
-
 	DLLDirSetter _setdir;
 
-	static CNyaTimer gTimer;
-	gTimer.Process();
-
-	if (IsChaosBlocked() && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) return;
-
-	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-	if (!inMenu && CustomCamera::bRunCustom) {
+	if (CustomCamera::bRunCustom) {
+		static CNyaTimer gTimer;
+		gTimer.Process();
 		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), nullptr);
 		CustomCamera::ProcessCam(pMover->pCamera, gTimer.fDeltaTime);
 	}
 
+	pMoverCamera = pMover->pCamera;
 	ProcessChaosEffects<ChaosEffect::HOOK_CAMERA>();
 }
 
