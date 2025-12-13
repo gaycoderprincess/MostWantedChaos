@@ -36,7 +36,7 @@ public:
 	void InitFunction() override {
 		GenerateRandomCar();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (!IsVehicleValidAndActive(pRandomCar)) {
 			GenerateRandomCar();
 			return;
@@ -65,7 +65,7 @@ public:
 	void InitFunction() override {
 		GenerateRandomCar();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (!IsVehicleValidAndActive(pRandomCar)) {
 			GenerateRandomCar();
 			return;
@@ -85,7 +85,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			auto collision = car->mCOMObject->Find<ICollisionBody>();
@@ -112,7 +112,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			auto rb = car->mCOMObject->Find<IRigidBody>();
@@ -136,7 +136,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			auto rb = car->mCOMObject->Find<IRigidBody>();
@@ -163,7 +163,7 @@ public:
 	void InitFunction() override {
 		NoResetCount++;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			auto rb = car->mCOMObject->Find<IRigidBody>();
@@ -186,7 +186,7 @@ public:
 		fTimerLength = 120;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_RACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
@@ -245,7 +245,7 @@ public:
 		timer = 0;
 		CaptureAllCars();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		timer += delta;
 		if (timer > 1) {
 			int applyChance = 40;
@@ -306,7 +306,7 @@ public:
 		timer = 0;
 		CaptureAllCars();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		timer += delta;
 		if (timer > 1) {
 			int applyChance = 25;
@@ -371,7 +371,7 @@ public:
 		timer = 0;
 		lastStates.clear();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		timer += delta * Sim::Internal::mSystem->mSpeed;
 		if (timer > 1.0 / 60.0) {
 			lastStates.push_back(CwoeeCarPhysicalState(GetLocalPlayerVehicle()));
@@ -408,7 +408,7 @@ public:
 			"trailers",
 	};
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		for (auto& name : collections) {
 			auto collection = Attrib::FindCollection(Attrib::StringHash32("rigidbodyspecs"), Attrib::StringHash32(name));
 			if (!collection) continue;
@@ -453,7 +453,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		CarScaleMatrix = UMath::Matrix4::kIdentity;
 
 		auto fadeIn = GetEffectFadeInOut(this, 1, true);
@@ -491,7 +491,7 @@ public:
 
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/dealer.mp3");
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		state += delta * (goBack ? -GroovySpeed : GroovySpeed);
 		if (state > 1) goBack = true;
 		if (state < 0) goBack = false;

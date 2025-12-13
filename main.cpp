@@ -106,7 +106,49 @@ void MoneyChecker() {
 	}
 }
 
+void ProcessChaosEffectsMain(double fDeltaTime, bool inMenu, bool blockedByOtherMeans) {
+	// run effects first, then draw the chaos HUD over top
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
+		effect.OnTickMain(fDeltaTime, inMenu || blockedByOtherMeans);
+	}
+
+	float y = 0;
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
+		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
+		effect.Draw(y, inMenu || blockedByOtherMeans);
+		y += 1 - (inMenu ? 0 : effect.GetOffscreenPercentage());
+	}
+
+	while (RunningEffectsCleanup()) {}
+}
+
+template<ChaosEffect::eChaosHook hook>
+void ProcessChaosEffects() {
+	static CNyaTimer gTimer;
+	gTimer.Process();
+
+	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
+	auto isBlocked = IsChaosBlocked();
+	for (auto& effect : aRunningEffects) {
+		if (inMenu && !effect.pEffect->RunInMenus()) continue;
+		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
+		effect.OnTick(hook, gTimer.fDeltaTime);
+	}
+}
+
+template<ChaosEffect::eChaosHook hook>
+void ProcessChaosEffects_SetDir() {
+	DLLDirSetter _setdir;
+	ProcessChaosEffects<hook>();
+}
+
 void CameraHook(CameraMover* pMover) {
+	pMoverCamera = pMover->pCamera;
+
 	DLLDirSetter _setdir;
 
 	static CNyaTimer gTimer;
@@ -120,30 +162,7 @@ void CameraHook(CameraMover* pMover) {
 		CustomCamera::ProcessCam(pMover->pCamera, gTimer.fDeltaTime);
 	}
 
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		effect.OnTickCamera(pMover->pCamera, gTimer.fDeltaTime);
-	}
-}
-
-void ProcessChaosEffects(double fDeltaTime, bool inMenu, bool blockedByOtherMeans) {
-	// run effects first, then draw the chaos HUD over top
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
-		effect.OnTick(fDeltaTime, inMenu || blockedByOtherMeans);
-	}
-
-	float y = 0;
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
-		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
-		effect.Draw(y, inMenu || blockedByOtherMeans);
-		y += 1 - (inMenu ? 0 : effect.GetOffscreenPercentage());
-	}
-
-	while (RunningEffectsCleanup()) {}
+	ProcessChaosEffects<ChaosEffect::HOOK_CAMERA>();
 }
 
 void ChaosLoop() {
@@ -165,10 +184,10 @@ void ChaosLoop() {
 
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-		ProcessChaosEffects(gTimer.fDeltaTime, inMenu, !inMenu);
+		ProcessChaosEffectsMain(gTimer.fDeltaTime, inMenu, !inMenu);
 		return;
 	}
-	ProcessChaosEffects(gTimer.fDeltaTime, false, false);
+	ProcessChaosEffectsMain(gTimer.fDeltaTime, false, false);
 
 	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) {
@@ -217,28 +236,6 @@ void Render3DLoop() {
 		return;
 	}
 
-	static CNyaTimer gTimer;
-	gTimer.Process();
-
-	/*static auto models = Render3D::CreateModels("shork.fbx");
-	for (auto& model : models) {
-		auto mat = UMath::Matrix4::kIdentity;
-		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
-			ply->GetMatrix4(&mat);
-			UMath::Vector3 dim;
-			ply->GetDimension(&dim);
-			mat.p = *ply->GetPosition();
-		}
-		mat.x *= 1;
-		mat.y *= 1;
-		mat.z *= 1;
-
-		UMath::Matrix4 rotation;
-		//rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
-		mat = (UMath::Matrix4)(mat * rotation);
-		model->RenderAt(WorldToRenderMatrix(mat));
-	}*/
-
 	for (auto& func : aDrawing3DLoopFunctions) {
 		func();
 	}
@@ -248,67 +245,12 @@ void Render3DLoop() {
 	}
 	aDrawing3DLoopFunctionsOnce.clear();
 
-	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-	auto isBlocked = IsChaosBlocked();
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
-		effect.OnTick3D(gTimer.fDeltaTime);
-	}
+	ProcessChaosEffects<ChaosEffect::HOOK_3D>();
 
 	state->Apply();
 	state->Release();
 
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
-		effect.OnTickPost3D(gTimer.fDeltaTime);
-	}
-}
-
-void PreRender3DLoop() {
-	DLLDirSetter _setdir;
-
-	static CNyaTimer gTimer;
-	gTimer.Process();
-
-	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-	auto isBlocked = IsChaosBlocked();
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
-		effect.OnTickPre3D(gTimer.fDeltaTime);
-	}
-}
-
-void PreRenderPropsLoop() {
-	DLLDirSetter _setdir;
-
-	static CNyaTimer gTimer;
-	gTimer.Process();
-
-	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-	auto isBlocked = IsChaosBlocked();
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
-		effect.OnTickPreProps(gTimer.fDeltaTime);
-	}
-}
-
-void RenderPropsLoop() {
-	DLLDirSetter _setdir;
-
-	static CNyaTimer gTimer;
-	gTimer.Process();
-
-	auto inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
-	auto isBlocked = IsChaosBlocked();
-	for (auto& effect : aRunningEffects) {
-		if (inMenu && !effect.pEffect->RunInMenus()) continue;
-		if (isBlocked && !effect.pEffect->RunWhenBlocked()) continue;
-		effect.OnTickPostProps(gTimer.fDeltaTime);
-	}
+	ProcessChaosEffects<ChaosEffect::HOOK_POST3D>();
 }
 
 void ChaosModMenu() {
@@ -584,11 +526,11 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::aCameraMoverFuncs.push_back(CameraHook);
 			NyaHooks::PlaceLateInitHook();
 			NyaHooks::PlaceRenderHook();
-			NyaHooks::aPreRenderFuncs.push_back(PreRender3DLoop);
+			NyaHooks::aPreRenderFuncs.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PRE3D>);
 			NyaHooks::aRenderFuncs.push_back(Render3DLoop);
 			NyaHooks::PlacePropsRenderHook();
-			NyaHooks::aPrePropsRenderFuncs.push_back(PreRenderPropsLoop);
-			NyaHooks::aPropsRenderFuncs.push_back(RenderPropsLoop);
+			NyaHooks::aPrePropsRenderFuncs.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PREPROPS>);
+			NyaHooks::aPropsRenderFuncs.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_POSTPROPS>);
 
 			// SkipFE
 			//*(bool*)0x926064 = 1;

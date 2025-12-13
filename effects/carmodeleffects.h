@@ -8,7 +8,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForcedOpponentVehicle = Attrib::StringHash32("bmwm3gtre46");
 		RandomizeOpponentTuning = true;
 	}
@@ -29,7 +29,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForcedOpponentVehicle = Attrib::StringHash32("gti");
 		RandomizeOpponentTuning = true;
 	}
@@ -50,7 +50,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		OpponentPlayerCar = true;
 	}
 	void DeinitFunction() override {
@@ -69,7 +69,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		OpponentPlayerCarRandom = true;
 	}
 	void DeinitFunction() override {
@@ -88,7 +88,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_tune"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		OpponentsFullyTuned = true;
 	}
 	void DeinitFunction() override {
@@ -107,7 +107,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("traffic_car_model"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForcedTrafficVehicle = Attrib::StringHash32("trafpizza");
 
 		auto cars = GetActiveVehicles(DRIVER_TRAFFIC);
@@ -129,7 +129,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("traffic_car_model");
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForcedTrafficVehicle = Attrib::StringHash32("semicrate");
 	}
 	void DeinitFunction() override {
@@ -167,7 +167,7 @@ public:
 	void InitFunction() override {
 		pCurrentReplacedCar = &aCopCars[rand()%aCopCars.size()];
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		// going back to the menu will randomize your car again
 		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
 			InitFunction();
@@ -224,7 +224,7 @@ public:
 	void InitFunction() override {
 		pCurrentReplacedCar = &aTrafficCars[rand()%aTrafficCars.size()];
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		// going back to the menu will randomize your car again
 		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
 			InitFunction();
@@ -249,7 +249,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForcedPlayerVehicle = Attrib::StringHash32("punto");
 	}
 	void DeinitFunction() override {

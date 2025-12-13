@@ -18,7 +18,9 @@ public:
 	static inline float offZ = -0.5;
 	static inline float scale = 0.5;
 
-	void TickFunction3D(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_3D) return;
+
 		if (models.empty() || models[0]->bInvalidated) {
 			models = Render3D::CreateModels("shork.fbx");
 		}
@@ -108,7 +110,9 @@ public:
 		model->RenderAt(carMatrix);
 	}
 
-	void TickFunction3D(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_3D) return;
+		
 		DrawCars = false;
 
 		if (models.empty() || models[0]->bInvalidated) {
@@ -201,7 +205,9 @@ public:
 	void InitFunction() override {
 		gCustomCar_Pepper.Reset(GetLocalPlayerVehicle());
 	}
-	void TickFunction3D(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_3D) return;
+		
 		CarRender_DontRenderPlayer = true;
 		DrawLightFlares = false;
 
@@ -228,7 +234,9 @@ public:
 	void InitFunction() override {
 		gCustomCar_Greenwood.Reset(GetLocalPlayerVehicle());
 	}
-	void TickFunction3D(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_3D) return;
+		
 		CarRender_DontRenderPlayer = true;
 		DrawLightFlares = false;
 
@@ -255,7 +263,9 @@ public:
 	void InitFunction() override {
 		gCustomCar_Mona.Reset(GetLocalPlayerVehicle());
 	}
-	void TickFunction3D(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_3D) return;
+		
 		CarRender_DontRenderPlayer = true;
 		DrawLightFlares = false;
 

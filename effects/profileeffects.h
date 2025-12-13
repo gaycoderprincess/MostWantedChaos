@@ -23,7 +23,7 @@ public:
 		fTimerLength = 240;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = false;
 	}
 	void DeinitFunction() override {
@@ -93,7 +93,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForceManualGearbox = true;
 	}
 	void DeinitFunction() override {
@@ -115,7 +115,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForceAutomaticGearbox = true;
 	}
 	void DeinitFunction() override {
@@ -354,7 +354,7 @@ public:
 	void InitFunction() override {
 		chanceFired = false;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
 			if (rand() % 100 < 10) {
 				FEDatabase->mUserProfile->TheCareerSettings.CurrentBin--;

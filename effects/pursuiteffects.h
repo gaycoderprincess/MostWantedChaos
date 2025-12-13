@@ -19,7 +19,7 @@ public:
 			}
 		}
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
 		for (int i = 0; i < list.size(); i++) {
 			auto veh = list[i];
@@ -131,7 +131,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ICopMgr::mInstance->SetAllBustedTimersToZero();
 	}
 	bool HasTimer() override { return true; }
@@ -147,7 +147,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ICopMgr::mDisableCops = true;
 	}
 	void DeinitFunction() override {
@@ -186,7 +186,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
 		for (int i = 0; i < list.size(); i++) {
 			auto car = list[i];
@@ -226,7 +226,7 @@ public:
 			EffectInstance->fTimer = 15;
 		}
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (pass) {
 			static float f = -999.0;
 			NyaHookLib::Patch(0x4445CC + 2, &f);
@@ -332,7 +332,7 @@ public:
 		sName = "Enter Pursuit Cooldown";
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		NyaHookLib::Patch<uint64_t>(0x4448EF, 0x44D9909090909090);
 	}
 	void DeinitFunction() override {
@@ -347,7 +347,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IDamageable>()) {
 			if (IsCarDestroyed(GetLocalPlayerVehicle())) return;
 			ply->ResetDamage();
@@ -364,7 +364,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles(DRIVER_COP);
 		for (auto& car : cars) {
 			car->mCOMObject->Find<IDamageable>()->ResetDamage();
@@ -388,7 +388,7 @@ public:
 		fTimerLength = 45;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles(DRIVER_COP);
 		IVehicle* bottom = nullptr;
 		for (auto& car : cars) {

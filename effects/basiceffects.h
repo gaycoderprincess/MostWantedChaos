@@ -15,7 +15,7 @@ public:
 		fTimerLength = 10;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		DrawRectangle(0, 1, 0, 1, {0,0,0,255});
 	}
 	bool HasTimer() override { return true; }
@@ -37,7 +37,7 @@ public:
 			NyaAudio::Play(sound);
 		}
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		uint8_t alpha = 255;
 		if (EffectInstance->fTimer < 2) alpha = (EffectInstance->fTimer * 0.5) * 255;
 		DrawRectangle(0, 1, 0, 1, {255,255,255,alpha});
@@ -52,7 +52,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto fadeIn = GetEffectFadeInOut(this, 1, true);
 		DrawRectangle(0, std::lerp(0,0.33, fadeIn), 0, 1, {0,0,0,255});
 		DrawRectangle(std::lerp(1,0.66, fadeIn), 1, 0, 1, {0,0,0,255});
@@ -69,7 +69,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto fLetterboxMultiplier = ((4.0 / 3.0) / GetAspectRatio()) * 0.5;
 		auto left = 0.5 - fLetterboxMultiplier;
 		auto right = 0.5 + fLetterboxMultiplier;
@@ -94,7 +94,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto fadeIn = GetEffectFadeInOut(this, 1, true);
 		DrawRectangle(0, 1, 0, std::lerp(0,0.1, fadeIn), {0,0,0,255});
 		DrawRectangle(0, 1, std::lerp(1,0.9, fadeIn), 1, {0,0,0,255});
@@ -127,7 +127,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		static double timer = 0;
 		timer += delta;
 		while (timer > 0.03) {
@@ -152,7 +152,7 @@ public:
 	void InitFunction() override {
 		chanceFired = false;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
 			if (rand() % 100 < 10) {
 				__debugbreak();
@@ -181,7 +181,7 @@ public:
 		fTimerLength = 30;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				float size = 1.0 / 8.0;
@@ -204,7 +204,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		for (int x = 0; x < 16; x++) {
 			for (int y = 0; y < 16; y++) {
 				float size = 1.0 / 16.0;
@@ -228,7 +228,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		DisableChaosHUD = true;
 	}
 	void DeinitFunction() override {
@@ -246,7 +246,7 @@ public:
 		fTimerLength = 30;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		static auto texture = LoadTexture("CwoeeChaos/data/textures/punchhole.png");
 		DrawRectangle(0, 1, 0, 1, {255,255,255,255}, 0, texture);
 	}

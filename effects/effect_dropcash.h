@@ -44,7 +44,7 @@ public:
 	void InitFunction() override {
 		CaptureAllCars();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		CheckAllCars();
 		CaptureAllCars();
 	}

@@ -26,7 +26,7 @@ public:
 		return 0;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, &DetermineHudFeaturesHooked);
 	}
 	void DeinitFunction() override {
@@ -79,7 +79,7 @@ public:
 	void InitFunction() override {
 		FlatOutHUD::NewGameHud::OnReset();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, &DetermineHudFeaturesHooked);
 		FlatOutHUD::NewGameHud::OnHUDTick();
 		NyaHookLib::Patch<uint8_t>(0x57CFA8, 0xEB); // remove MilestoneBoard

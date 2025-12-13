@@ -10,7 +10,9 @@ public:
 
 	static inline float LiftOffset = 3;
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+		
 		auto camMatrix = PrepareCameraMatrix();
 		camMatrix.p.z += LiftOffset;
 		ApplyCameraMatrix(camMatrix);
@@ -29,7 +31,9 @@ public:
 
 	static inline float LiftOffset = -0.4;
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+		
 		auto camMatrix = PrepareCameraMatrix();
 		camMatrix.p.z += LiftOffset;
 		ApplyCameraMatrix(camMatrix);
@@ -48,7 +52,9 @@ public:
 
 	static inline float RoofOffset = 0.5;
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+		
 		auto camMatrix = PrepareCameraMatrix();
 		UMath::Matrix4 playerMatrix;
 		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&playerMatrix);
@@ -73,7 +79,9 @@ public:
 	static inline float YOffset = -1;
 	static inline float ZOffset = -5;
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+		
 		UMath::Matrix4 playerMatrix;
 		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&playerMatrix);
 		playerMatrix.p = *GetLocalPlayerVehicle()->GetPosition();
@@ -81,7 +89,7 @@ public:
 		camMatrix.p += XOffset * camMatrix.x;
 		camMatrix.p += YOffset * camMatrix.y;
 		camMatrix.p += ZOffset * camMatrix.z;
-		ApplyCameraMatrix(pCamera, camMatrix);
+		ApplyCameraMatrix(pMoverCamera, camMatrix);
 	}
 	bool HasTimer() override { return true; }
 } E_GTCamera;
@@ -113,11 +121,13 @@ public:
 		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
 	}
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
 		auto closest = GetClosestActiveVehicle(GetLocalPlayerVehicle());
 		if (!IsAvailable()) return;
 		CustomCamera::SetTargetCar(closest, GetLocalPlayerVehicle());
-		CustomCamera::ProcessCam(pCamera, delta);
+		CustomCamera::ProcessCam(pMoverCamera, delta);
 	}
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
@@ -145,7 +155,9 @@ public:
 	static inline float y = 0.0;
 	static inline float z = -2.0;
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
 		UMath::Matrix4 playerMatrix;
 		GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&playerMatrix);
 		playerMatrix.p = *GetLocalPlayerVehicle()->GetPosition();
@@ -155,7 +167,7 @@ public:
 		offsetMatrix.p.y = y;
 		offsetMatrix.p.z = z;
 		playerMatrix = (UMath::Matrix4)(playerMatrix * offsetMatrix);
-		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(playerMatrix));
+		ApplyCameraMatrix(pMoverCamera, WorldToRenderMatrix(playerMatrix));
 	}
 	bool HasTimer() override { return true; }
 } E_CinematicCamera;
@@ -197,7 +209,7 @@ public:
 	static inline float speedDecay = 5;
 	static inline float speedCap = 200;
 
-	void DoTopDownCamera(Camera* pCamera, double delta, bool upsidedown) {
+	void DoTopDownCamera(Camera* pMoverCamera, double delta, bool upsidedown) {
 		auto ply = GetLocalPlayerInterface<IRigidBody>();
 
 		UMath::Matrix4 camMatrix;
@@ -231,14 +243,16 @@ public:
 		auto addY = yOffset + (abs(speed) * yOffsetScale);
 		camMatrix.p.y += upsidedown ? -addY : addY;
 		camMatrix.p += speed * fwdOffsetScale * fwd;
-		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(camMatrix));
+		ApplyCameraMatrix(pMoverCamera, WorldToRenderMatrix(camMatrix));
 	}
 
 	void InitFunction() override {
 		speed = 0;
 	}
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
-		DoTopDownCamera(pCamera, delta, false);
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
+		DoTopDownCamera(pMoverCamera, delta, false);
 	}
 	bool HasTimer() override { return true; }
 } E_TopDownCamera;
@@ -252,8 +266,10 @@ public:
 		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
 	}
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
-		DoTopDownCamera(pCamera, delta, true);
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
+		DoTopDownCamera(pMoverCamera, delta, true);
 	}
 } E_TopDownCamera2;
 
@@ -273,7 +289,9 @@ public:
 	static inline float y = 1;
 	static inline float z = -1;
 
-	void TickFunctionCamera(Camera* pCamera, double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
 		if (!GetLocalPlayerVehicle()) return;
 
 		UMath::Matrix4 playerMatrix;
@@ -285,7 +303,7 @@ public:
 		offsetMatrix.p.y = y;
 		offsetMatrix.p.z = z;
 		playerMatrix = (UMath::Matrix4)(playerMatrix * offsetMatrix);
-		ApplyCameraMatrix(pCamera, WorldToRenderMatrix(playerMatrix));
+		ApplyCameraMatrix(pMoverCamera, WorldToRenderMatrix(playerMatrix));
 	}
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }

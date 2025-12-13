@@ -15,7 +15,7 @@ public:
 		tankAmount = 100;
 		abort = false;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		NyaDrawing::CNyaRGBA32 rgb = {190,240,64,255};
 		if (tankAmount < 15) rgb = {200,0,0,255};
 		DrawTopBar(tankAmount / 100.0, rgb);
@@ -67,7 +67,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto playerSpeed = GetLocalPlayerVehicle()->GetSpeed();
 		if (playerSpeed < 5) playerSpeed = 5;
 		TankTimer += playerSpeed * Sim::Internal::mSystem->mSpeed * delta;

@@ -5,7 +5,7 @@ public:
 		fTimerLength = 10;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		DrawCars = false;
 		DrawLightFlares = false;
 		ICopMgr::mDisableCops = true;

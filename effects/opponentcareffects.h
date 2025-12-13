@@ -116,7 +116,7 @@ public:
 		fTimerLength = 30;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto car = list[i];
@@ -219,7 +219,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto car = list[i];
@@ -248,7 +248,7 @@ public:
 		fTimerLength = 90;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto car = list[i];
@@ -279,7 +279,7 @@ public:
 		fTimerLength = 90;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto car = list[i];
@@ -326,7 +326,7 @@ public:
 	void InitFunction() override {
 		CaptureAllCars();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ApplyAllCars();
 	}
 	bool HasTimer() override { return true; }

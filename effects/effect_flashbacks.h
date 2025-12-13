@@ -48,7 +48,7 @@ public:
 		lastStates.clear();
 		CaptureAllCars();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		timer += delta;
 		if (timer > fCaptureInterval) {
 			timer -= fCaptureInterval;

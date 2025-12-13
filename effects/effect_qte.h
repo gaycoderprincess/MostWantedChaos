@@ -12,7 +12,7 @@ public:
 	void InitFunction() override {
 		nNumPresses = 0;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		tNyaStringData data;
 		data.x = 0.5;
 		data.y = 0.5 - data.size;

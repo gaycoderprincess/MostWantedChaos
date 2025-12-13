@@ -14,7 +14,7 @@ public:
 		TextHook::pReplaceText = "Trans Rights";
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0xEB); // remove duplicate racer name check
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		Chyron::mArtist = "Trans Rights";
 		Chyron::mTitle = "Trans Rights";
 		Chyron::mAlbum = "Trans Rights";
@@ -35,7 +35,7 @@ public:
 		fTimerLength = 120;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		TextHook::bReverseText = true;
 	}
 	void DeinitFunction() override {

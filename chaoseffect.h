@@ -30,14 +30,19 @@ public:
 		return sName;
 	}
 
+	enum eChaosHook {
+		HOOK_GAMETICK,
+		HOOK_CAMERA,
+		HOOK_3D,
+		HOOK_PRE3D,
+		HOOK_POST3D,
+		HOOK_PREPROPS,
+		HOOK_POSTPROPS,
+	};
+
 	virtual void InitFunction() {}
-	virtual void TickFunction(double delta) {}
-	virtual void TickFunctionCamera(Camera* pCamera, double delta) {}
-	virtual void TickFunction3D(double delta) {}
-	virtual void TickFunctionPre3D(double delta) {}
-	virtual void TickFunctionPost3D(double delta) {}
-	virtual void TickFunctionPreProps(double delta) {}
-	virtual void TickFunctionPostProps(double delta) {}
+	virtual void TickFunction(eChaosHook hook, double delta) {}
+	virtual void TickFunctionMain(double delta) {}
 	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
@@ -186,67 +191,17 @@ public:
 		DrawString(data, str);
 	}
 
-	void OnTickCamera(Camera* pCamera, double delta) {
+	void OnTick(ChaosEffect::eChaosHook hook, double delta) {
 		if (IsHidden()) return;
 		if (bFirstFrame) return;
 		if (!IsActive()) return;
 
 		pEffect->EffectInstance = this;
-		pEffect->TickFunctionCamera(pCamera, delta);
+		pEffect->TickFunction(hook, delta);
 		pEffect->EffectInstance = nullptr;
 	}
 
-	void OnTick3D(double delta) {
-		if (IsHidden()) return;
-		if (bFirstFrame) return;
-		if (!IsActive()) return;
-
-		pEffect->EffectInstance = this;
-		pEffect->TickFunction3D(delta);
-		pEffect->EffectInstance = nullptr;
-	}
-
-	void OnTickPre3D(double delta) {
-		if (IsHidden()) return;
-		if (bFirstFrame) return;
-		if (!IsActive()) return;
-
-		pEffect->EffectInstance = this;
-		pEffect->TickFunctionPre3D(delta);
-		pEffect->EffectInstance = nullptr;
-	}
-
-	void OnTickPost3D(double delta) {
-		if (IsHidden()) return;
-		if (bFirstFrame) return;
-		if (!IsActive()) return;
-
-		pEffect->EffectInstance = this;
-		pEffect->TickFunctionPost3D(delta);
-		pEffect->EffectInstance = nullptr;
-	}
-
-	void OnTickPreProps(double delta) {
-		if (IsHidden()) return;
-		if (bFirstFrame) return;
-		if (!IsActive()) return;
-
-		pEffect->EffectInstance = this;
-		pEffect->TickFunctionPreProps(delta);
-		pEffect->EffectInstance = nullptr;
-	}
-
-	void OnTickPostProps(double delta) {
-		if (IsHidden()) return;
-		if (bFirstFrame) return;
-		if (!IsActive()) return;
-
-		pEffect->EffectInstance = this;
-		pEffect->TickFunctionPostProps(delta);
-		pEffect->EffectInstance = nullptr;
-	}
-
-	void OnTick(double delta, bool inMenu) {
+	void OnTickMain(double delta, bool inMenu) {
 		if (!pEffect) {
 			fTimer -= delta;
 			return;
@@ -310,7 +265,7 @@ public:
 			}
 		}
 		if (IsActive()) {
-			pEffect->TickFunction(delta);
+			pEffect->TickFunctionMain(delta);
 		}
 		pEffect->EffectInstance = nullptr;
 	}

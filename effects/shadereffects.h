@@ -37,7 +37,7 @@ public:
 			pixel_shader_buffer->Release();
 		}
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (!pShader) return;
 		pShaderToDraw = pShader;
 		if (bEasedTimer) bShaderTimerEase1 = true;
@@ -79,10 +79,10 @@ public:
 		IncompatibilityGroups.clear();
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		bShaderDisco = true;
 		if (!pShaderToDraw) {
-			EffectBase_ScreenShader::TickFunction(delta);
+			EffectBase_ScreenShader::TickFunctionMain(delta);
 		}
 	}
 } E_ShaderDisco;

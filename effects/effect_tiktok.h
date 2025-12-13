@@ -52,7 +52,7 @@ public:
 			bOnce = false;
 		}
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/candyland.mp3");
 		if (aWords.empty()) {
 			aWords = TextHook::SplitStringIntoWords(aSentences[rand()%aSentences.size()]);

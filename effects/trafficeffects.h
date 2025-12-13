@@ -13,7 +13,7 @@ public:
 		NyaHookLib::Patch(0x4231BD + 1, "AIGoalRacer"); // AIVehicleTraffic::StartDriving
 		NyaHookLib::Patch<uint16_t>(0x411E9E, 0x1BEB); // never set DriveSpeed for AIVehicleTraffic
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		fTimer += delta;
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
@@ -39,7 +39,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
@@ -57,7 +57,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
@@ -78,7 +78,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;
@@ -126,7 +126,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			if (car->GetDriverClass() != DRIVER_TRAFFIC) continue;

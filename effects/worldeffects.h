@@ -20,7 +20,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);
 		}
@@ -42,7 +42,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);
 		}
@@ -64,7 +64,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);
 		}
@@ -91,7 +91,7 @@ public:
 		fTimerLength = 90;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		IgnoreSpeedbreakerTime = true;
 	}
 	void DeinitFunction() override {
@@ -107,7 +107,7 @@ public:
 		fTimerLength = 30;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		NyaHookLib::Patch(0x723FA0, 0x530008C2);
 		NyaHookLib::Patch<uint8_t>(0x6DEF49, 0xEB); // FE
 	}
@@ -126,7 +126,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	}
 	void DeinitFunction() override {
@@ -144,20 +144,20 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
 
-	void TickFunctionPre3D(double delta) override {
-		static auto texture = LoadTexture("CwoeeChaos/data/textures/wireframe.png");
-		pWorldTextureOverride = texture;
-		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-	}
-	void TickFunctionPost3D(double delta) override {
-		pWorldTextureOverride = nullptr;
-		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	}
-	void TickFunctionPreProps(double delta) override {
-		TickFunctionPre3D(delta);
-	}
-	void TickFunctionPostProps(double delta) override {
-		TickFunctionPost3D(delta);
+	void TickFunction(eChaosHook hook, double delta) override {
+		switch (hook) {
+			case HOOK_PRE3D:
+			case HOOK_PREPROPS:
+				static auto texture = LoadTexture("CwoeeChaos/data/textures/wireframe.png");
+				pWorldTextureOverride = texture;
+				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+				break;
+			case HOOK_POST3D:
+			case HOOK_POSTPROPS:
+				pWorldTextureOverride = nullptr;
+				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+				break;
+		}
 	}
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
@@ -173,7 +173,7 @@ public:
 
 	//static inline float PointSize = 4;
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING ? D3DFILL_POINT : D3DFILL_SOLID);
 		//g_pd3dDevice->SetRenderState(D3DRS_POINTSCALEENABLE, TRUE);
 		//g_pd3dDevice->SetRenderState(D3DRS_POINTSIZE, PointSize);
@@ -337,22 +337,22 @@ public:
 	Effect_RainbowRoad() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Rainbow Road";
 		sFriendlyName = "Rainbow World";
-		fTimerLength = 60;
+		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
 
-	void TickFunctionPre3D(double delta) override {
-		static auto texture = LoadTexture("CwoeeChaos/data/textures/rainbow.png");
-		pWorldTextureOverride = texture;
-	}
-	void TickFunctionPost3D(double delta) override {
-		pWorldTextureOverride = nullptr;
-	}
-	void TickFunctionPreProps(double delta) override {
-		TickFunctionPre3D(delta);
-	}
-	void TickFunctionPostProps(double delta) override {
-		TickFunctionPost3D(delta);
+	void TickFunction(eChaosHook hook, double delta) override {
+		switch (hook) {
+			case HOOK_PRE3D:
+			case HOOK_PREPROPS:
+				static auto texture = LoadTexture("CwoeeChaos/data/textures/rainbow.png");
+				pWorldTextureOverride = texture;
+				break;
+			case HOOK_POST3D:
+			case HOOK_POSTPROPS:
+				pWorldTextureOverride = nullptr;
+				break;
+		}
 	}
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }

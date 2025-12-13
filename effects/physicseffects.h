@@ -61,7 +61,7 @@ public:
 		fTimerLength = 90;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
 			ply->EnableObjectCollisions(false);
 		}

@@ -141,7 +141,7 @@ public:
 		fTimerLength = 120;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		GRaceStatus::DisableBarriers();
 	}
 	void DeinitFunction() override {
@@ -168,7 +168,7 @@ public:
 	void InitFunction() override {
 		active = false;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
 			if (IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) {

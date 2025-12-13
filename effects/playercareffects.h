@@ -128,7 +128,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ChargeGameBreaker(1);
 		}
@@ -144,7 +144,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			ply->ChargeNOS(1);
 		}
@@ -161,7 +161,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);
 		}
@@ -177,7 +177,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerEngine()) {
 			ply->ChargeNOS(-1);
 		}
@@ -284,7 +284,7 @@ public:
 		fTimerLength = 30;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		aMainLoopFunctionsOnce.push_back([](){
 			if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
 				if (!ply->GetAiControl()) ply->SetAiControl(true);
@@ -307,7 +307,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("autodrive"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
 			if (!ply->GetAiControl()) {
 				NyaHookLib::Patch(0x42920D + 1, "AIGoalTraffic");
@@ -352,7 +352,7 @@ public:
 		fTimerLength = 10;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			auto vel = *ply->GetAngularVelocity();
 			vel.y = 2;
@@ -370,7 +370,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("aerodynamics"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::AERODYNAMICS] = 50;
@@ -396,7 +396,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::HANDLING] = 2;
@@ -422,7 +422,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::HANDLING] = -2;
@@ -448,7 +448,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = -2;
@@ -474,7 +474,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension");
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = -10;
@@ -500,7 +500,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::RIDEHEIGHT] = 25;
@@ -532,7 +532,7 @@ public:
 	void InitFunction() override {
 		state = 0;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		state += delta * (goBack ? -2 : 2);
 		if (state > 1) goBack = true;
 		if (state < 0) goBack = false;
@@ -562,7 +562,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = -5;
@@ -588,7 +588,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = 3;
@@ -650,7 +650,7 @@ public:
 		}
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<ISpikeable>()) {
 			for (int i = 0; i < 4; i++) {
 				if (ply->GetTireDamage(i) < TIRE_DAMAGE_PUNCTURED) ply->Puncture(i);
@@ -767,7 +767,7 @@ public:
 		fTimerLength = 30;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		DoCarMagnet(GetLocalPlayerVehicle(), delta);
 	}
 	bool HasTimer() override { return true; }
@@ -780,7 +780,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		DoCarForcefield(GetLocalPlayerVehicle());
 	}
 	bool HasTimer() override { return true; }
@@ -793,7 +793,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			ply->ClearInput();
 		}
@@ -808,7 +808,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		static double timer = 0;
 		timer += delta;
 		while (timer > 0.1) {
@@ -829,7 +829,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForceManualGearbox = true;
 		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
 			if (ply->GetGear() != G_FIRST) ply->Shift(G_FIRST);
@@ -850,7 +850,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForceManualGearbox = true;
 		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
 			if (ply->GetGear() != ply->GetTopGear()) ply->Shift(ply->GetTopGear());
@@ -870,7 +870,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		ForceManualGearbox = true;
 		if (auto ply = GetLocalPlayerInterface<ITransmission>()) {
 			if (ply->GetGear() != G_REVERSE) ply->Shift(G_REVERSE);
@@ -1018,7 +1018,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("playermass"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
 			ply->SetCollisionMass(100000);
 		}
@@ -1039,7 +1039,7 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("playermass"));
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
 			ply->SetCollisionMass(0.01);
 		}
@@ -1073,7 +1073,7 @@ public:
 	void InitFunction() override {
 		NoResetCount++;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto target = GetClosestActiveVehicle(GetLocalPlayerVehicle())) {
 			DoPiggyback(target, GetLocalPlayerVehicle());
 		}
@@ -1097,7 +1097,7 @@ public:
 	void InitFunction() override {
 		position = *GetLocalPlayerSimable()->GetPosition();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		GetLocalPlayerInterface<IRigidBody>()->SetPosition(&position);
 	}
 	bool HasTimer() override { return true; }
@@ -1115,7 +1115,7 @@ public:
 	void InitFunction() override {
 		orient = *GetLocalPlayerInterface<IRigidBody>()->GetOrientation();
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		GetLocalPlayerInterface<IRigidBody>()->SetOrientation(&orient);
 	}
 	bool HasTimer() override { return true; }
@@ -1153,7 +1153,7 @@ public:
 	void InitFunction() override {
 		NoResetCount++;
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			auto playerRB = GetLocalPlayerInterface<IRigidBody>();
 			auto playerOrient = *playerRB->GetOrientation();
@@ -1193,7 +1193,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			ply->SetControlBrake(0);
 			ply->SetControlHandBrake(0);
@@ -1210,7 +1210,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			ply->SetControlSteering(0);
 		}
@@ -1233,7 +1233,7 @@ public:
 		timer = 0;
 		lastState.Capture(GetLocalPlayerVehicle());
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		timer += delta;
 		if (timer > 1) {
 			if (rand() % 100 < 25) {
@@ -1267,7 +1267,7 @@ public:
 		fTimerLength = 45;
 	}
 
-	void TickFunction(double timer) override {
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			auto engine = car->mCOMObject->Find<IEngine>();
@@ -1287,7 +1287,7 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunction(double timer) override {
+	void TickFunctionMain(double delta) override {
 		// this results in around 60km/h with my cobalt
 		if (auto ply = GetLocalPlayerInterface<ISuspension>()) {
 			ply->SetWheelAngularVelocity(0, 50.0);
@@ -1315,7 +1315,7 @@ public:
 			ply->SetLinearVelocity(&UMath::Vector3::kZero);
 		}
 	}
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			auto vel = *ply->GetLinearVelocity();
 			if (vel.y < -2) {
@@ -1340,7 +1340,7 @@ public:
 
 	static inline float DeltaMult = 0.002;
 
-	void TickFunction(double delta) override {
+	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			auto heat = GetLocalPlayerInterface<IPerpetrator>()->GetHeat();
 			heat += (ply->GetControls()->fSteering * DeltaMult);
