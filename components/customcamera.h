@@ -27,13 +27,23 @@ namespace CustomCamera {
 
 	double fMouseTimer = -1;
 
+	bool IsHeliCam() {
+		return !strcmp(pTargetPlayerVehicle->GetVehicleName(), "copheli");
+	}
+
 	double GetMinStringDistance(IRigidBody* ply) {
+		// this makes the heli stop moving??
+		//if (IsHeliCam()) return 1;
+
 		UMath::Vector3 dim;
 		ply->GetDimension(&dim);
 		return abs(dim.z) * fStringMinDistance;
 	}
 
 	double GetMaxStringDistance(IRigidBody* ply) {
+		// this makes the heli stop moving??
+		//if (IsHeliCam()) return 1;
+
 		UMath::Vector3 dim;
 		ply->GetDimension(&dim);
 		return abs(dim.z) * fStringMaxDistance;
@@ -46,6 +56,8 @@ namespace CustomCamera {
 	}
 
 	NyaVec3 GetFollowOffset(IRigidBody* ply) {
+		if (IsHeliCam()) return {0, -4, 0};
+
 		UMath::Vector3 dim;
 		ply->GetDimension(&dim);
 		return {0, abs(dim.y) * fFollowOffset, 0};
@@ -144,7 +156,7 @@ namespace CustomCamera {
 		vPos -= vPosChange;
 
 		auto velocity = *player->GetPosition() - vLastPlayerPosition;
-		if ((vPos - *GetFollowPosition(player)).length() >= fStringMaxDistance * 0.999) {
+		if ((vPos - *GetFollowPosition(player)).length() >= GetMaxStringDistance(player) * 0.999) {
 			velocity *= fStringVelocityMult;
 		}
 

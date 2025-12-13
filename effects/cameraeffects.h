@@ -161,13 +161,14 @@ public:
 
 		auto closest = GetHelicopter();
 		if (!closest) return;
-		// todo making this be below the heli would be nice?
 		CustomCamera::SetTargetCar(closest, GetLocalPlayerVehicle());
 		CustomCamera::ProcessCam(pMoverCamera, delta);
 	}
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
-		return GetHelicopter() != nullptr;
+		auto heli = GetHelicopter();
+		if (!heli || (*heli->GetPosition() - *GetLocalPlayerVehicle()->GetPosition()).length() > 200) return false;
+		return true;
 	}
 	bool IsRehideable() override { return true; }
 	bool IsConditionallyAvailable() override { return true; }
