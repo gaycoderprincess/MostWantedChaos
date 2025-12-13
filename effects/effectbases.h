@@ -223,3 +223,17 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 };
+
+class EffectBase_CareerConditional : public ChaosEffect {
+public:
+	EffectBase_CareerConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) Career Conditional";
+	}
+
+	bool IsAvailable() override {
+		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
+		return true;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+};

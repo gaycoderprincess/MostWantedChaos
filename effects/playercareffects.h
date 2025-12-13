@@ -1084,7 +1084,7 @@ public:
 		}
 	}
 	void DeinitFunction() override {
-		NoResetCount++;
+		NoResetCount--;
 	}
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; }

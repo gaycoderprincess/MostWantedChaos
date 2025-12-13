@@ -139,6 +139,41 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 } E_SecondPersonCamera;
 
+class Effect_SecondPersonHeliCamera : public ChaosEffect {
+public:
+	Effect_SecondPersonHeliCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Helicopter Camera";
+		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+	}
+
+	IVehicle* GetHelicopter() {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (!strcmp(car->GetVehicleName(), "copheli")) return car;
+		}
+		return nullptr;
+	}
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
+		auto closest = GetHelicopter();
+		if (!closest) return;
+		// todo making this be below the heli would be nice?
+		CustomCamera::SetTargetCar(closest, GetLocalPlayerVehicle());
+		CustomCamera::ProcessCam(pMoverCamera, delta);
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		return GetHelicopter() != nullptr;
+	}
+	bool IsRehideable() override { return true; }
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_SecondPersonHeliCamera;
+
 class Effect_CinematicCamera : public ChaosEffect {
 public:
 	Effect_CinematicCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

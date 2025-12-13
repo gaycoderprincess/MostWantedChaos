@@ -152,9 +152,9 @@ public:
 	//bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarRandomTuning;
 
-class Effect_PlayerCarImpoundStrike : public ChaosEffect {
+class Effect_PlayerCarImpoundStrike : public EffectBase_CareerConditional {
 public:
-	Effect_PlayerCarImpoundStrike() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarImpoundStrike() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Strike To Active Career Car";
 	}
 
@@ -165,11 +165,6 @@ public:
 		if (!career) return;
 		career->TheImpoundData.mTimesBusted++;
 	}
-	bool IsAvailable() override {
-		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
-		return true;
-	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundStrike;
 
@@ -199,9 +194,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundStrikeRemove;
 
-class Effect_PlayerCarImpoundMarker : public ChaosEffect {
+class Effect_PlayerCarImpoundMarker : public EffectBase_CareerConditional {
 public:
-	Effect_PlayerCarImpoundMarker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_PlayerCarImpoundMarker() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add Extra Impound Slot To Active Career Car";
 	}
 
@@ -212,17 +207,13 @@ public:
 		if (!career) return;
 		career->TheImpoundData.mMaxBusted++;
 	}
-	bool IsAvailable() override {
-		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
-		return true;
-	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundMarker;
 
-class Effect_AddRandomTuningMarker : public ChaosEffect {
+class Effect_AddRandomTuningMarker : public EffectBase_CareerConditional {
 public:
-	Effect_AddRandomTuningMarker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_AddRandomTuningMarker() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Random Tuning Marker";
 	}
 
@@ -257,9 +248,9 @@ public:
 	}
 } E_AddRandomTuningMarker;
 
-class Effect_AddRandomBonusMarker : public ChaosEffect {
+class Effect_AddRandomBonusMarker : public EffectBase_CareerConditional {
 public:
-	Effect_AddRandomBonusMarker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_AddRandomBonusMarker() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Random Bonus Marker";
 	}
 
