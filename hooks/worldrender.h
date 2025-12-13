@@ -2,6 +2,11 @@ UMath::Vector3 SceneryScale = {1,1,1};
 UMath::Vector3 SceneryMove = {0,0,0};
 bool SceneryRoadsOnly = false;
 
+bool SceneryDrawingGround = false;
+std::string SceneryDrawingModelName;
+
+bool UseAlternateSceneryRendering = false;
+
 auto WorldRenderOrig = (void(__thiscall*)(eViewPlatInterface*, eModel*, bMatrix4*, eLightContext*, unsigned int, bMatrix4*))nullptr;
 void __thiscall WorldRenderHooked(eViewPlatInterface* pThis, eModel* model, bMatrix4* local_world, eLightContext* light_context, unsigned int flags, bMatrix4* blending_matricies) {
 	// these pointers are saved for later, so they all need to be unique
@@ -27,7 +32,12 @@ void __thiscall WorldRenderHooked(eViewPlatInterface* pThis, eModel* model, bMat
 		*mat *= ply;
 	}
 
-	return WorldRenderOrig(pThis, model, mat, light_context, flags, blending_matricies);
+	WorldRenderOrig(pThis, model, mat, light_context, flags, blending_matricies);
+	if (UseAlternateSceneryRendering) {
+		SceneryDrawingGround = local_world == &UMath::Matrix4::kIdentity;
+		SceneryDrawingModelName = model->Solid ? model->Solid->Name : "";
+		ExecuteRenderData_WithHooks();
+	}
 }
 
 IDirect3DTexture9* pWorldTextureOverride = nullptr;

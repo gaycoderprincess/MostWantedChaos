@@ -268,3 +268,41 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_RainbowRoad;
+
+class Effect_Snow : public ChaosEffect {
+public:
+	Effect_Snow() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Snowy World";
+		fTimerLength = 90;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
+	}
+
+	void InitFunction() override {
+		UseAlternateSceneryRendering = true;
+		g_VisualTreatment = false;
+	}
+	void TickFunction(eChaosHook hook, double delta) override {
+		switch (hook) {
+			case HOOK_PRE3D:
+			case HOOK_PREPROPS:
+				static auto texture = LoadTexture("CwoeeChaos/data/textures/snow.png");
+				if (SceneryDrawingGround && SceneryDrawingModelName.find("TREE") == std::string::npos && SceneryDrawingModelName.find("BUSH") == std::string::npos) pWorldTextureOverride = texture;
+				break;
+			case HOOK_POST3D:
+			case HOOK_POSTPROPS:
+				pWorldTextureOverride = nullptr;
+				break;
+		}
+	}
+	void DeinitFunction() override {
+		UseAlternateSceneryRendering = false;
+		g_VisualTreatment = true;
+	}
+	bool IsAvailable() override {
+		return g_VisualTreatment;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_Snow;

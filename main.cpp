@@ -24,9 +24,7 @@ std::vector<void(*)()> aMainLoopFunctionsOnce;
 std::vector<void(*)()> aDrawingLoopFunctions;
 std::vector<void(*)()> aDrawingLoopFunctionsOnce;
 std::vector<void(*)()> aDrawingGameUILoopFunctions;
-std::vector<void(*)()> aDrawingGameUILoopFunctionsOnce;
 std::vector<void(*)()> aDrawing3DLoopFunctions;
-std::vector<void(*)()> aDrawing3DLoopFunctionsOnce;
 void MainLoop() {
 	for (auto& func : aMainLoopFunctions) {
 		func();
@@ -235,16 +233,17 @@ void Render3DLoop() {
 		func();
 	}
 
-	for (auto& func : aDrawing3DLoopFunctionsOnce) {
-		func();
-	}
-	aDrawing3DLoopFunctionsOnce.clear();
-
 	ProcessChaosEffects<ChaosEffect::HOOK_3D>();
 
 	state->Apply();
 	state->Release();
 
+	ProcessChaosEffects<ChaosEffect::HOOK_POST3D>();
+}
+
+void ExecuteRenderData_WithHooks() {
+	ProcessChaosEffects<ChaosEffect::HOOK_PRE3D>();
+	ExecuteRenderData();
 	ProcessChaosEffects<ChaosEffect::HOOK_POST3D>();
 }
 

@@ -547,6 +547,8 @@ const char** GetPVehicleModelPointer(uint32_t pvehicleHash) {
 	return (const char**)(model + 0xC);
 }
 
+void ExecuteRenderData_WithHooks();
+
 Camera* pMoverCamera = nullptr;
 
 wchar_t gDLLDir[MAX_PATH];

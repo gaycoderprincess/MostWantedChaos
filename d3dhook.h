@@ -39,11 +39,6 @@ void HookLoop() {
 			func();
 		}
 
-		for (auto& func : aDrawingGameUILoopFunctionsOnce) {
-			func();
-		}
-		aDrawingGameUILoopFunctionsOnce.clear();
-
 		bDontRefreshInputsThisLoop = true;
 		CommonMain();
 		bDrawingGameUI = false;
