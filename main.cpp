@@ -454,6 +454,19 @@ void ChaosModMenu() {
 			}
 		}
 
+		if (DrawMenuOption("Dump Quick-Triggerable Effect List")) {
+			std::ofstream fout("cwoee_effects_quick.txt", std::ios::out);
+			if (fout.is_open()) {
+				for (auto& effect : ChaosEffect::aEffects) {
+					if (!effect->CanQuickTrigger()) continue;
+
+					fout << effect->GetFriendlyName();
+					if (effect->sFriendlyName) fout << std::format(" ({})", effect->sName);
+					fout << "\n";
+				}
+			}
+		}
+
 		ChloeMenuLib::EndMenu();
 	}
 

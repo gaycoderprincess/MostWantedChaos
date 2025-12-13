@@ -29,6 +29,7 @@ public:
 	bool HasTimer() override { return true; }
 } E_InvisibleWorld;
 
+// worse duplicate of wireframeworld2, todo is this worth keeping? it does add craziness to some effect combos because it affects the sky
 class Effect_WireframeWorld : public ChaosEffect {
 public:
 	Effect_WireframeWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
@@ -241,7 +242,7 @@ class Effect_BreakTextures : public ChaosEffect {
 public:
 	Effect_BreakTextures() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Acid Trip";
-		fTimerLength = 30;
+		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
 
@@ -288,6 +289,27 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
 
+	static inline const char* aBannedModelNames[] = {
+			"TREE",
+			"BUSH",
+
+			// these are wild guesses and idk if ive seen a single model get fixed by these, todo
+			"BUILDING",
+			"HOUSE",
+			"SKYSCRAPER",
+			"TOWER",
+			"FACTORY",
+			"CRANE",
+	};
+
+	static bool ShouldSnowifyModel() {
+		if (!SceneryDrawingGround) return false;
+		for (auto& name : aBannedModelNames) {
+			if (SceneryDrawingModelName.find(name) != std::string::npos) return false;
+		}
+		return true;
+	}
+
 	void InitFunction() override {
 		UseAlternateSceneryRendering = true;
 		g_VisualTreatment = false;
@@ -296,7 +318,7 @@ public:
 		switch (hook) {
 			case HOOK_PRE3D:
 				static auto texture = LoadTexture("CwoeeChaos/data/textures/snow.png");
-				if (SceneryDrawingGround && SceneryDrawingModelName.find("TREE") == std::string::npos && SceneryDrawingModelName.find("BUSH") == std::string::npos) pWorldTextureOverride = texture;
+				if (ShouldSnowifyModel()) pWorldTextureOverride = texture;
 				break;
 			case HOOK_POST3D:
 				pWorldTextureOverride = nullptr;

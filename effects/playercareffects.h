@@ -894,6 +894,7 @@ public:
 			ChangePlayerCarInWorld(Attrib::StringHash32("cs_clio_trafpizza"), nullptr);
 		});
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_SetCarTRAFPIZZA;
 
 class Effect_SetCarRazor : public ChaosEffect {
@@ -908,6 +909,7 @@ public:
 			ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization), true);
 		});
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_SetCarRazor;
 
 class Effect_SetCarRandom : public ChaosEffect {
@@ -931,6 +933,7 @@ public:
 			ChangePlayerCarInWorld(car->VehicleKey, &customization, (car->FilterBits & 1) != 0); // add nitro if they're stock
 		});
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandom;
 
 class Effect_SetCarRandomAI : public ChaosEffect {
@@ -986,6 +989,7 @@ public:
 			ChangePlayerCarInWorld(model, nullptr);
 		});
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandomAI;
 
 // this can crash sometimes?
@@ -1008,6 +1012,7 @@ public:
 		});
 	}
 	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandomOpponent;
 
 class Effect_SetCarMassInf : public ChaosEffect {

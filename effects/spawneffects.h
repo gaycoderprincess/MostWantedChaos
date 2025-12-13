@@ -35,6 +35,7 @@ public:
 	bool ShouldAbort() override {
 		return abort;
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_SpawnCarRandomized;
 
 class Effect_SpawnCarTruck : public ChaosEffect {
@@ -67,4 +68,5 @@ public:
 	bool ShouldAbort() override {
 		return abort;
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_SpawnCarTruck;

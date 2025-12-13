@@ -44,17 +44,18 @@ public:
 	virtual void TickFunction(eChaosHook hook, double delta) {}
 	virtual void TickFunctionMain(double delta) {}
 	virtual void DeinitFunction() {}
-	virtual bool HasTimer() { return false; };
-	virtual bool IsAvailable() { return true; };
-	virtual bool IsConditionallyAvailable() { return false; };
-	virtual bool IsRehideable() { return false; };
-	virtual bool HideFromPlayer() { return false; };
-	virtual bool AbortOnConditionFailed() { return false; };
+	virtual bool HasTimer() { return false; }
+	virtual bool IsAvailable() { return true; }
+	virtual bool IsConditionallyAvailable() { return false; }
+	virtual bool IsRehideable() { return false; }
+	virtual bool HideFromPlayer() { return false; }
+	virtual bool AbortOnConditionFailed() { return false; }
 	virtual bool RunInMenus() { return false; } // frontend specifically
 	virtual bool RunWhenBlocked() { return false; } // pause menu, race end screen, etc.
 	virtual bool InfiniteTimer() { return false; }
 	virtual bool ShouldAbort() { return false; }
 	virtual bool IgnoreHUDState() { return false; }
+	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
 	virtual void OnAnyEffectTriggered() {}
 };
 
@@ -360,12 +361,13 @@ bool CanEffectActivate(ChaosEffect* effect) {
 	return true;
 }
 
-ChaosEffect* GetRandomEffect() {
+ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
 		if (effect->bTriggeredThisCycle) continue;
 		//if (effect->fLastTriggerTime) // todo
 		if (!CanEffectActivate(effect)) continue;
+		if (quickTrigger && !effect->CanQuickTrigger()) continue;
 		availableEffects.push_back(effect);
 	}
 	if (availableEffects.empty()) {

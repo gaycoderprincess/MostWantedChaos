@@ -208,11 +208,11 @@ public:
 	bool IsRehideable() override { return true; }
 } E_SetCopMassInf;
 
-class Effect_GetBusted : public EffectBase_PursuitConditional {
+class Effect_GetBusted : public ChaosEffect {
 public:
 	bool pass = false;
 
-	Effect_GetBusted() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_GetBusted() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "10% Chance Of Getting Busted";
 		fTimerLength = 2;
 	}
@@ -220,6 +220,9 @@ public:
 	void InitFunction() override {
 		if (pass = rand() % 100 < 10) {
 			EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
+
+			ICopMgr::mDisableCops = false;
+			ICopMgr::mInstance->PursueAtHeatLevel(GetLocalPlayerInterface<IPerpetrator>()->GetHeat());
 		}
 		else {
 			EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
@@ -235,7 +238,6 @@ public:
 	void DeinitFunction() override {
 		NyaHookLib::Patch(0x4445CC + 2, 0x890DA4);
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_GetBusted;
 
 class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {

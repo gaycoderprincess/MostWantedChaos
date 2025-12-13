@@ -184,7 +184,7 @@ public:
 		if (!car) return;
 		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
 		if (!career) return;
-		career->TheImpoundData.mTimesBusted++;
+		career->TheImpoundData.mTimesBusted--;
 	}
 	bool IsAvailable() override {
 		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
@@ -388,7 +388,7 @@ public:
 		obj->StartLicensedMusic(song->PathEvent);
 	}
 	bool IsAvailable() override {
-		return FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0;
+		return FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }

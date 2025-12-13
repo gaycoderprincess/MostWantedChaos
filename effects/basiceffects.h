@@ -294,8 +294,8 @@ public:
 	}
 
 	void InitFunction() override {
-		AddRunningEffect(GetRandomEffect());
-		AddRunningEffect(GetRandomEffect());
-		AddRunningEffect(GetRandomEffect());
+		AddRunningEffect(GetRandomEffect(true));
+		AddRunningEffect(GetRandomEffect(true));
+		AddRunningEffect(GetRandomEffect(true));
 	}
 } E_3Effects;
