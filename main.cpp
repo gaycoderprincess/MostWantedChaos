@@ -25,16 +25,6 @@ std::vector<void(*)()> aDrawingLoopFunctions;
 std::vector<void(*)()> aDrawingLoopFunctionsOnce;
 std::vector<void(*)()> aDrawingGameUILoopFunctions;
 std::vector<void(*)()> aDrawing3DLoopFunctions;
-void MainLoop() {
-	for (auto& func : aMainLoopFunctions) {
-		func();
-	}
-
-	for (auto& func : aMainLoopFunctionsOnce) {
-		func();
-	}
-	aMainLoopFunctionsOnce.clear();
-}
 
 bool bTimerEnabled = true;
 float fEffectCycleTimer = 30;
@@ -142,6 +132,21 @@ template<ChaosEffect::eChaosHook hook>
 void ProcessChaosEffects_SetDir() {
 	DLLDirSetter _setdir;
 	ProcessChaosEffects<hook>();
+}
+
+void MainLoop() {
+	DLLDirSetter _setdir;
+
+	for (auto& func : aMainLoopFunctions) {
+		func();
+	}
+
+	for (auto& func : aMainLoopFunctionsOnce) {
+		func();
+	}
+	aMainLoopFunctionsOnce.clear();
+
+	ProcessChaosEffects<ChaosEffect::HOOK_GAMETICK>();
 }
 
 void CameraHook(CameraMover* pMover) {

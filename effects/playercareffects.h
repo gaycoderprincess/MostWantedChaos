@@ -284,12 +284,12 @@ public:
 		fTimerLength = 30;
 	}
 
-	void TickFunctionMain(double delta) override {
-		aMainLoopFunctionsOnce.push_back([](){
-			if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
-				if (!ply->GetAiControl()) ply->SetAiControl(true);
-			}
-		});
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_GAMETICK) return;
+		
+		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
+			if (!ply->GetAiControl()) ply->SetAiControl(true);
+		}
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IHumanAI>()) {
