@@ -36,6 +36,8 @@ public:
 	virtual void TickFunction3D(double delta) {}
 	virtual void TickFunctionPre3D(double delta) {}
 	virtual void TickFunctionPost3D(double delta) {}
+	virtual void TickFunctionPreProps(double delta) {}
+	virtual void TickFunctionPostProps(double delta) {}
 	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; };
 	virtual bool IsAvailable() { return true; };
@@ -221,6 +223,26 @@ public:
 
 		pEffect->EffectInstance = this;
 		pEffect->TickFunctionPost3D(delta);
+		pEffect->EffectInstance = nullptr;
+	}
+
+	void OnTickPreProps(double delta) {
+		if (IsHidden()) return;
+		if (bFirstFrame) return;
+		if (!IsActive()) return;
+
+		pEffect->EffectInstance = this;
+		pEffect->TickFunctionPreProps(delta);
+		pEffect->EffectInstance = nullptr;
+	}
+
+	void OnTickPostProps(double delta) {
+		if (IsHidden()) return;
+		if (bFirstFrame) return;
+		if (!IsActive()) return;
+
+		pEffect->EffectInstance = this;
+		pEffect->TickFunctionPostProps(delta);
 		pEffect->EffectInstance = nullptr;
 	}
 

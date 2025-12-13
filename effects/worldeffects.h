@@ -141,13 +141,23 @@ public:
 		sName = "Wireframe World";
 		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
+		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
 
 	void TickFunctionPre3D(double delta) override {
+		static auto texture = LoadTexture("CwoeeChaos/data/textures/wireframe.png");
+		pWorldTextureOverride = texture;
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	}
 	void TickFunctionPost3D(double delta) override {
+		pWorldTextureOverride = nullptr;
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	}
+	void TickFunctionPreProps(double delta) override {
+		TickFunctionPre3D(delta);
+	}
+	void TickFunctionPostProps(double delta) override {
+		TickFunctionPost3D(delta);
 	}
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
@@ -326,6 +336,7 @@ class Effect_RainbowRoad : public ChaosEffect {
 public:
 	Effect_RainbowRoad() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Rainbow Road";
+		sFriendlyName = "Rainbow World";
 		fTimerLength = 60;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
 	}
@@ -336,6 +347,12 @@ public:
 	}
 	void TickFunctionPost3D(double delta) override {
 		pWorldTextureOverride = nullptr;
+	}
+	void TickFunctionPreProps(double delta) override {
+		TickFunctionPre3D(delta);
+	}
+	void TickFunctionPostProps(double delta) override {
+		TickFunctionPost3D(delta);
 	}
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
