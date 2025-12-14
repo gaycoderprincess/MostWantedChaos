@@ -89,6 +89,10 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
+	if (ChaosVoting::bEnabled) {
+		ChaosVoting::DrawUI();
+	}
+
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 		ProcessChaosEffectsMain(gTimer.fDeltaTime, inMenu, !inMenu);
@@ -122,7 +126,12 @@ void ChaosLoop() {
 		float cycleTimer = fEffectCycleTimer + 0.1;
 		if (fTimeSinceLastEffect >= cycleTimer) {
 			fTimeSinceLastEffect -= cycleTimer;
-			AddRunningEffect(GetRandomEffect());
+			if (ChaosVoting::bEnabled) {
+				ChaosVoting::TriggerHighestVotedEffect();
+			}
+			else {
+				AddRunningEffect(GetRandomEffect());
+			}
 		}
 	}
 	else {
@@ -156,6 +165,7 @@ void ChaosModMenu() {
 		QuickValueEditor("fEffectArcThickness", fEffectArcThickness);
 		QuickValueEditor("fEffectArcRotation", fEffectArcRotation);
 		QuickValueEditor("fEffectTimerTextSize", fEffectTimerTextSize);
+		QuickValueEditor("fEffectVotingSize", fEffectVotingSize);
 		ChloeMenuLib::EndMenu();
 	}
 
@@ -256,6 +266,9 @@ void ChaosModMenu() {
 			ChloeMenuLib::BeginMenu();
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
+			}
+			if (DrawMenuOption("Toggle Voting Test")) {
+				ChaosVoting::bEnabled = !ChaosVoting::bEnabled;
 			}
 			//QuickValueEditor("SceneryScale.x", SceneryScale.x);
 			//QuickValueEditor("SceneryScale.y", SceneryScale.y);

@@ -48,6 +48,7 @@ namespace FlatOutHUD {
 #include "hooks/worldrender.h"
 #include "chaosvars.h"
 #include "chaoseffect.h"
+#include "chaosvoting.h"
 #include "chaosmod.h"
 
 void OnWinRace() {

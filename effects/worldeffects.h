@@ -337,3 +337,28 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_Snow;
+
+class Effect_MissingWorld : public ChaosEffect {
+public:
+	Effect_MissingWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Uninstall Counter-Strike: Source";
+		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
+	}
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		switch (hook) {
+			case HOOK_PRE3D:
+			case HOOK_PREPROPS:
+				static auto texture = LoadTexture("CwoeeChaos/data/textures/missing.png");
+				pWorldTextureOverride = texture;
+				break;
+			case HOOK_POST3D:
+			case HOOK_POSTPROPS:
+				pWorldTextureOverride = nullptr;
+				break;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_MissingWorld;

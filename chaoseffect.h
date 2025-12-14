@@ -77,6 +77,8 @@ float fEffectArcThickness = 0.017;
 float fEffectArcRotation = -1.5;
 float fEffectTimerTextSize = 0.03;
 
+float fEffectVotingSize = 0.75;
+
 class ChaosEffectInstance {
 public:
 	ChaosEffect* pEffect = nullptr;
@@ -86,6 +88,10 @@ public:
 	double fTimeConditionMet = 3;
 	bool bFirstFrame = true;
 	bool bAborted = false;
+
+	bool bIsVotingDummy = false;
+	int nVotingDummyVoteCount = 0;
+	float fVotingDummyVotePercentage = 0;
 
 	ChaosEffectInstance(ChaosEffect* effect) : pEffect(effect) {
 		fTimer = pEffect->fTimerLength;
@@ -113,6 +119,7 @@ public:
 	}
 
 	bool HasTimer() const {
+		if (bIsVotingDummy) return false;
 		return pEffect && pEffect->HasTimer();
 	}
 
@@ -130,19 +137,48 @@ public:
 		return pEffect->IsConditionallyAvailable() && pEffect->IsRehideable() && !pEffect->IsAvailable();
 	}
 
+	void UpdatePopup(double delta, bool shouldBeOnScreen) {
+		if (shouldBeOnScreen) {
+			if (fTextTimer < 1) {
+				fTextTimer += delta * 2;
+			}
+			else {
+				fTextTimer = 1;
+			}
+		}
+		else {
+			if (fTextTimer > 0) {
+				fTextTimer -= delta * 2;
+			}
+			else {
+				fTextTimer = 0;
+			}
+		}
+	}
+
 	void Draw(float y, bool inMenu) const {
 		if (!IsNameOnScreen() && !inMenu) return;
 		if (!IsActive() && inMenu) return;
+
+		float effectSize = fEffectSize;
+		float effectSpacing = fEffectSpacing;
+		float effectTextureYSpacing = fEffectTextureYSpacing;
+		if (bIsVotingDummy) {
+			effectSize *= fEffectVotingSize;
+			effectSpacing *= fEffectVotingSize;
+			effectTextureYSpacing *= fEffectVotingSize;
+		}
 
 		auto x = fEffectX;
 		x = 1 - x;
 		x *= GetAspectRatioInv();
 		x = 1 - x;
-		y = fEffectY + (fEffectSpacing * y);
+		y = fEffectY + (effectSpacing * y);
 
 		std::string str = GetName();
+		if (bIsVotingDummy) str += std::format(" ({}%)", (int)fVotingDummyVotePercentage);
 
-		auto width = GetStringWidth(fEffectSize, str.c_str());
+		auto width = GetStringWidth(effectSize, str.c_str());
 		float barWidth = ((HasTimer() && !inMenu ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());
 		float barTipWidth = (fEffectTextureTipX * GetAspectRatioInv());
 
@@ -156,8 +192,14 @@ public:
 		auto textureTip = bDarkMode ? textureTipD : textureTipL;
 		if (textureBar && textureTip) {
 			float barX = x - width - barWidth;
-			DrawRectangle(barX, 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureBar);
-			DrawRectangle(barX - barTipWidth, barX, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, textureTip);
+			if (bIsVotingDummy) {
+				DrawRectangle(1 - barX, 0, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, textureBar);
+				DrawRectangle(1 - (barX - barTipWidth), 1 - barX, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, textureTip);
+			}
+			else {
+				DrawRectangle(barX, 1, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, textureBar);
+				DrawRectangle(barX - barTipWidth, barX, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, textureTip);
+			}
 			if (!inMenu && HasTimer() && fTimer > 0.1) {
 				float arcX = barX - (fEffectArcX * GetAspectRatioInv());
 				DrawArc(arcX, y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
@@ -178,14 +220,18 @@ public:
 		}
 		//static auto texture = LoadTexture("CwoeeChaos/data/textures/effectbg.png");
 		//if (texture) {
-		//	DrawRectangle(x - width - (fEffectTextureXSpacing * GetAspectRatioInv()), 1, y - fEffectTextureYSpacing, y + fEffectTextureYSpacing, {255,255,255,255}, 0, texture);
+		//	DrawRectangle(x - width - (fEffectTextureXSpacing * GetAspectRatioInv()), 1, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, texture);
 		//}
 
 		tNyaStringData data;
 		data.x = x;
 		data.y = y;
-		data.size = fEffectSize;
+		data.size = effectSize;
 		data.XRightAlign = true;
+		if (bIsVotingDummy) {
+			data.x = 1 - x;
+			data.XRightAlign = false;
+		}
 		if (!bDarkMode) {
 			data.outlinea = 255;
 			data.outlinedist = 0.025;
@@ -210,22 +256,7 @@ public:
 		}
 
 		if (!inMenu) {
-			if (ShouldNameBeOnScreen()) {
-				if (fTextTimer < 1) {
-					fTextTimer += delta * 2;
-				}
-				else {
-					fTextTimer = 1;
-				}
-			}
-			else {
-				if (fTextTimer > 0) {
-					fTextTimer -= delta * 2;
-				}
-				else {
-					fTextTimer = 0;
-				}
-			}
+			UpdatePopup(delta, ShouldNameBeOnScreen());
 		}
 
 		// conditional effects will show after 3 seconds of the conditions being met, or immediately if the condition was met on trigger
@@ -358,7 +389,10 @@ bool CanEffectActivate(ChaosEffect* effect) {
 	for (auto& group : effect->ActivateIncompatibilityGroups) {
 		if (IsEffectRunningFromGroup(group, false)) return false;
 	}
-	if (effect->IsConditionallyAvailable() && effect->AbortOnConditionFailed() && !effect->IsAvailable()) return false;
+	if (effect->IsConditionallyAvailable() && effect->AbortOnConditionFailed()) {
+		if (IsChaosBlocked()) return false; // IsAvailable can run in-game code, so always skip abortonconditionfailed effects in menus
+		if (!effect->IsAvailable()) return false;
+	}
 	return true;
 }
 
