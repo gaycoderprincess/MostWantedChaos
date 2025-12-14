@@ -293,12 +293,12 @@ public:
 			"BUSH",
 
 			// these are wild guesses and idk if ive seen a single model get fixed by these, todo
-			"BUILDING",
-			"HOUSE",
-			"SKYSCRAPER",
-			"TOWER",
-			"FACTORY",
-			"CRANE",
+			//"BUILDING",
+			//"HOUSE",
+			//"SKYSCRAPER",
+			//"TOWER",
+			//"FACTORY",
+			//"CRANE",
 	};
 
 	static bool ShouldSnowifyModel() {

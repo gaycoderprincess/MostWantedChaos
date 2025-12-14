@@ -234,6 +234,8 @@ public:
 		if (pass) {
 			auto cars = GetActiveVehicles(DRIVER_COP);
 			if (cars.empty()) {
+				ForceEnableCops();
+
 				EffectInstance->fTimer = fTimerLength;
 
 				auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit();
