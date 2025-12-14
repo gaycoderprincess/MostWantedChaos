@@ -147,25 +147,21 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
 	}
 
-	struct tReplacedCar {
-		std::string baseVehicle;
-		std::string vehicleModel;
+	static inline std::vector<std::string> aCopCars = {
+		"COPMIDSIZE",
+		"COPGHOST",
+		"COPGTO",
+		"COPGTOGHOST",
+		"COPSPORTHENCH",
+		"COPSPORTGHOST",
+		"COPSPORT",
+		"COPSUV",
+		"COPSUVL",
 	};
-	static inline std::vector<tReplacedCar> aCopCars = {
-		{"cs_viper_copmidsize", "COPMIDSIZE"},
-		{"cs_viper_copmidsize", "COPGHOST"},
-		{"cs_gto_copgto", "COPGTO"},
-		{"cs_gto_copgto", "COPGTOGHOST"},
-		{"cs_c6_copsporthench", "COPSPORTHENCH"},
-		{"cs_c6_copsporthench", "COPSPORTGHOST"},
-		{"cs_c6_copsporthench", "COPSPORT"},
-		{"cs_mustang_copsuv", "COPSUV"},
-		{"cs_mustang_copsuv", "COPSUVL"},
-	};
-	tReplacedCar* pCurrentReplacedCar = nullptr;
+	std::string sCurrentReplacedCar;
 
 	void InitFunction() override {
-		pCurrentReplacedCar = &aCopCars[rand()%aCopCars.size()];
+		sCurrentReplacedCar = aCopCars[rand()%aCopCars.size()];
 	}
 	void TickFunctionMain(double delta) override {
 		// going back to the menu will randomize your car again
@@ -173,8 +169,13 @@ public:
 			InitFunction();
 		}
 
-		ForcedPlayerVehicle = Attrib::StringHash32(pCurrentReplacedCar->baseVehicle.c_str());
-		ForcedPlayerVehicleModel = pCurrentReplacedCar->vehicleModel;
+		auto baseVehicle = GetReplacedAICarName(sCurrentReplacedCar, true);
+		if (!baseVehicle) {
+			MessageBoxA(nullptr, std::format("Failed to find base model for car {}", sCurrentReplacedCar).c_str(), "nya?!~", MB_ICONERROR);
+			exit(0);
+		}
+		ForcedPlayerVehicle = Attrib::StringHash32(baseVehicle);
+		ForcedPlayerVehicleModel = sCurrentReplacedCar;
 	}
 	void DeinitFunction() override {
 		ForcedPlayerVehicle = 0;
@@ -192,37 +193,33 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
 	}
 
-	struct tReplacedCar {
-		std::string baseVehicle;
-		std::string vehicleModel;
-	};
-	static inline std::vector<tReplacedCar> aTrafficCars = {
-		{"cs_clio_trafpizza", "PIZZA"},
-		{"cs_clio_traftaxi", "TAXI"},
-		{"cs_cts_traf_minivan", "MINIVAN"},
-		{"cs_cts_traffictruck", "PICKUPA"},
-		{"cs_trafcement", "CEMTR"},
-		{"cs_trafgarb", "GARB"},
+	static inline std::vector<std::string> aTrafficCars = {
+		"PIZZA",
+		"TAXI",
+		"MINIVAN",
+		"PICKUPA",
+		"CEMTR",
+		"GARB",
 
 		// new cars
-		{"cs_cts_traffictruck", "TRAFAMB"}, // looks weird but then again the ambulance looks weird anyway
-		{"cs_cts_traffictruck", "TRAFSUVA"},
-		{"cs_cts_traf_minivan", "TRAFNEWS"},
-		{"cs_cts_traf_minivan", "TRAFSTWAG"}, // floating a bit? im sure noone will notice
-		{"cs_cts_traf_minivan", "TRAFVANB"},
-		{"cs_clio_trafpizza", "TRAF4DSEDA"},
-		{"cs_clio_trafpizza", "TRAF4DSEDB"},
-		{"cs_clio_trafpizza", "TRAF4DSEDC"},
-		{"cs_clio_trafpizza", "TRAFCOURT"},
-		{"cs_clio_trafpizza", "TRAFFICCOUP"},
-		{"cs_clio_trafpizza", "TRAFHA"},
-		{"cs_trafcement", "TRAFDMPTR"},
-		{"cs_trafcement", "TRAFFIRE"},
+		"TRAFAMB", // looks weird but then again the ambulance looks weird anyway
+		"TRAFSUVA",
+		"TRAFNEWS",
+		"TRAFSTWAG", // floating a bit? im sure noone will notice
+		"TRAFVANB",
+		"TRAF4DSEDA",
+		"TRAF4DSEDB",
+		"TRAF4DSEDC",
+		"TRAFCOURT",
+		"TRAFFICCOUP",
+		"TRAFHA",
+		"TRAFDMPTR",
+		"TRAFFIRE",
 	};
-	tReplacedCar* pCurrentReplacedCar = nullptr;
+	std::string sCurrentReplacedCar;
 
 	void InitFunction() override {
-		pCurrentReplacedCar = &aTrafficCars[rand()%aTrafficCars.size()];
+		sCurrentReplacedCar = aTrafficCars[rand()%aTrafficCars.size()];
 	}
 	void TickFunctionMain(double delta) override {
 		// going back to the menu will randomize your car again
@@ -230,8 +227,13 @@ public:
 			InitFunction();
 		}
 
-		ForcedPlayerVehicle = Attrib::StringHash32(pCurrentReplacedCar->baseVehicle.c_str());
-		ForcedPlayerVehicleModel = pCurrentReplacedCar->vehicleModel;
+		auto baseVehicle = GetReplacedAICarName(sCurrentReplacedCar, true);
+		if (!baseVehicle) {
+			MessageBoxA(nullptr, std::format("Failed to find base model for car {}", sCurrentReplacedCar).c_str(), "nya?!~", MB_ICONERROR);
+			exit(0);
+		}
+		ForcedPlayerVehicle = Attrib::StringHash32(baseVehicle);
+		ForcedPlayerVehicleModel = sCurrentReplacedCar;
 	}
 	void DeinitFunction() override {
 		ForcedPlayerVehicle = 0;

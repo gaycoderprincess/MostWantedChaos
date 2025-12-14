@@ -418,10 +418,11 @@ public:
 		if (!IsInCareerMode()) return false;
 		auto car = GetCurrentCareerCar();
 		if (!car) return false;
-		auto carModel = GetLocalPlayerVehicle()->GetVehicleKey();
+		auto carModel = Attrib::StringHash32(GetLocalPlayerVehicle()->GetVehicleName());
 		if (carModel == car->VehicleKey) return false;
-		auto carModelName = GetLocalPlayerVehicle()->GetVehicleName();
-		if (!strcmp(carModelName, "cs_c6_copsporthench") && car->VehicleKey == Attrib::StringHash32("copcross")) return false; // playable copcross exception
+		auto model1 = GetPVehicleModelPointer(car->VehicleKey);
+		auto model2 = GetPVehicleModelPointer(carModel);
+		if (model1 && model2 && !strcmp(*model1, *model2)) return false; // cross check the raw car models too
 		return true;
 	}
 	bool IsConditionallyAvailable() override { return true; }

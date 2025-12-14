@@ -571,6 +571,71 @@ void ForceEnableCops() {
 	ICopMgr::mInstance->VehicleSpawningEnabled(true);
 }
 
+const char* GetReplacedAICarName(const std::string& aiCar, bool includeOriginalCS) {
+	struct tReplacedCar {
+		std::string baseVehicle;
+		std::string vehicleModel;
+	};
+	static std::vector<tReplacedCar> replacedCarsCS = {
+			{"cs_clio_trafpizza", "PIZZA"},
+			{"cs_clio_traftaxi", "TAXI"},
+			{"cs_cts_traf_minivan", "MINIVAN"},
+			{"cs_cts_traffictruck", "PICKUPA"},
+			{"cs_trafcement", "CEMTR"},
+			{"cs_trafgarb", "FGARB"},
+
+			// cops
+			{"cs_viper_copmidsize", "COPMIDSIZE"},
+			{"cs_gto_copgto", "COPGTO"},
+			{"cs_c6_copsporthench", "COPSPORTHENCH"},
+			{"cs_mustang_copsuv", "COPSUV"},
+	};
+	static std::vector<tReplacedCar> replacedCars = {
+			// challenge series traffic
+			{"cs_clio_trafpizza", "TRAFPIZZA"},
+			{"cs_clio_traftaxi", "TRAFTAXI"},
+			{"cs_cts_traf_minivan", "TRAFMINIVAN"},
+			{"cs_cts_traffictruck", "TRAFPICKUPA"},
+			{"cs_trafcement", "TRAFCEMTR"},
+			{"cs_trafgarb", "TRAFGARB"},
+
+			// traffic
+			{"cs_cts_traffictruck", "TRAFAMB"}, // looks weird but then again the ambulance looks weird anyway
+			{"cs_cts_traffictruck", "TRAFSUVA"},
+			{"cs_cts_traf_minivan", "TRAFNEWS"},
+			{"cs_cts_traf_minivan", "TRAFSTWAG"}, // floating a bit? im sure noone will notice
+			{"cs_cts_traf_minivan", "TRAFVANB"},
+			{"cs_clio_trafpizza", "TRAF4DSEDA"},
+			{"cs_clio_trafpizza", "TRAF4DSEDB"},
+			{"cs_clio_trafpizza", "TRAF4DSEDC"},
+			{"cs_clio_trafpizza", "TRAFCOURT"},
+			{"cs_clio_trafpizza", "TRAFFICCOUP"},
+			{"cs_clio_trafpizza", "TRAFHA"},
+			{"cs_trafcement", "TRAFDMPTR"},
+			{"cs_trafcement", "TRAFFIRE"},
+
+			// cops
+			{"cs_viper_copmidsize", "COPGHOST"},
+			{"cs_gto_copgto", "COPGTOGHOST"},
+			{"cs_c6_copsporthench", "COPSPORTGHOST"},
+			{"cs_c6_copsporthench", "COPSPORT"},
+			{"cs_mustang_copsuv", "COPSUVL"},
+	};
+	if (includeOriginalCS) {
+		for (auto& car : replacedCarsCS) {
+			if (aiCar == car.vehicleModel) {
+				return car.baseVehicle.c_str();
+			}
+		}
+	}
+	for (auto& car : replacedCars) {
+		if (aiCar == car.vehicleModel) {
+			return car.baseVehicle.c_str();
+		}
+	}
+	return nullptr;
+}
+
 wchar_t gDLLDir[MAX_PATH];
 class DLLDirSetter {
 public:

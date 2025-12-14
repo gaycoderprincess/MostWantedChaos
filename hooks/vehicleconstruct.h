@@ -21,14 +21,17 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 
 	auto vehicle = (VehicleParams*)params.mData;
 	if (vehicle->carClass == DRIVER_HUMAN) {
-		// hack for copcross in career garage
-		if (WorldTimeElapsed < 0.5 && vehicle->carType == Attrib::StringHash32("copcross")) {
-			auto vehAttrib = Attrib::StringHash32("cs_c6_copsporthench");
-			auto model = GetPVehicleModelPointer(vehAttrib);
-			modelBackup = *model;
-			*model = "COPSPORT";
-			vehicle->carType = vehAttrib;
-			modelBackupHash = vehAttrib;
+		// hack for playable ai cars in career garage
+		if (WorldTimeElapsed < 0.5) {
+			auto origModel = *GetPVehicleModelPointer(vehicle->carType);
+			if (auto ai = GetReplacedAICarName(origModel, false)) {
+				auto vehAttrib = Attrib::StringHash32(ai);
+				auto model = GetPVehicleModelPointer(vehAttrib);
+				modelBackup = *model;
+				*model = origModel;
+				vehicle->carType = vehAttrib;
+				modelBackupHash = vehAttrib;
+			}
 		}
 		if (ForcedPlayerVehicle) {
 			if (!ForcedPlayerVehicleModel.empty()) {
