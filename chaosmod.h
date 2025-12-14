@@ -90,6 +90,7 @@ void ChaosLoop() {
 	gTimer.Process();
 
 	if (ChaosVoting::bEnabled) {
+		ChaosVoting::pAllOfTheAbove = &E_VotingAll; // this is such a hack lol woof meow
 		ChaosVoting::DrawUI();
 	}
 

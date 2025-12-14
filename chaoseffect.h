@@ -424,6 +424,8 @@ bool RunningEffectsCleanup() {
 	return false;
 }
 
+#include "chaosvoting.h"
+
 #include "effects/effectbases.h"
 #include "effects/basiceffects.h"
 #include "effects/shadereffects.h"
@@ -443,14 +445,10 @@ bool RunningEffectsCleanup() {
 #include "effects/cameraeffects.h"
 #include "effects/rendereffects.h"
 #include "effects/timeeffects.h"
+#include "effects/votingeffects.h"
 #include "effects/effect_safehouse.h"
 #include "effects/effect_leaktank.h"
 #include "effects/effect_flashbacks.h"
 #include "effects/effect_qte.h"
 #include "effects/effect_disableall.h"
 #include "effects/effect_tiktok.h"
-
-// todo voting effects:
-// rigged - lowest voted wins
-// all of the above - simultaneously activate every other voting option
-// streamer votes - streamer can press 1/2/3/4/etc to select the next effect or two
