@@ -1,4 +1,5 @@
 bool bDrawingGameUI = false;
+std::vector<void(*)()> aDrawingGameUILoopFunctions;
 void UpdateD3DProperties() {
 	g_pd3dDevice = *(IDirect3DDevice9**)0x982BDC;
 	ghWnd = *(HWND*)0x982BF4;

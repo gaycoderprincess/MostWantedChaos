@@ -199,7 +199,7 @@ public:
 	}
 } E_SetHeat1;
 
-class Effect_SetHeat5 : public EffectBase_NotInPursuitConditional {
+/*class Effect_SetHeat5 : public EffectBase_NotInPursuitConditional {
 public:
 	Effect_SetHeat5() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Set Heat Level to 5";
@@ -214,7 +214,7 @@ public:
 		}
 	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_SetHeat5;
+} E_SetHeat5;*/
 
 // max heat level doesn't seem to apply when in the middle of an active pursuit
 class Effect_SetHeat6 : public EffectBase_NotInPursuitConditional {
