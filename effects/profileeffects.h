@@ -150,6 +150,7 @@ public:
 	//}
 	//bool IsConditionallyAvailable() override { return true; }
 	//bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarRandomTuning;
 
 class Effect_PlayerCarImpoundStrike : public EffectBase_CareerConditional {
@@ -166,6 +167,7 @@ public:
 		career->TheImpoundData.mTimesBusted++;
 	}
 	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundStrike;
 
 class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
@@ -192,6 +194,7 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundStrikeRemove;
 
 class Effect_PlayerCarImpoundMarker : public EffectBase_CareerConditional {
@@ -209,6 +212,7 @@ public:
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundMarker;
 
 class Effect_AddRandomTuningMarker : public EffectBase_CareerConditional {
@@ -331,6 +335,7 @@ public:
 			FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
 		}
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_AddRandomBonusMarker;
 
 // todo this breaks speedtraps and milestones
@@ -384,3 +389,42 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_SkipMusic;
+
+class Effect_OverwriteCareerCar : public ChaosEffect {
+public:
+	Effect_OverwriteCareerCar() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Overwrite Active Career Car";
+	}
+
+	void InitFunction() override {
+		auto car = GetCurrentCareerCar();
+		if (!car) return;
+		car->VehicleKey = Attrib::StringHash32(GetLocalPlayerVehicle()->GetVehicleName());
+		car->FEKey = GetCarFEKey(car->VehicleKey);
+
+		if (auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization)) {
+			auto oldId = customization->Handle;
+			if (auto current = GetLocalPlayerVehicle()->GetCustomizations()) {
+				*customization = *current;
+			}
+			else {
+				*customization = CreateStockCustomizations(car->VehicleKey);
+			}
+			customization->Handle = oldId;
+		}
+	}
+	// only activate in career mode if your car model is different from your active career car
+	bool IsAvailable() override {
+		if (!IsInCareerMode()) return false;
+		auto car = GetCurrentCareerCar();
+		if (!car) return false;
+		auto carModel = GetLocalPlayerVehicle()->GetVehicleKey();
+		if (carModel == car->VehicleKey) return false;
+		auto carModelName = GetLocalPlayerVehicle()->GetVehicleName();
+		if (!strcmp(carModelName, "cs_c6_copsporthench") && car->VehicleKey == Attrib::StringHash32("copcross")) return false; // playable copcross exception
+		return true;
+	}
+	bool IsConditionallyAvailable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_OverwriteCareerCar;

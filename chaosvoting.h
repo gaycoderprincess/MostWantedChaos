@@ -33,7 +33,11 @@ namespace ChaosVoting {
 	void TriggerHighestVotedEffect() {
 		auto votes = aNewVotes;
 		if (votes.empty()) return;
-		if (!AnyEffectGotVotes()) return;
+
+		if (!AnyEffectGotVotes()) {
+			AddRunningEffect(GetRandomEffect());
+			return;
+		}
 
 		std::sort(votes.begin(), votes.end(), [](const ChaosEffectInstance& a, const ChaosEffectInstance& b) {
 			if (nLowestWins > 0) return a.fVotingDummyVotePercentage < b.fVotingDummyVotePercentage;

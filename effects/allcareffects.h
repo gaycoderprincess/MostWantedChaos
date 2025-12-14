@@ -642,3 +642,23 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_InvisCars;
+
+class Effect_Fragile : public ChaosEffect {
+public:
+	Effect_Fragile() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Fragile Cars";
+		fTimerLength = 60;
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("player_godmode"));
+	}
+
+	void TickFunctionMain(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->mCOMObject->Find<ICollisionBody>()->HasHadCollision()) {
+				car->mCOMObject->Find<IDamageable>()->Destroy();
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_Fragile;

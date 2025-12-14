@@ -184,11 +184,17 @@ void ChaosModMenu() {
 					*model = "TRAFFICCOUP";
 				}
 			}
+			if (DrawMenuOption("Add CopCross To Garage")) {
+				if (auto car = CreateStockCarRecord("copcross")) {
+					FEPlayerCarDB::CreateNewCareerCar(&FEDatabase->mUserProfile->PlayersCarStable, car->Handle);
+				}
+			}
 			if (auto ply = GetLocalPlayer()) {
 				DrawMenuOption(std::format("IPlayer: {:X}", (uintptr_t)ply));
 				DrawMenuOption(std::format("ISimable: {:X}", (uintptr_t)ply->GetSimable()));
 				DrawMenuOption(std::format("IHud: {:X}", (uintptr_t)ply->GetHud()));
 				DrawMenuOption(std::format("IVehicle: {:X}", (uintptr_t)ply->GetSimable()->mCOMObject->Find<IVehicle>()));
+				DrawMenuOption(std::format("Car Model: {}", GetLocalPlayerVehicle()->GetVehicleName()));
 				auto pos = ply->GetPosition();
 				DrawMenuOption(std::format("Coords: {:.2f} {:.2f} {:.2f}", pos->x, pos->y, pos->z));
 				UMath::Vector3 fwd;
