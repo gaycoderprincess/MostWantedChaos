@@ -303,12 +303,12 @@ void DoChaosLoad() {
 	}
 }
 
-bool IsEffectRunning(ChaosEffect* effect) {
+ChaosEffectInstance* GetEffectRunning(ChaosEffect* effect) {
 	for (auto& running : aRunningEffects) {
 		if (!running.IsActive()) continue;
-		if (running.pEffect == effect) return true;
+		if (running.pEffect == effect) return &running;
 	}
-	return false;
+	return nullptr;
 }
 
 bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup, bool includeActivate) {
@@ -328,7 +328,7 @@ bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup, bool includeActivat
 }
 
 void AddRunningEffect(ChaosEffect* effect) {
-	if (!effect->CanMultiTrigger() && IsEffectRunning(effect)) return;
+	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return;
 
 	effect->bTriggeredThisCycle = true;
 	effect->LastTriggerTime = std::time(0);
@@ -351,7 +351,7 @@ int GetRandomNumber(int min, int max) {
 }
 
 bool CanEffectActivate(ChaosEffect* effect) {
-	if (!effect->CanMultiTrigger() && IsEffectRunning(effect)) return false;
+	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return false;
 	for (auto& group : effect->IncompatibilityGroups) {
 		if (IsEffectRunningFromGroup(group, true)) return false;
 	}

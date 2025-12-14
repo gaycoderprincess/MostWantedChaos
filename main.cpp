@@ -59,7 +59,7 @@ void OnWinRace() {
 	DLLDirSetter _setdir;
 
 	Achievements::AwardAchievement(GetAchievement("WIN_RACE"));
-	if (IsEffectRunning(&E_LeakTank)) {
+	if (GetEffectRunning(&E_LeakTank)) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_LEAKTANK"));
 	}
 	auto plyModel = GetLocalPlayerVehicle()->GetVehicleName();
@@ -79,17 +79,25 @@ void MoneyChecker() {
 	else if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
 		int currentCash = FEDatabase->mUserProfile->TheCareerSettings.CurrentCash;
 		if (cash != currentCash) {
+			static int cashForEffect = 0;
+			if (auto effect = GetEffectRunning(&TempEffect)) {
+				effect->fTimer = TempEffect.fTimerLength;
+			}
+			else {
+				cashForEffect = cash;
+				AddRunningEffect(&TempEffect);
+			}
 			static std::string name;
-			name = std::format("Money changed (${} -> ${})", cash, currentCash);
+			name = std::format("Money changed (${} -> ${})", cashForEffect, currentCash);
 			TempEffect.sName = name.c_str();
-			AddRunningEffect(&TempEffect);
+			cash = currentCash;
+			
 			if (currentCash >= 2000000) {
 				Achievements::AwardAchievement(GetAchievement("MILLIONAIRE"));
 			}
 			if (currentCash <= -2000000) {
 				Achievements::AwardAchievement(GetAchievement("ANTI_MILLIONAIRE"));
 			}
-			cash = currentCash;
 		}
 	}
 }

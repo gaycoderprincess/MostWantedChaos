@@ -187,4 +187,5 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return active; }
+	bool CanQuickTrigger() override { return false; }
 } E_RestartRaceOn99;

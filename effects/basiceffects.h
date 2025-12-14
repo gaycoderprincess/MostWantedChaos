@@ -19,6 +19,7 @@ public:
 		DrawRectangle(0, 1, 0, 1, {0,0,0,255});
 	}
 	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_Blind;
 
 class Effect_Flash : public ChaosEffect {
@@ -164,6 +165,7 @@ public:
 		}
 	}
 	bool IgnoreHUDState() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_CrashChance;
 
 class Effect_Nothing : public ChaosEffect {
@@ -194,6 +196,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_BlockyCover;
 
 class Effect_BlockyCoverMissing : public ChaosEffect {
@@ -236,6 +239,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool IgnoreHUDState() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_NoChaosHUD;
 
 class Effect_PunchHole : public ChaosEffect {
@@ -251,6 +255,7 @@ public:
 		DrawRectangle(0, 1, 0, 1, {255,255,255,255}, 0, texture);
 	}
 	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_PunchHole;
 
 class Effect_RandomChaosTimer : public ChaosEffect {
@@ -287,15 +292,33 @@ public:
 	}
 } E_SFXPursuitBreaker;
 
-class Effect_3Effects : public ChaosEffect {
+/*class Effect_3Effects : public ChaosEffect {
 public:
 	Effect_3Effects() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Activate 3 Effects";
 	}
 
 	void InitFunction() override {
-		AddRunningEffect(GetRandomEffect(true));
-		AddRunningEffect(GetRandomEffect(true));
-		AddRunningEffect(GetRandomEffect(true));
+		for (int i = 0; i < 3; i++) {
+			AddRunningEffect(GetRandomEffect(true));
+		}
 	}
-} E_3Effects;
+	bool CanQuickTrigger() override { return false; }
+} E_3Effects;*/
+
+class Effect_10Effects : public ChaosEffect {
+public:
+	Effect_10Effects() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Activate 10 Effects";
+	}
+
+	void InitFunction() override {
+		for (int i = 0; i < 10; i++) {
+			// since this basically makes the game unplayable, reset all trigger flags just in case an actually cool effect happened here
+			auto effect = GetRandomEffect(true);
+			AddRunningEffect(effect);
+			effect->bTriggeredThisCycle = false;
+		}
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_10Effects;
