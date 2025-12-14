@@ -582,7 +582,7 @@ const char* GetReplacedAICarName(const std::string& aiCar, bool includeOriginalC
 			{"cs_cts_traf_minivan", "MINIVAN"},
 			{"cs_cts_traffictruck", "PICKUPA"},
 			{"cs_trafcement", "CEMTR"},
-			{"cs_trafgarb", "FGARB"},
+			{"cs_trafgarb", "GARB"},
 
 			// cops
 			{"cs_viper_copmidsize", "COPMIDSIZE"},

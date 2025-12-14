@@ -61,7 +61,6 @@ public:
 		if (!laps || *laps < 2) return false;
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_RemoveLap;
 
@@ -86,7 +85,6 @@ public:
 		if (!laps || *laps >= 10) return false;
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_AddLap;
 
@@ -111,7 +109,6 @@ public:
 		if (!laps || *laps >= 10) return false;
 		return GetLocalPlayerCurrentLap() <= 0;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_Add3Laps;
 
@@ -130,7 +127,6 @@ public:
 	bool IsAvailable() override {
 		return IsInNormalRace();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_RestartRace;
 
@@ -153,7 +149,6 @@ public:
 	bool IsAvailable() override {
 		return IsInNormalRace();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_DisableBarriers;
 
@@ -184,7 +179,6 @@ public:
 	bool IsAvailable() override {
 		return IsInNormalRace();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return active; }
 	bool CanQuickTrigger() override { return false; }

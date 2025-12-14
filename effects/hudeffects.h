@@ -106,5 +106,4 @@ public:
 		return IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
 	}
 	bool IsRehideable() override { return true; }
-	bool IsConditionallyAvailable() override { return true; }
 } E_FO1HUD;

@@ -12,7 +12,6 @@ public:
 	bool IsAvailable() override {
 		return !FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.JumpCam;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_EnableMomentCam;
 
@@ -32,7 +31,6 @@ public:
 	bool IsAvailable() override {
 		return FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.AutoSaveOn;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
@@ -55,7 +53,6 @@ public:
 	bool IsAvailable() override {
 		return g_VisualTreatment;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
@@ -102,7 +99,6 @@ public:
 	bool IsAvailable() override {
 		return GetLocalPlayerInterface<IInput>()->IsAutomaticShift();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 } E_ManualTrans;
@@ -124,7 +120,6 @@ public:
 	bool IsAvailable() override {
 		return !GetLocalPlayerInterface<IInput>()->IsAutomaticShift();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 } E_AutoTrans;
@@ -192,7 +187,6 @@ public:
 		if (!career) return false;
 		return career->TheImpoundData.mTimesBusted > 0;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundStrikeRemove;
@@ -210,7 +204,6 @@ public:
 		if (!career) return;
 		career->TheImpoundData.mMaxBusted++;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundMarker;
@@ -386,7 +379,6 @@ public:
 	bool IsAvailable() override {
 		return FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_SkipMusic;
 
@@ -428,7 +420,6 @@ public:
 		}
 		return true;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_OverwriteCareerCar;

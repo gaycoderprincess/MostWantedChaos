@@ -44,7 +44,6 @@ public:
 		}
 		return true;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_Pursuit;
 
@@ -157,7 +156,6 @@ public:
 	bool IsAvailable() override {
 		return !ICopMgr::mDisableCops;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_NoCops;
 

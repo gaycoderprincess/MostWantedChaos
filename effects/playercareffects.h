@@ -686,7 +686,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_FixPlayerCar;
 
@@ -1188,7 +1187,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 } E_PlayerResetTransform;
 
 class Effect_PlayerNoBrakes : public ChaosEffect {

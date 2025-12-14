@@ -280,3 +280,5 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_Mona;
+
+// todo stock dodge neon from ug1

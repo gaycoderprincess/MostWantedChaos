@@ -46,7 +46,6 @@ public:
 	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; }
 	virtual bool IsAvailable() { return true; }
-	virtual bool IsConditionallyAvailable() { return false; }
 	virtual bool IsRehideable() { return false; }
 	virtual bool HideFromPlayer() { return false; }
 	virtual bool AbortOnConditionFailed() { return false; }
@@ -134,7 +133,7 @@ public:
 	}
 
 	bool IsHidden() const {
-		return pEffect->IsConditionallyAvailable() && pEffect->IsRehideable() && !pEffect->IsAvailable();
+		return pEffect->IsRehideable() && !pEffect->IsAvailable();
 	}
 
 	void UpdatePopup(double delta, bool shouldBeOnScreen) {
@@ -260,7 +259,7 @@ public:
 		}
 
 		// conditional effects will show after 3 seconds of the conditions being met, or immediately if the condition was met on trigger
-		if (bFirstFrame && pEffect->IsConditionallyAvailable()) {
+		if (bFirstFrame) {
 			if (pEffect->IsAvailable()) {
 				fTimeConditionMet += delta;
 				if (fTimeConditionMet < pEffect->fUnhideTime) {
@@ -389,7 +388,7 @@ bool CanEffectActivate(ChaosEffect* effect) {
 	for (auto& group : effect->ActivateIncompatibilityGroups) {
 		if (IsEffectRunningFromGroup(group, false)) return false;
 	}
-	if (effect->IsConditionallyAvailable() && effect->AbortOnConditionFailed()) {
+	if (effect->AbortOnConditionFailed()) {
 		if (IsChaosBlocked()) return false; // IsAvailable can run in-game code, so always skip abortonconditionfailed effects in menus
 		if (!effect->IsAvailable()) return false;
 	}

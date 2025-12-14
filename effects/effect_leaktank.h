@@ -53,7 +53,6 @@ public:
 	bool IsAvailable() override {
 		return GetEffectRunning(&E_LeakTank);
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_LeakTankRefuel;
 

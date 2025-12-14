@@ -80,7 +80,6 @@ public:
 	bool IsAvailable() override {
 		return g_VisualTreatment;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
@@ -332,7 +331,6 @@ public:
 	bool IsAvailable() override {
 		return g_VisualTreatment;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }

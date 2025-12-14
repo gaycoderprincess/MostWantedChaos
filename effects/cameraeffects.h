@@ -136,7 +136,6 @@ public:
 		return true;
 	}
 	bool IsRehideable() override { return true; }
-	bool IsConditionallyAvailable() override { return true; }
 } E_SecondPersonCamera;
 
 class Effect_SecondPersonHeliCamera : public ChaosEffect {
@@ -171,7 +170,6 @@ public:
 		return true;
 	}
 	bool IsRehideable() override { return true; }
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_SecondPersonHeliCamera;
 

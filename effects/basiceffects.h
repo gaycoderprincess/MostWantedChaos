@@ -83,7 +83,6 @@ public:
 	bool IsAvailable() override {
 		return (((4.0 / 3.0) / GetAspectRatio()) * 0.5) < 0.99;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_43Borders;

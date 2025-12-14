@@ -10,7 +10,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_OpponentInRaceOrRoamingConditional : public ChaosEffect {
@@ -22,7 +21,6 @@ public:
 	bool IsAvailable() override {
 		return !VEHICLE_LIST::GetList(VEHICLE_AIRACERS).empty();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_OpponentInRaceConditional : public ChaosEffect {
@@ -34,7 +32,6 @@ public:
 	bool IsAvailable() override {
 		return !VEHICLE_LIST::GetList(VEHICLE_AIRACERS).empty() && GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_OpponentAliveInRaceConditional : public ChaosEffect {
@@ -52,7 +49,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_MultiOpponentAliveInRaceConditional : public ChaosEffect {
@@ -74,7 +70,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_PursuitConditional : public ChaosEffect {
@@ -89,7 +84,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_PursuitNoRaceConditional : public ChaosEffect {
@@ -104,7 +98,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_NotInPursuitConditional : public ChaosEffect {
@@ -119,7 +112,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_ActiveCarsConditional : public ChaosEffect {
@@ -131,7 +123,6 @@ public:
 	bool IsAvailable() override {
 		return GetActiveVehicles().size() > 1;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_ActiveTrafficConditional : public ChaosEffect {
@@ -143,7 +134,6 @@ public:
 	bool IsAvailable() override {
 		return GetActiveVehicles(DRIVER_TRAFFIC).size() > 0;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_ActiveCopsConditional : public ChaosEffect {
@@ -155,7 +145,6 @@ public:
 	bool IsAvailable() override {
 		return !GetActiveVehicles(DRIVER_COP).empty();
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_ManyActiveCopsConditional : public ChaosEffect {
@@ -167,7 +156,6 @@ public:
 	bool IsAvailable() override {
 		return GetActiveVehicles(DRIVER_COP).size() >= 3;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_TriggerInMenu : public ChaosEffect {
@@ -181,7 +169,6 @@ public:
 	bool IsAvailable() override {
 		return TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_InRaceConditional : public ChaosEffect {
@@ -193,7 +180,6 @@ public:
 	bool IsAvailable() override {
 		return GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_HasTuningConditional : public ChaosEffect {
@@ -208,7 +194,6 @@ public:
 		}
 		return false;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 };
 
 class EffectBase_NotInPrologueConditional : public ChaosEffect {
@@ -220,7 +205,6 @@ public:
 	bool IsAvailable() override {
 		return FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) > 0;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 };
 
@@ -234,6 +218,5 @@ public:
 		if (!IsInCareerMode()) return false;
 		return true;
 	}
-	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 };
