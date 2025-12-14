@@ -75,4 +75,5 @@ public:
 		lastStates.clear();
 	}
 	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_Flashbacks;

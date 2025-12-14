@@ -420,9 +420,12 @@ public:
 		if (!car) return false;
 		auto carModel = Attrib::StringHash32(GetLocalPlayerVehicle()->GetVehicleName());
 		if (carModel == car->VehicleKey) return false;
+		// special case for overwritten ai cars
 		auto model1 = GetPVehicleModelPointer(car->VehicleKey);
-		auto model2 = GetPVehicleModelPointer(carModel);
-		if (model1 && model2 && !strcmp(*model1, *model2)) return false; // cross check the raw car models too
+		if (model1) {
+			auto aiCar = GetReplacedAICarName(*model1, false);
+			if (aiCar && carModel == Attrib::StringHash32(aiCar)) return false;
+		}
 		return true;
 	}
 	bool IsConditionallyAvailable() override { return true; }
