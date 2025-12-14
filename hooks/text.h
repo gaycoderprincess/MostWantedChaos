@@ -6,6 +6,7 @@ namespace TextHook {
 	const char* pInterspersedText = nullptr;
 	const char* pInterspersedTextUpper = nullptr;
 	const char* pInterspersedTextProper = nullptr;
+	int nInterspersedTextRuns = 0;
 
 	bool CanStringBeReversed(const std::string& str) {
 		for (auto& c : str) {
@@ -194,7 +195,9 @@ namespace TextHook {
 		}
 		if (pReplaceText) str = pReplaceText;
 		if (pInterspersedText) {
-			str = GetInterspersedText(str);
+			for (int i = 0; i < nInterspersedTextRuns; i++) {
+				str = GetInterspersedText(str);
+			}
 		}
 		if (bReverseText && CanStringBeReversed(str)) {
 			str = GetReversedText(str);

@@ -274,6 +274,7 @@ public:
 			ply->Sabotage(3);
 		}
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_BlowEngine;
 
 class Effect_AutoDrive : public ChaosEffect {
@@ -1356,3 +1357,87 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_HeatSteer;
+
+class Effect_MinSpeed : public ChaosEffect {
+public:
+	Effect_MinSpeed() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Need For Speed";
+		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("top_bar"));
+		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("player_godmode"));
+	}
+
+	static inline float fMinSpeedSlow = TOMPS(100);
+	static inline float fMinSpeedFast = TOMPS(150);
+	static inline float fMaxSpeed = TOMPS(100);
+	static inline float fTextY = 0.05;
+
+	bool bActive = false;
+	double fInactiveTimer = 0;
+	double fLeewayTimer = 0;
+	float fMinSpeed = fMinSpeedSlow;
+
+	void InitFunction() override {
+		bActive = false;
+		fInactiveTimer = 0;
+		fLeewayTimer = 0;
+		fMinSpeed = IsInCareerMode() && FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= 10 ? fMinSpeedSlow : fMinSpeedFast;
+	}
+	void TickFunctionMain(double delta) override {
+		NyaDrawing::CNyaRGBA32 redrgb = {200,0,0,255};
+
+		auto speed = GetLocalPlayerInterface<IRigidBody>()->GetSpeed();
+
+		tNyaStringData data;
+		data.x = 0.5;
+		data.y = fTextY;
+		data.size = 0.04;
+		data.XCenterAlign = true;
+		data.outlinea = 255;
+		data.outlinedist = 0.025;
+		DrawString(data, std::format("Current Speed: {:.0f}KM/H", TOKMH(speed)));
+		data.y += data.size;
+		DrawString(data, std::format("Minimum Speed: {:.0f}KM/H", TOKMH(fMinSpeed)));
+
+		if (!bActive) {
+			data.y += data.size;
+			data.SetColor(redrgb);
+			DrawString(data, std::format("Time Remaining: {:.1f}", 5.0 - fInactiveTimer));
+
+			fInactiveTimer += delta;
+			if (fInactiveTimer > 5) {
+				bActive = true;
+				return;
+			}
+			else {
+				EffectInstance->fTimer = fTimerLength;
+				if (speed >= fMinSpeed * 1.1) bActive = true;
+			}
+			return;
+		}
+
+		NyaDrawing::CNyaRGBA32 rgb = {190,240,64,255};
+		auto speedAmount = (speed - fMinSpeed) / fMaxSpeed;
+		if (speedAmount < 0.33) rgb = {200,0,0,255};
+		DrawTopBar(speedAmount, rgb);
+
+		if (speedAmount <= 0) {
+			data.y += data.size;
+			data.SetColor(redrgb);
+			DrawString(data, std::format("Time Remaining: {:.1f}", 0.5 - fLeewayTimer));
+
+			fLeewayTimer += delta;
+			if (fLeewayTimer > 0.5) {
+				GetLocalPlayerInterface<IDamageable>()->Destroy();
+			}
+		}
+		else {
+			fLeewayTimer = 0;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool ShouldAbort() override {
+		return IsCarDestroyed(GetLocalPlayerVehicle());
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_MinSpeed;

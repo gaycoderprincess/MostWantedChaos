@@ -38,12 +38,25 @@ public:
 class Effect_PauseMenu : public ChaosEffect {
 public:
 	Effect_PauseMenu() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Open Pause Menu";
+		sName = "Constant Pausing";
+		fTimerLength = 30;
 	}
+
+	double timer = 0;
 
 	void InitFunction() override {
 		aMainLoopFunctionsOnce.push_back([]() { EPause::Create(0, 0, 0); });
 	}
+	void TickFunctionMain(double delta) override {
+		timer += delta;
+		if (timer > 1) {
+			if (rand() % 100 < 30) {
+				aMainLoopFunctionsOnce.push_back([]() { EPause::Create(0, 0, 0); });
+			}
+			timer -= 1;
+		}
+	}
+	bool HasTimer() override { return true; }
 } E_PauseMenu;
 
 class Effect_FO1HUD : public ChaosEffect {

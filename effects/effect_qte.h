@@ -35,4 +35,5 @@ public:
 			}
 		}
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_QTE;

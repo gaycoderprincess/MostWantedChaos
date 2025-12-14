@@ -9,6 +9,7 @@ public:
 
 	Effect_LeakTank() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Leaking Gas Tank";
+		IncompatibilityGroups.push_back(Attrib::StringHash32("top_bar"));
 	}
 
 	void InitFunction() override {

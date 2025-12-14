@@ -91,11 +91,13 @@ public:
 	}
 
 	void InitFunction() override {
+		TextHook::nInterspersedTextRuns++;
 		TextHook::pInterspersedText = "cock";
 		TextHook::pInterspersedTextUpper = "COCK";
 		TextHook::pInterspersedTextProper = "Cock";
 	}
 	void DeinitFunction() override {
+		TextHook::nInterspersedTextRuns--;
 		TextHook::pInterspersedText = nullptr;
 		TextHook::pInterspersedTextUpper = nullptr;
 		TextHook::pInterspersedTextProper = nullptr;
@@ -103,4 +105,5 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
+	bool CanMultiTrigger() override { return true; }
 } E_InterspersedText;

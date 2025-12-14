@@ -353,6 +353,7 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Racers: {}", VEHICLE_LIST::GetList(VEHICLE_AIRACERS).size()));
 				DrawMenuOption(std::format("Cops: {}", VEHICLE_LIST::GetList(VEHICLE_AICOPS).size()));
 				DrawMenuOption(std::format("Traffic: {}", VEHICLE_LIST::GetList(VEHICLE_AITRAFFIC).size()));
+				DrawMenuOption(std::format("CurrentBin: {}", FEDatabase->mUserProfile->TheCareerSettings.CurrentBin));
 				if (auto heat = GetMaxHeat()) {
 					DrawMenuOption(std::format("Max Heat: {:.2f}", *heat));
 				}
@@ -378,13 +379,14 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
 			}
-			QuickValueEditor("SceneryScale.x", SceneryScale.x);
-			QuickValueEditor("SceneryScale.y", SceneryScale.y);
-			QuickValueEditor("SceneryScale.z", SceneryScale.z);
-			QuickValueEditor("SceneryMove.x", SceneryMove.x);
-			QuickValueEditor("SceneryMove.y", SceneryMove.y);
-			QuickValueEditor("SceneryMove.z", SceneryMove.z);
+			//QuickValueEditor("SceneryScale.x", SceneryScale.x);
+			//QuickValueEditor("SceneryScale.y", SceneryScale.y);
+			//QuickValueEditor("SceneryScale.z", SceneryScale.z);
+			//QuickValueEditor("SceneryMove.x", SceneryMove.x);
+			//QuickValueEditor("SceneryMove.y", SceneryMove.y);
+			//QuickValueEditor("SceneryMove.z", SceneryMove.z);
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
+			QuickValueEditor("MinSpeed::fTextY", Effect_MinSpeed::fTextY);
 			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("LeakTankCash::TankDrainRate", Effect_LeakTankCash::TankDrainRate);
 			QuickValueEditor("GroovyCars::GroovySpeed", Effect_GroovyCars::GroovySpeed);

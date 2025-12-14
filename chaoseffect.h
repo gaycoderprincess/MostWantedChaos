@@ -56,6 +56,7 @@ public:
 	virtual bool ShouldAbort() { return false; }
 	virtual bool IgnoreHUDState() { return false; }
 	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
+	virtual bool CanMultiTrigger() { return false; } // multiple instances at once
 	virtual void OnAnyEffectTriggered() {}
 };
 
@@ -327,7 +328,7 @@ bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup, bool includeActivat
 }
 
 void AddRunningEffect(ChaosEffect* effect) {
-	if (IsEffectRunning(effect)) return;
+	if (!effect->CanMultiTrigger() && IsEffectRunning(effect)) return;
 
 	effect->bTriggeredThisCycle = true;
 	effect->LastTriggerTime = std::time(0);
@@ -350,7 +351,7 @@ int GetRandomNumber(int min, int max) {
 }
 
 bool CanEffectActivate(ChaosEffect* effect) {
-	if (IsEffectRunning(effect)) return false;
+	if (!effect->CanMultiTrigger() && IsEffectRunning(effect)) return false;
 	for (auto& group : effect->IncompatibilityGroups) {
 		if (IsEffectRunningFromGroup(group, true)) return false;
 	}

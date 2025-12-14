@@ -154,7 +154,7 @@ public:
 	}
 	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
-			if (rand() % 100 < 10) {
+			if ((rand() % 100) < 10) {
 				__debugbreak();
 			}
 			else {

@@ -7,7 +7,7 @@ public:
 	}
 
 	void InitFunction() override {
-		ICopMgr::mDisableCops = false;
+		ForceEnableCops();
 		if (auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
 			for (int i = 0; i < 8; i++) {
 				AICopManager::SpawnCopCarNow(TheOneCopManager, pursuit);
@@ -35,7 +35,7 @@ public:
 	}
 
 	void InitFunction() override {
-		ICopMgr::mDisableCops = false;
+		ForceEnableCops();
 		ICopMgr::mInstance->PursueAtHeatLevel(GetLocalPlayerInterface<IPerpetrator>()->GetHeat());
 	}
 	bool IsAvailable() override {
@@ -213,16 +213,19 @@ public:
 	bool pass = false;
 
 	Effect_GetBusted() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "10% Chance Of Getting Busted";
-		fTimerLength = 2;
+		sName = "25% Chance Of Getting Busted";
+		fTimerLength = 1;
 	}
 
 	void InitFunction() override {
-		if (pass = rand() % 100 < 10) {
+		pass = (rand() % 100) < 25;
+		if (pass) {
 			EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
 
-			ICopMgr::mDisableCops = false;
-			ICopMgr::mInstance->PursueAtHeatLevel(GetLocalPlayerInterface<IPerpetrator>()->GetHeat());
+			if (!GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
+				ForceEnableCops();
+				ICopMgr::mInstance->PursueAtHeatLevel(GetLocalPlayerInterface<IPerpetrator>()->GetHeat());
+			}
 		}
 		else {
 			EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
@@ -231,13 +234,35 @@ public:
 	}
 	void TickFunctionMain(double delta) override {
 		if (pass) {
+			auto cars = GetActiveVehicles(DRIVER_COP);
+			if (cars.empty()) {
+				EffectInstance->fTimer = fTimerLength;
+
+				auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit();
+				if (pursuit) {
+					//AICopManager::SpawnPursuitCar(TheOneCopManager, pursuit);
+					AICopManager::SpawnCopCarNow(TheOneCopManager, pursuit);
+				}
+				return;
+			}
+
 			static float f = -999.0;
 			NyaHookLib::Patch(0x4445CC + 2, &f);
+
+			GetLocalPlayerInterface<IRigidBody>()->SetLinearVelocity(&UMath::Vector3::kZero);
+			GetLocalPlayerInterface<IRigidBody>()->SetAngularVelocity(&UMath::Vector3::kZero);
+
+			auto pos = *GetLocalPlayerVehicle()->GetPosition();
+			auto fwd = *GetLocalPlayerInterface<ICollisionBody>()->GetForwardVector();
+			for (auto& car : cars) {
+				car->SetVehicleOnGround(&pos, &fwd);
+			}
 		}
 	}
 	void DeinitFunction() override {
 		NyaHookLib::Patch(0x4445CC + 2, 0x890DA4);
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_GetBusted;
 
 class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
@@ -347,6 +372,7 @@ public:
 	Effect_InvincibleTires() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Invincible Player Tires";
 		fTimerLength = 60;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("player_godmode"));
 	}
 
 	void TickFunctionMain(double delta) override {

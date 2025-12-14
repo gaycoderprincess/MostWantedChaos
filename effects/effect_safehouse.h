@@ -8,4 +8,5 @@ public:
 		aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 	}
 	bool RunInMenus() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_Safehouse;

@@ -551,6 +551,16 @@ void ExecuteRenderData_WithHooks();
 
 Camera* pMoverCamera = nullptr;
 
+bool IsInCareerMode() {
+	return GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext == kRaceContext_Career;
+}
+
+void ForceEnableCops() {
+	ICopMgr::mDisableCops = false;
+	ICopMgr::mInstance->LockoutCops(false);
+	ICopMgr::mInstance->VehicleSpawningEnabled(true);
+}
+
 wchar_t gDLLDir[MAX_PATH];
 class DLLDirSetter {
 public:

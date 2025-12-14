@@ -231,7 +231,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		if (GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext != kRaceContext_Career) return false;
+		if (!IsInCareerMode()) return false;
 		return true;
 	}
 	bool IsConditionallyAvailable() override { return true; }
