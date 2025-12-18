@@ -59,7 +59,7 @@ public:
 			aWords = TextHook::SplitStringIntoWords(aSentences[rand()%aSentences.size()]);
 		}
 
-		pShaderToDraw = pShader;
+		aShadersToDraw.push_back(pShader);
 
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);

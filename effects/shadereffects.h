@@ -9,7 +9,7 @@ public:
 	bool bInvertTimerAtEnd = true;
 
 	EffectBase_ScreenShader(const char* category) : ChaosEffect(category) {
-		IncompatibilityGroups.push_back(Attrib::StringHash32("screenshader"));
+		//IncompatibilityGroups.push_back(Attrib::StringHash32("screenshader"));
 	};
 	
 	void InitFunction() override {
@@ -39,7 +39,7 @@ public:
 	}
 	void TickFunctionMain(double delta) override {
 		if (!pShader) return;
-		pShaderToDraw = pShader;
+		aShadersToDraw.push_back(pShader);
 		if (bEasedTimer) bShaderTimerEase1 = true;
 		if (bInvertTimerAtEnd && EffectInstance->fTimer < 1) bShaderTimerInvert = true;
 	}
@@ -81,9 +81,7 @@ public:
 
 	void TickFunctionMain(double delta) override {
 		bShaderDisco = true;
-		if (!pShaderToDraw) {
-			EffectBase_ScreenShader::TickFunctionMain(delta);
-		}
+		EffectBase_ScreenShader::TickFunctionMain(delta);
 	}
 } E_ShaderDisco;
 
