@@ -4,7 +4,7 @@ class EffectBase_ScreenShader : public ChaosEffect {
 public:
 	// todo add this to the d3d reset handler
 	IDirect3DPixelShader9* pShader = nullptr;
-	std::string sFileName = "mirror";
+	std::string sFileName;
 	bool bEasedTimer = true;
 	bool bInvertTimerAtEnd = true;
 

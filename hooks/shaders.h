@@ -36,10 +36,10 @@ void DoScreenShaders() {
 		g_pd3dDevice->CreateTexture(desc.Width, desc.Height, 1, D3DUSAGE_RENDERTARGET, desc.Format, D3DPOOL_DEFAULT, &pRenderTargetCopy, nullptr);
 		if (!pRenderTargetCopy) return;
 
+		static double r = 0;
+		static double g = 255;
+		static double b = 255;
 		if (bShaderDisco) {
-			static double r = 0;
-			static double g = 255;
-			static double b = 255;
 			static int stage = 0;
 			switch (stage) {
 				case 0:

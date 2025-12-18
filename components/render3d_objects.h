@@ -7,10 +7,13 @@ namespace Render3DObjects {
 		NyaMat4x4 mMatrix = UMath::Matrix4::kIdentity;
 		NyaVec3 vColPosition = UMath::Vector3::kZero;
 		float fColSize = 1;
+		void(*pTickFunction)(Object*, double) = nullptr;
 
-		Object(std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition, float collisionSize) : aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize) {}
+		Object(std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {}
 
 		void CheckCollision(IRigidBody* other, double delta) {
+			if (fColSize <= 0) return;
+
 			// todo while this works it's very janky and id prefer to actually add collisions to the map somehow later
 
 			UMath::Vector3 dim;
@@ -52,6 +55,9 @@ namespace Render3DObjects {
 			if (obj.aModels[0]->bInvalidated) continue;
 			for (auto& car: cars) {
 				obj.CheckCollision(car->mCOMObject->Find<IRigidBody>(), gTimer.fDeltaTime);
+			}
+			if (obj.pTickFunction) {
+				obj.pTickFunction(&obj, gTimer.fDeltaTime);
 			}
 		}
 	}

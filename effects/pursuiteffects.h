@@ -405,7 +405,7 @@ public:
 
 class Effect_DropCash : public EffectBase_PursuitConditional {
 public:
-	Effect_DropCash() : EffectBase_PursuitConditional("Uncategorized") {
+	Effect_DropCash() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Cops Drop Cash";
 		fTimerLength = 90;
 	}

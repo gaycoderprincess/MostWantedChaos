@@ -281,4 +281,90 @@ public:
 	bool RunWhenBlocked() override { return true; }
 } E_Mona;
 
+class Effect_173 : public ChaosEffect {
+public:
+	Effect_173() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn SCP-173";
+	}
+
+	std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = 0;
+	static inline float rZ = 0;
+	static inline float offX = 0;
+	static inline float offY = 0;
+	static inline float offZ = 4;
+	static inline float scale = 1.0;
+	static inline float colScale = 0.5;
+
+	static inline float peanutSpeed = 25;
+	static inline float lastPeanutDot = 0;
+
+	static void PeanutMove(Render3DObjects::Object* obj, double delta) {
+		if (IsChaosBlocked()) return;
+		auto objDir = (GetLocalPlayerCamera()->CurrentKey.Position - WorldToRenderCoords(obj->vColPosition));
+		objDir.Normalize();
+		auto dot = GetLocalPlayerCamera()->CurrentKey.Direction.Dot(objDir);
+		lastPeanutDot = dot;
+		if (dot > 0) {
+			auto movePos = (RenderToWorldCoords(GetLocalPlayerCamera()->CurrentKey.Position) - obj->vColPosition);
+			movePos.Normalize();
+			obj->vColPosition += movePos * peanutSpeed * delta;
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
+
+			obj->mMatrix = NyaMat4x4::LookAt(-movePos);
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
+
+			obj->mMatrix.p = obj->vColPosition;
+
+			auto distFromCar = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition).length();
+			if (distFromCar < 5) {
+				static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap3.ogg");
+				if (sound) {
+					NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					NyaAudio::Play(sound);
+				}
+
+				obj->aModels.clear();
+				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+			}
+		}
+	}
+
+	void InitFunction() override {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("scp173.fbx");
+		}
+
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+
+			WRoadNav nav;
+			WRoadNav::InitAtPoint(&nav, (UMath::Vector3*)&mat.p, &UMath::Vector3::kZero, false, 0.0);
+			if (nav.fValid) {
+				mat.p = nav.fPosition;
+			}
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+			mat.x *= scale;
+			mat.y *= scale;
+			mat.z *= scale;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+			Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, PeanutMove));
+		}
+	}
+} E_173;
+
 // todo stock dodge neon from ug1
