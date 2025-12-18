@@ -302,13 +302,17 @@ public:
 		}
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
-		if (hook != HOOK_3D) return;
+		if (hook == HOOK_INPUT) {
+			auto controls = GetLocalPlayerInterface<IInput>()->GetControls();
+			if (controls->fGas > 0.75) controls->fGas = 0.75;
+		}
+		else if (hook == HOOK_3D) {
+			CarRender_DontRenderPlayer = true;
+			DrawLightFlares = false;
 
-		CarRender_DontRenderPlayer = true;
-		DrawLightFlares = false;
-
-		gCustomCar_Neon.Update(GetLocalPlayerVehicle(), delta);
-		gCustomCar_Neon.Render(GetLocalPlayerVehicle());
+			gCustomCar_Neon.Update(GetLocalPlayerVehicle(), delta);
+			gCustomCar_Neon.Render(GetLocalPlayerVehicle());
+		}
 	}
 	void DeinitFunction() override {
 		CarRender_DontRenderPlayer = false;

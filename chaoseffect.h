@@ -39,6 +39,7 @@ public:
 		HOOK_POST3D,
 		HOOK_PREPROPS,
 		HOOK_POSTPROPS,
+		HOOK_INPUT,
 	};
 
 	virtual void InitFunction() {}

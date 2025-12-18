@@ -46,6 +46,7 @@ namespace FlatOutHUD {
 #include "hooks/carrender.h"
 #include "hooks/eventwin.h"
 #include "hooks/worldrender.h"
+#include "hooks/input.h"
 #include "chaosvars.h"
 #include "chaoseffect.h"
 #include "chaosmod.h"
@@ -61,6 +62,10 @@ void OnWinRace() {
 	if (!strcmp(plyModel, "cs_clio_trafpizza")) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_TRAFPIZZA"));
 	}
+}
+
+void PlayerInputLoop() {
+	ProcessChaosEffects_SetDir<ChaosEffect::HOOK_INPUT>();
 }
 
 void MainLoop() {

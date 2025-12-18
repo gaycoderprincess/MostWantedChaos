@@ -1197,10 +1197,13 @@ public:
 		fTimerLength = 60;
 	}
 
-	void TickFunctionMain(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			ply->SetControlBrake(0);
-			ply->SetControlHandBrake(0);
+			auto controls = ply->GetControls();
+			controls->fBrake = 0;
+			controls->fHandBrake = 0;
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -1214,13 +1217,55 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunctionMain(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			ply->SetControlSteering(0);
+			auto controls = ply->GetControls();
+			controls->fSteering = 0;
 		}
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerNoSteering;
+
+class Effect_PlayerHalfSteering : public ChaosEffect {
+public:
+	Effect_PlayerHalfSteering() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Half-Broken Steering Wheel";
+		sFriendlyName = "Halve Player Steering";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			auto controls = ply->GetControls();
+			if (controls->fSteering < -0.5) controls->fSteering = -0.5;
+			if (controls->fSteering > 0.5) controls->fSteering = 0.5;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerHalfSteering;
+
+class Effect_PlayerHalfGas : public ChaosEffect {
+public:
+	Effect_PlayerHalfGas() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Half-Broken Throttle";
+		sFriendlyName = "Halve Player Throttle";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			auto controls = ply->GetControls();
+			if (controls->fGas > 0.5) controls->fGas = 0.5;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerHalfGas;
 
 class Effect_PlayerLag : public ChaosEffect {
 public:
