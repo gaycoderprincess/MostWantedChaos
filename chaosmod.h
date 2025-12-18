@@ -284,16 +284,9 @@ void ChaosModMenu() {
 			//QuickValueEditor("SceneryMove.y", SceneryMove.y);
 			//QuickValueEditor("SceneryMove.z", SceneryMove.z);
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
-			QuickValueEditor("173::rX", Effect_173::rX);
-			QuickValueEditor("173::rY", Effect_173::rY);
-			QuickValueEditor("173::rZ", Effect_173::rZ);
-			QuickValueEditor("173::offX", Effect_173::offX);
-			QuickValueEditor("173::offY", Effect_173::offY);
-			QuickValueEditor("173::offZ", Effect_173::offZ);
-			QuickValueEditor("173::scale", Effect_173::scale);
-			QuickValueEditor("173::colScale", Effect_173::colScale);
 			QuickValueEditor("173::peanutSpeed", Effect_173::peanutSpeed);
 			QuickValueEditor("173::lastPeanutDot", Effect_173::lastPeanutDot);
+			QuickValueEditor("173::lastPeanutDistance", Effect_173::lastPeanutDistance);
 			QuickValueEditor("MinSpeed::fTextY", Effect_MinSpeed::fTextY);
 			QuickValueEditor("LeakTank::TankDrainRate", Effect_LeakTank::TankDrainRate);
 			QuickValueEditor("LeakTankCash::TankDrainRate", Effect_LeakTankCash::TankDrainRate);

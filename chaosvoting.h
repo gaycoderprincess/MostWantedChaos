@@ -22,12 +22,16 @@ namespace ChaosVoting {
 		if (nStreamerVotes > 0) nStreamerVotes--;
 	}
 
-	bool AnyEffectGotVotes() {
+	int GetTotalVoteCount() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
-			totalVotes += vote.nVotingDummyVoteCount;
+			totalVotes += vote.nVotingDummyVoteCount + vote.nVotingDummyVoteCountStreamer;
 		}
-		return totalVotes > 0;
+		return totalVotes;
+	}
+
+	bool AnyEffectGotVotes() {
+		return GetTotalVoteCount() > 0;
 	}
 
 	void TriggerHighestVotedEffect() {
@@ -53,10 +57,10 @@ namespace ChaosVoting {
 			if (!CanEffectActivate(vote.pEffect)) continue;
 
 			// also trigger any tied votes
-			if (allOfTheAbove || !highestVoted || highestVoteCount == vote.nVotingDummyVoteCount) {
+			if (allOfTheAbove || !highestVoted || highestVoteCount == vote.GetVotingDummyVoteCount()) {
 				AddRunningEffect(vote.pEffect);
 				highestVoted = &vote;
-				highestVoteCount = vote.nVotingDummyVoteCount;
+				highestVoteCount = vote.GetVotingDummyVoteCount();
 			}
 		}
 
@@ -66,10 +70,10 @@ namespace ChaosVoting {
 	void UpdateVotePercentages() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
-			totalVotes += vote.nVotingDummyVoteCount;
+			totalVotes += vote.GetVotingDummyVoteCount();
 		}
 		for (auto& vote : aNewVotes) {
-			vote.fVotingDummyVotePercentage = (vote.nVotingDummyVoteCount / (double)totalVotes) * 100.0;
+			vote.fVotingDummyVotePercentage = (vote.GetVotingDummyVoteCount() / (double)totalVotes) * 100.0;
 		}
 	}
 
@@ -82,9 +86,9 @@ namespace ChaosVoting {
 	void OnStreamerVoteCast(int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
 		for (auto& vote : aNewVotes) {
-			vote.nVotingDummyVoteCount = 0;
+			vote.nVotingDummyVoteCountStreamer = 0;
 		}
-		aNewVotes[i].nVotingDummyVoteCount += 9999;
+		aNewVotes[i].nVotingDummyVoteCountStreamer++;
 		UpdateVotePercentages();
 	}
 
@@ -123,5 +127,15 @@ namespace ChaosVoting {
 				vote.Draw(y++, false);
 			}
 		}
+
+		static ChaosEffect VoteCountDummyEffect("DUMMY", true);
+		static char tmp[256];
+		strcpy_s(tmp, 256, std::format("Vote Count: {}", GetTotalVoteCount()).c_str());
+		VoteCountDummyEffect.sName = tmp;
+		static ChaosEffectInstance VoteCountDummy(&VoteCountDummyEffect);
+		VoteCountDummy.bIsVotingDummy = true;
+		VoteCountDummy.fVotingDummyVotePercentage = -1;
+		VoteCountDummy.UpdatePopup(gTimer.fDeltaTime, true);
+		VoteCountDummy.Draw(aNewVotes.size(), false);
 	}
 }

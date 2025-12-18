@@ -90,11 +90,16 @@ public:
 
 	bool bIsVotingDummy = false;
 	int nVotingDummyVoteCount = 0;
+	int nVotingDummyVoteCountStreamer = 0;
 	float fVotingDummyVotePercentage = 0;
 
 	ChaosEffectInstance(ChaosEffect* effect) : pEffect(effect) {
 		fTimer = pEffect->fTimerLength;
 		fTimeConditionMet = pEffect->fUnhideTime;
+	}
+
+	int GetVotingDummyVoteCount() {
+		return nVotingDummyVoteCount + (nVotingDummyVoteCountStreamer * 9999);
 	}
 
 	bool IsActive() const {
@@ -175,7 +180,7 @@ public:
 		y = fEffectY + (effectSpacing * y);
 
 		std::string str = GetName();
-		if (bIsVotingDummy) str += std::format(" ({}%)", (int)fVotingDummyVotePercentage);
+		if (bIsVotingDummy && fVotingDummyVotePercentage >= 0) str += std::format(" ({}%)", (int)fVotingDummyVotePercentage);
 
 		auto width = GetStringWidth(effectSize, str.c_str());
 		float barWidth = ((HasTimer() && !inMenu ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());

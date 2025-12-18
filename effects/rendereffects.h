@@ -299,6 +299,7 @@ public:
 	static inline float colScale = 0.5;
 
 	static inline float peanutSpeed = 30;
+	static inline float lastPeanutDistance = 0;
 	static inline float lastPeanutDot = 0;
 
 	static void PeanutMove(Render3DObjects::Object* obj, double delta) {
@@ -308,7 +309,8 @@ public:
 		auto dot = GetLocalPlayerCamera()->CurrentKey.Direction.Dot(objDir);
 		lastPeanutDot = dot;
 		if (dot > 0) {
-			auto movePos = (RenderToWorldCoords(GetLocalPlayerCamera()->CurrentKey.Position) - obj->vColPosition);
+			auto movePos = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition);
+			lastPeanutDistance = movePos.length();
 			movePos.Normalize();
 			obj->vColPosition += movePos * peanutSpeed * Sim::Internal::mSystem->mSpeed * delta;
 			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
