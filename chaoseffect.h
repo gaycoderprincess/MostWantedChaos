@@ -78,70 +78,16 @@ float fEffectTimerTextSize = 0.03;
 
 float fEffectVotingSize = 0.75;
 
-class ChaosEffectInstance {
+class ChaosUIPopup {
 public:
-	ChaosEffect* pEffect = nullptr;
-	std::string sNameToDisplay;
-	double fTimer = 0;
-	double fTextTimer = 0;
-	double fTimeConditionMet = 3;
-	bool bFirstFrame = true;
-	bool bAborted = false;
-
 	bool bIsVotingDummy = false;
-	int nVotingDummyVoteCount = 0;
-	int nVotingDummyVoteCountStreamer = 0;
-	float fVotingDummyVotePercentage = 0;
+	double fTextTimer = 0;
 
-	ChaosEffectInstance(ChaosEffect* effect) : pEffect(effect) {
-		fTimer = pEffect->fTimerLength;
-		fTimeConditionMet = pEffect->fUnhideTime;
-	}
+	bool bHasTimer = false;
+	double fTimer = 0;
+	double fTimerLength = 0;
 
-	int GetVotingDummyVoteCount() {
-		return nVotingDummyVoteCount + (nVotingDummyVoteCountStreamer * 9999);
-	}
-
-	bool IsActive() const {
-		return fTimer > 0 && !bAborted;
-	}
-
-	bool IsNameOnScreen() const {
-		return fTextTimer > 0;
-	}
-
-	bool ShouldNameBeOnScreen() const {
-		if (!IsActive()) return false;
-		if (bFirstFrame) return false;
-		if (IsHidden()) return false;
-		if (pEffect->HideFromPlayer()) return false;
-		return true;
-	}
-
-	bool CanBeDeleted() const {
-		return !IsActive() && !IsNameOnScreen();
-	}
-
-	bool HasTimer() const {
-		if (bIsVotingDummy) return false;
-		return pEffect && pEffect->HasTimer();
-	}
-
-	const char* GetName() const {
-		if (!sNameToDisplay.empty()) return sNameToDisplay.c_str();
-		return pEffect->sName;
-	}
-
-	float GetOffscreenPercentage() const {
-		if (fTextTimer < 1) return std::lerp(1, 0, easeInOutQuart(fTextTimer));
-		return 0;
-	}
-
-	bool IsHidden() const {
-		return pEffect->IsRehideable() && !pEffect->IsAvailable();
-	}
-
-	void UpdatePopup(double delta, bool shouldBeOnScreen) {
+	void Update(double delta, bool shouldBeOnScreen) {
 		if (shouldBeOnScreen) {
 			if (fTextTimer < 1) {
 				fTextTimer += delta * 2;
@@ -160,9 +106,8 @@ public:
 		}
 	}
 
-	void Draw(float y, bool inMenu) const {
-		if (!IsNameOnScreen() && !inMenu) return;
-		if (!IsActive() && inMenu) return;
+	void Draw(std::string str, float y, bool ignoreTimers) const {
+		if (fTextTimer <= 0 && !ignoreTimers) return;
 
 		float effectSize = fEffectSize;
 		float effectSpacing = fEffectSpacing;
@@ -179,14 +124,11 @@ public:
 		x = 1 - x;
 		y = fEffectY + (effectSpacing * y);
 
-		std::string str = GetName();
-		if (bIsVotingDummy && fVotingDummyVotePercentage >= 0) str += std::format(" ({}%)", (int)fVotingDummyVotePercentage);
-
 		auto width = GetStringWidth(effectSize, str.c_str());
-		float barWidth = ((HasTimer() && !inMenu ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());
+		float barWidth = ((bHasTimer && !ignoreTimers ? fEffectTextureXSpacing : fEffectTextureXSpacingNoTimer) * GetAspectRatioInv());
 		float barTipWidth = (fEffectTextureTipX * GetAspectRatioInv());
 
-		if (fTextTimer < 1 && !inMenu) x = std::lerp(1 + width + barWidth + barTipWidth, x, easeInOutQuart(fTextTimer));
+		if (fTextTimer < 1 && !ignoreTimers) x = std::lerp(1 + width + barWidth + barTipWidth, x, easeInOutQuart(fTextTimer));
 
 		static auto textureBarL = LoadTexture("CwoeeChaos/data/textures/effectbg_bar.png");
 		static auto textureTipL = LoadTexture("CwoeeChaos/data/textures/effectbg_end.png");
@@ -204,10 +146,10 @@ public:
 				DrawRectangle(barX, 1, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, textureBar);
 				DrawRectangle(barX - barTipWidth, barX, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, textureTip);
 			}
-			if (!inMenu && HasTimer() && fTimer > 0.1) {
+			if (!ignoreTimers && bHasTimer && fTimer > 0.1) {
 				float arcX = barX - (fEffectArcX * GetAspectRatioInv());
-				DrawArc(arcX, y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / pEffect->fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
-				if (fTimer < 5 && pEffect->fTimerLength > 5) {
+				DrawArc(arcX, y, fEffectArcSize, fEffectArcThickness, fEffectArcRotation, fEffectArcRotation - ((fTimer / fTimerLength) * std::numbers::pi * 2), {255,255,255,255});
+				if (fTimer < 5 && fTimerLength > 5) {
 					tNyaStringData data;
 					data.x = arcX;
 					data.y = y;
@@ -222,10 +164,6 @@ public:
 				}
 			}
 		}
-		//static auto texture = LoadTexture("CwoeeChaos/data/textures/effectbg.png");
-		//if (texture) {
-		//	DrawRectangle(x - width - (fEffectTextureXSpacing * GetAspectRatioInv()), 1, y - effectTextureYSpacing, y + effectTextureYSpacing, {255,255,255,255}, 0, texture);
-		//}
 
 		tNyaStringData data;
 		data.x = x;
@@ -241,6 +179,70 @@ public:
 			data.outlinedist = 0.025;
 		}
 		DrawString(data, str);
+	}
+};
+
+class ChaosEffectInstance {
+public:
+	ChaosEffect* pEffect = nullptr;
+	std::string sNameToDisplay;
+	double fTimer = 0;
+	double fTimeConditionMet = 3;
+	bool bFirstFrame = true;
+	bool bAborted = false;
+
+	ChaosUIPopup Popup;
+
+	ChaosEffectInstance(ChaosEffect* effect) : pEffect(effect) {
+		fTimer = pEffect->fTimerLength;
+		fTimeConditionMet = pEffect->fUnhideTime;
+	}
+
+	bool IsActive() const {
+		return fTimer > 0 && !bAborted;
+	}
+
+	bool IsNameOnScreen() const {
+		return Popup.fTextTimer > 0;
+	}
+
+	bool ShouldNameBeOnScreen() const {
+		if (!IsActive()) return false;
+		if (bFirstFrame) return false;
+		if (IsHidden()) return false;
+		if (pEffect->HideFromPlayer()) return false;
+		return true;
+	}
+
+	bool CanBeDeleted() const {
+		return !IsActive() && !IsNameOnScreen();
+	}
+
+	bool HasTimer() const {
+		return pEffect && pEffect->HasTimer();
+	}
+
+	const char* GetName() const {
+		if (!sNameToDisplay.empty()) return sNameToDisplay.c_str();
+		return pEffect->sName;
+	}
+
+	float GetOffscreenPercentage() const {
+		if (Popup.fTextTimer < 1) return std::lerp(1, 0, easeInOutQuart(Popup.fTextTimer));
+		return 0;
+	}
+
+	bool IsHidden() const {
+		return pEffect->IsRehideable() && !pEffect->IsAvailable();
+	}
+
+	void Draw(float y, bool inMenu) {
+		if (!IsActive() && inMenu) return;
+
+		Popup.fTimerLength = pEffect->fTimerLength;
+		Popup.fTimer = fTimer;
+		Popup.bHasTimer = HasTimer();
+		Popup.Draw(GetName(), y, inMenu);
 	}
 
 	void OnTick(ChaosEffect::eChaosHook hook, double delta) {
@@ -260,7 +262,7 @@ public:
 		}
 
 		if (!inMenu) {
-			UpdatePopup(delta, ShouldNameBeOnScreen());
+			Popup.Update(delta, ShouldNameBeOnScreen());
 		}
 
 		// conditional effects will show after 3 seconds of the conditions being met, or immediately if the condition was met on trigger

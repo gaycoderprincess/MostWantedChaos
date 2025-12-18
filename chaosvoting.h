@@ -4,8 +4,32 @@ namespace ChaosVoting {
 	bool bEnabled = false;
 	int nNumVoteOptions = 4;
 
-	std::vector<ChaosEffectInstance> aOldVotes;
-	std::vector<ChaosEffectInstance> aNewVotes;
+	class VotingPopup {
+	public:
+		ChaosUIPopup Popup;
+		ChaosEffect* pEffect = nullptr;
+
+		int nVoteCount = 0;
+		int nVoteCountStreamer = 0;
+		float fVotePercentage = 0;
+
+		VotingPopup(ChaosEffect* effect) : pEffect(effect) {}
+
+		int GetVoteCount() {
+			return nVoteCount + (nVoteCountStreamer * 9999);
+		}
+
+		void Draw(float y) {
+			Popup.bIsVotingDummy = true;
+
+			std::string str = pEffect->GetFriendlyName();
+			if (fVotePercentage >= 0) str += std::format(" ({}%)", (int)fVotePercentage);
+			Popup.Draw(str, y, false);
+		}
+	};
+
+	std::vector<VotingPopup> aOldVotes;
+	std::vector<VotingPopup> aNewVotes;
 
 	// voting tweaks
 	int nLowestWins = 0;
@@ -16,7 +40,7 @@ namespace ChaosVoting {
 		aOldVotes = aNewVotes;
 		aNewVotes.clear();
 		for (int i = 0; i < nNumVoteOptions; i++) {
-			aNewVotes.push_back(ChaosEffectInstance(GetRandomEffect(false)));
+			aNewVotes.push_back(VotingPopup(GetRandomEffect(false)));
 		}
 		if (nLowestWins > 0) nLowestWins--;
 		if (nStreamerVotes > 0) nStreamerVotes--;
@@ -25,7 +49,7 @@ namespace ChaosVoting {
 	int GetTotalVoteCount() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
-			totalVotes += vote.nVotingDummyVoteCount + vote.nVotingDummyVoteCountStreamer;
+			totalVotes += vote.nVoteCount + vote.nVoteCountStreamer;
 		}
 		return totalVotes;
 	}
@@ -43,13 +67,13 @@ namespace ChaosVoting {
 			return;
 		}
 
-		std::sort(votes.begin(), votes.end(), [](const ChaosEffectInstance& a, const ChaosEffectInstance& b) {
-			if (nLowestWins > 0) return a.fVotingDummyVotePercentage < b.fVotingDummyVotePercentage;
-			return a.fVotingDummyVotePercentage > b.fVotingDummyVotePercentage;
+		std::sort(votes.begin(), votes.end(), [](const VotingPopup& a, const VotingPopup& b) {
+			if (nLowestWins > 0) return a.fVotePercentage < b.fVotePercentage;
+			return a.fVotePercentage > b.fVotePercentage;
 		});
 		bool allOfTheAbove = votes[0].pEffect == pAllOfTheAbove;
 
-		ChaosEffectInstance* highestVoted = nullptr;
+		VotingPopup* highestVoted = nullptr;
 		int highestVoteCount = 0;
 
 		// activate highest voted activatable effect
@@ -57,10 +81,10 @@ namespace ChaosVoting {
 			if (!CanEffectActivate(vote.pEffect)) continue;
 
 			// also trigger any tied votes
-			if (allOfTheAbove || !highestVoted || highestVoteCount == vote.GetVotingDummyVoteCount()) {
+			if (allOfTheAbove || !highestVoted || highestVoteCount == vote.GetVoteCount()) {
 				AddRunningEffect(vote.pEffect);
 				highestVoted = &vote;
-				highestVoteCount = vote.GetVotingDummyVoteCount();
+				highestVoteCount = vote.GetVoteCount();
 			}
 		}
 
@@ -70,25 +94,25 @@ namespace ChaosVoting {
 	void UpdateVotePercentages() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
-			totalVotes += vote.GetVotingDummyVoteCount();
+			totalVotes += vote.GetVoteCount();
 		}
 		for (auto& vote : aNewVotes) {
-			vote.fVotingDummyVotePercentage = (vote.GetVotingDummyVoteCount() / (double)totalVotes) * 100.0;
+			vote.fVotePercentage = (vote.GetVoteCount() / (double)totalVotes) * 100.0;
 		}
 	}
 
 	void OnVoteCast(int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
-		aNewVotes[i].nVotingDummyVoteCount++;
+		aNewVotes[i].nVoteCount++;
 		UpdateVotePercentages();
 	}
 
 	void OnStreamerVoteCast(int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
 		for (auto& vote : aNewVotes) {
-			vote.nVotingDummyVoteCountStreamer = 0;
+			vote.nVoteCountStreamer = 0;
 		}
-		aNewVotes[i].nVotingDummyVoteCountStreamer++;
+		aNewVotes[i].nVoteCountStreamer++;
 		UpdateVotePercentages();
 	}
 
@@ -113,29 +137,22 @@ namespace ChaosVoting {
 		if (!aOldVotes.empty()) {
 			int y = 0;
 			for (auto& vote : aOldVotes) {
-				vote.bIsVotingDummy = true;
-				vote.UpdatePopup(gTimer.fDeltaTime, false);
-				vote.Draw(y++, false);
+				vote.Popup.Update(gTimer.fDeltaTime, false);
+				vote.Draw(y++);
 			}
-			if (aOldVotes[0].fTextTimer <= 0) aOldVotes.clear();
+			if (aOldVotes[0].Popup.fTextTimer <= 0) aOldVotes.clear();
 		}
 		else {
 			int y = 0;
 			for (auto& vote : aNewVotes) {
-				vote.bIsVotingDummy = true;
-				vote.UpdatePopup(gTimer.fDeltaTime, true);
-				vote.Draw(y++, false);
+				vote.Popup.Update(gTimer.fDeltaTime, true);
+				vote.Draw(y++);
 			}
 		}
 
-		static ChaosEffect VoteCountDummyEffect("DUMMY", true);
-		static char tmp[256];
-		strcpy_s(tmp, 256, std::format("Vote Count: {}", GetTotalVoteCount()).c_str());
-		VoteCountDummyEffect.sName = tmp;
-		static ChaosEffectInstance VoteCountDummy(&VoteCountDummyEffect);
-		VoteCountDummy.bIsVotingDummy = true;
-		VoteCountDummy.fVotingDummyVotePercentage = -1;
-		VoteCountDummy.UpdatePopup(gTimer.fDeltaTime, true);
-		VoteCountDummy.Draw(aNewVotes.size(), false);
+		static ChaosUIPopup VoteCountPopup;
+		VoteCountPopup.bIsVotingDummy = true;
+		VoteCountPopup.Update(gTimer.fDeltaTime, true);
+		VoteCountPopup.Draw(std::format("Vote Count: {}", GetTotalVoteCount()), aNewVotes.size(), false);
 	}
 }
