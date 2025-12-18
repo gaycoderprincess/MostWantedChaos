@@ -42,6 +42,10 @@ namespace Render3DObjects {
 				other->SetPosition((UMath::Vector3*)&newPos);
 			}
 		}
+
+		bool IsActive() {
+			return !aModels.empty() && !aModels[0]->bInvalidated;
+		}
 	};
 	std::vector<Object> aObjects;
 
@@ -51,8 +55,7 @@ namespace Render3DObjects {
 
 		auto cars = GetActiveVehicles();
 		for (auto& obj : aObjects) {
-			if (obj.aModels.empty()) continue;
-			if (obj.aModels[0]->bInvalidated) continue;
+			if (!obj.IsActive()) continue;
 			for (auto& car: cars) {
 				obj.CheckCollision(car->mCOMObject->Find<IRigidBody>(), gTimer.fDeltaTime);
 			}

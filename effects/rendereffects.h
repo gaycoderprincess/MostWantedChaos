@@ -298,7 +298,7 @@ public:
 	static inline float scale = 1.0;
 	static inline float colScale = 0.5;
 
-	static inline float peanutSpeed = 25;
+	static inline float peanutSpeed = 30;
 	static inline float lastPeanutDot = 0;
 
 	static void PeanutMove(Render3DObjects::Object* obj, double delta) {
@@ -310,7 +310,7 @@ public:
 		if (dot > 0) {
 			auto movePos = (RenderToWorldCoords(GetLocalPlayerCamera()->CurrentKey.Position) - obj->vColPosition);
 			movePos.Normalize();
-			obj->vColPosition += movePos * peanutSpeed * delta;
+			obj->vColPosition += movePos * peanutSpeed * Sim::Internal::mSystem->mSpeed * delta;
 			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
 
 			obj->mMatrix = NyaMat4x4::LookAt(-movePos);
@@ -329,7 +329,7 @@ public:
 					NyaAudio::Play(sound);
 				}
 
-				obj->aModels.clear();
+				obj->aModels.clear(); // despawn after one kill
 				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 			}
 		}
@@ -344,12 +344,6 @@ public:
 			auto mat = UMath::Matrix4::kIdentity;
 			veh->GetMatrix4(&mat);
 			mat.p = *veh->GetPosition();
-
-			WRoadNav nav;
-			WRoadNav::InitAtPoint(&nav, (UMath::Vector3*)&mat.p, &UMath::Vector3::kZero, false, 0.0);
-			if (nav.fValid) {
-				mat.p = nav.fPosition;
-			}
 			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
 
 			mat.p += mat.x * offX;
@@ -365,6 +359,7 @@ public:
 			Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, PeanutMove));
 		}
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_173;
 
 // todo stock dodge neon from ug1
