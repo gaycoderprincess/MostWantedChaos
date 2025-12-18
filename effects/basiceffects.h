@@ -291,6 +291,40 @@ public:
 	}
 } E_SFXPursuitBreaker;
 
+class Effect_SFXBody : public ChaosEffect {
+public:
+	Effect_SFXBody() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Occasional Backstreet Boys";
+		fTimerLength = 120;
+	}
+
+	double timer = 0;
+	NyaAudio::NyaSound sound[9] = {};
+
+	void InitFunction() override {
+		timer = 0;
+		for (int i = 0; i < 9; i++) {
+			if (!sound[i]) sound[i] = NyaAudio::LoadFile(std::format("CwoeeChaos/data/sound/effect/backstreet{}.mp3", i+1));
+		}
+	}
+	void TickFunctionMain(double delta) override {
+		timer += delta;
+		if (timer > 1) {
+			if (rand() % 100 < 10) {
+				int r = rand() % 9;
+				if (sound[r]) {
+					NyaAudio::SetVolume(sound[r], FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					NyaAudio::Play(sound[r]);
+				}
+			}
+			timer -= 1;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_SFXBody;
+
 /*class Effect_3Effects : public ChaosEffect {
 public:
 	Effect_3Effects() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
