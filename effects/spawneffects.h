@@ -1,6 +1,7 @@
 #define EFFECT_CATEGORY_TEMP "Spawn"
 
-class Effect_SpawnCarRandomized : public ChaosEffect {
+// uhh idk this seems a bit lame now
+/*class Effect_SpawnCarRandomized : public ChaosEffect {
 public:
 	bool abort = false;
 
@@ -36,7 +37,7 @@ public:
 		return abort;
 	}
 	bool CanQuickTrigger() override { return false; }
-} E_SpawnCarRandomized;
+} E_SpawnCarRandomized;*/
 
 class Effect_SpawnCarTruck : public ChaosEffect {
 public:
@@ -158,16 +159,29 @@ public:
 
 			obj->mMatrix.p = obj->vColPosition;
 
-			auto distFromCar = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition).length();
-			if (distFromCar < 5) {
-				static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap3.ogg");
-				if (sound) {
-					NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
-					NyaAudio::Play(sound);
-				}
+			auto cars = GetActiveVehicles();
+			for (auto& car : cars) {
+				auto distFromCar = (*car->GetPosition() - obj->vColPosition).length();
+				if (distFromCar < 5) {
+					static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap3.ogg");
+					if (car == GetLocalPlayerVehicle()) {
+						if (sound) {
+							NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+							NyaAudio::Play(sound);
+						}
 
-				obj->aModels.clear(); // despawn after one kill
-				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+						obj->aModels.clear(); // despawn after one kill
+						aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+					}
+					else if (!IsCarDestroyed(car)) {
+						if (sound) {
+							NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+							NyaAudio::Play(sound);
+						}
+
+						car->mCOMObject->Find<IDamageable>()->Destroy();
+					}
+				}
 			}
 		}
 	}
