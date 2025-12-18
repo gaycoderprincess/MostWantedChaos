@@ -65,17 +65,26 @@ public:
 		}
 	}
 
-	virtual void Render(IVehicle* playerCar, NyaMat4x4 carMatrix, bool windows) {
+	virtual void Render(IVehicle* playerCar, NyaMat4x4 carMatrix, bool alpha) {
 		Load();
 
 		for (auto& model : aModels) {
+			bool isAlpha = false;
+			if (model->sTextureName == "windows.dds") isAlpha = true;
+			if (model->sTextureName == "WINDOW_FRONT.dds") isAlpha = true;
+			if (model->sTextureName == "DRIVER_CUTOUT.dds") isAlpha = true;
+			if (model->sTextureName.find("BADGING") != std::string::npos) isAlpha = true;
+			if (model->sTextureName.find("HEADLIGHT_GLASS") != std::string::npos) isAlpha = true;
+			if (model->sTextureName.find("BRAKELIGHT_GLASS") != std::string::npos) isAlpha = true;
+			if (alpha != isAlpha) continue;
+
 			int effect = EEFFECT_WORLD;
 			//if (model->sTextureName == "skin1.dds") effect = EEFFECT_CAR;
-			if (windows != (model->sTextureName == "windows.dds")) continue;
+			//if (model->sTextureName.find("CARSKIN") != std::string::npos) effect = EEFFECT_CAR;
 
 			if (bIsDetached) {
 				if (DetachedTransform.p.y > -500) {
-					model->RenderAt(WorldToRenderMatrix(DetachedTransform), model->sTextureName == "windows.dds", effect);
+					model->RenderAt(WorldToRenderMatrix(DetachedTransform), isAlpha, effect);
 				}
 			}
 			else {
@@ -92,7 +101,7 @@ public:
 				}
 				auto partMat = (UMath::Matrix4)(carMatrix * offset);
 				LastRawTransform = partMat;
-				model->RenderAt(WorldToRenderMatrix(partMat), model->sTextureName == "windows.dds", effect);
+				model->RenderAt(WorldToRenderMatrix(partMat), isAlpha, effect);
 			}
 		}
 	}
@@ -190,11 +199,15 @@ public:
 		fRotation = 0;
 	}
 
-	void Render(IVehicle* playerCar, NyaMat4x4 carMatrix, bool windows) override {
+	void Render(IVehicle* playerCar, NyaMat4x4 carMatrix, bool alpha) override {
 		Load();
 
 		auto sus = playerCar->mCOMObject->Find<ISuspension>();
 		for (auto& model : aModels) {
+			bool isAlpha = false;
+			if (model->sTextureName == "TIRE_BACK.dds") isAlpha = true;
+			if (alpha != isAlpha) continue;
+
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(-fRotation, 0, sus->GetWheelSteer(nWheelID) * 4));
 			rotation.p = RestPosition;
@@ -216,7 +229,7 @@ public:
 			}
 			auto partMat = (UMath::Matrix4)(carMatrix * rotation);
 			LastRawTransform = partMat;
-			model->RenderAt(WorldToRenderMatrix(partMat));
+			model->RenderAt(WorldToRenderMatrix(partMat), isAlpha);
 		}
 	}
 
@@ -448,4 +461,14 @@ auto gCustomCar_Mona = CustomCar("mona", {180,0,0}, {0,0.01,0}, {
 	new CustomCarTire(1, "tire_r", {0.861393, 0.952418, 0.044909}, 0.3),
 	new CustomCarTire(2, "tire_l", {-0.861393, -1.12206, 0.044909}, 0.3),
 	new CustomCarTire(3, "tire_r", {0.861393, -1.12206, 0.044909}, 0.3),
+});
+
+auto gCustomCar_Neon = CustomCar("neon", {180,0,0}, {0,0.01,0}, {
+	new CustomCarPart("body", false, {0,0,0}),
+	new CustomCarPart("hood", true, {0,0.994441,0.665329}, true, {0,0.994441,0.665329}, {0,0,0}, {80,0,0}),
+	new CustomCarBrakelight("brakelight", false, {0,0,0}),
+	new CustomCarTire(0, "tire_l", {-0.824625, 1.31297, 0.153955}, 0.3),
+	new CustomCarTire(1, "tire_r", {0.824625, 1.31297, 0.153955}, 0.3),
+	new CustomCarTire(2, "tire_l", {-0.824625, -1.32742, 0.153955}, 0.3),
+	new CustomCarTire(3, "tire_r", {0.824625, -1.31297, 0.153955}, 0.3),
 });

@@ -281,6 +281,43 @@ public:
 	bool RunWhenBlocked() override { return true; }
 } E_Mona;
 
+class Effect_Neon : public ChaosEffect {
+public:
+	Effect_Neon() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Seriously Weak, Dude";
+		sFriendlyName = "Change Car To Dodge Neon";
+		fTimerLength = 120;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+	}
+
+	NyaAudio::NyaSound sound = 0;
+
+	void InitFunction() override {
+		gCustomCar_Neon.Reset(GetLocalPlayerVehicle());
+
+		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/weak.mp3");
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound);
+		}
+	}
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_3D) return;
+
+		CarRender_DontRenderPlayer = true;
+		DrawLightFlares = false;
+
+		gCustomCar_Neon.Update(GetLocalPlayerVehicle(), delta);
+		gCustomCar_Neon.Render(GetLocalPlayerVehicle());
+	}
+	void DeinitFunction() override {
+		CarRender_DontRenderPlayer = false;
+		DrawLightFlares = true;
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_Neon;
+
 class Effect_173 : public ChaosEffect {
 public:
 	Effect_173() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

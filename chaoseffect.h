@@ -14,7 +14,7 @@ public:
 	std::time_t LastTriggerTime = 0;
 	uint32_t nTotalTimesActivated = 0;
 	bool bTriggeredThisCycle = false;
-	ChaosEffectInstance* EffectInstance;
+	ChaosEffectInstance* EffectInstance = nullptr;
 
 	static inline std::vector<ChaosEffect*> aEffects;
 
@@ -410,7 +410,7 @@ ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 		//if (effect->fLastTriggerTime) // todo
 		if (!CanEffectActivate(effect)) continue;
 		if (quickTrigger && !effect->CanQuickTrigger()) continue;
-		
+
 		for (int i = 0; i < effect->nFrequency; i++) {
 			availableEffects.push_back(effect);
 		}
