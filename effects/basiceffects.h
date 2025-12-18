@@ -231,10 +231,10 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		DisableChaosHUD = true;
+		bDisableChaosHUD = true;
 	}
 	void DeinitFunction() override {
-		DisableChaosHUD = false;
+		bDisableChaosHUD = false;
 	}
 	bool HasTimer() override { return true; }
 	bool IgnoreHUDState() override { return true; }

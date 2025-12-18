@@ -112,9 +112,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_Add3Laps;
 
-class Effect_RestartRace : public ChaosEffect {
+class Effect_RestartRace : public EffectBase_InRaceConditional {
 public:
-	Effect_RestartRace() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_RestartRace() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Restart Race";
 	}
 
@@ -124,15 +124,12 @@ public:
 		}
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
-	bool IsAvailable() override {
-		return IsInNormalRace();
-	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_RestartRace;
 
-class Effect_DisableBarriers : public ChaosEffect {
+class Effect_DisableBarriers : public EffectBase_InRaceConditional {
 public:
-	Effect_DisableBarriers() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_DisableBarriers() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Race Barriers";
 		fTimerLength = 120;
 	}
@@ -146,11 +143,26 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsAvailable() override {
-		return IsInNormalRace();
-	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_DisableBarriers;
+
+class Effect_FalseStarts : public EffectBase_InRaceConditional {
+public:
+	Effect_FalseStarts() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "False Starts";
+		fTimerLength = 120;
+	}
+
+	void TickFunctionMain(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car->IsStaging()) car->SetStaging(false);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_FalseStarts;
 
 class Effect_RestartRaceOn99 : public ChaosEffect {
 public:

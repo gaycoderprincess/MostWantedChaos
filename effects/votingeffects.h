@@ -1,6 +1,8 @@
+#define EFFECT_CATEGORY_TEMP "Voting"
+
 class Effect_VotingRigged : public ChaosEffect {
 public:
-	Effect_VotingRigged() : ChaosEffect("Uncategorized") {
+	Effect_VotingRigged() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Rigged Votes";
 	}
 
@@ -24,7 +26,7 @@ public:
 
 class Effect_VotingAll : public ChaosEffect {
 public:
-	Effect_VotingAll() : ChaosEffect("Uncategorized") {
+	Effect_VotingAll() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Activate All Votes";
 	}
 
@@ -37,7 +39,7 @@ public:
 
 class Effect_VotingStreamer : public ChaosEffect {
 public:
-	Effect_VotingStreamer() : ChaosEffect("Uncategorized") {
+	Effect_VotingStreamer() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Streamer Votes (Press 1/2/3/4)";
 		sFriendlyName = "Streamer Votes";
 	}

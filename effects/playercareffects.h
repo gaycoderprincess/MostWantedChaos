@@ -906,7 +906,7 @@ public:
 	void InitFunction() override {
 		aMainLoopFunctionsOnce.push_back([]() {
 			auto car = CreatePinkSlipPreset("RAZORMUSTANG");
-			ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization), true);
+			ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization), true);
 		});
 	}
 	bool CanQuickTrigger() override { return false; }
@@ -921,7 +921,7 @@ public:
 	void InitFunction() override {
 		aMainLoopFunctionsOnce.push_back([]() {
 			std::vector<FECarRecord*> validCars;
-			auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+			auto cars = GetPlayerCarDB();
 			for (auto &car: cars->CarTable) {
 				if (car.Handle == 0xFFFFFFFF) continue;
 				if (car.VehicleKey == Attrib::StringHash32("copcross")) continue;

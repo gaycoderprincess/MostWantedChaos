@@ -33,7 +33,7 @@ void FixIndexLapCount() {
 // always unlock all cars in the career garage
 auto IsCarUnlockedOrig = (bool(__cdecl*)(void* a1, uint32_t a2, int a3))nullptr;
 bool IsCarUnlockedFixed(void* a1, uint32_t a2, int a3) {
-	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	auto cars = GetPlayerCarDB();
 	if (auto rec = FEPlayerCarDB::GetCarRecordByHandle(cars, a2)) {
 		if (FEPlayerCarDB::GetCareerRecordByHandle(cars, rec->CareerHandle) != nullptr) return true;
 	}

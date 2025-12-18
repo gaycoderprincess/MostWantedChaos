@@ -10,6 +10,10 @@ void DisableKeyboardInput(bool disable) {
 	NyaHooks::bInputsBlocked = disable;
 }
 
+FEPlayerCarDB* GetPlayerCarDB() {
+	return &FEDatabase->mUserProfile->PlayersCarStable;
+}
+
 IPlayer* GetLocalPlayer() {
 	auto& list = PLAYER_LIST::GetList(PLAYER_LOCAL);
 	if (list.empty()) return nullptr;
@@ -192,13 +196,13 @@ FECarRecord* GetCurrentCareerCar() {
 	auto id = FEDatabase->mUserProfile->TheCareerSettings.CurrentCar;
 	if (id < 0) return nullptr;
 	if (id >= 200) return nullptr;
-	return &FEDatabase->mUserProfile->PlayersCarStable.CarTable[id];
+	return &GetPlayerCarDB()->CarTable[id];
 }
 
 FECarRecord* GetRandomCareerCar() {
 	static int counter = rand() % 4;
 	std::vector<FECarRecord*> records;
-	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	auto cars = GetPlayerCarDB();
 	for (auto& car : cars->CarTable) {
 		if (car.Handle == 0xFFFFFFFF) continue;
 		auto career = FEPlayerCarDB::GetCareerRecordByHandle(cars, car.CareerHandle);
@@ -215,7 +219,7 @@ FECarRecord* GetRandomCareerCar() {
 }
 
 bool HasPinkSlip(uint32_t model) {
-	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	auto cars = GetPlayerCarDB();
 	for (auto& car : cars->CarTable) {
 		if (car.FilterBits != 0xF0042) continue;
 		if (car.VehicleKey != model) continue;
@@ -226,7 +230,7 @@ bool HasPinkSlip(uint32_t model) {
 
 FECarRecord* CreatePinkSlipPreset(const char* presetName) {
 	uint32_t rideHash = FEngHashString(presetName);
-	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	auto cars = GetPlayerCarDB();
 	for (auto& car : cars->CarTable) {
 		if (car.Handle == rideHash) {
 			return &car;
@@ -247,7 +251,7 @@ uint32_t GetCarFEKey(uint32_t modelHash) {
 
 FECarRecord* CreateStockCarRecord(const char* carModel) {
 	uint32_t rideHash = Attrib::StringHash32(carModel);
-	auto cars = &FEDatabase->mUserProfile->PlayersCarStable;
+	auto cars = GetPlayerCarDB();
 	for (auto& car : cars->CarTable) {
 		if (car.VehicleKey == rideHash) {
 			return &car;

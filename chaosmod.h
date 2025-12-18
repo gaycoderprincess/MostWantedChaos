@@ -10,7 +10,7 @@ void ProcessChaosEffectsMain(double fDeltaTime, bool inMenu, bool blockedByOther
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
 		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
-		if (DisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
+		if (bDisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
 		effect.Draw(y, inMenu || blockedByOtherMeans);
 		y += 1 - (inMenu ? 0 : effect.GetOffscreenPercentage());
 	}
@@ -121,7 +121,7 @@ void ChaosLoop() {
 		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");
 		auto texture = bDarkMode ? textureD : textureL;
 		NyaDrawing::CNyaRGBA32 rgb = bDarkMode ? NyaDrawing::CNyaRGBA32(133,122,168,255) : NyaDrawing::CNyaRGBA32(243,138,175,255);
-		if (!DisableChaosHUD) DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, rgb, texture);
+		if (!bDisableChaosHUD) DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, rgb, texture);
 
 		// add a lil bit of extra time so effects don't overlap each other by a frame or two
 		float cycleTimer = fEffectCycleTimer + 0.1;
@@ -186,7 +186,7 @@ void ChaosModMenu() {
 			}
 			if (DrawMenuOption("Add CopCross To Garage")) {
 				if (auto car = CreateStockCarRecord("copcross")) {
-					FEPlayerCarDB::CreateNewCareerCar(&FEDatabase->mUserProfile->PlayersCarStable, car->Handle);
+					FEPlayerCarDB::CreateNewCareerCar(GetPlayerCarDB(), car->Handle);
 				}
 			}
 			if (auto ply = GetLocalPlayer()) {

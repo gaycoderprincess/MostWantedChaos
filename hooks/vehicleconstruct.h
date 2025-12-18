@@ -84,7 +84,7 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 			if (auto car = GetRandomCareerCar()) {
 				vehicle->carType = car->VehicleKey;
 				vehicle->customization = new FECustomizationRecord;
-				*vehicle->customization = *FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization);
+				*vehicle->customization = *FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization);
 				vehicle->matched = nullptr;
 			}
 			else {

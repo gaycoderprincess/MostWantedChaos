@@ -178,7 +178,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		return GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
+		return IsInNormalRace();
 	}
 };
 
@@ -203,7 +203,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		return FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) > 0;
+		return FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0;
 	}
 	bool AbortOnConditionFailed() override { return true; }
 };

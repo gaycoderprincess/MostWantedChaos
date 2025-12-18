@@ -134,7 +134,7 @@ public:
 	void InitFunction() override {
 		auto car = GetCurrentCareerCar();
 		if (!car) return;
-		auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization);
+		auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization);
 		if (!customization) return;
 		auto random = CreateRandomCustomizations(car->VehicleKey);
 		memcpy(customization->InstalledPartIndices, random.InstalledPartIndices, sizeof(random.InstalledPartIndices));
@@ -157,7 +157,7 @@ public:
 	void InitFunction() override {
 		auto car = GetCurrentCareerCar();
 		if (!car) return;
-		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(GetPlayerCarDB(), car->CareerHandle);
 		if (!career) return;
 		career->TheImpoundData.mTimesBusted++;
 	}
@@ -174,7 +174,7 @@ public:
 	void InitFunction() override {
 		auto car = GetCurrentCareerCar();
 		if (!car) return;
-		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(GetPlayerCarDB(), car->CareerHandle);
 		if (!career) return;
 		career->TheImpoundData.mTimesBusted--;
 	}
@@ -183,7 +183,7 @@ public:
 
 		auto car = GetCurrentCareerCar();
 		if (!car) return false;
-		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(GetPlayerCarDB(), car->CareerHandle);
 		if (!career) return false;
 		return career->TheImpoundData.mTimesBusted > 0;
 	}
@@ -200,7 +200,7 @@ public:
 	void InitFunction() override {
 		auto car = GetCurrentCareerCar();
 		if (!car) return;
-		auto career = FEPlayerCarDB::GetCareerRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->CareerHandle);
+		auto career = FEPlayerCarDB::GetCareerRecordByHandle(GetPlayerCarDB(), car->CareerHandle);
 		if (!career) return;
 		career->TheImpoundData.mMaxBusted++;
 	}
@@ -298,7 +298,7 @@ public:
 			}
 		}
 
-		if (!unearnedPinkSlips.empty() && FEPlayerCarDB::GetNumCareerCars(&FEDatabase->mUserProfile->PlayersCarStable) < 25) {
+		if (!unearnedPinkSlips.empty() && FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) < 25) {
 			markers.push_back({"Pink Slip", FEMarkerManager::MARKER_PINK_SLIP});
 		}
 
@@ -316,12 +316,12 @@ public:
 			EffectInstance->sNameToDisplay = std::format("{} ({} - {})", sName, selectedMarker.name, ride.name);
 			if (ride.preset == nullptr) {
 				if (auto car = CreateStockCarRecord(ride.carType)) {
-					FEPlayerCarDB::CreateNewCareerCar(&FEDatabase->mUserProfile->PlayersCarStable, car->Handle);
+					FEPlayerCarDB::CreateNewCareerCar(GetPlayerCarDB(), car->Handle);
 				}
 			}
 			else {
 				CreatePinkSlipPreset(ride.preset);
-				FEPlayerCarDB::AwardRivalCar(&FEDatabase->mUserProfile->PlayersCarStable, FEngHashString(ride.preset));
+				FEPlayerCarDB::AwardRivalCar(GetPlayerCarDB(), FEngHashString(ride.preset));
 			}
 		}
 		else {
@@ -394,7 +394,7 @@ public:
 		car->VehicleKey = Attrib::StringHash32(GetLocalPlayerVehicle()->GetVehicleName());
 		car->FEKey = GetCarFEKey(car->VehicleKey);
 
-		if (auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(&FEDatabase->mUserProfile->PlayersCarStable, car->Customization)) {
+		if (auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization)) {
 			auto oldId = customization->Handle;
 			if (auto current = GetLocalPlayerVehicle()->GetCustomizations()) {
 				*customization = *current;
@@ -423,3 +423,27 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_OverwriteCareerCar;
+
+class Effect_AddBounty : public ChaosEffect {
+public:
+	Effect_AddBounty() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Add 100K Bounty";
+	}
+
+	void InitFunction() override {
+		GetPlayerCarDB()->SoldHistoryBounty += 100000;
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_AddBounty;
+
+class Effect_SubtractBounty : public ChaosEffect {
+public:
+	Effect_SubtractBounty() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Subtract 100K Bounty";
+	}
+
+	void InitFunction() override {
+		GetPlayerCarDB()->SoldHistoryBounty -= 100000;
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_SubtractBounty;

@@ -75,34 +75,6 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_AddCostToState;
 
-class Effect_AddBounty : public EffectBase_PursuitNoRaceConditional {
-public:
-	Effect_AddBounty() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Add 100K Pursuit Bounty";
-	}
-
-	void InitFunction() override {
-		if (auto pursuit = GetLocalPlayerInterface<IPerpetrator>()) {
-			pursuit->AddToPendingRepPointsNormal(100000);
-		}
-	}
-	bool AbortOnConditionFailed() override { return true; }
-} E_AddBounty;
-
-class Effect_SubtractBounty : public EffectBase_PursuitNoRaceConditional {
-public:
-	Effect_SubtractBounty() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Subtract 100K Pursuit Bounty";
-	}
-
-	void InitFunction() override {
-		if (auto pursuit = GetLocalPlayerInterface<IPerpetrator>()) {
-			pursuit->AddToPendingRepPointsNormal(-100000);
-		}
-	}
-	bool AbortOnConditionFailed() override { return true; }
-} E_SubtractBounty;
-
 // needs a way to force cooldown
 /*class Effect_HiddenFromCops : public EffectBase_PursuitConditional {
 public:
