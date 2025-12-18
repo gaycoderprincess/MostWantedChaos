@@ -320,6 +320,13 @@ public:
 			timer -= 1;
 		}
 	}
+	void DeinitFunction() override {
+		// play backstreet9.mp3
+		if (sound[8]) {
+			NyaAudio::SetVolume(sound[8], FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound[8]);
+		}
+	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
