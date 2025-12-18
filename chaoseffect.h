@@ -9,6 +9,7 @@ public:
 	std::vector<uint32_t> ActivateIncompatibilityGroups; // checks IncompatibilityGroups but doesn't deactivate for effects that only share ActivateIncompatibilityGroups
 	const char* sListCategory = nullptr;
 	const char* sAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
+	int nFrequency = 10; // 10 is standard, make this higher or lower to make an effect more or less likely to appear
 
 	std::time_t LastTriggerTime = 0;
 	uint32_t nTotalTimesActivated = 0;
@@ -409,7 +410,10 @@ ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 		//if (effect->fLastTriggerTime) // todo
 		if (!CanEffectActivate(effect)) continue;
 		if (quickTrigger && !effect->CanQuickTrigger()) continue;
-		availableEffects.push_back(effect);
+		
+		for (int i = 0; i < effect->nFrequency; i++) {
+			availableEffects.push_back(effect);
+		}
 	}
 	if (availableEffects.empty()) {
 		for (auto& effect : ChaosEffect::aEffects) {

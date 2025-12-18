@@ -170,6 +170,30 @@ void ChaosModMenu() {
 		ChloeMenuLib::EndMenu();
 	}
 
+	if (DrawMenuOption("Stats")) {
+		ChloeMenuLib::BeginMenu();
+		if (DrawMenuOption("Achievement Stats")) {
+			ChloeMenuLib::BeginMenu();
+			for (auto& ach : Achievements::gAchievements) {
+				if (!ach->bUnlocked && ach->bHidden) continue;
+				DrawMenuOption(std::format("{} - {}", ach->sName, ach->bUnlocked ? "Unlocked" : "Locked"));
+				DrawMenuOption(ach->sDescription);
+				DrawMenuOption(" ", "", true);
+			}
+			ChloeMenuLib::EndMenu();
+		}
+		if (DrawMenuOption("Effect Stats")) {
+			ChloeMenuLib::BeginMenu();
+			auto effects = ChaosEffect::aEffects;
+			std::sort(effects.begin(),effects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return a->nTotalTimesActivated > b->nTotalTimesActivated; });
+			for (auto& effect : effects) {
+				DrawMenuOption(std::format("{} - {} times", effect->sName, effect->nTotalTimesActivated));
+			}
+			ChloeMenuLib::EndMenu();
+		}
+		ChloeMenuLib::EndMenu();
+	}
+
 	if (DrawMenuOption("Debug")) {
 		ChloeMenuLib::BeginMenu();
 		if (DrawMenuOption("Player Debug")) {

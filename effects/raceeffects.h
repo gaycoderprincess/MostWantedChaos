@@ -164,11 +164,11 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_FalseStarts;
 
-class Effect_RestartRaceOn99 : public ChaosEffect {
+class Effect_RestartRaceOn99 : public EffectBase_InRaceConditional {
 public:
 	bool active = false;
 
-	Effect_RestartRaceOn99() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_RestartRaceOn99() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Exit To Menu At 99% Completion";
 	}
 
@@ -187,9 +187,6 @@ public:
 	}
 	bool HideFromPlayer() override {
 		return !active;
-	}
-	bool IsAvailable() override {
-		return IsInNormalRace();
 	}
 	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return active; }

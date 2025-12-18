@@ -88,6 +88,7 @@ public:
 	Effect_InterspersedText() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cocksbot";
 		fTimerLength = 120;
+		nFrequency *= 4;
 	}
 
 	void InitFunction() override {

@@ -1,5 +1,3 @@
-// todo!!
-
 namespace ChaosVoting {
 	bool bEnabled = false;
 	int nNumVoteOptions = 4;
@@ -21,10 +19,7 @@ namespace ChaosVoting {
 
 		void Draw(float y) {
 			Popup.bIsVotingDummy = true;
-
-			std::string str = pEffect->GetFriendlyName();
-			if (fVotePercentage >= 0) str += std::format(" ({}%)", (int)fVotePercentage);
-			Popup.Draw(str, y, false);
+			Popup.Draw(std::format("{} ({}%)", pEffect->GetFriendlyName(), (int)fVotePercentage), y, false);
 		}
 	};
 

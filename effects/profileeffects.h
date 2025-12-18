@@ -162,7 +162,6 @@ public:
 		career->TheImpoundData.mTimesBusted++;
 	}
 	bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundStrike;
 
 class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
@@ -188,7 +187,6 @@ public:
 		return career->TheImpoundData.mTimesBusted > 0;
 	}
 	bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundStrikeRemove;
 
 class Effect_PlayerCarImpoundMarker : public EffectBase_CareerConditional {
@@ -205,7 +203,6 @@ public:
 		career->TheImpoundData.mMaxBusted++;
 	}
 	bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarImpoundMarker;
 
 class Effect_AddRandomTuningMarker : public EffectBase_CareerConditional {
@@ -243,6 +240,7 @@ public:
 		EffectInstance->sNameToDisplay = std::format("{} ({})", sName, selectedMarker.name);
 		FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_AddRandomTuningMarker;
 
 class Effect_AddRandomBonusMarker : public EffectBase_CareerConditional {
@@ -433,7 +431,6 @@ public:
 	void InitFunction() override {
 		GetPlayerCarDB()->SoldHistoryBounty += 100000;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_AddBounty;
 
 class Effect_SubtractBounty : public ChaosEffect {
@@ -445,5 +442,4 @@ public:
 	void InitFunction() override {
 		GetPlayerCarDB()->SoldHistoryBounty -= 100000;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_SubtractBounty;
