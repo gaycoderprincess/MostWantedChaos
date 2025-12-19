@@ -453,3 +453,4 @@ bool RunningEffectsCleanup() {
 #include "effects/effect_qte.h"
 #include "effects/effect_disableall.h"
 #include "effects/effect_tiktok.h"
+#include "effects/unfaireffects.h"

@@ -75,6 +75,13 @@ void MoneyChecker() {
 ChaosEffect* GetSmartRNGEffect() {
 	if (!nSmartRNG) return nullptr;
 
+	if (nSmartRNG == 2 && PercentageChanceCheck(25)) {
+		if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) return &E_RefillActiveTimers;
+	}
+	if (nSmartRNG == 1 && PercentageChanceCheck(25)) {
+		if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) return &E_RefillActiveTimers;
+	}
+
 	bool isInFreeroamPursuit = IsInCareerMode() && !IsInNormalRace() && GetLocalPlayerInterface<IVehicleAI>()->GetPursuit();
 
 	// global effects
@@ -91,6 +98,7 @@ ChaosEffect* GetSmartRNGEffect() {
 		if (CanEffectBeRandomlyPicked(&E_10Effects)) { effects.push_back(&E_10Effects); }
 		if (CanEffectBeRandomlyPicked(&E_SpawnCarTruck)) { effects.push_back(&E_SpawnCarTruck); }
 		if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) { effects.push_back(&E_RefillActiveTimers); }
+		if (CanEffectBeRandomlyPicked(&E_GetBustedInstant)) { effects.push_back(&E_GetBustedInstant); }
 		//if (CanEffectBeRandomlyPicked(&E_CrashChance)) { effects.push_back(&E_CrashChance); } // the chance is too low for this one
 
 		if (GetLocalPlayerVehicle()->GetSpeed() < TOMPS(60)) {
@@ -123,6 +131,8 @@ ChaosEffect* GetSmartRNGEffect() {
 		if (completion >= 90) {
 			if (CanEffectBeRandomlyPicked(&E_RestartRace)) return &E_RestartRace;
 			if (CanEffectBeRandomlyPicked(&E_Safehouse)) return &E_Safehouse;
+			if (CanEffectBeRandomlyPicked(&E_DisableSave)) return &E_DisableSave;
+			if (CanEffectBeRandomlyPicked(&E_GetBustedInstant)) return &E_GetBustedInstant;
 		}
 
 		std::vector<ChaosEffect*> effects;

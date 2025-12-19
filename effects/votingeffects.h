@@ -68,6 +68,7 @@ class Effect_VotingSmart : public ChaosEffect {
 public:
 	Effect_VotingSmart() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Insanely Unfair RNG";
+		nFrequency *= 2;
 	}
 
 	static inline int max = 5;
