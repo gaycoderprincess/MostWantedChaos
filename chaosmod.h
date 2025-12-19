@@ -90,6 +90,7 @@ ChaosEffect* GetSmartRNGEffect() {
 		if (CanEffectBeRandomlyPicked(&E_PlayerCarSpike1)) { effects.push_back(&E_PlayerCarSpike1); }
 		if (CanEffectBeRandomlyPicked(&E_10Effects)) { effects.push_back(&E_10Effects); }
 		if (CanEffectBeRandomlyPicked(&E_SpawnCarTruck)) { effects.push_back(&E_SpawnCarTruck); }
+		if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) { effects.push_back(&E_RefillActiveTimers); }
 		//if (CanEffectBeRandomlyPicked(&E_CrashChance)) { effects.push_back(&E_CrashChance); } // the chance is too low for this one
 
 		if (GetLocalPlayerVehicle()->GetSpeed() < TOMPS(60)) {
@@ -129,7 +130,7 @@ ChaosEffect* GetSmartRNGEffect() {
 		if (CanEffectBeRandomlyPicked(&E_SpinCar2)) { effects.push_back(&E_SpinCar2); }
 		if (CanEffectBeRandomlyPicked(&E_Neon)) { effects.push_back(&E_Neon); } // the neon slows down your throttle
 		if (CanEffectBeRandomlyPicked(&E_PlayerHalfGas)) { effects.push_back(&E_PlayerHalfGas); }
-		if (CanEffectBeRandomlyPicked(&E_PlayerHalfSteering)) { effects.push_back(&E_PlayerHalfSteering); }
+		//if (CanEffectBeRandomlyPicked(&E_PlayerHalfSteering)) { effects.push_back(&E_PlayerHalfSteering); }
 		if (CanEffectBeRandomlyPicked(&E_NoInput)) { effects.push_back(&E_NoInput); }
 		if (CanEffectBeRandomlyPicked(&E_SetCarRandomAI)) { effects.push_back(&E_SetCarRandomAI); }
 		if (CanEffectBeRandomlyPicked(&E_PlayerLag)) { effects.push_back(&E_PlayerLag); }
@@ -147,8 +148,17 @@ ChaosEffect* GetSmartRNGEffect() {
 			if (CanEffectBeRandomlyPicked(&E_SetCarTRAFPIZZA)) { effects.push_back(&E_SetCarTRAFPIZZA); }
 		}
 
+		// tollbooths
+		if (GetActiveVehicles(DRIVER_RACER).empty()) {
+			if (CanEffectBeRandomlyPicked(&E_CarBouncy)) { effects.push_back(&E_CarBouncy); }
+			if (CanEffectBeRandomlyPicked(&E_CarFloaty)) { effects.push_back(&E_CarFloaty); }
+			if (CanEffectBeRandomlyPicked(&E_CarFlippy)) { effects.push_back(&E_CarFlippy); }
+			if (CanEffectBeRandomlyPicked(&E_CarTumbly)) { effects.push_back(&E_CarTumbly); }
+		}
+
 		if (completion < 80 && CanEffectBeRandomlyPicked(&E_RubberbandOpponents)) { effects.push_back(&E_RubberbandOpponents); }
 		if (completion < 10 && CanEffectBeRandomlyPicked(&E_LeakTank)) { effects.push_back(&E_LeakTank); }
+		if (completion < 10 && CanEffectBeRandomlyPicked(&E_NoPauseMenu)) { effects.push_back(&E_NoPauseMenu); }
 
 		if (!effects.empty()) {
 			return effects[rand() % effects.size()];
@@ -157,8 +167,9 @@ ChaosEffect* GetSmartRNGEffect() {
 	else if (auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
 		auto status = pursuit->GetPursuitStatus();
 		if (status == PS_COOL_DOWN) {
+			if (CanEffectBeRandomlyPicked(&E_NoHidingSpots)) { return &E_NoHidingSpots; }
+
 			std::vector<ChaosEffect*> effects;
-			if (CanEffectBeRandomlyPicked(&E_NoHidingSpots)) { effects.push_back(&E_NoHidingSpots); }
 			if (CanEffectBeRandomlyPicked(&E_RuthlessCopSpawns)) { effects.push_back(&E_RuthlessCopSpawns); }
 			if (CanEffectBeRandomlyPicked(&E_TeleportAllCars)) { effects.push_back(&E_TeleportAllCars); }
 			if (CanEffectBeRandomlyPicked(&E_Piggyback)) { effects.push_back(&E_Piggyback); }

@@ -137,7 +137,7 @@ public:
 	Effect_RubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "FUCKING RUBBERBAND";
 		sFriendlyName = "Opponents Rubberband";
-		fTimerLength = 45;
+		fTimerLength = 90;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("rubberband"));
 	}
 

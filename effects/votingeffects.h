@@ -6,14 +6,14 @@ public:
 		sName = "Rigged Votes";
 	}
 
+	static inline int max = 2;
+
 	void InitFunction() override {
-		ChaosVoting::nLowestWins = 2;
-	}
-	void DeinitFunction() override {
-		ChaosVoting::nLowestWins = 2;
+		ChaosVoting::nLowestWins = max;
 	}
 	void TickFunctionMain(double delta) override {
-		EffectInstance->fTimer = fTimerLength * ChaosVoting::nLowestWins;
+		fTimerLength = max * 5;
+		EffectInstance->fTimer = ChaosVoting::nLowestWins * 5;
 	}
 	bool ShouldAbort() override { return !ChaosVoting::nLowestWins; }
 	bool HasTimer() override { return true; }
@@ -45,11 +45,14 @@ public:
 		sFriendlyName = "Streamer Votes";
 	}
 
+	static inline int max = 3;
+
 	void InitFunction() override {
-		ChaosVoting::nStreamerVotes = 3;
+		ChaosVoting::nStreamerVotes = max;
 	}
 	void TickFunctionMain(double delta) override {
-		EffectInstance->fTimer = fTimerLength * ChaosVoting::nStreamerVotes;
+		fTimerLength = max * 5;
+		EffectInstance->fTimer = ChaosVoting::nStreamerVotes * 5;
 	}
 	bool ShouldAbort() override { return !ChaosVoting::nStreamerVotes; }
 	bool HasTimer() override { return true; }
@@ -67,11 +70,14 @@ public:
 		sName = "Insanely Unfair RNG";
 	}
 
+	static inline int max = 5;
+
 	void InitFunction() override {
-		nSmartRNG = 5;
+		nSmartRNG = max;
 	}
 	void TickFunctionMain(double delta) override {
-		EffectInstance->fTimer = fTimerLength * nSmartRNG;
+		fTimerLength = max * 5;
+		EffectInstance->fTimer = nSmartRNG * 5;
 	}
 	bool ShouldAbort() override { return !nSmartRNG; }
 	bool HasTimer() override { return true; }
