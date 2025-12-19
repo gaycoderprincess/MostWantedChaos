@@ -146,6 +146,7 @@ public:
 	static inline float lastPeanutDot = 0;
 
 	static inline std::vector<int> aPeanutsInWorld;
+	static inline bool bPeanutEverSpawned = false;
 
 	static void PeanutMove(Render3DObjects::Object* obj, double delta) {
 		if (IsChaosBlocked()) return;
@@ -203,6 +204,8 @@ public:
 
 		aPeanutsInWorld.push_back(Render3DObjects::aObjects.size());
 		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, PeanutMove));
+
+		bPeanutEverSpawned = true;
 	}
 
 	void InitFunction() override {
@@ -247,5 +250,7 @@ public:
 		mat.p.z = GetRandomNumber(-5000, 5000);
 		Effect_173::SpawnPeanut(mat);
 	}
+	bool IsAvailable() override { return Effect_173::bPeanutEverSpawned; }
+	bool AbortOnConditionFailed() override { return true; }
 	bool CanMultiTrigger() override { return true; }
 } E_173Somewhere;

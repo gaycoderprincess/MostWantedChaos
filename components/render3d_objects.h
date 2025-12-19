@@ -46,6 +46,10 @@ namespace Render3DObjects {
 		bool IsActive() {
 			return !aModels.empty() && !aModels[0]->bInvalidated;
 		}
+
+		bool IsEmpty() {
+			return aModels.empty();
+		}
 	};
 	std::vector<Object> aObjects;
 

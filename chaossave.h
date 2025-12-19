@@ -40,12 +40,14 @@ void DoChaos173Save() {
 	std::vector<t173Save> save;
 	for (auto& peanut : Effect_173::aPeanutsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
-		if (!model->IsActive()) continue;
+		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix});
 	}
 
 	std::ofstream file("CwoeeChaos/save/173.sav", std::iostream::out | std::iostream::binary);
 	if (!file.is_open()) return;
+
+	file.write((char*)&Effect_173::bPeanutEverSpawned, sizeof(Effect_173::bPeanutEverSpawned));
 
 	int count = save.size();
 	file.write((char*)&count, sizeof(count));
@@ -57,6 +59,8 @@ void DoChaos173Save() {
 void DoChaos173Load() {
 	std::ifstream file("CwoeeChaos/save/173.sav", std::iostream::in | std::iostream::binary);
 	if (!file.is_open()) return;
+
+	file.read((char*)&Effect_173::bPeanutEverSpawned, sizeof(Effect_173::bPeanutEverSpawned));
 
 	int count = 0;
 	file.read((char*)&count, sizeof(count));
@@ -72,7 +76,7 @@ void DoChaosTeddieSave() {
 	std::vector<tTeddieSave> save;
 	for (auto& peanut : Effect_Teddie::aTeddiesInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
-		if (!model->IsActive()) continue;
+		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix, model->vColPosition});
 	}
 
