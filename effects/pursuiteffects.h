@@ -237,6 +237,19 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_GetBusted;
 
+// there aren't enough kill effects but this is kinda lame and repetitive
+/*class Effect_GetBusted2 : public ChaosEffect {
+public:
+	Effect_GetBusted2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Get Busted";
+	}
+
+	void InitFunction() override {
+		NISListenerActivity::MessageBusted(nullptr, 0);
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_GetBusted2;*/
+
 class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
 public:
 	Effect_RuthlessCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {

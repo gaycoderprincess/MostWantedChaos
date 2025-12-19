@@ -85,6 +85,9 @@ public:
 		fTimerLength = 15;
 	}
 
+	void InitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6B20C6, 0x6A938D); // Chassis::DoJumpStabilizer
+	}
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
@@ -100,6 +103,9 @@ public:
 				rb->SetLinearVelocity(&vel);
 			}
 		}
+	}
+	void DeinitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6B20C6, 0x6A8F40);
 	}
 	bool HasTimer() override { return true; }
 } E_CarBouncy;

@@ -146,11 +146,11 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_DisableBarriers;
 
-class Effect_FalseStarts : public EffectBase_InRaceConditional {
+class Effect_FalseStarts : public ChaosEffect {
 public:
-	Effect_FalseStarts() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_FalseStarts() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "False Starts";
-		fTimerLength = 120;
+		fTimerLength = 30;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -160,6 +160,13 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		if (!IsInNormalRace()) return false;
+		if (EffectInstance && !EffectInstance->bFirstFrame && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete > 5.0) {
+			return false;
+		}
+		return true;
+	}
 	bool IsRehideable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_FalseStarts;

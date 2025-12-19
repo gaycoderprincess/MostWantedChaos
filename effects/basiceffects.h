@@ -198,7 +198,8 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_BlockyCover;
 
-class Effect_BlockyCoverMissing : public ChaosEffect {
+// the texture replacer makes this obsolete
+/*class Effect_BlockyCoverMissing : public ChaosEffect {
 public:
 	Effect_BlockyCoverMissing() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Missing Texture";
@@ -221,7 +222,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
-} E_BlockyCoverMissing;
+} E_BlockyCoverMissing;*/
 
 class Effect_NoChaosHUD : public ChaosEffect {
 public:

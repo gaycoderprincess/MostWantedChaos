@@ -59,7 +59,7 @@ public:
 		sName = "Become Fish";
 		sFriendlyName = "All Cars Are Blahaj";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+		//IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 
 	std::vector<Render3D::tModel*> models;
@@ -155,7 +155,7 @@ public:
 		sName = "Pep";
 		sFriendlyName = "Change Car To FO1 Pepper (Visual)";
 		fTimerLength = 180;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+		//IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 
 	void InitFunction() override {
@@ -184,7 +184,7 @@ public:
 		sName = "Bucket-Ass Car";
 		sFriendlyName = "Change Car To GTA Greenwood (Visual)";
 		fTimerLength = 120;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+		//IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 
 	void InitFunction() override {
@@ -213,7 +213,7 @@ public:
 		sName = "Not A Cat";
 		sFriendlyName = "Change Car To Morgana (Visual)";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+		//IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 
 	void InitFunction() override {
@@ -242,7 +242,7 @@ public:
 		sName = "Seriously Weak, Dude";
 		sFriendlyName = "Change Car To Dodge Neon";
 		fTimerLength = 120;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
+		//IncompatibilityGroups.push_back(Attrib::StringHash32("customplayercar"));
 	}
 
 	NyaAudio::NyaSound sound = 0;

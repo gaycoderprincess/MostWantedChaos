@@ -1,6 +1,7 @@
 #define EFFECT_CATEGORY_TEMP "Opponents"
 
-class Effect_BlowEngineOpponents : public EffectBase_MultiOpponentAliveInRaceConditional {
+// same effect achieved by puncturing their tires
+/*class Effect_BlowEngineOpponents : public EffectBase_MultiOpponentAliveInRaceConditional {
 public:
 	Effect_BlowEngineOpponents() : EffectBase_MultiOpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Blow Opponents' Engines";
@@ -16,7 +17,7 @@ public:
 		}
 	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_BlowEngineOpponents;
+} E_BlowEngineOpponents;*/
 
 class Effect_BlowEngineOpponents1 : public EffectBase_OpponentAliveInRaceConditional {
 public:
@@ -35,7 +36,8 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_BlowEngineOpponents1;
 
-class Effect_LaunchCarFwdOpponents : public EffectBase_OpponentInRaceConditional {
+// todo this doesnt do anything...?
+/*class Effect_LaunchCarFwdOpponents : public EffectBase_OpponentInRaceConditional {
 public:
 	Effect_LaunchCarFwdOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Forward";
@@ -45,11 +47,11 @@ public:
 		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
-			racer->SetSpeed(TOMPS(800));
+			racer->SetSpeed(TOMPS(400));
 		}
 	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_LaunchCarFwdOpponents;
+} E_LaunchCarFwdOpponents;*/
 
 class Effect_LaunchCarBwdOpponents : public EffectBase_OpponentInRaceConditional {
 public:

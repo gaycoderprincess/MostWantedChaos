@@ -302,7 +302,7 @@ public:
 
 		tMarker selectedMarker = markers[rand()%markers.size()];
 
-		auto effectName = new char[64];
+		static char effectName[64];
 		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
 		EffectInstance->sNameToDisplay = std::format("{} ({})", sName, selectedMarker.name);
 		if (selectedMarker.type == FEMarkerManager::MARKER_CASH) {

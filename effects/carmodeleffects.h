@@ -3,7 +3,7 @@
 class Effect_OpponentsRazor : public EffectBase_NotInPursuitConditional {
 public:
 	Effect_OpponentsRazor() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "New Opponents Are BMWs";
+		sName = "New Opponents Are BMW M3s";
 		fTimerLength = 240;
 		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
 	}
@@ -99,7 +99,8 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsJunkman;
 
-class Effect_AllTrafficPizza : public ChaosEffect {
+// pretty lame, also reduces traffic density
+/*class Effect_AllTrafficPizza : public ChaosEffect {
 public:
 	Effect_AllTrafficPizza() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "All Traffic Is TRAFPIZZA";
@@ -119,7 +120,7 @@ public:
 		ForcedTrafficVehicle = 0;
 	}
 	bool HasTimer() override { return true; }
-} E_AllTrafficPizza;
+} E_AllTrafficPizza;*/
 
 /*class Effect_AllTrafficTruck : public ChaosEffect {
 public:

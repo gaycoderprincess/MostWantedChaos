@@ -12,6 +12,14 @@ public:
 		IncompatibilityGroups.push_back(Attrib::StringHash32("top_bar"));
 	}
 
+	static inline UMath::Vector3 aGasStations[] = {
+			{-1620, 150, 2011}, // rosewood
+			{-4495, 205, 809}, // rosewood tuning shop
+			{-386, 91, 1829}, // rockport
+			{-3413, 10, 3968}, // north gray point
+			{-2162, 107, 2738}, // middle of the map
+	};
+
 	void InitFunction() override {
 		tankAmount = 100;
 		abort = false;
@@ -24,6 +32,15 @@ public:
 		auto playerSpeed = GetLocalPlayerVehicle()->GetSpeed();
 		if (playerSpeed < 5) playerSpeed = 5;
 		tankAmount -= TankDrainRate * playerSpeed * Sim::Internal::mSystem->mSpeed * delta;
+
+		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
+		for (auto& pos : aGasStations) {
+			if ((pos - plyPos).length() < 10) {
+				tankAmount = 100;
+				Achievements::AwardAchievement(GetAchievement("REFUEL"));
+			}
+		}
+
 		if (tankAmount <= 0) {
 			if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
 				ply->Sabotage(3);
@@ -60,7 +77,7 @@ class Effect_LeakTankCash : public EffectBase_NotInPrologueConditional {
 public:
 	float TankTimer = 0;
 
-	static inline float TankDrainRate = 0.5;
+	static inline float TankDrainRate = 0.25;
 
 	Effect_LeakTankCash() : EffectBase_NotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Realistic Fuel Prices";

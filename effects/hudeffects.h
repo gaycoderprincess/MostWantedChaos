@@ -27,7 +27,12 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, &DetermineHudFeaturesHooked);
+		if (GetLocalPlayerVehicle()->IsStaging()) {
+			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, 0x57CA60);
+		}
+		else {
+			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, &DetermineHudFeaturesHooked);
+		}
 	}
 	void DeinitFunction() override {
 		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, 0x57CA60);

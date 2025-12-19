@@ -208,6 +208,9 @@ public:
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
 			Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, PeanutMove));
+
+			veh->SetLinearVelocity(&UMath::Vector3::kZero);
+			veh->SetAngularVelocity(&UMath::Vector3::kZero);
 		}
 	}
 	bool CanQuickTrigger() override { return false; }
