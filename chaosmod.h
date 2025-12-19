@@ -75,6 +75,12 @@ void MoneyChecker() {
 void ChaosLoop() {
 	DLLDirSetter _setdir;
 
+	static bool bOnce = true;
+	if (bOnce) {
+		DoChaosLoad();
+		bOnce = false;
+	}
+
 	MoneyChecker();
 
 	for (auto& func : aDrawingLoopFunctions) {

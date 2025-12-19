@@ -150,7 +150,7 @@ class Effect_FalseStarts : public ChaosEffect {
 public:
 	Effect_FalseStarts() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "False Starts";
-		fTimerLength = 30;
+		fTimerLength = 120;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -162,9 +162,9 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
 		if (!IsInNormalRace()) return false;
-		if (EffectInstance && !EffectInstance->bFirstFrame && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete > 5.0) {
-			return false;
-		}
+		//if (EffectInstance && !EffectInstance->bFirstFrame && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete > 5.0) {
+		//	return false;
+		//}
 		return true;
 	}
 	bool IsRehideable() override { return true; }

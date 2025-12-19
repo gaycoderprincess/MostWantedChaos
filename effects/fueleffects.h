@@ -35,7 +35,7 @@ public:
 
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 		for (auto& pos : aGasStations) {
-			if ((pos - plyPos).length() < 10) {
+			if ((pos - plyPos).length() < 15) {
 				tankAmount = 100;
 				Achievements::AwardAchievement(GetAchievement("REFUEL"));
 			}

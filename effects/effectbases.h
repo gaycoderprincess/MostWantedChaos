@@ -43,7 +43,7 @@ public:
 	bool IsAvailable() override {
 		auto cars = GetActiveVehicles(DRIVER_RACER);
 		for (auto& car : cars) {
-			if (!IsCarDestroyed(car)) {
+			if (!IsCarDestroyed(car, true)) {
 				return GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
 			}
 		}
@@ -61,7 +61,7 @@ public:
 		auto cars = GetActiveVehicles(DRIVER_RACER);
 		int count = 0;
 		for (auto& car : cars) {
-			if (!IsCarDestroyed(car)) {
+			if (!IsCarDestroyed(car, true)) {
 				count++;
 			}
 		}

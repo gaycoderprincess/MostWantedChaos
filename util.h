@@ -469,10 +469,20 @@ void TeleportPlayer(UMath::Vector3 pos, UMath::Vector3 fwd) {
 	GetLocalPlayerVehicle()->SetVehicleOnGround(&pos, &fwd);
 }
 
-bool IsCarDestroyed(IVehicle* car) {
-	auto engine = car->mCOMObject->Find<IEngineDamage>();
-	if (engine && engine->IsBlown()) return true;
-	if (engine && engine->IsSabotaged()) return true;
+bool IsCarDestroyed(IVehicle* car, bool tirePopsCount = false) {
+	if (auto engine = car->mCOMObject->Find<IEngineDamage>()) {
+		if (engine->IsBlown()) return true;
+		if (engine->IsSabotaged()) return true;
+	}
+	if (tirePopsCount) {
+		if (auto sus = car->mCOMObject->Find<ISpikeable>()) {
+			int count = 0;
+			for (int i = 0; i < 4; i++) {
+				if (sus->GetTireDamage(i) > TIRE_DAMAGE_NONE) count++;
+			}
+			if (count >= 2) return true;
+		}
+	}
 	return car->IsDestroyed();
 }
 

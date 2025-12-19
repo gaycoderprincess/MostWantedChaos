@@ -50,6 +50,7 @@ namespace FlatOutHUD {
 #include "chaosvars.h"
 #include "chaoseffect.h"
 #include "chaosmod.h"
+#include "chaossave.h"
 
 void OnWinRace() {
 	DLLDirSetter _setdir;
@@ -157,12 +158,6 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			srand(time(0));
 
-			auto configName = "NFSMWChaos_gcp.toml";
-			if (std::filesystem::exists(configName)) {
-				static auto config = toml::parse_file(configName);
-				bDarkMode = config["main"]["dark_mode"].value_or(false);
-			}
-
 			for (auto& func : ChloeHook::aHooks) {
 				func();
 			}
@@ -173,7 +168,6 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
 			aRunningEffects.reserve(64);
 			WriteLog(std::format("Initialized {} effects", ChaosEffect::aEffects.size()));
-			DoChaosLoad();
 
 			aMainLoopFunctions.push_back(ProcessChaosEffects<ChaosEffect::HOOK_GAMETICK>);
 			aDrawing3DLoopFunctions.push_back(ProcessChaosEffects<ChaosEffect::HOOK_3D>);

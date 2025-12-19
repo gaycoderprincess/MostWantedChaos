@@ -79,7 +79,7 @@ public:
 		sFriendlyName = "Spawn Teddie From Persona 4";
 	}
 
-	std::vector<Render3D::tModel*> models;
+	static inline std::vector<Render3D::tModel*> models;
 
 	static inline float rX = 90;
 	static inline float rY = 0;
@@ -90,11 +90,18 @@ public:
 	static inline float scale = 1.0;
 	static inline float colScale = 0.65;
 
-	void InitFunction() override {
+	static inline std::vector<int> aTeddiesInWorld;
+
+	static void SpawnTeddie(UMath::Matrix4 mat, NyaVec3 colPos) {
 		if (models.empty() || models[0]->bInvalidated) {
 			models = Render3D::CreateModels("teddie.fbx");
 		}
 
+		aTeddiesInWorld.push_back(Render3DObjects::aObjects.size());
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, colPos, colScale));
+	}
+
+	void InitFunction() override {
 		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
 			auto mat = UMath::Matrix4::kIdentity;
 			veh->GetMatrix4(&mat);
@@ -112,7 +119,7 @@ public:
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
-			Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, colPos, colScale));
+			SpawnTeddie(mat, colPos);
 		}
 	}
 } E_Teddie;
@@ -123,7 +130,7 @@ public:
 		sName = "Spawn SCP-173";
 	}
 
-	std::vector<Render3D::tModel*> models;
+	static inline std::vector<Render3D::tModel*> models;
 
 	static inline float rX = 90;
 	static inline float rY = 0;
@@ -137,6 +144,8 @@ public:
 	static inline float peanutSpeed = 30;
 	static inline float lastPeanutDistance = 0;
 	static inline float lastPeanutDot = 0;
+
+	static inline std::vector<int> aPeanutsInWorld;
 
 	static void PeanutMove(Render3DObjects::Object* obj, double delta) {
 		if (IsChaosBlocked()) return;
@@ -164,6 +173,7 @@ public:
 				auto distFromCar = (*car->GetPosition() - obj->vColPosition).length();
 				if (distFromCar < 5) {
 					static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap3.ogg");
+					static auto soundAlt = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap1.ogg");
 					if (car == GetLocalPlayerVehicle()) {
 						if (sound) {
 							NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
@@ -174,9 +184,9 @@ public:
 						aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 					}
 					else if (!IsCarDestroyed(car)) {
-						if (sound) {
-							NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
-							NyaAudio::Play(sound);
+						if (soundAlt) {
+							NyaAudio::SetVolume(soundAlt, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+							NyaAudio::Play(soundAlt);
 						}
 
 						car->mCOMObject->Find<IDamageable>()->Destroy();
@@ -184,6 +194,15 @@ public:
 				}
 			}
 		}
+	}
+
+	static void SpawnPeanut(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("scp173.fbx");
+		}
+
+		aPeanutsInWorld.push_back(Render3DObjects::aObjects.size());
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, PeanutMove));
 	}
 
 	void InitFunction() override {
@@ -207,7 +226,7 @@ public:
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
-			Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, PeanutMove));
+			SpawnPeanut(mat);
 
 			veh->SetLinearVelocity(&UMath::Vector3::kZero);
 			veh->SetAngularVelocity(&UMath::Vector3::kZero);
@@ -215,3 +234,18 @@ public:
 	}
 	bool CanQuickTrigger() override { return false; }
 } E_173;
+
+class Effect_173Somewhere : public ChaosEffect {
+public:
+	Effect_173Somewhere() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn SCP-173 Somewhere";
+	}
+
+	void InitFunction() override {
+		auto mat = UMath::Matrix4::kIdentity;
+		mat.p.x = GetRandomNumber(-5000, 5000);
+		mat.p.z = GetRandomNumber(-5000, 5000);
+		Effect_173::SpawnPeanut(mat);
+	}
+	bool CanMultiTrigger() override { return true; }
+} E_173Somewhere;
