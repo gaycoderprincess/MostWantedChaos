@@ -130,7 +130,7 @@ namespace TextHook {
 			origWord.pop_back();
 		}
 		if (std::all_of(origWord.begin(), origWord.end(), [](unsigned char c){ return std::isdigit(c); })) {
-			str = rand() % 100 > 50 ? pInterspersedTextUpper : pInterspersedText;
+			str = PercentageChanceCheck(50) ? pInterspersedTextUpper : pInterspersedText;
 		}
 		else if (std::all_of(origWord.begin(), origWord.end(), [](unsigned char c){ return std::isupper(c); })) {
 			str = pInterspersedTextUpper;
@@ -153,7 +153,7 @@ namespace TextHook {
 		std::string str;
 		for (auto& word : words) {
 			if (CanStringBeInterspersed(word)) {
-				if (rand() % 100 < 10) {
+				if (PercentageChanceCheck(10)) {
 					word = DoIntersperseWord(word);
 					numWordsChanged++;
 				}
@@ -173,7 +173,7 @@ namespace TextHook {
 		}
 
 		// don't always replace one-word strings
-		if (words.size() == 1 && rand() % 100 > 25) {
+		if (words.size() == 1 && PercentageChanceCheck(75)) {
 			str = origString;
 		}
 		else for (auto& word : words) {

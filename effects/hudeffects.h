@@ -58,7 +58,7 @@ public:
 
 		timer += delta;
 		if (timer > 1) {
-			if (rand() % 100 < 30) {
+			if (PercentageChanceCheck(30)) {
 				EPause::Create(0, 0, 0);
 			}
 			timer -= 1;

@@ -1285,10 +1285,10 @@ public:
 	void TickFunctionMain(double delta) override {
 		timer += delta;
 		if (timer > 1) {
-			if (rand() % 100 < 25) {
+			if (PercentageChanceCheck(25)) {
 				lastState.Apply(GetLocalPlayerVehicle());
 			}
-			else if (rand() % 100 < 50) {
+			else if (PercentageChanceCheck(50)) {
 				lastState.Capture(GetLocalPlayerVehicle());
 			}
 			timer -= 1;
@@ -1522,7 +1522,7 @@ public:
 
 		timer += delta;
 		if (timer > 3) {
-			gas = (rand() % 100) < 25 ? 0 : 1;
+			gas = PercentageChanceCheck(25) ? 0 : 1;
 			brake = 1 - gas;
 			steer = (((rand() % 100) / 100.0) - 0.5) * 2;
 			timer -= 3;

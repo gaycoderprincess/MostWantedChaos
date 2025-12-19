@@ -22,6 +22,7 @@ public:
 	bool IsAvailable() override { return ChaosVoting::bEnabled; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
+	void OnTimerRefill() override { InitFunction(); }
 } E_VotingRigged;
 
 class Effect_VotingAll : public ChaosEffect {
@@ -57,4 +58,23 @@ public:
 	bool IsAvailable() override { return ChaosVoting::bEnabled; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
+	void OnTimerRefill() override { InitFunction(); }
 } E_VotingStreamer;
+
+class Effect_VotingSmart : public ChaosEffect {
+public:
+	Effect_VotingSmart() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Insanely Unfair RNG";
+	}
+
+	void InitFunction() override {
+		nSmartRNG = 5;
+	}
+	void TickFunctionMain(double delta) override {
+		EffectInstance->fTimer = fTimerLength * nSmartRNG;
+	}
+	bool ShouldAbort() override { return !nSmartRNG; }
+	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+	void OnTimerRefill() override { InitFunction(); }
+} E_VotingSmart;

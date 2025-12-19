@@ -343,7 +343,7 @@ public:
 	}
 	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
-			if (rand() % 100 < 10) {
+			if (PercentageChanceCheck(10)) {
 				FEDatabase->mUserProfile->TheCareerSettings.CurrentBin--;
 				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng"); });
 				EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);

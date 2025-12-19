@@ -59,6 +59,7 @@ public:
 	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
 	virtual bool CanMultiTrigger() { return false; } // multiple instances at once
 	virtual void OnAnyEffectTriggered() {}
+	virtual void OnTimerRefill() {}
 };
 
 bool bDarkMode = false;
@@ -388,12 +389,17 @@ bool CanEffectActivate(ChaosEffect* effect) {
 	return true;
 }
 
+bool CanEffectBeRandomlyPicked(ChaosEffect* effect) {
+	if (effect->bTriggeredThisCycle) return false;
+	//if (effect->fLastTriggerTime) // todo
+	if (!CanEffectActivate(effect)) return false;
+	return true;
+}
+
 ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
-		if (effect->bTriggeredThisCycle) continue;
-		//if (effect->fLastTriggerTime) // todo
-		if (!CanEffectActivate(effect)) continue;
+		if (!CanEffectBeRandomlyPicked(effect)) continue;
 		if (quickTrigger && !effect->CanQuickTrigger()) continue;
 
 		for (int i = 0; i < effect->nFrequency; i++) {

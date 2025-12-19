@@ -650,6 +650,10 @@ const char* GetReplacedAICarName(const std::string& aiCar, bool includeOriginalC
 	return nullptr;
 }
 
+bool PercentageChanceCheck(int percent) {
+	return rand() % 100 < percent;
+}
+
 wchar_t gDLLDir[MAX_PATH];
 class DLLDirSetter {
 public:

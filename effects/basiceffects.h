@@ -110,8 +110,8 @@ public:
 	}
 
 	void InitFunction() override {
-		if (rand() % 100 > 50) {
-			Sleep(rand() % 10 > 5 ? 3000 : 4000);
+		if (PercentageChanceCheck(50)) {
+			Sleep(PercentageChanceCheck(50) ? 3000 : 4000);
 		}
 		else {
 			MessageBoxA(nullptr, "Debug Error!\n\nProgram: speed.exe\n\nR6025\n- pure virtual function call\n\n(Press Retry to debug the application)", "Microsoft Visual C++ Debug Library", MB_ICONERROR | MB_ABORTRETRYIGNORE);
@@ -131,7 +131,7 @@ public:
 		static double timer = 0;
 		timer += delta;
 		while (timer > 0.03) {
-			if (rand() % 100 < 5) {
+			if (PercentageChanceCheck(5)) {
 				Sleep(100);
 			}
 			timer -= 0.03;
@@ -154,7 +154,7 @@ public:
 	}
 	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
-			if ((rand() % 100) < 10) {
+			if (PercentageChanceCheck(10)) {
 				__debugbreak();
 			}
 			else {
@@ -311,7 +311,7 @@ public:
 	void TickFunctionMain(double delta) override {
 		timer += delta;
 		if (timer > 1) {
-			if (rand() % 100 < 10) {
+			if (PercentageChanceCheck(10)) {
 				int r = rand() % 9;
 				if (sound[r]) {
 					NyaAudio::SetVolume(sound[r], FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
@@ -374,6 +374,7 @@ public:
 		for (auto& effect : aRunningEffects) {
 			if (!effect.IsActive()) continue;
 			effect.fTimer = effect.pEffect->fTimerLength;
+			effect.pEffect->OnTimerRefill();
 		}
 	}
 	bool IsAvailable() override {

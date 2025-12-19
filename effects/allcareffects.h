@@ -256,10 +256,10 @@ public:
 		if (timer > 1) {
 			int applyChance = 40;
 			int captureChance = 60;
-			if (rand() % 100 < applyChance) {
+			if (PercentageChanceCheck(applyChance)) {
 				ApplyAllCars();
 			}
-			else if (rand() % 100 < captureChance) {
+			else if (PercentageChanceCheck(captureChance)) {
 				CaptureAllCars();
 			}
 			timer -= 1;
@@ -328,10 +328,10 @@ public:
 				}
 			}
 
-			if (rand() % 100 < applyChance) {
+			if (PercentageChanceCheck(applyChance)) {
 				ApplyAllCars();
 			}
-			else if (rand() % 100 < captureChance) {
+			else if (PercentageChanceCheck(captureChance)) {
 				CaptureAllCars();
 			}
 			timer -= 1;

@@ -188,7 +188,7 @@ public:
 	}
 
 	void InitFunction() override {
-		pass = (rand() % 100) < 25;
+		pass = PercentageChanceCheck(25);
 		if (pass) {
 			EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
 
@@ -267,7 +267,7 @@ public:
 			if (heat < 4) return "copgto";
 			if (heat < 5) return "copgtoghost";
 			if (heat < 6) return "copsporthench";
-			if (heat < 7) return rand() % 100 > 50 ? "copcross" : "copsportghost";
+			if (heat < 7) return PercentageChanceCheck(50) ? "copcross" : "copsportghost";
 			if (heat < 8) return "copsuvpatrol";
 			if (heat < 9) return "copsportghost";
 			if (heat < 10) return "copmidsize";
