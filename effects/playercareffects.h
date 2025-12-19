@@ -1484,3 +1484,60 @@ public:
 	}
 	bool CanQuickTrigger() override { return false; }
 } E_MinSpeed;
+
+class Effect_PlayerRandomInput : public ChaosEffect {
+public:
+	Effect_PlayerRandomInput() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "ChatGPT Take The Wheel";
+		sFriendlyName = "Randomize Player Input";
+		fTimerLength = 20;
+	}
+
+	float gas = 0;
+	float brake = 0;
+	float steer = 0;
+	double timer = 3;
+	double runTime = 0;
+
+	void InitFunction() override {
+		timer = 3;
+		runTime = 0;
+	}
+	void TickFunctionMain(double delta) override {
+		runTime += delta;
+
+		tNyaStringData data;
+		data.x = 0.5;
+		data.y = 0.85;
+		data.size = 0.04;
+		data.XCenterAlign = true;
+		data.outlinea = 255;
+		data.outlinedist = 0.025;
+		DrawString(data, std::format("Electricity Cost: ${}", (int)(runTime * 1000)));
+		data.y += data.size;
+		DrawString(data, std::format("Water Used: {:.1f}L", runTime * 500));
+	}
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
+		timer += delta;
+		if (timer > 3) {
+			gas = (rand() % 100) < 25 ? 0 : 1;
+			brake = 1 - gas;
+			steer = (((rand() % 100) / 100.0) - 0.5) * 2;
+			timer -= 3;
+		}
+
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			auto controls = ply->GetControls();
+			controls->fSteering = steer;
+			controls->fGas = gas;
+			controls->fBrake = brake;
+			controls->fHandBrake = 0;
+			controls->fActionButton = false;
+			controls->fNOS = false;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_PlayerRandomInput;
