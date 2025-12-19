@@ -362,3 +362,22 @@ public:
 	}
 	bool CanQuickTrigger() override { return false; }
 } E_10Effects;
+
+class Effect_RefillActiveTimers : public ChaosEffect {
+public:
+	Effect_RefillActiveTimers() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Refill Effect Timers";
+	}
+
+	void InitFunction() override {
+		for (auto& effect : aRunningEffects) {
+			if (!effect.IsActive()) continue;
+			effect.fTimer = effect.pEffect->fTimerLength;
+		}
+	}
+	bool IsAvailable() override {
+		return GetNumEffectsRunning(this) > 0;
+	}
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_RefillActiveTimers;

@@ -301,6 +301,9 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Toggle Voting Test")) {
 				ChaosVoting::bEnabled = !ChaosVoting::bEnabled;
 			}
+			if (DrawMenuOption("Trigger Busted")) {
+				NISListenerActivity::MessageBusted(nullptr, 0);
+			}
 			//QuickValueEditor("SceneryScale.x", SceneryScale.x);
 			//QuickValueEditor("SceneryScale.y", SceneryScale.y);
 			//QuickValueEditor("SceneryScale.z", SceneryScale.z);

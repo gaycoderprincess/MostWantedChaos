@@ -40,6 +40,7 @@ public:
 	Effect_PauseMenu() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Constant Pausing";
 		fTimerLength = 30;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("pausing"));
 	}
 
 	double timer = 0;
@@ -47,17 +48,36 @@ public:
 	void InitFunction() override {
 		aMainLoopFunctionsOnce.push_back([]() { EPause::Create(0, 0, 0); });
 	}
-	void TickFunctionMain(double delta) override {
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_GAMETICK) return;
+
 		timer += delta;
 		if (timer > 1) {
 			if (rand() % 100 < 30) {
-				aMainLoopFunctionsOnce.push_back([]() { EPause::Create(0, 0, 0); });
+				EPause::Create(0, 0, 0);
 			}
 			timer -= 1;
 		}
 	}
 	bool HasTimer() override { return true; }
 } E_PauseMenu;
+
+class Effect_NoPauseMenu : public ChaosEffect {
+public:
+	Effect_NoPauseMenu() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Disable Pausing";
+		fTimerLength = 90;
+		IncompatibilityGroups.push_back(Attrib::StringHash32("pausing"));
+	}
+
+	void InitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63A5D3, 0x62F358);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63A5D3, 0x62F220);
+	}
+	bool HasTimer() override { return true; }
+} E_NoPauseMenu;
 
 class Effect_FO1HUD : public ChaosEffect {
 public:

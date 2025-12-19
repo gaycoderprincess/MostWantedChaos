@@ -187,7 +187,7 @@ FECustomizationRecord CreateRandomCustomizations(uint32_t carModel) {
 	RideInfo info;
 	RideInfo::Init(&info, FECarRecord::GetType(&tmp), CarRenderUsage_Player, false, false);
 	RideInfo::SetRandomParts(&info);
-	RideInfo::SetRandomPaint(&info);
+	//RideInfo::SetRandomPaint(&info);
 	FECustomizationRecord::WriteRideIntoRecord(&record, &info);
 	return record;
 }

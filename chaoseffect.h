@@ -350,6 +350,16 @@ ChaosEffectInstance* GetEffectRunning(ChaosEffect* effect) {
 	return nullptr;
 }
 
+int GetNumEffectsRunning(ChaosEffect* except = nullptr) {
+	int count = 0;
+	for (auto& running : aRunningEffects) {
+		if (!running.IsActive()) continue;
+		if (running.pEffect == except) continue;
+		count++;
+	}
+	return count;
+}
+
 bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup, bool includeActivate) {
 	if (!IncompatibilityGroup) return false;
 	for (auto& running : aRunningEffects) {
