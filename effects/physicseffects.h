@@ -16,6 +16,22 @@ public:
 	bool HasTimer() override { return true; }
 } E_NoTirePhysics;
 
+class Effect_NoTirePhysics2 : public ChaosEffect {
+public:
+	Effect_NoTirePhysics2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Remove All Tires";
+		fTimerLength = 10;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch(0x8ABB60, 0x6B20E1);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8ABB60, 0x6B1DD0);
+	}
+	bool HasTimer() override { return true; }
+} E_NoTirePhysics2;
+
 class Effect_NoWallCollision : public ChaosEffect {
 public:
 	Effect_NoWallCollision() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

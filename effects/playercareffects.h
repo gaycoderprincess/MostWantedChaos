@@ -1578,3 +1578,32 @@ public:
 	bool HasTimer() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_PlayerRandomInput;
+
+class Effect_PlayerForceSpeedbrk : public ChaosEffect {
+public:
+	Effect_PlayerForceSpeedbrk() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Forced Speedbreaker";
+		fTimerLength = 30;
+		fUnhideTime = 0;
+		AddToIncompatiblityGroup("speedbreaker");
+	}
+
+	void TickFunctionMain(double delta) override {
+		auto ply = GetLocalPlayer();
+		ply->ChargeGameBreaker(1);
+
+		if (!ply->InGameBreaker()) {
+			ply->ToggleGameBreaker();
+		}
+	}
+	void DeinitFunction() override {
+		auto ply = GetLocalPlayer();
+		if (ply->InGameBreaker()) {
+			ply->ToggleGameBreaker();
+		}
+	}
+	bool IsAvailable() override { return GetLocalPlayerVehicle()->GetSpeed() > TOMPS(50); }
+	bool IsRehideable() override { return true; }
+	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_PlayerForceSpeedbrk;
