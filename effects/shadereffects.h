@@ -9,7 +9,7 @@ public:
 	bool bInvertTimerAtEnd = true;
 
 	EffectBase_ScreenShader(const char* category) : ChaosEffect(category) {
-		//IncompatibilityGroups.push_back(Attrib::StringHash32("screenshader"));
+		//AddToIncompatiblityGroup("screenshader");
 	};
 	
 	void InitFunction() override {
@@ -76,7 +76,6 @@ public:
 		sFriendlyName = "Disco Screen Overlay";
 		fTimerLength = 60;
 		sFileName = "default";
-		IncompatibilityGroups.clear();
 	}
 
 	void TickFunctionMain(double delta) override {

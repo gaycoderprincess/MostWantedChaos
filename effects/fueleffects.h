@@ -9,7 +9,7 @@ public:
 
 	Effect_LeakTank() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Leaking Fuel Tank";
-		IncompatibilityGroups.push_back(Attrib::StringHash32("top_bar"));
+		AddToIncompatiblityGroup("top_bar");
 	}
 
 	static inline UMath::Vector3 aGasStations[] = {

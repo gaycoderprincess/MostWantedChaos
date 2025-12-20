@@ -160,6 +160,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 		if (CanEffectBeRandomlyPicked(&E_CruiseControl)) { effects.push_back(&E_CruiseControl); }
 		if (CanEffectBeRandomlyPicked(&E_AddLap)) { effects.push_back(&E_AddLap); }
 		if (CanEffectBeRandomlyPicked(&E_PlayerCarTuneAero)) { effects.push_back(&E_PlayerCarTuneAero); }
+		if (CanEffectBeRandomlyPicked(&E_PlayerRandomInput)) { effects.push_back(&E_PlayerRandomInput); }
 
 		// the mustang and clio will be a lot slower than any other car by this point
 		if (IsInCareerMode() && completion < 50 && FEDatabase->mUserProfile->TheCareerSettings.CurrentBin < 5) {
@@ -215,6 +216,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 			if (CanEffectBeRandomlyPicked(&E_CarBouncy)) { effects.push_back(&E_CarBouncy); }
 			if (CanEffectBeRandomlyPicked(&E_PlayerCarTuneAero)) { effects.push_back(&E_PlayerCarTuneAero); }
 			if (CanEffectBeRandomlyPicked(&E_Fragile)) { effects.push_back(&E_Fragile); }
+			if (CanEffectBeRandomlyPicked(&E_PlayerRandomInput)) { effects.push_back(&E_PlayerRandomInput); }
 
 			if (!effects.empty()) {
 				return effects[rand() % effects.size()];

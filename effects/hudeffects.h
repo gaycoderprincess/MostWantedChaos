@@ -19,7 +19,7 @@ public:
 		sName = "Disable HUD";
 		sFriendlyName = "Disable Game HUD";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("hud_replace"));
+		AddToIncompatiblityGroup("hud_replace");
 	}
 
 	static uint32_t __thiscall DetermineHudFeaturesHooked(IHud* pThis, IPlayer* a2) {
@@ -45,7 +45,7 @@ public:
 	Effect_PauseMenu() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Constant Pausing";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("pausing"));
+		AddToIncompatiblityGroup("pausing");
 	}
 
 	double timer = 0;
@@ -72,7 +72,7 @@ public:
 	Effect_NoPauseMenu() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Pausing";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("pausing"));
+		AddToIncompatiblityGroup("pausing");
 	}
 
 	void InitFunction() override {
@@ -89,7 +89,7 @@ public:
 	Effect_FO1HUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "FlatOut Style HUD";
 		fTimerLength = 120;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("hud_replace"));
+		AddToIncompatiblityGroup("hud_replace");
 	}
 
 	static uint32_t __thiscall DetermineHudFeaturesHooked(IHud* pThis, IPlayer* a2) {

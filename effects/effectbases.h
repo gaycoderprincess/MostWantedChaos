@@ -162,6 +162,7 @@ class EffectBase_TriggerInMenu : public ChaosEffect {
 public:
 	EffectBase_TriggerInMenu(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Trigger In Menu";
+		fUnhideTime = 0;
 	}
 
 	// runs in menus to trigger the 3 second available cooldown, this way it'll only be visible once you spawn into the world again

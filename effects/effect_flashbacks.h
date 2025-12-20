@@ -16,7 +16,7 @@ public:
 	Effect_Flashbacks() : ChaosEffect("Uncategorized") {
 		sName = "Forza Rewind";
 		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
+		AddToIncompatiblityGroup("car_lag");
 	}
 
 	void CaptureAllCars() {

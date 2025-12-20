@@ -11,9 +11,9 @@ bool OpponentPlayerCarRandom = false;
 uint32_t PlayerCarModel;
 FECustomizationRecord PlayerCarCustomizations;
 uint32_t LastOpponentVehicleSpawn = 0;
-bool LastOpponentPlayerCar = 0;
-bool LastOpponentPlayerCarRandom = 0;
-bool LastOpponentFullyTuned = 0;
+bool LastOpponentPlayerCar = false;
+bool LastOpponentPlayerCarRandom = false;
+bool LastOpponentFullyTuned = false;
 
 ISimable* VehicleConstructHooked(Sim::Param params) {
 	uint32_t modelBackupHash = 0;

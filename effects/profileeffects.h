@@ -87,7 +87,7 @@ public:
 	Effect_ManualTrans() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Manual Transmission";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
+		AddToIncompatiblityGroup("transmission");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -108,7 +108,7 @@ public:
 	Effect_AutoTrans() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Automatic Transmission";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
+		AddToIncompatiblityGroup("transmission");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -128,7 +128,6 @@ class Effect_PlayerCarRandomTuning : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarRandomTuning() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Randomize Active Car's Visuals";
-		fUnhideTime = 0;
 	}
 
 	void InitFunction() override {

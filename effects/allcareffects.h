@@ -225,7 +225,7 @@ public:
 		sName = "Hosted by Cloudflare";
 		sFriendlyName = "Lag For All Cars";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
+		AddToIncompatiblityGroup("car_lag");
 	}
 
 	void CaptureAllCars() {
@@ -286,7 +286,7 @@ public:
 	Effect_FreezeEveryoneNoPlayer() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Lag For All Other Cars";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
+		AddToIncompatiblityGroup("car_lag");
 	}
 
 	void CaptureAllCars() {
@@ -353,7 +353,7 @@ public:
 		sName = "Snake";
 		sFriendlyName = "Cars Follow Player";
 		fTimerLength = 45;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("car_lag"));
+		AddToIncompatiblityGroup("car_lag");
 	}
 
 	void ApplyAllCars() {
@@ -456,7 +456,7 @@ public:
 	Effect_WideCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Wide Cars";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
+		AddToIncompatiblityGroup("car_scale");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -485,7 +485,7 @@ public:
 		sName = "Why's This Dealer?";
 		sFriendlyName = "Groovy Cars";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
+		AddToIncompatiblityGroup("car_scale");
 	}
 
 	NyaAudio::NyaSound sound = 0;
@@ -592,7 +592,7 @@ public:
 	Effect_BillboardCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cars Stare At You";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("carstare"));
+		AddToIncompatiblityGroup("carstare");
 	}
 
 	void InitFunction() override {
@@ -614,7 +614,7 @@ public:
 		sName = "Staredown";
 		sFriendlyName = "Cars Stare At Each Other";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("carstare"));
+		AddToIncompatiblityGroup("carstare");
 	}
 
 	void InitFunction() override {
@@ -634,7 +634,7 @@ public:
 	Effect_InvisCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Invisible Cars";
 		fTimerLength = 60;
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("car_scale"));
+		MakeIncompatibleWithFilterGroup("car_scale");
 	}
 
 	void InitFunction() override {
@@ -654,7 +654,7 @@ public:
 	Effect_Fragile() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Fragile Cars";
 		fTimerLength = 60;
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("player_godmode"));
+		MakeIncompatibleWithFilterGroup("player_godmode");
 	}
 
 	void TickFunctionMain(double delta) override {

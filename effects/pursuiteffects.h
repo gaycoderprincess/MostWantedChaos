@@ -243,7 +243,7 @@ public:
 		sName = "EVERYONE!!!";
 		sFriendlyName = "Ruthless Cop Spawns";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
+		AddToIncompatiblityGroup("coprequest");
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -282,7 +282,7 @@ public:
 		sName = "It's Cross";
 		sFriendlyName = "Ruthless Cross Spawns";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
+		AddToIncompatiblityGroup("coprequest");
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -307,7 +307,7 @@ public:
 	Effect_NoCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Cop Spawning";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("coprequest"));
+		AddToIncompatiblityGroup("coprequest");
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -344,7 +344,7 @@ public:
 	Effect_InvincibleTires() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Invincible Player Tires";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("player_godmode"));
+		AddToFilterGroup("player_godmode");
 	}
 
 	void TickFunctionMain(double delta) override {

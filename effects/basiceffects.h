@@ -50,7 +50,7 @@ public:
 	Effect_PortraitMode() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Portrait Mode";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
+		AddToIncompatiblityGroup("letterbox_aspect");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -67,7 +67,7 @@ public:
 	Effect_43Borders() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "4:3 Letterboxed";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("letterbox_aspect"));
+		AddToIncompatiblityGroup("letterbox_aspect");
 	}
 
 	void TickFunctionMain(double delta) override {

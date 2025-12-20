@@ -124,7 +124,7 @@ class Effect_InfGameBreaker : public ChaosEffect {
 public:
 	Effect_InfGameBreaker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Speedbreaker";
-		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
+		AddToIncompatiblityGroup("speedbreaker");
 		fTimerLength = 60;
 	}
 
@@ -140,7 +140,7 @@ class Effect_InfNitro : public EffectBase_PlayerCarHasNitro {
 public:
 	Effect_InfNitro() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Player Nitro";
-		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro"));
+		AddToIncompatiblityGroup("nitro");
 		fTimerLength = 60;
 	}
 
@@ -158,7 +158,7 @@ public:
 	Effect_NoGameBreaker() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Speedbreaker";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
+		AddToIncompatiblityGroup("speedbreaker");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -174,7 +174,7 @@ public:
 	Effect_NoNitro() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Player Nitro";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro"));
+		AddToIncompatiblityGroup("nitro");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -281,7 +281,7 @@ class Effect_AutoDrive : public ChaosEffect {
 public:
 	Effect_AutoDrive() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Auto-Drive";
-		IncompatibilityGroups.push_back(Attrib::StringHash32("autodrive"));
+		AddToIncompatiblityGroup("autodrive");
 		fTimerLength = 30;
 	}
 
@@ -305,7 +305,7 @@ public:
 	Effect_AutoDrive2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Auto-Drive (Traffic)";
 		fTimerLength = 15;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("autodrive"));
+		AddToIncompatiblityGroup("autodrive");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -368,7 +368,7 @@ public:
 	Effect_PlayerCarTuneAero() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Aerodynamics +100";
 		fTimerLength = 15;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("aerodynamics"));
+		AddToIncompatiblityGroup("aerodynamics");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -394,7 +394,7 @@ public:
 	Effect_PlayerCarTuneHandling() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Handling +10";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
+		AddToIncompatiblityGroup("handling_tune");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -420,7 +420,7 @@ public:
 	Effect_PlayerCarTuneHandling2() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Handling -10";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("handling_tune"));
+		AddToIncompatiblityGroup("handling_tune");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -498,7 +498,7 @@ public:
 	Effect_PlayerCarTuneHeight3() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Monster Truck Suspension";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
+		AddToIncompatiblityGroup("suspension");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -527,7 +527,7 @@ public:
 	Effect_PlayerCarTuneHeight4() : EffectBase_HasTuningConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Bouncy Suspension";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("suspension"));
+		AddToIncompatiblityGroup("suspension");
 	}
 
 	void InitFunction() override {
@@ -560,7 +560,7 @@ public:
 	Effect_PlayerCarTuneNitro() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Weak Nitro";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
+		AddToIncompatiblityGroup("nitro_tune");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -586,7 +586,7 @@ public:
 	Effect_PlayerCarTuneNitro2() : EffectBase_PlayerCarHasNitro(EFFECT_CATEGORY_TEMP) {
 		sName = "Strong Nitro";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("nitro_tune"));
+		AddToIncompatiblityGroup("nitro_tune");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -826,7 +826,7 @@ public:
 	Effect_PlayerCarGear1() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Player To Gear 1";
 		fTimerLength = 15;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
+		AddToIncompatiblityGroup("transmission");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -847,7 +847,7 @@ public:
 		sName = "Top Gear";
 		sFriendlyName = "Force Player To Top Gear";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
+		AddToIncompatiblityGroup("transmission");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -867,7 +867,7 @@ public:
 	Effect_PlayerCarGearR() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Force Player To Reverse Gear";
 		fTimerLength = 15;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("transmission"));
+		AddToIncompatiblityGroup("transmission");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -887,6 +887,7 @@ public:
 	Effect_SetCarTRAFPIZZA() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "It's Pizza Time";
 		sFriendlyName = "Change Car To TRAFPIZZA";
+		AddToFilterGroup("change_player_car");
 	}
 
 	void InitFunction() override {
@@ -901,6 +902,7 @@ class Effect_SetCarRazor : public ChaosEffect {
 public:
 	Effect_SetCarRazor() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Razor's Mustang";
+		AddToFilterGroup("change_player_car");
 	}
 
 	void InitFunction() override {
@@ -916,6 +918,7 @@ class Effect_SetCarRandom : public ChaosEffect {
 public:
 	Effect_SetCarRandom() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Random Model";
+		AddToFilterGroup("change_player_car");
 	}
 
 	void InitFunction() override {
@@ -939,6 +942,7 @@ class Effect_SetCarRandomAI : public ChaosEffect {
 public:
 	Effect_SetCarRandomAI() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To AI Traffic/Police Car";
+		AddToFilterGroup("change_player_car");
 	}
 
 	void InitFunction() override {
@@ -997,6 +1001,7 @@ public:
 	Effect_SetCarRandomOpponent() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Grand Theft Auto";
 		sFriendlyName = "Steal Car From Random Opponent";
+		AddToFilterGroup("change_player_car");
 	}
 
 	void InitFunction() override {
@@ -1019,7 +1024,7 @@ public:
 	Effect_SetCarMassInf() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Player Mass";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("playermass"));
+		AddToIncompatiblityGroup("playermass");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -1040,7 +1045,7 @@ public:
 	Effect_SetCarMass0() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Zero Player Mass";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("playermass"));
+		AddToIncompatiblityGroup("playermass");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -1405,8 +1410,8 @@ public:
 	Effect_MinSpeed() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Need For Speed";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("top_bar"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("player_godmode"));
+		AddToIncompatiblityGroup("top_bar");
+		MakeIncompatibleWithFilterGroup("player_godmode");
 	}
 
 	static inline float fMinSpeedSlow = TOMPS(100);

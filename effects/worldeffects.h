@@ -35,7 +35,7 @@ public:
 	Effect_WireframeWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Wireframe Mode";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
+		AddToIncompatiblityGroup("fillmode");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -52,8 +52,8 @@ public:
 	Effect_WireframeWorld2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Wireframe World";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
-		//IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures")); // if rainbow road replaces this, it gives a unique effect
+		AddToIncompatiblityGroup("fillmode");
+		//AddToIncompatiblityGroup("world_textures"); // if rainbow road replaces this, it gives a unique effect
 	}
 
 	void InitFunction() override {
@@ -90,7 +90,7 @@ public:
 	Effect_LaserScanWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Laser-Scanned World";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("fillmode"));
+		AddToIncompatiblityGroup("fillmode");
 	}
 
 	//static inline float PointSize = 4;
@@ -119,7 +119,7 @@ public:
 	Effect_SlipperyWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Slippery World";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("simsurface_friction"));
+		AddToIncompatiblityGroup("simsurface_friction");
 	}
 
 	void InitFunction() override {
@@ -168,7 +168,7 @@ public:
 	Effect_GrippyWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Grippy World";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("simsurface_friction"));
+		AddToIncompatiblityGroup("simsurface_friction");
 	}
 
 	void InitFunction() override {
@@ -242,7 +242,7 @@ public:
 	Effect_BreakTextures() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Acid Trip";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
+		AddToIncompatiblityGroup("world_textures");
 	}
 
 	void InitFunction() override {
@@ -260,7 +260,7 @@ public:
 		sName = "Rainbow Road";
 		sFriendlyName = "Rainbow World";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
+		AddToIncompatiblityGroup("world_textures");
 	}
 
 	void TickFunction(eChaosHook hook, double delta) override {
@@ -285,7 +285,7 @@ public:
 	Effect_Snow() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Snowy World";
 		fTimerLength = 120;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
+		AddToIncompatiblityGroup("world_textures");
 	}
 
 	static inline const char* aBannedModelNames[] = {
@@ -341,7 +341,7 @@ public:
 	Effect_MissingWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Uninstall Counter-Strike: Source";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("world_textures"));
+		AddToIncompatiblityGroup("world_textures");
 	}
 
 	void TickFunction(eChaosHook hook, double delta) override {

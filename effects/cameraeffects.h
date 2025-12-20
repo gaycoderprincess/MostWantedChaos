@@ -1,53 +1,10 @@
 #define EFFECT_CATEGORY_TEMP "Camera"
 
-/*class Effect_LiftCamera : public ChaosEffect {
-public:
-	Effect_LiftCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Lift Camera Up";
-		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
-	}
-
-	static inline float LiftOffset = 3;
-
-	void TickFunction(eChaosHook hook, double delta) override {
-		if (hook != HOOK_CAMERA) return;
-		
-		auto camMatrix = PrepareCameraMatrix();
-		camMatrix.p.z += LiftOffset;
-		ApplyCameraMatrix(camMatrix);
-	}
-	bool HasTimer() override { return true; }
-	bool RunInMenus() override { return true; }
-} E_LiftCamera;
-
-class Effect_LowerCamera : public ChaosEffect {
-public:
-	Effect_LowerCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Low Camera Height";
-		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
-	}
-
-	static inline float LiftOffset = -0.4;
-
-	void TickFunction(eChaosHook hook, double delta) override {
-		if (hook != HOOK_CAMERA) return;
-		
-		auto camMatrix = PrepareCameraMatrix();
-		camMatrix.p.z += LiftOffset;
-		ApplyCameraMatrix(camMatrix);
-	}
-	bool HasTimer() override { return true; }
-	bool RunInMenus() override { return true; }
-} E_LowerCamera;
-
-class Effect_RoofCamera : public ChaosEffect {
+/*class Effect_RoofCamera : public ChaosEffect {
 public:
 	Effect_RoofCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "00Roof Camera";
 		fTimerLength = 60;
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
 	}
 
 	static inline float RoofOffset = 0.5;
@@ -71,8 +28,7 @@ public:
 	Effect_GTCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Gran Turismo Camera";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	static inline float XOffset = 0;
@@ -99,8 +55,7 @@ public:
 	Effect_FreezeCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Freeze Camera";
 		fTimerLength = 10;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	void InitFunction() override {
@@ -117,8 +72,7 @@ public:
 	Effect_SecondPersonCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Second Person View";
 		fTimerLength = 45;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	void TickFunction(eChaosHook hook, double delta) override {
@@ -143,8 +97,7 @@ public:
 	Effect_SecondPersonHeliCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Helicopter Camera";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	IVehicle* GetHelicopter() {
@@ -178,8 +131,7 @@ public:
 	Effect_CinematicCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Wheel Camera";
 		fTimerLength = 60;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	static inline float rx = -0.15;
@@ -211,8 +163,7 @@ public:
 	Effect_ReplayCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Cinematic Camera";
 		fTimerLength = 45;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	void InitFunction() override {
@@ -233,8 +184,7 @@ public:
 	Effect_TopDownCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Top-Down Camera";
 		fTimerLength = 90;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	static inline float yOffset = 10;
@@ -296,8 +246,7 @@ public:
 	Effect_TopDownCamera2() : Effect_TopDownCamera() {
 		sName = "Bottom-Up Camera";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	void TickFunction(eChaosHook hook, double delta) override {
@@ -312,8 +261,7 @@ public:
 	Effect_ReverseCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Forced Rear View";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	static inline float rx = 0;
@@ -347,8 +295,7 @@ class Effect_ChallengeCam : public ChaosEffect {
 public:
 	Effect_ChallengeCam() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Challenge Series Camera";
-		IncompatibilityGroups.push_back(Attrib::StringHash32("camera_replace"));
-		ActivateIncompatibilityGroups.push_back(Attrib::StringHash32("camera_height"));
+		AddToIncompatiblityGroup("camera_replace");
 	}
 
 	void InitFunction() override {

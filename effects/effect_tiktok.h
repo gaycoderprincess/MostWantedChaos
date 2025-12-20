@@ -4,8 +4,8 @@ public:
 		sName = "Tik Tok Mode";
 		fTimerLength = 30;
 		sFileName = "portrait";
-		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
-		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
+		AddToIncompatiblityGroup("gamespeed");
+		AddToIncompatiblityGroup("speedbreaker");
 	}
 
 	NyaAudio::NyaSound sound = 0;

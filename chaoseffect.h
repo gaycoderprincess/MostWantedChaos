@@ -5,8 +5,8 @@ public:
 	const char* sFriendlyName = nullptr;
 	double fTimerLength = 15;
 	double fUnhideTime = 3;
-	std::vector<uint32_t> IncompatibilityGroups;
-	std::vector<uint32_t> ActivateIncompatibilityGroups; // checks IncompatibilityGroups but doesn't deactivate for effects that only share ActivateIncompatibilityGroups
+	std::vector<uint32_t> FilterGroups;
+	std::vector<uint32_t> IncompatibleFilterGroups; // effects that contain these in FilterGroups are incompatible with this
 	const char* sListCategory = nullptr;
 	const char* sAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
 	int nFrequency = 10; // 10 is standard, make this higher or lower to make an effect more or less likely to appear
@@ -29,6 +29,13 @@ public:
 	const char* GetFriendlyName() const {
 		if (sFriendlyName) return sFriendlyName;
 		return sName;
+	}
+
+	void AddToFilterGroup(const std::string& group) { FilterGroups.push_back(Attrib::StringHash32(group.c_str())); }
+	void MakeIncompatibleWithFilterGroup(const std::string& group) { IncompatibleFilterGroups.push_back(Attrib::StringHash32(group.c_str())); }
+	void AddToIncompatiblityGroup(const std::string& group) {
+		FilterGroups.push_back(Attrib::StringHash32(group.c_str()));
+		IncompatibleFilterGroups.push_back(Attrib::StringHash32(group.c_str()));
 	}
 
 	enum eChaosHook {
@@ -54,7 +61,7 @@ public:
 	virtual bool RunInMenus() { return false; } // frontend specifically
 	virtual bool RunWhenBlocked() { return false; } // pause menu, race end screen, etc.
 	virtual bool ShouldAbort() { return false; }
-	virtual bool IgnoreHUDState() { return false; }
+	virtual bool IgnoreHUDState() { return false; } // display even when disable chaos hud is active
 	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
 	virtual bool CanMultiTrigger() { return false; } // multiple instances at once
 	virtual void OnAnyEffectTriggered() {}
@@ -332,24 +339,46 @@ int GetNumEffectsRunning(ChaosEffect* except = nullptr) {
 	return count;
 }
 
-bool IsEffectRunningFromGroup(uint32_t IncompatibilityGroup, bool includeActivate) {
+bool IsEffectRunningFromIncompatibleGroup(uint32_t IncompatibilityGroup) {
 	if (!IncompatibilityGroup) return false;
 	for (auto& running : aRunningEffects) {
 		if (!running.IsActive()) continue;
-		for (auto& group : running.pEffect->IncompatibilityGroups) {
+		for (auto& group : running.pEffect->IncompatibleFilterGroups) {
 			if (group == IncompatibilityGroup) return true;
-		}
-		if (includeActivate) {
-			for (auto& group : running.pEffect->ActivateIncompatibilityGroups) {
-				if (group == IncompatibilityGroup) return true;
-			}
 		}
 	}
 	return false;
 }
 
+bool IsEffectRunningFromFilterGroup(uint32_t IncompatibilityGroup) {
+	if (!IncompatibilityGroup) return false;
+	for (auto& running : aRunningEffects) {
+		if (!running.IsActive()) continue;
+		for (auto& group : running.pEffect->FilterGroups) {
+			if (group == IncompatibilityGroup) return true;
+		}
+	}
+	return false;
+}
+
+bool CanEffectActivate(ChaosEffect* effect) {
+	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return false;
+	for (auto& group : effect->FilterGroups) {
+		if (IsEffectRunningFromIncompatibleGroup(group)) return false;
+	}
+	for (auto& group : effect->IncompatibleFilterGroups) {
+		if (IsEffectRunningFromFilterGroup(group)) return false;
+	}
+	if (effect->AbortOnConditionFailed()) {
+		if (IsChaosBlocked()) return false; // IsAvailable can run in-game code, so always skip abortonconditionfailed effects in menus
+		if (!effect->IsAvailable()) return false;
+	}
+	return true;
+}
+
 void AddRunningEffect(ChaosEffect* effect) {
 	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return;
+	if (!CanEffectActivate(effect)) return;
 
 	effect->bTriggeredThisCycle = true;
 	effect->LastTriggerTime = std::time(0);
@@ -369,21 +398,6 @@ int GetRandomNumber(int min, int max) {
 	static std::mt19937 randGen(device());
 	std::uniform_int_distribution<> distr(min, max-1);
 	return distr(randGen);
-}
-
-bool CanEffectActivate(ChaosEffect* effect) {
-	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return false;
-	for (auto& group : effect->IncompatibilityGroups) {
-		if (IsEffectRunningFromGroup(group, true)) return false;
-	}
-	for (auto& group : effect->ActivateIncompatibilityGroups) {
-		if (IsEffectRunningFromGroup(group, false)) return false;
-	}
-	if (effect->AbortOnConditionFailed()) {
-		if (IsChaosBlocked()) return false; // IsAvailable can run in-game code, so always skip abortonconditionfailed effects in menus
-		if (!effect->IsAvailable()) return false;
-	}
-	return true;
 }
 
 bool CanEffectBeRandomlyPicked(ChaosEffect* effect) {

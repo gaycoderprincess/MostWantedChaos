@@ -5,8 +5,8 @@ public:
 	Effect_SpeedSlow() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Slow Motion";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
-		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
+		AddToIncompatiblityGroup("gamespeed");
+		AddToIncompatiblityGroup("speedbreaker");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -27,8 +27,8 @@ public:
 	Effect_SpeedFast() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Fast Motion";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
-		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
+		AddToIncompatiblityGroup("gamespeed");
+		AddToIncompatiblityGroup("speedbreaker");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -49,8 +49,8 @@ public:
 	Effect_SpeedSpeedBased() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Reverse Superhot";
 		fTimerLength = 30;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("gamespeed"));
-		IncompatibilityGroups.push_back(Attrib::StringHash32("speedbreaker"));
+		AddToIncompatiblityGroup("gamespeed");
+		AddToIncompatiblityGroup("speedbreaker");
 	}
 
 	void TickFunctionMain(double delta) override {

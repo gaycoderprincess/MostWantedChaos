@@ -3,9 +3,9 @@
 class Effect_OpponentsRazor : public EffectBase_NotInPursuitConditional {
 public:
 	Effect_OpponentsRazor() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "New Opponents Are BMW M3s";
+		sName = "New Opponents Are M3 GTRs";
 		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
+		AddToIncompatiblityGroup("opponent_car_model");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -28,7 +28,7 @@ public:
 	Effect_OpponentsGolf() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Are Golfs";
 		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
+		AddToIncompatiblityGroup("opponent_car_model");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -51,7 +51,7 @@ public:
 	Effect_OpponentsPlayer() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Copy Your Car";
 		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
+		AddToIncompatiblityGroup("opponent_car_model");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -72,7 +72,7 @@ public:
 	Effect_OpponentsPlayerRandom() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Steal Your Cars";
 		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_model"));
+		AddToIncompatiblityGroup("opponent_car_model");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -93,7 +93,7 @@ public:
 	Effect_OpponentsJunkman() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Are Junkman";
 		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("opponent_car_tune"));
+		AddToIncompatiblityGroup("opponent_car_tune");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -115,7 +115,7 @@ public:
 	Effect_AllTrafficPizza() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "All Traffic Is TRAFPIZZA";
 		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("traffic_car_model"));
+		AddToIncompatiblityGroup("traffic_car_model");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -154,8 +154,7 @@ public:
 	Effect_PlayerCarCopCorvette() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Player As Random Cop Car";
 		fTimerLength = 120;
-		fUnhideTime = 0;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
+		AddToIncompatiblityGroup("player_car_model");
 	}
 
 	static inline std::vector<std::string> aCopCars = {
@@ -200,8 +199,7 @@ public:
 	Effect_PlayerCarTraffic() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Player As Random Traffic Car";
 		fTimerLength = 120;
-		fUnhideTime = 0;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
+		AddToIncompatiblityGroup("player_car_model");
 	}
 
 	static inline std::vector<std::string> aTrafficCars = {
@@ -258,8 +256,7 @@ public:
 	Effect_PlayerCarStockPunto() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Player As Stock Punto";
 		fTimerLength = 120;
-		fUnhideTime = 0;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("player_car_model"));
+		AddToIncompatiblityGroup("player_car_model");
 	}
 
 	void TickFunctionMain(double delta) override {
