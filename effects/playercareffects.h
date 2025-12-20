@@ -1431,8 +1431,6 @@ public:
 		fMinSpeed = IsInCareerMode() && FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= BIN_BARON ? fMinSpeedSlow : fMinSpeedFast;
 	}
 	void TickFunctionMain(double delta) override {
-		NyaDrawing::CNyaRGBA32 redrgb = {200,0,0,255};
-
 		auto speed = GetLocalPlayerInterface<IRigidBody>()->GetSpeed();
 
 		tNyaStringData data;
@@ -1448,7 +1446,7 @@ public:
 
 		if (!bActive) {
 			data.y += data.size;
-			data.SetColor(redrgb);
+			data.SetColor(200,0,0,255);
 			DrawString(data, std::format("Time Remaining: {:.1f}", 5.0 - fInactiveTimer));
 
 			fInactiveTimer += delta;
@@ -1470,7 +1468,7 @@ public:
 
 		if (speedAmount <= 0) {
 			data.y += data.size;
-			data.SetColor(redrgb);
+			data.SetColor(200,0,0,255);
 			DrawString(data, std::format("Time Remaining: {:.1f}", 0.5 - fLeewayTimer));
 
 			fLeewayTimer += delta;

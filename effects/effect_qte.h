@@ -7,6 +7,7 @@ public:
 	Effect_QTE() : ChaosEffect("Uncategorized") {
 		sName = "Quick-Time Event";
 		fTimerLength = 5;
+		MakeIncompatibleWithFilterGroup("player_godmode");
 	}
 
 	void InitFunction() override {

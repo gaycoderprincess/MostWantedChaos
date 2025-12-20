@@ -199,3 +199,66 @@ public:
 	bool RunInMenus() override { return active; }
 	bool CanQuickTrigger() override { return false; }
 } E_RestartRaceOn99;
+
+class Effect_SuddenDeath : public ChaosEffect {
+public:
+	Effect_SuddenDeath() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Sudden Death";
+		sFriendlyName = "Blow Engine On Position Loss";
+		fTimerLength = 60;
+	}
+
+	int ranking = 0;
+	bool abort = false;
+	double fLeewayTimer = 0;
+
+	void InitFunction() override {
+		ranking = GRaceStatus::fObj->mRacerInfo[0].mRanking;
+		abort = false;
+		fLeewayTimer = 0;
+	}
+	void TickFunctionMain(double delta) override {
+		if (GetLocalPlayerVehicle()->IsStaging()) {
+			ranking = GRaceStatus::fObj->mRacerCount;
+		}
+
+		tNyaStringData data;
+		data.x = 0.5;
+		data.y = 0.85;
+		data.size = 0.04;
+		data.XCenterAlign = true;
+		data.outlinea = 255;
+		data.outlinedist = 0.025;
+		DrawString(data, std::format("Stay in #{}{}!", ranking, ranking == 1 ? "" : " or higher"));
+
+		auto currRanking = GRaceStatus::fObj->mRacerInfo[0].mRanking;
+		if (currRanking < ranking) {
+			ranking = currRanking;
+		}
+		if (currRanking > ranking) {
+			data.y += data.size;
+			data.SetColor(200,0,0,255);
+			DrawString(data, std::format("Time Remaining: {:.1f}", 1.0 - fLeewayTimer));
+
+			fLeewayTimer += delta;
+			if (fLeewayTimer > 1.0) {
+				GetLocalPlayerInterface<IDamageable>()->Destroy();
+				abort = true;
+			}
+		}
+		else {
+			fLeewayTimer = 0;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		if (!IsInNormalRace() || GetActiveVehicles(DRIVER_RACER).empty()) {
+			ranking = 999;
+			return false;
+		}
+		return true;
+	}
+	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool ShouldAbort() override { return abort; }
+} E_SuddenDeath;

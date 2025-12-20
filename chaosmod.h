@@ -146,7 +146,6 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 		std::vector<ChaosEffect*> effects;
 		if (CanEffectBeRandomlyPicked(&E_PlayerCarSpin)) { effects.push_back(&E_PlayerCarSpin); }
 		if (CanEffectBeRandomlyPicked(&E_SpinCar2)) { effects.push_back(&E_SpinCar2); }
-		if (CanEffectBeRandomlyPicked(&E_Neon)) { effects.push_back(&E_Neon); } // the neon slows down your throttle
 		if (CanEffectBeRandomlyPicked(&E_PlayerHalfGas)) { effects.push_back(&E_PlayerHalfGas); }
 		//if (CanEffectBeRandomlyPicked(&E_PlayerHalfSteering)) { effects.push_back(&E_PlayerHalfSteering); }
 		if (CanEffectBeRandomlyPicked(&E_NoInput)) { effects.push_back(&E_NoInput); }
@@ -177,6 +176,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 		}
 
 		if (completion < 80 && CanEffectBeRandomlyPicked(&E_RubberbandOpponents)) { effects.push_back(&E_RubberbandOpponents); }
+		if (completion < 80 && CanEffectBeRandomlyPicked(&E_Neon)) { effects.push_back(&E_Neon); } // the neon slows down your throttle
 		if (completion < 10 && CanEffectBeRandomlyPicked(&E_LeakTank)) { effects.push_back(&E_LeakTank); }
 		if (completion < 10 && CanEffectBeRandomlyPicked(&E_Fragile)) { effects.push_back(&E_Fragile); }
 		if (completion < 10 && CanEffectBeRandomlyPicked(&E_NoPauseMenu)) { effects.push_back(&E_NoPauseMenu); }
