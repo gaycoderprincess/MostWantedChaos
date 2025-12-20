@@ -3,7 +3,7 @@ bool IgnoreSpeedbreakerTime = false;
 
 auto OnManageTime = (float(__thiscall*)(Sim::ITimeManager*, float, float))0x6F4D10;
 float __thiscall OnManageTimeHooked(Sim::ITimeManager* pThis, float real_time_delta, float sim_speed) {
-	if (IgnoreSpeedbreakerTime) return 1.0 * GameSpeedModifier;
+	if (IgnoreSpeedbreakerTime) return GameSpeedModifier;
 	auto speed = OnManageTime(pThis, real_time_delta, sim_speed);
 	return speed * GameSpeedModifier;
 }

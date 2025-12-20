@@ -483,7 +483,7 @@ public:
 
 	Effect_GroovyCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Why's This Dealer?";
-		sFriendlyName = "Groovy Cars";
+		//sFriendlyName = "Groovy Cars";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("car_scale");
 	}

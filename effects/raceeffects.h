@@ -171,11 +171,11 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_FalseStarts;
 
-class Effect_RestartRaceOn99 : public EffectBase_InRaceConditional {
+class Effect_RestartRaceOn99 : public ChaosEffect {
 public:
 	bool active = false;
 
-	Effect_RestartRaceOn99() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_RestartRaceOn99() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Exit To Menu At 99% Completion";
 	}
 
@@ -185,7 +185,7 @@ public:
 	void TickFunctionMain(double delta) override {
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
-			if (IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) {
+			if ((IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) || (IsInPursuitRace() && IsPlayerApproachingOldBridge())) {
 				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 				//aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
@@ -195,6 +195,7 @@ public:
 	bool HideFromPlayer() override {
 		return !active;
 	}
+	bool IsAvailable() override { return IsInNormalRace() || IsInPursuitRace(); }
 	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return active; }
 	bool CanQuickTrigger() override { return false; }
@@ -206,6 +207,7 @@ public:
 		sName = "Sudden Death";
 		sFriendlyName = "Blow Engine On Position Loss";
 		fTimerLength = 60;
+		MakeIncompatibleWithFilterGroup("player_godmode");
 	}
 
 	int ranking = 0;
@@ -261,4 +263,5 @@ public:
 	bool IsRehideable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool ShouldAbort() override { return abort; }
+	bool CanQuickTrigger() override { return false; }
 } E_SuddenDeath;

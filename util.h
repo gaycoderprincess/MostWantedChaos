@@ -584,6 +584,17 @@ bool IsInNormalRace() {
 	return true;
 }
 
+bool IsInPursuitRace() {
+	if (!GRaceStatus::fObj) return false;
+	if (!GRaceStatus::fObj->mRaceParms) return false;
+	if (!GRaceParameters::GetIsPursuitRace(GRaceStatus::fObj->mRaceParms)) return false;
+	return true;
+}
+
+bool IsPlayerApproachingOldBridge() {
+	return (*GetLocalPlayerVehicle()->GetPosition() - NyaVec3(-2878, 220, -729)).length() < 25;
+}
+
 const char** GetPVehicleModelPointer(uint32_t pvehicleHash) {
 	auto collection = Attrib::FindCollection(Attrib::StringHash32("pvehicle"), pvehicleHash);
 	auto model = (uintptr_t)Attrib::Collection::GetData(collection, Attrib::StringHash32("MODEL"), 0);

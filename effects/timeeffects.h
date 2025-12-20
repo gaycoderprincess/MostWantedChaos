@@ -6,7 +6,7 @@ public:
 		sName = "Slow Motion";
 		fTimerLength = 30;
 		AddToIncompatiblityGroup("gamespeed");
-		AddToIncompatiblityGroup("speedbreaker");
+		MakeIncompatibleWithFilterGroup("speedbreaker");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -28,7 +28,7 @@ public:
 		sName = "Fast Motion";
 		fTimerLength = 30;
 		AddToIncompatiblityGroup("gamespeed");
-		AddToIncompatiblityGroup("speedbreaker");
+		MakeIncompatibleWithFilterGroup("speedbreaker");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -50,7 +50,7 @@ public:
 		sName = "Reverse Superhot";
 		fTimerLength = 30;
 		AddToIncompatiblityGroup("gamespeed");
-		AddToIncompatiblityGroup("speedbreaker");
+		MakeIncompatibleWithFilterGroup("speedbreaker");
 	}
 
 	void TickFunctionMain(double delta) override {

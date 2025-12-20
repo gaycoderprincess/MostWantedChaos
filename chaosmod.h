@@ -72,6 +72,33 @@ void MoneyChecker() {
 	}
 }
 
+void BountyChecker() {
+	static ChaosEffect TempEffect("DUMMY", true);
+	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) BOUNTY CHANGE";
+
+	static int cash = 0;
+	if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+		cash = FEPlayerCarDB::GetTotalBounty(GetPlayerCarDB());
+	}
+	else if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
+		int currentCash = FEPlayerCarDB::GetTotalBounty(GetPlayerCarDB());
+		if (cash != currentCash) {
+			static int cashForEffect = 0;
+			if (auto effect = GetEffectRunning(&TempEffect)) {
+				effect->fTimer = TempEffect.fTimerLength;
+			}
+			else {
+				cashForEffect = cash;
+				AddRunningEffect(&TempEffect);
+			}
+			static std::string name;
+			name = std::format("Bounty changed ({} -> {})", cashForEffect, currentCash);
+			TempEffect.sName = name.c_str();
+			cash = currentCash;
+		}
+	}
+}
+
 ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 	if (!nSmartRNG) return nullptr;
 
@@ -241,6 +268,7 @@ void ChaosLoop() {
 	}
 
 	MoneyChecker();
+	BountyChecker();
 
 	for (auto& func : aDrawingLoopFunctions) {
 		func();

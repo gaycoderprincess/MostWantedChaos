@@ -421,24 +421,34 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_OverwriteCareerCar;
 
-class Effect_AddBounty : public ChaosEffect {
+class Effect_AddBounty : public EffectBase_CareerConditional {
 public:
-	Effect_AddBounty() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_AddBounty() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 100K Bounty";
 	}
 
 	void InitFunction() override {
 		GetPlayerCarDB()->SoldHistoryBounty += 100000;
 	}
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanMultiTrigger() override { return true; }
 } E_AddBounty;
 
-class Effect_SubtractBounty : public ChaosEffect {
+class Effect_SubtractBounty : public EffectBase_CareerConditional {
 public:
-	Effect_SubtractBounty() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_SubtractBounty() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Subtract 100K Bounty";
+		sFriendlyName = "Subtract Bounty (100K/1Mil)";
 	}
 
 	void InitFunction() override {
-		GetPlayerCarDB()->SoldHistoryBounty -= 100000;
+		bool mil = FEDatabase->mUserProfile->TheCareerSettings.CurrentBin < BIN_MING;
+		int amount = mil ? 1000000 : 100000;
+		GetPlayerCarDB()->SoldHistoryBounty -= amount;
+		if (mil) {
+			EffectInstance->sNameToDisplay = "Subtract 1 Million Bounty";
+		}
 	}
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanMultiTrigger() override { return true; }
 } E_SubtractBounty;
