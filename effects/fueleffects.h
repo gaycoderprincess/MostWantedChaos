@@ -13,11 +13,13 @@ public:
 	}
 
 	static inline UMath::Vector3 aGasStations[] = {
-			{-1620, 150, 2011}, // rosewood
+			{-1620, 150, 2011}, // rosewood 1
+			{-2645, 170, 457}, // rosewood 2
 			{-4495, 205, 809}, // rosewood tuning shop
 			{-386, 91, 1829}, // rockport
 			{-3413, 10, 3968}, // north gray point
-			{-2162, 107, 2738}, // middle of the map
+			{-2162, 107, 2738}, // middle of the map 1
+			{-1517, 81, 3461}, // middle of the map 2
 	};
 
 	void InitFunction() override {

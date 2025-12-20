@@ -128,9 +128,10 @@ namespace ChaosVoting {
 		static CNyaTimer gTimer;
 		gTimer.Process();
 
+		int y = 0;
+
 		// clear old votes
 		if (!aOldVotes.empty()) {
-			int y = 0;
 			for (auto& vote : aOldVotes) {
 				vote.Popup.Update(gTimer.fDeltaTime, false);
 				vote.Draw(y++);
@@ -138,7 +139,6 @@ namespace ChaosVoting {
 			if (aOldVotes[0].Popup.fTextTimer <= 0) aOldVotes.clear();
 		}
 		else {
-			int y = 0;
 			for (auto& vote : aNewVotes) {
 				vote.Popup.Update(gTimer.fDeltaTime, true);
 				vote.Draw(y++);
@@ -148,6 +148,11 @@ namespace ChaosVoting {
 		static ChaosUIPopup VoteCountPopup;
 		VoteCountPopup.bIsVotingDummy = true;
 		VoteCountPopup.Update(gTimer.fDeltaTime, true);
-		VoteCountPopup.Draw(std::format("Vote Count: {}", GetTotalVoteCount()), aNewVotes.size(), false);
+		VoteCountPopup.Draw(std::format("Vote Count: {}", GetTotalVoteCount()), y++, false);
+
+		static ChaosUIPopup VoteDisabledPopup;
+		VoteDisabledPopup.bIsVotingDummy = true;
+		VoteDisabledPopup.Update(gTimer.fDeltaTime, nSmartRNG > 0);
+		VoteDisabledPopup.Draw("Voting is disabled!", y++, false);
 	}
 }

@@ -72,20 +72,25 @@ void MoneyChecker() {
 	}
 }
 
-ChaosEffect* GetSmartRNGEffect() {
+ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 	if (!nSmartRNG) return nullptr;
 
-	if (nSmartRNG == 2 && PercentageChanceCheck(25)) {
-		if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) return &E_RefillActiveTimers;
-	}
-	if (nSmartRNG == 1 && PercentageChanceCheck(25)) {
-		if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) return &E_RefillActiveTimers;
+	if (!redo) {
+		if (nSmartRNG == 2 && PercentageChanceCheck(25)) {
+			if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) return &E_RefillActiveTimers;
+		}
+		if (nSmartRNG == 1 && PercentageChanceCheck(25)) {
+			if (CanEffectBeRandomlyPicked(&E_RefillActiveTimers)) {
+				nSmartRNG++; // this won't work if smart rng is 1, since it'll be set to 0 before refill can trigger
+				return &E_RefillActiveTimers;
+			}
+		}
 	}
 
 	bool isInFreeroamPursuit = IsInCareerMode() && !IsInNormalRace() && GetLocalPlayerInterface<IVehicleAI>()->GetPursuit();
 
 	// global effects
-	if (PercentageChanceCheck(10)) {
+	if (PercentageChanceCheck(10) || redo) {
 		std::vector<ChaosEffect*> effects;
 		if (CanEffectBeRandomlyPicked(&E_RestartRaceOn99)) { effects.push_back(&E_RestartRaceOn99); }
 		if (CanEffectBeRandomlyPicked(&E_GetBusted)) { effects.push_back(&E_GetBusted); }
@@ -148,6 +153,7 @@ ChaosEffect* GetSmartRNGEffect() {
 		if (CanEffectBeRandomlyPicked(&E_LockPlayer)) { effects.push_back(&E_LockPlayer); }
 		if (CanEffectBeRandomlyPicked(&E_LockPlayerOrient)) { effects.push_back(&E_LockPlayerOrient); }
 		if (CanEffectBeRandomlyPicked(&E_LaunchCarSide)) { effects.push_back(&E_LaunchCarSide); }
+		if (CanEffectBeRandomlyPicked(&E_LaunchCarBwd)) { effects.push_back(&E_LaunchCarBwd); }
 		if (CanEffectBeRandomlyPicked(&E_CruiseControl)) { effects.push_back(&E_CruiseControl); }
 		if (CanEffectBeRandomlyPicked(&E_AddLap)) { effects.push_back(&E_AddLap); }
 		if (CanEffectBeRandomlyPicked(&E_PlayerCarTuneAero)) { effects.push_back(&E_PlayerCarTuneAero); }
@@ -168,6 +174,7 @@ ChaosEffect* GetSmartRNGEffect() {
 
 		if (completion < 80 && CanEffectBeRandomlyPicked(&E_RubberbandOpponents)) { effects.push_back(&E_RubberbandOpponents); }
 		if (completion < 10 && CanEffectBeRandomlyPicked(&E_LeakTank)) { effects.push_back(&E_LeakTank); }
+		if (completion < 10 && CanEffectBeRandomlyPicked(&E_Fragile)) { effects.push_back(&E_Fragile); }
 		if (completion < 10 && CanEffectBeRandomlyPicked(&E_NoPauseMenu)) { effects.push_back(&E_NoPauseMenu); }
 
 		if (!effects.empty()) {
@@ -211,6 +218,11 @@ ChaosEffect* GetSmartRNGEffect() {
 			}
 		}
 	}
+
+	if (!redo) {
+		return GetSmartRNGEffect(true);
+	}
+	nSmartRNG = 0;
 	return nullptr;
 }
 
