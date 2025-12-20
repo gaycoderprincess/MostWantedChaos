@@ -136,7 +136,10 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 		if (completion >= 90) {
 			if (CanEffectBeRandomlyPicked(&E_RestartRace)) return &E_RestartRace;
 			if (CanEffectBeRandomlyPicked(&E_Safehouse)) return &E_Safehouse;
-			if (CanEffectBeRandomlyPicked(&E_DisableSave)) return &E_DisableSave;
+			// don't disable saving during razor's chapter - that might genuinely be useless
+			if (!IsInCareerMode() || FEDatabase->mUserProfile->TheCareerSettings.CurrentBin > BIN_RAZOR) {
+				if (CanEffectBeRandomlyPicked(&E_DisableSave)) return &E_DisableSave;
+			}
 			if (CanEffectBeRandomlyPicked(&E_GetBustedInstant)) return &E_GetBustedInstant;
 		}
 
@@ -184,7 +187,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 	else if (auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit()) {
 		auto status = pursuit->GetPursuitStatus();
 		if (status == PS_COOL_DOWN) {
-			if (CanEffectBeRandomlyPicked(&E_NoHidingSpots)) { return &E_NoHidingSpots; }
+			if (GetLocalPlayerInterface<IPerpetrator>()->GetHeat() >= 2.0 && CanEffectBeRandomlyPicked(&E_NoHidingSpots)) { return &E_NoHidingSpots; }
 
 			std::vector<ChaosEffect*> effects;
 			if (CanEffectBeRandomlyPicked(&E_RuthlessCopSpawns)) { effects.push_back(&E_RuthlessCopSpawns); }

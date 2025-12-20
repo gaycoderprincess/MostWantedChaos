@@ -53,7 +53,6 @@ public:
 	virtual bool AbortOnConditionFailed() { return false; }
 	virtual bool RunInMenus() { return false; } // frontend specifically
 	virtual bool RunWhenBlocked() { return false; } // pause menu, race end screen, etc.
-	virtual bool InfiniteTimer() { return false; }
 	virtual bool ShouldAbort() { return false; }
 	virtual bool IgnoreHUDState() { return false; }
 	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
@@ -302,9 +301,7 @@ public:
 				pEffect->DeinitFunction();
 			}
 
-			if (!pEffect->InfiniteTimer()) {
-				fTimer -= delta;
-			}
+			fTimer -= delta;
 		}
 		if (IsActive()) {
 			pEffect->TickFunctionMain(delta);

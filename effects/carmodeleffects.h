@@ -9,6 +9,9 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
+		if (!HasTimer()) {
+			EffectInstance->fTimer = fTimerLength;
+		}
 		ForcedOpponentVehicle = Attrib::StringHash32("bmwm3gtre46");
 		RandomizeOpponentTuning = true;
 	}
@@ -16,8 +19,7 @@ public:
 		ForcedOpponentVehicle = 0;
 		RandomizeOpponentTuning = false;
 	}
-	bool InfiniteTimer() override { return LastOpponentVehicleSpawn != Attrib::StringHash32("bmwm3gtre46"); }
-	bool HasTimer() override { return !InfiniteTimer(); }
+	bool HasTimer() override { return LastOpponentVehicleSpawn == Attrib::StringHash32("bmwm3gtre46"); }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsRazor;
 
@@ -30,6 +32,9 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
+		if (!HasTimer()) {
+			EffectInstance->fTimer = fTimerLength;
+		}
 		ForcedOpponentVehicle = Attrib::StringHash32("gti");
 		RandomizeOpponentTuning = true;
 	}
@@ -37,8 +42,7 @@ public:
 		ForcedOpponentVehicle = 0;
 		RandomizeOpponentTuning = false;
 	}
-	bool InfiniteTimer() override { return LastOpponentVehicleSpawn != Attrib::StringHash32("gti"); }
-	bool HasTimer() override { return !InfiniteTimer(); }
+	bool HasTimer() override { return LastOpponentVehicleSpawn == Attrib::StringHash32("gti"); }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsGolf;
 
@@ -51,13 +55,15 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
+		if (!HasTimer()) {
+			EffectInstance->fTimer = fTimerLength;
+		}
 		OpponentPlayerCar = true;
 	}
 	void DeinitFunction() override {
 		OpponentPlayerCar = false;
 	}
-	bool InfiniteTimer() override { return !LastOpponentPlayerCar; }
-	bool HasTimer() override { return !InfiniteTimer(); }
+	bool HasTimer() override { return LastOpponentPlayerCar; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayer;
 
@@ -70,13 +76,15 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
+		if (!HasTimer()) {
+			EffectInstance->fTimer = fTimerLength;
+		}
 		OpponentPlayerCarRandom = true;
 	}
 	void DeinitFunction() override {
 		OpponentPlayerCarRandom = false;
 	}
-	bool InfiniteTimer() override { return !LastOpponentPlayerCarRandom; }
-	bool HasTimer() override { return !InfiniteTimer(); }
+	bool HasTimer() override { return LastOpponentPlayerCarRandom; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayerRandom;
 
@@ -89,13 +97,15 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
+		if (!HasTimer()) {
+			EffectInstance->fTimer = fTimerLength;
+		}
 		OpponentsFullyTuned = true;
 	}
 	void DeinitFunction() override {
 		OpponentsFullyTuned = false;
 	}
-	bool InfiniteTimer() override { return !LastOpponentFullyTuned; }
-	bool HasTimer() override { return !InfiniteTimer(); }
+	bool HasTimer() override { return LastOpponentFullyTuned; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsJunkman;
 

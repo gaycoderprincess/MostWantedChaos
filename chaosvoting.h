@@ -1,5 +1,6 @@
 namespace ChaosVoting {
 	bool bEnabled = false;
+	bool bSelectingEffectsForVote = false;
 	int nNumVoteOptions = 4;
 
 	class VotingPopup {
@@ -34,9 +35,11 @@ namespace ChaosVoting {
 	void GenerateNewVotes() {
 		aOldVotes = aNewVotes;
 		aNewVotes.clear();
+		bSelectingEffectsForVote = true;
 		for (int i = 0; i < nNumVoteOptions; i++) {
 			aNewVotes.push_back(VotingPopup(GetRandomEffect(false)));
 		}
+		bSelectingEffectsForVote = false;
 		if (nLowestWins > 0) nLowestWins--;
 		if (nStreamerVotes > 0) nStreamerVotes--;
 	}

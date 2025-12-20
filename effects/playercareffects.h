@@ -924,7 +924,6 @@ public:
 			auto cars = GetPlayerCarDB();
 			for (auto &car: cars->CarTable) {
 				if (car.Handle == 0xFFFFFFFF) continue;
-				if (car.VehicleKey == Attrib::StringHash32("copcross")) continue;
 				validCars.push_back(&car);
 			}
 			auto car = validCars[rand() % validCars.size()];
@@ -1424,7 +1423,7 @@ public:
 		bActive = false;
 		fInactiveTimer = 0;
 		fLeewayTimer = 0;
-		fMinSpeed = IsInCareerMode() && FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= 10 ? fMinSpeedSlow : fMinSpeedFast;
+		fMinSpeed = IsInCareerMode() && FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= BIN_BARON ? fMinSpeedSlow : fMinSpeedFast;
 	}
 	void TickFunctionMain(double delta) override {
 		NyaDrawing::CNyaRGBA32 redrgb = {200,0,0,255};

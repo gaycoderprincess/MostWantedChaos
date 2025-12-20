@@ -1,3 +1,22 @@
+enum eCareerBin {
+	BIN_RAZOR = 1,
+	BIN_BULL,
+	BIN_RONNIE,
+	BIN_JV,
+	BIN_WEBSTER,
+	BIN_MING,
+	BIN_KAZE,
+	BIN_JEWELS,
+	BIN_EARL,
+	BIN_BARON,
+	BIN_BIGLOU,
+	BIN_IZZY,
+	BIN_VIC,
+	BIN_TAZ,
+	BIN_SONNY,
+	BIN_ROG,
+};
+
 void WriteLog(const std::string& str) {
 	static auto file = std::ofstream("NFSMWChaos_gcp.log");
 

@@ -27,6 +27,8 @@ public:
 		abort = false;
 	}
 	void TickFunctionMain(double delta) override {
+		EffectInstance->fTimer = fTimerLength;
+
 		NyaDrawing::CNyaRGBA32 rgb = {190,240,64,255};
 		if (tankAmount < 15) rgb = {200,0,0,255};
 		DrawTopBar(tankAmount / 100.0, rgb);
@@ -53,7 +55,6 @@ public:
 			abort = true;
 		}
 	}
-	bool InfiniteTimer() override { return true; }
 	bool ShouldAbort() override {
 		return abort;
 	}
