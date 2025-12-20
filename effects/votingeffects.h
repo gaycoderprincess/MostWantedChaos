@@ -4,6 +4,7 @@ class Effect_VotingRigged : public ChaosEffect {
 public:
 	Effect_VotingRigged() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Rigged Votes";
+		sFriendlyName = "Rigged Votes (Lowest Voted Wins)";
 	}
 
 	static inline int max = 2;
@@ -71,9 +72,12 @@ public:
 		nFrequency *= 2;
 	}
 
-	static inline int max = 5;
+	static inline int max = 6;
 
 	void InitFunction() override {
+		for (auto& effect : aEffects) {
+			effect->bTriggeredThisCycleSmart = false;
+		}
 		nSmartRNG = max;
 	}
 	void TickFunctionMain(double delta) override {

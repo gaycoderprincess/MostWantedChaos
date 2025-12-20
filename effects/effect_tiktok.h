@@ -46,6 +46,7 @@ public:
 				if (!valid) continue;
 				if (str.find("Are you sure") != std::string::npos) continue;
 				if (str.find("Do you wish") != std::string::npos) continue;
+				if (str.find("Do you want") != std::string::npos) continue;
 				if (str.find("unused") != std::string::npos) continue;
 				if (str.find("Unused") != std::string::npos) continue;
 				aSentences.push_back(str);

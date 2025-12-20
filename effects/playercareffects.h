@@ -267,6 +267,7 @@ class Effect_BlowEngine : public ChaosEffect {
 public:
 	Effect_BlowEngine() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Blow Player's Engine";
+		MakeIncompatibleWithFilterGroup("player_godmode");
 	}
 
 	void InitFunction() override {
@@ -621,6 +622,8 @@ public:
 			ply->ResetVehicle(true);
 		}
 	}
+	bool IsAvailable() override { return !NoResetCount; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarReset;
 
 class Effect_PlayerCarSpike1 : public ChaosEffect {
@@ -660,6 +663,7 @@ public:
 	}
 
 	void DeinitFunction() override {
+		if (IsCarDestroyed(GetLocalPlayerVehicle())) return;
 		if (auto ply = GetLocalPlayerInterface<IDamageable>()) {
 			ply->ResetDamage();
 		}
@@ -1193,7 +1197,8 @@ public:
 	}
 } E_PlayerResetTransform;
 
-class Effect_PlayerNoBrakes : public ChaosEffect {
+// doesn't do enough at all to be worth an effect slot
+/*class Effect_PlayerNoBrakes : public ChaosEffect {
 public:
 	Effect_PlayerNoBrakes() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "They Just Slow Us Down";
@@ -1211,7 +1216,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-} E_PlayerNoBrakes;
+} E_PlayerNoBrakes;*/
 
 class Effect_PlayerNoSteering : public ChaosEffect {
 public:
@@ -1311,6 +1316,17 @@ public:
 		TeleportPlayer({-2200.7, 144.6, 1458.7}, {-0.14, 0.0, 0.99});
 	}
 } E_PlayerTPHidingSpot;
+
+class Effect_PlayerTPBridge : public ChaosEffect {
+public:
+	Effect_PlayerTPBridge() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Teleport Behind The Old Bridge";
+	}
+
+	void InitFunction() override {
+		TeleportPlayer({-2485.08, 207.38, -1348.54}, {-0.89, 0.0, -0.47});
+	}
+} E_PlayerTPBridge;
 
 // this technically affects all cars but it's here in playercareffects since it mostly only affects the player
 class Effect_NOSBoost : public EffectBase_PlayerCarHasNitro {
@@ -1415,7 +1431,8 @@ public:
 	}
 
 	static inline float fMinSpeedSlow = TOMPS(100);
-	static inline float fMinSpeedFast = TOMPS(150);
+	static inline float fMinSpeedMid = TOMPS(150);
+	static inline float fMinSpeedFast = TOMPS(200);
 	static inline float fMaxSpeed = TOMPS(100);
 	static inline float fTextY = 0.05;
 
@@ -1428,9 +1445,19 @@ public:
 		bActive = false;
 		fInactiveTimer = 0;
 		fLeewayTimer = 0;
-		fMinSpeed = IsInCareerMode() && FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= BIN_BARON ? fMinSpeedSlow : fMinSpeedFast;
+		fMinSpeed = fMinSpeedMid;
+		if (IsInCareerMode()) {
+			if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= BIN_BARON) {
+				fMinSpeed = fMinSpeedSlow;
+			}
+			else if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin <= BIN_BULL) {
+				fMinSpeed = fMinSpeedFast;
+			}
+		}
 	}
 	void TickFunctionMain(double delta) override {
+		if (GetLocalPlayerVehicle()->IsStaging()) return;
+
 		auto speed = GetLocalPlayerInterface<IRigidBody>()->GetSpeed();
 
 		tNyaStringData data;

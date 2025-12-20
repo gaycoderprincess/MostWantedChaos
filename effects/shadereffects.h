@@ -111,6 +111,8 @@ public:
 	}
 } E_ShaderInverted;
 
+// ehh this is kinda lame, freeing up rng chances by removing it
+#ifdef CWOEECHAOS_VOTING_ENABLED
 class Effect_ShaderBlue : public EffectBase_ScreenShader {
 public:
 	Effect_ShaderBlue() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
@@ -120,6 +122,7 @@ public:
 		sFileName = "blue";
 	}
 } E_ShaderBlue;
+#endif
 
 class Effect_ShaderWide : public EffectBase_ScreenShader {
 public:
@@ -169,7 +172,8 @@ public:
 	}
 } E_ShaderUpsideDown;
 
-class Effect_ShaderGray : public EffectBase_ScreenShader {
+// ehh this is kinda lame, freeing up rng chances by removing it
+/*class Effect_ShaderGray : public EffectBase_ScreenShader {
 public:
 	Effect_ShaderGray() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "Grayscale";
@@ -177,7 +181,7 @@ public:
 		fTimerLength = 60;
 		sFileName = "gray";
 	}
-} E_ShaderGray;
+} E_ShaderGray;*/
 
 class Effect_ShaderBW : public EffectBase_ScreenShader {
 public:

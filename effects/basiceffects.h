@@ -271,7 +271,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	void OnAnyEffectTriggered() override {
-		fEffectCycleTimerSpeedMult = GetRandomNumber(25, 500) * 0.01;
+		fEffectCycleTimerSpeedMult = GetRandomNumber(33, 500) * 0.01;
 	}
 } E_RandomChaosTimer;
 

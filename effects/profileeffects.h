@@ -147,6 +147,7 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarRandomTuning;
 
+// nothing to do with strikes and impound boxes does anything meaningful really, only leaving the add one strike effect
 class Effect_PlayerCarImpoundStrike : public EffectBase_CareerConditional {
 public:
 	Effect_PlayerCarImpoundStrike() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
@@ -163,7 +164,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundStrike;
 
-class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
+/*class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
 public:
 	Effect_PlayerCarImpoundStrikeRemove() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Remove A Strike From Active Career Car";
@@ -202,7 +203,7 @@ public:
 		career->TheImpoundData.mMaxBusted++;
 	}
 	bool AbortOnConditionFailed() override { return true; }
-} E_PlayerCarImpoundMarker;
+} E_PlayerCarImpoundMarker;*/
 
 class Effect_AddRandomTuningMarker : public EffectBase_CareerConditional {
 public:

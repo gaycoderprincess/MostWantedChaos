@@ -47,6 +47,7 @@ namespace FlatOutHUD {
 #include "hooks/eventwin.h"
 #include "hooks/worldrender.h"
 #include "hooks/input.h"
+#include "hooks/busted.h"
 #include "chaosvars.h"
 #include "chaoseffect.h"
 #include "chaosmod.h"

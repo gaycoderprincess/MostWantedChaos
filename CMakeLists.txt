@@ -24,7 +24,8 @@ else()
     endif()
 endif()
 
-add_compile_definitions(IMGUI_USER_CONFIG="../../nya_imconfig.h" CWOEECHAOS_VERSION="2.00" NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
+#add_compile_definitions(IMGUI_USER_CONFIG="../../nya_imconfig.h" CWOEECHAOS_VERSION="2.00" CWOEECHAOS_VOTING_ENABLED NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
+add_compile_definitions(IMGUI_USER_CONFIG="../../nya_imconfig.h" CWOEECHAOS_VERSION="1.99" NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
 add_library(NFSMWChaos SHARED
         ../nya-common/3rdparty/imgui/imgui.cpp
         ../nya-common/3rdparty/imgui/backends/imgui_impl_dx9.cpp

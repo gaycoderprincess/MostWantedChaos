@@ -59,7 +59,10 @@ public:
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps < 2) return false;
-		return GetLocalPlayerCurrentLap() <= 0;
+		if (!ChaosVoting::bEnabled || ChaosVoting::bSelectingEffectsForVote) {
+			return GetLocalPlayerCurrentLap() <= 0;
+		}
+		return true;
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_RemoveLap;
@@ -83,7 +86,10 @@ public:
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
-		return GetLocalPlayerCurrentLap() <= 0;
+		if (!ChaosVoting::bEnabled || ChaosVoting::bSelectingEffectsForVote) {
+			return GetLocalPlayerCurrentLap() <= 0;
+		}
+		return true;
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_AddLap;
@@ -107,7 +113,10 @@ public:
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
-		return GetLocalPlayerCurrentLap() <= 0;
+		if (!ChaosVoting::bEnabled || ChaosVoting::bSelectingEffectsForVote) {
+			return GetLocalPlayerCurrentLap() <= 0;
+		}
+		return true;
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_Add3Laps;
@@ -231,7 +240,7 @@ public:
 		data.XCenterAlign = true;
 		data.outlinea = 255;
 		data.outlinedist = 0.025;
-		DrawString(data, std::format("Stay in #{}{}!", ranking, ranking == 1 ? "" : " or higher"));
+		DrawString(data, std::format("Stay in #{}{}!", ranking, ranking == 1 ? "" : " or better"));
 
 		auto currRanking = GRaceStatus::fObj->mRacerInfo[0].mRanking;
 		if (currRanking < ranking) {

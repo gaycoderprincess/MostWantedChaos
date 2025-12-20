@@ -10,6 +10,7 @@ public:
 	Effect_LeakTank() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Leaking Fuel Tank";
 		AddToIncompatiblityGroup("top_bar");
+		MakeIncompatibleWithFilterGroup("player_godmode");
 	}
 
 	static inline UMath::Vector3 aGasStations[] = {
@@ -39,7 +40,7 @@ public:
 
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 		for (auto& pos : aGasStations) {
-			if ((pos - plyPos).length() < 15) {
+			if ((pos - plyPos).length() < 10) {
 				tankAmount = 100;
 				Achievements::AwardAchievement(GetAchievement("REFUEL"));
 			}

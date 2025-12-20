@@ -105,6 +105,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_LaserScanWorld;
 
 class Effect_SlipperyWorld : public ChaosEffect {
@@ -280,6 +281,7 @@ public:
 	bool RunWhenBlocked() override { return true; }
 } E_RainbowRoad;
 
+// todo this causes permanent framerate issues down the line?
 class Effect_Snow : public ChaosEffect {
 public:
 	Effect_Snow() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
@@ -334,6 +336,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_Snow;
 
 class Effect_MissingWorld : public ChaosEffect {

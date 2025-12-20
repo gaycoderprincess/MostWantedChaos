@@ -14,6 +14,7 @@ public:
 	std::time_t LastTriggerTime = 0;
 	uint32_t nTotalTimesActivated = 0;
 	bool bTriggeredThisCycle = false;
+	bool bTriggeredThisCycleSmart = false;
 	ChaosEffectInstance* EffectInstance = nullptr;
 
 	static inline std::vector<ChaosEffect*> aEffects;
@@ -403,6 +404,12 @@ int GetRandomNumber(int min, int max) {
 bool CanEffectBeRandomlyPicked(ChaosEffect* effect) {
 	if (effect->bTriggeredThisCycle) return false;
 	//if (effect->fLastTriggerTime) // todo
+	if (!CanEffectActivate(effect)) return false;
+	return true;
+}
+
+bool CanEffectBeSmartlyPicked(ChaosEffect* effect) {
+	if (effect->bTriggeredThisCycleSmart) return false;
 	if (!CanEffectActivate(effect)) return false;
 	return true;
 }

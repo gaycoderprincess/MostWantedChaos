@@ -141,6 +141,7 @@ void DoChaosSettingsSave() {
 	if (!file.is_open()) return;
 
 	file.write((char*)&bDarkMode, sizeof(bDarkMode));
+	file.write((char*)&nTimesBusted, sizeof(nTimesBusted));
 }
 
 void DoChaosSettingsLoad() {
@@ -148,6 +149,7 @@ void DoChaosSettingsLoad() {
 	if (!file.is_open()) return;
 
 	file.read((char*)&bDarkMode, sizeof(bDarkMode));
+	file.read((char*)&nTimesBusted, sizeof(nTimesBusted));
 }
 
 void DoChaosSave() {

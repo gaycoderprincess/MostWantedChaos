@@ -20,6 +20,7 @@ public:
 		GameSpeedModifier = 1.0;
 	}
 	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_SpeedSlow;
 
 class Effect_SpeedFast : public ChaosEffect {
@@ -42,6 +43,7 @@ public:
 		GameSpeedModifier = 1.0;
 	}
 	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_SpeedFast;
 
 class Effect_SpeedSpeedBased : public ChaosEffect {
@@ -71,6 +73,7 @@ public:
 		GameSpeedModifier = 1.0;
 	}
 	bool HasTimer() override { return true; }
+	bool CanQuickTrigger() override { return false; }
 } E_SpeedSpeedBased;
 
 class Effect_RealTimeSpeedbrk : public ChaosEffect {
