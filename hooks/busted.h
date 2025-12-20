@@ -11,5 +11,5 @@ void __thiscall MessageBustedHooked(NISListenerActivity* pThis, int a2) {
 }
 
 ChloeHook Hook_Busted([]() {
-	NyaHookLib::Patch(0x44F1C2, &MessageBustedHooked);
+	NyaHookLib::Patch(0x44F1C2 + 1, &MessageBustedHooked);
 });

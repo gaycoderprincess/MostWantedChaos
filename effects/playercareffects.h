@@ -345,7 +345,6 @@ public:
 	bool IsConditionallyAvailable() override { return true; }
 } E_911;*/
 
-// todo this one could use audio
 class Effect_PlayerCarSpin : public ChaosEffect {
 public:
 	Effect_PlayerCarSpin() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
@@ -354,6 +353,15 @@ public:
 		fTimerLength = 10;
 	}
 
+	NyaAudio::NyaSound sound = 0;
+
+	void InitFunction() override {
+		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/funky.mp3");
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound);
+		}
+	}
 	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			auto vel = *ply->GetAngularVelocity();
