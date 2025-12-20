@@ -104,6 +104,38 @@ void DoChaosTeddieLoad() {
 	}
 }
 
+void DoChaos8DownSave() {
+	std::vector<tTeddieSave> save;
+	for (auto& peanut : Effect_8Down::aObjectsInWorld) {
+		auto model = &Render3DObjects::aObjects[peanut];
+		if (model->IsEmpty()) continue;
+		save.push_back({model->mMatrix, model->vColPosition});
+	}
+
+	std::ofstream file("CwoeeChaos/save/8down.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+}
+
+void DoChaos8DownLoad() {
+	std::ifstream file("CwoeeChaos/save/8down.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		tTeddieSave save;
+		file.read((char*)&save, sizeof(save));
+		Effect_8Down::SpawnObject(save.matrix, save.colPos);
+	}
+}
+
 void DoChaosSettingsSave() {
 	std::ofstream file("CwoeeChaos/save/settings.sav", std::iostream::out | std::iostream::binary);
 	if (!file.is_open()) return;
@@ -125,6 +157,7 @@ void DoChaosSave() {
 	DoChaosEffectSave();
 	DoChaos173Save();
 	DoChaosTeddieSave();
+	DoChaos8DownSave();
 	DoChaosSettingsSave();
 }
 
@@ -132,5 +165,6 @@ void DoChaosLoad() {
 	DoChaosEffectLoad();
 	DoChaos173Load();
 	DoChaosTeddieLoad();
+	DoChaos8DownLoad();
 	DoChaosSettingsLoad();
 }

@@ -8,7 +8,7 @@ public:
 	static inline float TankDrainRate = 0.015;
 
 	Effect_LeakTank() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Leaking Gas Tank";
+		sName = "Leaking Fuel Tank";
 		IncompatibilityGroups.push_back(Attrib::StringHash32("top_bar"));
 	}
 

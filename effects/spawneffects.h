@@ -254,3 +254,55 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanMultiTrigger() override { return true; }
 } E_173Somewhere;
+
+class Effect_8Down : public ChaosEffect {
+public:
+	Effect_8Down() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "8 Down";
+		sFriendlyName = "Spawn Vending Machine";
+	}
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 180;
+	static inline float rY = 0;
+	static inline float rZ = -90;
+	static inline float offX = 0;
+	static inline float offY = -0.5;
+	static inline float offZ = 4;
+	static inline float scale = 1.0;
+	static inline float colScale = 0.65;
+
+	static inline std::vector<int> aObjectsInWorld;
+
+	static void SpawnObject(UMath::Matrix4 mat, NyaVec3 colPos) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("8down.fbx");
+		}
+
+		aObjectsInWorld.push_back(Render3DObjects::aObjects.size());
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, colPos, colScale));
+	}
+
+	void InitFunction() override {
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+			auto colPos = mat.p;
+			colPos += mat.x * offX;
+			colPos += mat.z * offZ;
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+			mat.x *= scale;
+			mat.y *= scale;
+			mat.z *= scale;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+			SpawnObject(mat, colPos);
+		}
+	}
+} E_8Down;
