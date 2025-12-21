@@ -291,6 +291,7 @@ FECarRecord* CreateStockCarRecord(const char* carModel) {
 	return nullptr;
 }
 
+int nNumPlayerCarChangesThisRace = 0;
 IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, bool forceNOS = false) {
 	// really weird hack for transparent car skins, change to a non-skinnable car first
 	// works but crashes the game after a few attempts
@@ -334,6 +335,8 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, b
 	}
 
 	if (auto newCar = PVehicle::Construct(param)) {
+		nNumPlayerCarChangesThisRace++;
+
 		newCar->Attach(GetLocalPlayer());
 		oldCar->Detach(GetLocalPlayer());
 		oldCar->Kill();

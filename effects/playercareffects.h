@@ -894,9 +894,9 @@ public:
 	bool HasTimer() override { return true; }
 } E_PlayerCarGearR;
 
-class Effect_SetCarTRAFPIZZA : public ChaosEffect {
+class Effect_SetCarTRAFPIZZA : public EffectBase_NoCarChangeYetConditional {
 public:
-	Effect_SetCarTRAFPIZZA() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_SetCarTRAFPIZZA() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "It's Pizza Time";
 		sFriendlyName = "Change Car To TRAFPIZZA";
 		AddToFilterGroup("change_player_car");
@@ -910,9 +910,9 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_SetCarTRAFPIZZA;
 
-class Effect_SetCarRazor : public ChaosEffect {
+class Effect_SetCarRazor : public EffectBase_NoCarChangeYetConditional {
 public:
-	Effect_SetCarRazor() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_SetCarRazor() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Razor's Mustang";
 		AddToFilterGroup("change_player_car");
 	}
@@ -926,9 +926,9 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_SetCarRazor;
 
-class Effect_SetCarRandom : public ChaosEffect {
+class Effect_SetCarRandom : public EffectBase_NoCarChangeYetConditional {
 public:
-	Effect_SetCarRandom() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_SetCarRandom() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Random Model";
 		AddToFilterGroup("change_player_car");
 	}
@@ -950,9 +950,9 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandom;
 
-class Effect_SetCarRandomAI : public ChaosEffect {
+class Effect_SetCarRandomAI : public EffectBase_NoCarChangeYetConditional {
 public:
-	Effect_SetCarRandomAI() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_SetCarRandomAI() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To AI Traffic/Police Car";
 		AddToFilterGroup("change_player_car");
 	}
@@ -1602,7 +1602,7 @@ public:
 			ply->ToggleGameBreaker();
 		}
 	}
-	bool IsAvailable() override { return GetLocalPlayerVehicle()->GetSpeed() > TOMPS(50); }
+	bool IsAvailable() override { return GetLocalPlayerVehicle()->GetSpeed() > TOMPS(60); }
 	bool IsRehideable() override { return true; }
 	bool HasTimer() override { return true; }
 	bool CanQuickTrigger() override { return false; }

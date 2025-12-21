@@ -260,6 +260,10 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 }
 
 void ChaosLoop() {
+	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) {
+		nNumPlayerCarChangesThisRace = 0;
+	}
+
 	DLLDirSetter _setdir;
 
 	static bool bOnce = true;

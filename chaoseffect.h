@@ -403,7 +403,12 @@ int GetRandomNumber(int min, int max) {
 
 bool CanEffectBeRandomlyPicked(ChaosEffect* effect) {
 	if (effect->bTriggeredThisCycle) return false;
-	//if (effect->fLastTriggerTime) // todo
+
+	// wait 30 minutes minimum before repeating an effect
+	auto time = std::time(0);
+	int timeDiff = time - effect->LastTriggerTime;
+	if (timeDiff < 30 * 60) return false;
+
 	if (!CanEffectActivate(effect)) return false;
 	return true;
 }
@@ -425,10 +430,17 @@ ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 		}
 	}
 	if (availableEffects.empty()) {
-		for (auto& effect : ChaosEffect::aEffects) {
-			effect->bTriggeredThisCycle = false;
+		bool anyReset = false;
+		for (auto& e : ChaosEffect::aEffects) {
+			if (e->bTriggeredThisCycle) anyReset = true;
+			e->bTriggeredThisCycle = false;
 		}
-		return GetRandomEffect();
+		if (!anyReset) {
+			for (auto& e : ChaosEffect::aEffects) {
+				e->LastTriggerTime = 0;
+			}
+		}
+		return GetRandomEffect(quickTrigger);
 	}
 	return availableEffects[GetRandomNumber(0, availableEffects.size())];
 }

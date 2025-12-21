@@ -221,3 +221,15 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 };
+
+class EffectBase_NoCarChangeYetConditional : public ChaosEffect {
+public:
+	EffectBase_NoCarChangeYetConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) No Car Change Yet Conditional";
+	}
+
+	bool IsAvailable() override {
+		return nNumPlayerCarChangesThisRace <= 0;
+	}
+	bool AbortOnConditionFailed() override { return true; }
+};

@@ -57,6 +57,8 @@ namespace Render3DObjects {
 		static CNyaTimer gTimer;
 		gTimer.Process();
 
+		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
+
 		auto cars = GetActiveVehicles();
 		for (auto& obj : aObjects) {
 			if (!obj.IsActive()) continue;
@@ -70,6 +72,8 @@ namespace Render3DObjects {
 	}
 
 	void OnTick3D() {
+		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
+
 		for (auto& obj : aObjects) {
 			for (auto& model : obj.aModels) {
 				model->RenderAt(WorldToRenderMatrix(obj.mMatrix));
