@@ -211,6 +211,18 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 };
 
+class EffectBase_InCareerNotInPrologueConditional : public ChaosEffect {
+public:
+	EffectBase_InCareerNotInPrologueConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) In Career & Not In Prologue Conditional";
+	}
+
+	bool IsAvailable() override {
+		return IsInCareerMode() && FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0;
+	}
+	bool AbortOnConditionFailed() override { return true; }
+};
+
 class EffectBase_CareerConditional : public ChaosEffect {
 public:
 	EffectBase_CareerConditional(const char* category) : ChaosEffect(category) {

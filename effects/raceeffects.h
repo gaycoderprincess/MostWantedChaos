@@ -194,7 +194,7 @@ public:
 	void TickFunctionMain(double delta) override {
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
-			if ((IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) || (IsInPursuitRace() && IsPlayerApproachingOldBridge())) {
+			if ((IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) || (cFrontendDatabase::IsFinalEpicChase(FEDatabase) && IsPlayerApproachingOldBridge())) {
 				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 				//aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
@@ -204,7 +204,7 @@ public:
 	bool HideFromPlayer() override {
 		return !active;
 	}
-	bool IsAvailable() override { return IsInNormalRace() || IsInPursuitRace(); }
+	bool IsAvailable() override { return IsInNormalRace() || cFrontendDatabase::IsFinalEpicChase(FEDatabase); }
 	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return active; }
 	bool CanQuickTrigger() override { return false; }

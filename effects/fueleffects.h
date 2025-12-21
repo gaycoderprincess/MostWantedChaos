@@ -77,13 +77,13 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_LeakTankRefuel;
 
-class Effect_LeakTankCash : public EffectBase_NotInPrologueConditional {
+class Effect_LeakTankCash : public EffectBase_InCareerNotInPrologueConditional {
 public:
 	float TankTimer = 0;
 
 	static inline float TankDrainRate = 0.25;
 
-	Effect_LeakTankCash() : EffectBase_NotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_LeakTankCash() : EffectBase_InCareerNotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Realistic Fuel Prices";
 		fTimerLength = 60;
 	}

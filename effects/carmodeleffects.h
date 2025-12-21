@@ -267,3 +267,140 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerCarStockPunto;
+
+class Effect_SetCarTRAFPIZZA : public EffectBase_NoCarChangeYetConditional {
+public:
+	Effect_SetCarTRAFPIZZA() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "It's Pizza Time";
+		sFriendlyName = "Change Car To TRAFPIZZA";
+		AddToFilterGroup("change_player_car");
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() {
+			ChangePlayerCarInWorld(Attrib::StringHash32("cs_clio_trafpizza"), nullptr);
+		});
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_SetCarTRAFPIZZA;
+
+class Effect_SetCarRazor : public EffectBase_NoCarChangeYetConditional {
+public:
+	Effect_SetCarRazor() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Change Car To Razor's Mustang";
+		AddToFilterGroup("change_player_car");
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() {
+			auto car = CreatePinkSlipPreset("RAZORMUSTANG");
+			ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization), true);
+		});
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_SetCarRazor;
+
+class Effect_SetCarRandom : public EffectBase_NoCarChangeYetConditional {
+public:
+	Effect_SetCarRandom() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Change Car To Random Model";
+		AddToFilterGroup("change_player_car");
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() {
+			std::vector<FECarRecord*> validCars;
+			auto cars = GetPlayerCarDB();
+			for (auto &car: cars->CarTable) {
+				if (car.Handle == 0xFFFFFFFF) continue;
+				validCars.push_back(&car);
+			}
+			auto car = validCars[rand() % validCars.size()];
+			auto pCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(cars, car->Customization);
+			auto customization = pCustomization ? *pCustomization : CreateRandomCustomizations(car->VehicleKey);
+			ChangePlayerCarInWorld(car->VehicleKey, &customization, (car->FilterBits & 1) != 0); // add nitro if they're stock
+		});
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_SetCarRandom;
+
+class Effect_SetCarRandomAI : public EffectBase_NoCarChangeYetConditional {
+public:
+	Effect_SetCarRandomAI() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Change Car To AI Traffic/Police Car";
+		AddToFilterGroup("change_player_car");
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() {
+			std::vector<const char*> carModels = {
+					"copgto",
+					"copgtoghost",
+					"copmidsize",
+					"copghost",
+					//"copsport",
+					"copcross",
+					"copsportghost",
+					"copsporthench",
+					"copsuv",
+					"copsuvl",
+					"copsuvpatrol",
+					"semi",
+					"semia",
+					"semib",
+					"semicmt",
+					"semicon",
+					"semicrate",
+					"semilog",
+					"traf4dseda",
+					"traf4dsedb",
+					"traf4dsedc",
+					"trafcourt",
+					"trafficcoup",
+					"trafha",
+					"trafpizza",
+					"trafstwag",
+					"traftaxi",
+					"trafamb",
+					"trafcemtr",
+					"trafdmptr",
+					"traffire",
+					"trafgarb",
+					//"trafcamper",
+					"trafminivan",
+					"trafnews",
+					"trafpickupa",
+					"trafsuva",
+					"trafvanb",
+			};
+
+			uint32_t model = Attrib::StringHash32(carModels[rand()%carModels.size()]);
+			ChangePlayerCarInWorld(model, nullptr);
+		});
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_SetCarRandomAI;
+
+// this can crash sometimes?
+class Effect_SetCarRandomOpponent : public EffectBase_OpponentInRaceConditional {
+public:
+	Effect_SetCarRandomOpponent() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Grand Theft Auto";
+		sFriendlyName = "Steal Car From Random Opponent";
+		AddToFilterGroup("change_player_car");
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([]() {
+			auto cars = GetActiveVehicles(DRIVER_RACER);
+			if (cars.empty()) return;
+
+			auto car = cars[rand()%cars.size()];
+			auto carModel = car->GetVehicleName();
+			auto carTuning = (FECustomizationRecord*)car->GetCustomizations();
+			ChangePlayerCarInWorld(Attrib::StringHash32(carModel), carTuning, true);
+		});
+	}
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_SetCarRandomOpponent;

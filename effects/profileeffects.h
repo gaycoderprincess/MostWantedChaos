@@ -60,9 +60,9 @@ public:
 } E_NoVisualTreatment;
 
 
-class Effect_Millionaire : public ChaosEffect {
+class Effect_Millionaire : public EffectBase_CareerConditional {
 public:
-	Effect_Millionaire() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_Millionaire() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Millionaire";
 	}
 
@@ -71,9 +71,9 @@ public:
 	}
 } E_Millionaire;
 
-class Effect_Millionaire2 : public EffectBase_NotInPrologueConditional {
+class Effect_Millionaire2 : public EffectBase_InCareerNotInPrologueConditional {
 public:
-	Effect_Millionaire2() : EffectBase_NotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_Millionaire2() : EffectBase_InCareerNotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Anti-Millionaire";
 	}
 
@@ -281,7 +281,7 @@ public:
 				{"Taz", "BL14", "is300"},
 				{"Sonny", "BL15", "gti"},
 				{"Rog", "OPM_MUSTANG_BOSS", "gto"},
-				{"Mia", "E3_DEMO_RX8", nullptr},//"rx8"}, // mia isn't actually a blacklist member, is this fine to have?
+				{"Mia", "E3_DEMO_RX8", nullptr},//"rx8"},
 				{"Razor - Mustang", "RAZORMUSTANG", nullptr},//"mustanggt"},
 				{"Ronnie - Supra", "DDAYSUPRA", nullptr},//"supra"},
 				{"Cross", nullptr, "copcross"},
