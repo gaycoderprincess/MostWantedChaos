@@ -150,7 +150,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_InfNitro;
 
 class Effect_NoGameBreaker : public ChaosEffect {
@@ -183,7 +182,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_NoNitro;
 
 class Effect_SetHeat1 : public ChaosEffect {
@@ -395,7 +393,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneAero;
 
 class Effect_PlayerCarTuneHandling : public EffectBase_HasTuningConditional {
@@ -421,7 +418,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHandling;
 
 class Effect_PlayerCarTuneHandling2 : public EffectBase_HasTuningConditional {
@@ -447,7 +443,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHandling2;
 
 /*class Effect_PlayerCarTuneHeight : public EffectBase_HasTuningConditional {
@@ -473,7 +468,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight;*/
 
 /*class Effect_PlayerCarTuneHeight2 : public EffectBase_HasTuningConditional {
@@ -499,7 +493,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight2;*/
 
 class Effect_PlayerCarTuneHeight3 : public EffectBase_HasTuningConditional {
@@ -525,7 +518,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight3;
 
 class Effect_PlayerCarTuneHeight4 : public EffectBase_HasTuningConditional {
@@ -561,7 +553,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneHeight4;
 
 class Effect_PlayerCarTuneNitro : public EffectBase_PlayerCarHasNitro {
@@ -587,7 +578,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneNitro;
 
 class Effect_PlayerCarTuneNitro2 : public EffectBase_PlayerCarHasNitro {
@@ -616,7 +606,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarTuneNitro2;
 
 class Effect_PlayerCarReset : public ChaosEffect {
@@ -1354,7 +1343,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_NOSBoost;
 
 class Effect_CruiseControl : public ChaosEffect {

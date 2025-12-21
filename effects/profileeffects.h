@@ -161,7 +161,6 @@ public:
 		if (!career) return;
 		career->TheImpoundData.mTimesBusted++;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundStrike;
 
 /*class Effect_PlayerCarImpoundStrikeRemove : public ChaosEffect {
@@ -202,7 +201,6 @@ public:
 		if (!career) return;
 		career->TheImpoundData.mMaxBusted++;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarImpoundMarker;*/
 
 class Effect_AddRandomTuningMarker : public EffectBase_CareerConditional {
@@ -431,7 +429,6 @@ public:
 	void InitFunction() override {
 		GetPlayerCarDB()->SoldHistoryBounty += 100000;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool CanMultiTrigger() override { return true; }
 } E_AddBounty;
 
@@ -450,6 +447,5 @@ public:
 			EffectInstance->sNameToDisplay = "Subtract 1 Million Bounty";
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool CanMultiTrigger() override { return true; }
 } E_SubtractBounty;

@@ -10,6 +10,7 @@ public:
 		}
 		return false;
 	}
+	bool AbortOnConditionFailed() override { return true; }
 };
 
 class EffectBase_OpponentInRaceOrRoamingConditional : public ChaosEffect {
@@ -195,6 +196,7 @@ public:
 		}
 		return false;
 	}
+	bool AbortOnConditionFailed() override { return true; }
 };
 
 class EffectBase_NotInPrologueConditional : public ChaosEffect {
