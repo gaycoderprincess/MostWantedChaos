@@ -384,6 +384,7 @@ public:
 	bool CanQuickTrigger() override { return false; }
 } E_RefillActiveTimers;
 
+// this is a pretty useless effect *but* it serves as a good way to put the credits in your face that wouldn't ever be shown otherwise
 class Effect_Credits : public ChaosEffect {
 public:
 	Effect_Credits() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
@@ -401,7 +402,6 @@ public:
 			"With additional help from",
 			"xan1242",
 			"",
-			"Models",
 	};
 	static inline float fScrollSpeed = 0.1;
 	static inline float fSpacingY = 0.05;
@@ -413,7 +413,7 @@ public:
 		data.x = 0.5;
 		data.y = (1 + y * fSpacingY) - fScrollY * fScrollSpeed;
 		data.size = 0.04;
-		data.XCenterAlign = 1;
+		data.XCenterAlign = true;
 		data.outlinea = 255;
 		data.outlinedist = 0.025;
 		DrawString(data, str);
@@ -429,6 +429,7 @@ public:
 			std::ifstream fin("CwoeeChaos/data/models/model_credits.txt");
 			if (!fin.is_open()) return;
 
+			aData.push_back("Models");
 			for (std::string line; std::getline(fin, line); ) {
 				if (line.empty()) continue;
 				aData.push_back(line);
