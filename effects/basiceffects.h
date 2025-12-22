@@ -383,3 +383,74 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_RefillActiveTimers;
+
+class Effect_Credits : public ChaosEffect {
+public:
+	Effect_Credits() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Chaos Mod Credits";
+	}
+
+	double fScrollY = 0;
+
+	static inline std::vector<std::string> aData = {
+			std::format("Cwoee Chaos v{}", CWOEECHAOS_VERSION),
+			"",
+			"Main Developer",
+			"gaycoderprincess",
+			"",
+			"With additional help from",
+			"xan1242",
+			"",
+			"Models",
+	};
+	static inline float fScrollSpeed = 0.1;
+	static inline float fSpacingY = 0.05;
+
+	bool abort = false;
+
+	bool DrawCredit(const std::string& str, float y) {
+		tNyaStringData data;
+		data.x = 0.5;
+		data.y = (1 + y * fSpacingY) - fScrollY * fScrollSpeed;
+		data.size = 0.04;
+		data.XCenterAlign = 1;
+		data.outlinea = 255;
+		data.outlinedist = 0.025;
+		DrawString(data, str);
+		return y > -0.25;
+	}
+
+	void InitFunction() override {
+		abort = false;
+		fScrollY = 0;
+
+		static bool bOnce = true;
+		if (bOnce) {
+			std::ifstream fin("CwoeeChaos/data/models/model_credits.txt");
+			if (!fin.is_open()) return;
+
+			for (std::string line; std::getline(fin, line); ) {
+				if (line.empty()) continue;
+				aData.push_back(line);
+			}
+
+			bOnce = false;
+		}
+	}
+	void TickFunctionMain(double delta) override {
+		bool anyDrawn = false;
+		int y = 0;
+		for (auto& str : aData) {
+			if (DrawCredit(str, y)) anyDrawn = true;
+			y++;
+		}
+		fScrollY += delta;
+
+		if (!anyDrawn) {
+			abort = true;
+		}
+	}
+	bool ShouldAbort() override { return abort; }
+	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_Credits;
