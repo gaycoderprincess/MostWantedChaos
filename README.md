@@ -7,7 +7,7 @@ This is just a fun side project for me to mess around with while I learn how the
 
 ## Installation
 
-- Make sure you have v1.3 of the game, as this is the only version this plugin is compatible with. (exe size of 6029312 bytes)
+- Make sure you have v1.3 of the game, as this is the only version this plugin is compatible with. (exe size of 6029312 bytes, other regions such as the Asian version are not and will never be supported)
 - Plop the files into your game folder, press F5 in game to open the menu.
 - Enjoy, nya~ :3
 
