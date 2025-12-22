@@ -35,6 +35,9 @@ public:
 				ply->Sabotage(3);
 			}
 		}
+		else {
+			Achievements::AwardAchievement(GetAchievement("QTE"));
+		}
 	}
 	bool CanQuickTrigger() override { return false; }
 } E_QTE;

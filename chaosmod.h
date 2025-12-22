@@ -269,6 +269,7 @@ void ChaosLoop() {
 	static bool bOnce = true;
 	if (bOnce) {
 		DoChaosLoad();
+		g_VisualTreatment = true;
 		bOnce = false;
 	}
 
@@ -351,7 +352,13 @@ void ChaosModMenu() {
 	if (DrawMenuOption(std::format("Chaos On - {}", bTimerEnabled))) {
 		bTimerEnabled = !bTimerEnabled;
 	}
+
+	auto tmp = fEffectCycleTimer;
 	QuickValueEditor("Cycle Timer", fEffectCycleTimer);
+	if (tmp != fEffectCycleTimer) {
+		if (fEffectCycleTimer < tmp) fTimeSinceLastEffect = 0;
+		if (fEffectCycleTimer < 5) fEffectCycleTimer = 5;
+	}
 
 	if (DrawMenuOption("UI")) {
 		ChloeMenuLib::BeginMenu();
@@ -362,13 +369,6 @@ void ChaosModMenu() {
 		QuickValueEditor("fEffectY", fEffectY);
 		QuickValueEditor("fEffectSize", fEffectSize);
 		QuickValueEditor("fEffectSpacing", fEffectSpacing);
-		QuickValueEditor("fEffectTextureXSpacing", fEffectTextureXSpacing);
-		QuickValueEditor("fEffectTextureYSpacing", fEffectTextureYSpacing);
-		QuickValueEditor("fEffectArcX", fEffectArcX);
-		QuickValueEditor("fEffectArcSize", fEffectArcSize);
-		QuickValueEditor("fEffectArcThickness", fEffectArcThickness);
-		QuickValueEditor("fEffectArcRotation", fEffectArcRotation);
-		QuickValueEditor("fEffectTimerTextSize", fEffectTimerTextSize);
 		QuickValueEditor("fEffectVotingSize", fEffectVotingSize);
 		ChloeMenuLib::EndMenu();
 	}

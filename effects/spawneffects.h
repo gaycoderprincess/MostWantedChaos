@@ -183,6 +183,8 @@ public:
 
 						obj->aModels.clear(); // despawn after one kill
 						aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+
+						DoChaosSave();
 					}
 					else if (!IsCarDestroyed(car)) {
 						if (soundAlt) {

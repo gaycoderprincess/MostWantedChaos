@@ -41,6 +41,7 @@ namespace Achievements {
 		new CAchievement("EVADE_WRECKED", "100% Skilled Luck", "Escape a pursuit while totaled"),
 		new CAchievement("REFUEL", "Second Chance", "Get your leaking gas tank refueled"),
 		new CAchievement("BUSTED_MANY", "Skill Issues", "Get busted 25 times"),
+		new CAchievement("QTE", "Button Masher", "Pass a Quick-Time Event"),
 	};
 
 	const float fSpriteBGX = 960;

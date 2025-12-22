@@ -142,6 +142,12 @@ void DoChaosSettingsSave() {
 
 	file.write((char*)&bDarkMode, sizeof(bDarkMode));
 	file.write((char*)&nTimesBusted, sizeof(nTimesBusted));
+	file.write((char*)&fEffectCycleTimer, sizeof(fEffectCycleTimer));
+	file.write((char*)&fEffectX, sizeof(fEffectX));
+	file.write((char*)&fEffectY, sizeof(fEffectY));
+	file.write((char*)&fEffectSize, sizeof(fEffectSize));
+	file.write((char*)&fEffectSpacing, sizeof(fEffectSpacing));
+	file.write((char*)&fEffectVotingSize, sizeof(fEffectVotingSize));
 }
 
 void DoChaosSettingsLoad() {
@@ -150,6 +156,12 @@ void DoChaosSettingsLoad() {
 
 	file.read((char*)&bDarkMode, sizeof(bDarkMode));
 	file.read((char*)&nTimesBusted, sizeof(nTimesBusted));
+	file.read((char*)&fEffectCycleTimer, sizeof(fEffectCycleTimer));
+	file.read((char*)&fEffectX, sizeof(fEffectX));
+	file.read((char*)&fEffectY, sizeof(fEffectY));
+	file.read((char*)&fEffectSize, sizeof(fEffectSize));
+	file.read((char*)&fEffectSpacing, sizeof(fEffectSpacing));
+	file.read((char*)&fEffectVotingSize, sizeof(fEffectVotingSize));
 }
 
 void DoChaosSave() {

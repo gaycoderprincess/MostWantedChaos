@@ -1263,6 +1263,7 @@ class Effect_HeatSteer : public ChaosEffect {
 public:
 	Effect_HeatSteer() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Heated Steering";
+		sFriendlyName = "Steer To Change Heat Level";
 		fTimerLength = 60;
 	}
 

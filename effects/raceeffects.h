@@ -121,9 +121,9 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_Add3Laps;
 
-class Effect_RestartRace : public EffectBase_InRaceConditional {
+class Effect_RestartRace : public EffectBase_InAnyRaceConditional {
 public:
-	Effect_RestartRace() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+	Effect_RestartRace() : EffectBase_InAnyRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Restart Race";
 	}
 

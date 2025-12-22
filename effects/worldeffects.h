@@ -331,6 +331,11 @@ public:
 		g_VisualTreatment = true;
 	}
 	bool IsAvailable() override {
+		// only available in december or january
+		static auto t = std::time(NULL);
+		static auto localtime = std::localtime(&t);
+		if (localtime->tm_mon != 11 && localtime->tm_mon != 0) return false;
+
 		return g_VisualTreatment;
 	}
 	bool AbortOnConditionFailed() override { return true; }
