@@ -20,7 +20,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		return !VEHICLE_LIST::GetList(VEHICLE_AIRACERS).empty();
+		return !GetActiveVehicles(DRIVER_RACER).empty();
 	}
 };
 
@@ -31,7 +31,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		return !VEHICLE_LIST::GetList(VEHICLE_AIRACERS).empty() && GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
+		return !GetActiveVehicles(DRIVER_RACER).empty() && GRaceStatus::fObj && GRaceStatus::fObj->mRaceParms;
 	}
 };
 

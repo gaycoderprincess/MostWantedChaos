@@ -20,9 +20,8 @@ public:
 		}
 	}
 	void TickFunctionMain(double delta) override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
-		for (int i = 0; i < list.size(); i++) {
-			auto veh = list[i];
+		auto cars = GetActiveVehicles(DRIVER_COP);
+		for (auto& veh : cars) {
 			if (!veh->IsActive() && !veh->IsLoading()) veh->Activate();
 		}
 	}
@@ -157,18 +156,16 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_COP);
+		for (auto& car : cars) {
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
 				ply->SetCollisionMass(100000);
 			}
 		}
 	}
 	void DeinitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AICOPS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_COP);
+		for (auto& car : cars) {
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
 				ply->SetCollisionMass(car->mCOMObject->Find<IRigidBody>()->GetMass());
 			}

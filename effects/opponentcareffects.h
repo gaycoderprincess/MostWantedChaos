@@ -8,9 +8,8 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto racer = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& racer : cars) {
 			auto engine = racer->mCOMObject->Find<IEngineDamage>();
 			if (!engine) continue;
 			engine->Sabotage(1);
@@ -26,7 +25,7 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
+		auto list = GetActiveVehicles(DRIVER_RACER);
 		int i = rand() % list.size();
 		auto racer = list[i];
 		auto engine = racer->mCOMObject->Find<IEngineDamage>();
@@ -44,9 +43,8 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto racer = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& racer : cars) {
 			racer->SetSpeed(TOMPS(400));
 		}
 	}
@@ -60,9 +58,8 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto racer = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& racer : cars) {
 			racer->SetSpeed(TOMPS(-200));
 		}
 	}
@@ -76,9 +73,8 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto racer = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& racer : cars) {
 			auto ply = racer->mCOMObject->Find<IRigidBody>();
 			UMath::Vector3 side;
 			ply->GetRightVector(&side);
@@ -98,9 +94,8 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto racer = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& racer : cars) {
 			auto ply = racer->mCOMObject->Find<IRigidBody>();
 			if (!ply) continue;
 			UMath::Vector3 vel = *ply->GetLinearVelocity();
@@ -119,9 +114,8 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			auto rb = car->mCOMObject->Find<IRigidBody>();
 			auto vel = *rb->GetAngularVelocity();
 			vel.y += 25 * delta;
@@ -147,6 +141,12 @@ public:
 
 	void InitFunction() override {
 		NyaHookLib::Patch(0x8925C8, &GetCatchupCheatHooked);
+	}
+	void TickFunctionMain(double delta) override {
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
+			car->mCOMObject->Find<IVehicleAI>()->SetDriveSpeed(TOMPS(400));
+		}
 	}
 	void DeinitFunction() override {
 		NyaHookLib::Patch(0x8925C8, 0x409390);
@@ -184,9 +184,8 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			auto ply = car->mCOMObject->Find<ISpikeable>();
 			ply->Puncture(0);
 			ply->Puncture(1);
@@ -204,9 +203,8 @@ public:
 	}
 
 	void InitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			auto ply = car->mCOMObject->Find<IRacer>();
 			ply->QuitRace();
 		}
@@ -222,18 +220,16 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
 				ply->SetCollisionMass(0.01);
 			}
 		}
 	}
 	void DeinitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
 				ply->SetCollisionMass(car->mCOMObject->Find<IRigidBody>()->GetMass());
 			}
@@ -251,9 +247,8 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
 				auto inst = Attrib::Instance(Attrib::FindCollection(Attrib::StringHash32("collisionreactions"), Attrib::StringHash32("cops")), 0, nullptr);
 				ply->SetPlayerReactions(&inst);
@@ -261,9 +256,8 @@ public:
 		}
 	}
 	void DeinitFunction() override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			if (auto ply = car->mCOMObject->Find<IRBVehicle>()) {
 				auto inst = Attrib::Instance(Attrib::FindCollection(Attrib::StringHash32("collisionreactions"), Attrib::StringHash32("racing")), 0, nullptr);
 				ply->SetPlayerReactions(&inst);
@@ -282,9 +276,8 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			car->mCOMObject->Find<IEngine>()->ChargeNOS(-1);
 		}
 	}
@@ -309,9 +302,8 @@ public:
 	void CaptureAllCars() {
 		lastStates.clear();
 
-		auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-		for (int i = 0; i < list.size(); i++) {
-			auto car = list[i];
+		auto cars = GetActiveVehicles(DRIVER_RACER);
+		for (auto& car : cars) {
 			lastStates.push_back({car, car->GetVehicleKey(), *car->GetPosition()});
 		}
 	}

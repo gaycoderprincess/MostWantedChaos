@@ -39,12 +39,6 @@ IPlayer* GetLocalPlayer() {
 	return list[0];
 }
 
-IVehicle* GetOpponentPlayer(int id) {
-	auto& list = VEHICLE_LIST::GetList(VEHICLE_AIRACERS);
-	if (list.size() < id) return nullptr;
-	return list[id];
-}
-
 ISimable* GetLocalPlayerSimable() {
 	auto ply = GetLocalPlayer();
 	if (!ply) return nullptr;
