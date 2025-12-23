@@ -149,19 +149,6 @@ namespace Render3D {
 	std::vector<tModel*> aAllModels;
 	std::vector<tTextureInfo> aAllTextures;
 
-	std::string GetMaterialFilename(aiMaterial* material) {
-		aiString tmp;
-		material->GetTexture(aiTextureType_DIFFUSE, 0, &tmp);
-		std::string str = tmp.C_Str();
-		while (str.find('\\') != std::string::npos) {
-			str.erase(str.begin());
-		}
-		while (str.find('/') != std::string::npos) {
-			str.erase(str.begin());
-		}
-		return str;
-	}
-
 	tModel* CreateOneModel(int numVertices, int numFaces, const NyaVec3* vertices, const NyaVec3* normals, const NyaVec3* tangents, const NyaVec3* bitangents, const NyaVec3* uvs, const NyaDrawing::CNyaRGBA32* colors, const int* indices, const std::string& material) {
 		auto model = new tModel;
 
@@ -253,192 +240,67 @@ namespace Render3D {
 		return model;
 	}
 
-	tModel* CreateOneModel(const aiMesh* mesh, aiMaterial* material) {
-		auto model = new tModel;
-
-		size_t vertexTotalSize = mesh->mNumVertices * sizeof(CwoeeVertexData);
-		size_t indexTotalSize = mesh->mNumFaces * 3 * 4;
-		auto hr = g_pd3dDevice->CreateVertexBuffer(vertexTotalSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1, D3DPOOL_DEFAULT, &model->pVertexBuffer, nullptr);
-		if (hr != D3D_OK) {
-			delete model;
-			return nullptr;
-		}
-		hr = g_pd3dDevice->CreateIndexBuffer(indexTotalSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFMT_INDEX32, D3DPOOL_DEFAULT, &model->pIndexBuffer, nullptr);
-		if (hr != D3D_OK) {
-			model->pVertexBuffer->Release();
-			delete model;
-			return nullptr;
-		}
-
-		CwoeeVertexData* vertices = nullptr;
-		int* indices = nullptr;
-		hr = model->pVertexBuffer->Lock(0, vertexTotalSize, (void**)&vertices, D3DLOCK_DISCARD);
-		if (hr != D3D_OK) {
-			model->pVertexBuffer->Release();
-			model->pIndexBuffer->Release();
-			delete model;
-			return nullptr;
-		}
-		hr = model->pIndexBuffer->Lock(0, indexTotalSize, (void**)&indices, D3DLOCK_DISCARD);
-		if (hr != D3D_OK) {
-			model->pVertexBuffer->Release();
-			model->pIndexBuffer->Release();
-			delete model;
-			return nullptr;
-		}
-
-		for (int i = 0; i < mesh->mNumVertices; i++) {
-			auto src = &mesh->mVertices[i];
-			auto srcNormal = &mesh->mNormals[i];
-			auto srcTangent = &mesh->mTangents[i];
-			auto srcUV = &mesh->mTextureCoords[0][i];
-			auto dest = &vertices[i];
-			dest->vPos[0] = src->x;
-			dest->vPos[1] = src->y;
-			dest->vPos[2] = src->z;
-			if (mesh->mNormals) {
-				dest->vNormals[0] = srcNormal->x;
-				dest->vNormals[1] = srcNormal->y;
-				dest->vNormals[2] = srcNormal->z;
-			}
-			if (mesh->mTangents) {
-				dest->vTangents[0] = srcTangent->x;
-				dest->vTangents[1] = srcTangent->y;
-				dest->vTangents[2] = srcTangent->z;
-			}
-			dest->Color = nVertexColorValue;
-			if (mesh->mTextureCoords[0]) {
-				dest->vUV[0] = srcUV->x;
-				dest->vUV[1] = srcUV->y * -1;
-			}
-		}
-
-		int indexCount = 0;
-		for (int i = 0; i < mesh->mNumFaces; i++) {
-			auto src = mesh->mFaces[i];
-			indices[indexCount++] = src.mIndices[0];
-			indices[indexCount++] = src.mIndices[1];
-			indices[indexCount++] = src.mIndices[2];
-		}
-		model->nVertexCount = mesh->mNumVertices;
-		model->nFaceCount = mesh->mNumFaces;
-
-		model->pVertexBuffer->Unlock();
-		model->pIndexBuffer->Unlock();
-
-		auto baseTextureName = GetMaterialFilename(material);
-		auto textureName = sTextureSubdir + baseTextureName;
-		model->sTextureName = baseTextureName;
-
-		for (auto& texture : aAllTextures) {
-			if (texture.sFile == textureName) {
-				model->pTexture = texture.pTexture;
-				break;
-			}
-		}
-		if (!model->pTexture) {
-			if (auto tex = LoadTexture(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
-				model->pTexture = tex;
-				aAllTextures.push_back({textureName, model->pTexture});
-			} else {
-				MessageBoxA(nullptr, std::format("Failed to load texture {}", textureName).c_str(), "nya?!~", MB_ICONERROR);
-			}
-		}
-
-		aAllModels.push_back(model);
-		return model;
-	}
-
 	std::vector<tModel*> CreateModels(const std::string& path) {
-		auto fullPath = std::format("CwoeeChaos/data/models/{}", path);
 		auto fullPathCwo = std::format("CwoeeChaos/data/models/{}.cwo", path);
-
-		if (std::filesystem::exists(fullPathCwo)) {
-			WriteLog(std::format("loading file {}", fullPathCwo));
-
-			std::vector<tModel*> models;
-
-			std::ifstream out(fullPathCwo, std::iostream::in | std::iostream::binary);
-			if (!out.is_open()) return {};
-
-			int version = 0;
-			out.read((char*)&version, sizeof(version));
-			WriteLog(std::format("version {}", version));
-			if (version > 1) return {};
-
-			int numMeshes = 0;
-			out.read((char*)&numMeshes, sizeof(numMeshes));
-			WriteLog(std::format("numMeshes {}", numMeshes));
-
-			for (int i = 0; i < numMeshes; i++) {
-				auto materialName = ReadStringFromFile(out);
-				WriteLog(std::format("materialName {}", materialName));
-				int numVertices = 0;
-				out.read((char*)&numVertices, sizeof(numVertices));
-				WriteLog(std::format("numVertices {}", numVertices));
-				int numFaces = 0;
-				out.read((char*)&numFaces, sizeof(numFaces));
-				WriteLog(std::format("numFaces {}", numFaces));
-
-				auto vertices = new NyaVec3[numVertices];
-				auto normals = new NyaVec3[numVertices];
-				auto tangents = new NyaVec3[numVertices];
-				auto bitangents = new NyaVec3[numVertices];
-				auto uvs = new NyaVec3[numVertices];
-				auto colors = new NyaDrawing::CNyaRGBA32[numVertices];
-				auto faces = new int[numFaces*3];
-				for (int j = 0; j < numVertices; j++) {
-					out.read((char*)&vertices[j], sizeof(vertices[j]));
-					out.read((char*)&normals[j], sizeof(normals[j]));
-					out.read((char*)&tangents[j], sizeof(tangents[j]));
-					out.read((char*)&bitangents[j], sizeof(bitangents[j]));
-					out.read((char*)&uvs[j], sizeof(uvs[j]));
-					out.read((char*)&colors[j], sizeof(colors[j]));
-				}
-				for (int j = 0; j < numFaces*3; j++) {
-					out.read((char*)&faces[j], sizeof(faces[j]));
-				}
-				auto model = CreateOneModel(numVertices, numFaces, vertices, normals, tangents, bitangents, uvs, colors, faces, materialName);
-				if (!model) continue;
-				models.push_back(model);
-				delete[] vertices;
-				delete[] normals;
-				delete[] tangents;
-				delete[] bitangents;
-				delete[] uvs;
-				delete[] colors;
-				delete[] faces;
-			}
-			return models;
+		if (!std::filesystem::exists(fullPathCwo)) {
+			MessageBoxA(0, std::format("Failed to find model {}!", fullPathCwo).c_str(), "nya?!~", MB_ICONERROR);
+			exit(0);
 		}
-		else {
-			WriteLog(std::format("loading file {}", fullPath));
 
-			std::vector<tModel*> models;
+		WriteLog(std::format("loading file {}", fullPathCwo));
 
-			Assimp::Logger::LogSeverity severity = Assimp::Logger::VERBOSE;
-			Assimp::DefaultLogger::create("model_import_log.txt", severity, aiDefaultLogStream_FILE);
+		std::vector<tModel*> models;
 
-			uint32_t flags = 0;
-			flags |= aiProcess_CalcTangentSpace;
-			flags |= aiProcess_GenSmoothNormals;
-			flags |= aiProcess_JoinIdenticalVertices;
-			flags |= aiProcess_RemoveRedundantMaterials;
-			flags |= aiProcess_Triangulate;
-			flags |= aiProcess_GenUVCoords;
-			flags |= aiProcess_GenBoundingBoxes;
+		std::ifstream out(fullPathCwo, std::iostream::in | std::iostream::binary);
+		if (!out.is_open()) return {};
 
-			static Assimp::Importer importer;
-			if (auto scene = importer.ReadFile(fullPath.c_str(), flags)) {
-				for (int i = 0; i < scene->mNumMeshes; i++) {
-					auto mesh = scene->mMeshes[i];
-					auto model = CreateOneModel(mesh, scene->mMaterials[mesh->mMaterialIndex]);
-					if (!model) continue;
-					models.push_back(model);
-				}
+		int version = 0;
+		out.read((char*)&version, sizeof(version));
+		if (version > 1) return {};
+
+		int numMeshes = 0;
+		out.read((char*)&numMeshes, sizeof(numMeshes));
+
+		for (int i = 0; i < numMeshes; i++) {
+			auto materialName = ReadStringFromFile(out);
+			int numVertices = 0;
+			out.read((char*)&numVertices, sizeof(numVertices));
+			int numFaces = 0;
+			out.read((char*)&numFaces, sizeof(numFaces));
+
+			auto vertices = new NyaVec3[numVertices];
+			auto normals = new NyaVec3[numVertices];
+			auto tangents = new NyaVec3[numVertices];
+			auto bitangents = new NyaVec3[numVertices];
+			auto uvs1 = new NyaVec3[numVertices];
+			auto uvs2 = new NyaVec3[numVertices];
+			auto colors = new NyaDrawing::CNyaRGBA32[numVertices];
+			auto faces = new int[numFaces*3];
+			for (int j = 0; j < numVertices; j++) {
+				out.read((char*)&vertices[j], sizeof(vertices[j]));
+				out.read((char*)&normals[j], sizeof(normals[j]));
+				out.read((char*)&tangents[j], sizeof(tangents[j]));
+				out.read((char*)&bitangents[j], sizeof(bitangents[j]));
+				out.read((char*)&uvs1[j], sizeof(uvs1[j]));
+				out.read((char*)&uvs2[j], sizeof(uvs2[j]));
+				out.read((char*)&colors[j], sizeof(colors[j]));
 			}
-			return models;
+			for (int j = 0; j < numFaces*3; j++) {
+				out.read((char*)&faces[j], sizeof(faces[j]));
+			}
+			auto model = CreateOneModel(numVertices, numFaces, vertices, normals, tangents, bitangents, uvs1, colors, faces, materialName);
+			if (!model) continue;
+			models.push_back(model);
+			delete[] vertices;
+			delete[] normals;
+			delete[] tangents;
+			delete[] bitangents;
+			delete[] uvs1;
+			delete[] uvs2;
+			delete[] colors;
+			delete[] faces;
 		}
+		return models;
 	}
 
 	void OnD3DReset() {

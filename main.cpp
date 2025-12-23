@@ -5,12 +5,6 @@
 #include <random>
 #include <numbers>
 #include <toml++/toml.hpp>
-#include "assimp/Importer.hpp"
-#include "assimp/Exporter.hpp"
-#include "assimp/Logger.hpp"
-#include "assimp/DefaultLogger.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
 
 #include "nya_dx9_hookbase.h"
 #include "nya_commonhooklib.h"

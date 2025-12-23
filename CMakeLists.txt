@@ -69,12 +69,3 @@ set_target_properties(NFSMWChaos PROPERTIES SUFFIX "_gcp.asi")
 
 target_link_libraries(NFSMWChaos d3dx9)
 target_link_libraries(NFSMWChaos bass)
-
-target_link_libraries(NFSMWChaos assimp)
-target_link_libraries(NFSMWChaos zlib)
-target_link_libraries(NFSMWChaos pugixml)
-target_link_libraries(NFSMWChaos polyclipping)
-target_link_libraries(NFSMWChaos minizip)
-target_link_libraries(NFSMWChaos kubazip)
-target_link_libraries(NFSMWChaos poly2tri)
-target_link_libraries(NFSMWChaos draco)
