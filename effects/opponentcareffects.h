@@ -131,7 +131,7 @@ public:
 	Effect_RubberbandOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "FUCKING RUBBERBAND";
 		sFriendlyName = "Opponents Rubberband";
-		fTimerLength = 90;
+		fTimerLength = 60;
 		AddToIncompatiblityGroup("rubberband");
 	}
 
@@ -139,8 +139,26 @@ public:
 		return 50;
 	}
 
+	static bool __thiscall GetPerformanceHooked(IVehicle* pThis, Physics::Info::Performance* out) {
+		out->Acceleration = 1.0;
+		out->Handling = 1.0;
+		out->TopSpeed = 1.0;
+		return true;
+	}
+
+	static float __thiscall GetTopSpeedHooked(IVehicle* pThis) {
+		return 1000;
+	}
+
+	static float __thiscall GetAccelerationHooked(IVehicle* pThis, float a2) {
+		return 1000;
+	}
+
 	void InitFunction() override {
 		NyaHookLib::Patch(0x8925C8, &GetCatchupCheatHooked);
+		NyaHookLib::Patch(0x8AA8FC, &GetPerformanceHooked);
+		NyaHookLib::Patch(0x892A64, &GetTopSpeedHooked);
+		NyaHookLib::Patch(0x892A68, &GetAccelerationHooked);
 	}
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles(DRIVER_RACER);
@@ -150,6 +168,9 @@ public:
 	}
 	void DeinitFunction() override {
 		NyaHookLib::Patch(0x8925C8, 0x409390);
+		NyaHookLib::Patch(0x8AA8FC, 0x688270);
+		NyaHookLib::Patch(0x892A64, 0x431D60);
+		NyaHookLib::Patch(0x892A68, 0x4223E0);
 	}
 	bool HasTimer() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
@@ -176,6 +197,49 @@ public:
 	bool HasTimer() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
 } E_NoRubberbandOpponents;
+
+class Effect_FairOpponents : public EffectBase_OpponentAliveInRaceConditional {
+public:
+	Effect_FairOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Realistic Opponent Performance";
+		fTimerLength = 90;
+		AddToIncompatiblityGroup("rubberband");
+	}
+
+	static float __thiscall GetCatchupCheatHooked(ICheater* pThis) {
+		return 0;
+	}
+
+	static bool __thiscall GetPerformanceHooked(IVehicle* pThis, Physics::Info::Performance* out) {
+		out->Acceleration = 1.0;
+		out->Handling = 1.0;
+		out->TopSpeed = 1.0;
+		return true;
+	}
+
+	static float __thiscall GetTopSpeedHooked(IVehicle* pThis) {
+		return 1000;
+	}
+
+	static float __thiscall GetAccelerationHooked(IVehicle* pThis, float a2) {
+		return 1000;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch(0x8925C8, &GetCatchupCheatHooked);
+		NyaHookLib::Patch(0x8AA8FC, &GetPerformanceHooked);
+		NyaHookLib::Patch(0x892A64, &GetTopSpeedHooked);
+		NyaHookLib::Patch(0x892A68, &GetAccelerationHooked);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8925C8, 0x409390);
+		NyaHookLib::Patch(0x8AA8FC, 0x688270);
+		NyaHookLib::Patch(0x892A64, 0x431D60);
+		NyaHookLib::Patch(0x892A68, 0x4223E0);
+	}
+	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_FairOpponents;
 
 class Effect_SpikeAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:

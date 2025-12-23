@@ -193,8 +193,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::aPrePropsRenderFuncs.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PREPROPS>);
 			NyaHooks::aPropsRenderFuncs.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_POSTPROPS>);
 
-			// SkipFE
-			//*(bool*)0x926064 = 1;
+			//SkipFE = true;
 		} break;
 		default:
 			break;

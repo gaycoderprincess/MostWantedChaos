@@ -321,10 +321,10 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, b
 	vehicleParams.customization = record;
 	vehicleParams.VehicleCache = (IVehicleCache*)GRaceStatus::fObj; // this is what GRacerInfo::CreateVehicle does but it looks SO wrong
 
-	if (forceNOS && record && record->InstalledPhysics.Part[Physics::Upgrades::Package::PUT_NOS] <= 0) {
+	if (forceNOS && record && record->InstalledPhysics.Part[Physics::Upgrades::PUT_NOS] <= 0) {
 		static auto temp = new FECustomizationRecord;
 		*temp = *record;
-		temp->InstalledPhysics.Part[Physics::Upgrades::Package::PUT_NOS] = 1;
+		temp->InstalledPhysics.Part[Physics::Upgrades::PUT_NOS] = 1;
 		vehicleParams.customization = temp;
 	}
 
