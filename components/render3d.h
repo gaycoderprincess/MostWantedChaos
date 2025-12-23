@@ -249,56 +249,13 @@ namespace Render3D {
 
 		WriteLog(std::format("loading file {}", fullPathCwo));
 
+		auto modelsCwo = ReadCwoeeModel(fullPathCwo);
 		std::vector<tModel*> models;
-
-		std::ifstream out(fullPathCwo, std::iostream::in | std::iostream::binary);
-		if (!out.is_open()) return {};
-
-		int version = 0;
-		out.read((char*)&version, sizeof(version));
-		if (version > 1) return {};
-
-		int numMeshes = 0;
-		out.read((char*)&numMeshes, sizeof(numMeshes));
-
-		for (int i = 0; i < numMeshes; i++) {
-			auto materialName = ReadStringFromFile(out);
-			int numVertices = 0;
-			out.read((char*)&numVertices, sizeof(numVertices));
-			int numFaces = 0;
-			out.read((char*)&numFaces, sizeof(numFaces));
-
-			auto vertices = new NyaVec3[numVertices];
-			auto normals = new NyaVec3[numVertices];
-			auto tangents = new NyaVec3[numVertices];
-			auto bitangents = new NyaVec3[numVertices];
-			auto uvs1 = new NyaVec3[numVertices];
-			auto uvs2 = new NyaVec3[numVertices];
-			auto colors = new NyaDrawing::CNyaRGBA32[numVertices];
-			auto faces = new int[numFaces*3];
-			for (int j = 0; j < numVertices; j++) {
-				out.read((char*)&vertices[j], sizeof(vertices[j]));
-				out.read((char*)&normals[j], sizeof(normals[j]));
-				out.read((char*)&tangents[j], sizeof(tangents[j]));
-				out.read((char*)&bitangents[j], sizeof(bitangents[j]));
-				out.read((char*)&uvs1[j], sizeof(uvs1[j]));
-				out.read((char*)&uvs2[j], sizeof(uvs2[j]));
-				out.read((char*)&colors[j], sizeof(colors[j]));
-			}
-			for (int j = 0; j < numFaces*3; j++) {
-				out.read((char*)&faces[j], sizeof(faces[j]));
-			}
-			auto model = CreateOneModel(numVertices, numFaces, vertices, normals, tangents, bitangents, uvs1, colors, faces, materialName);
+		for (auto& mesh : modelsCwo) {
+			auto model = CreateOneModel(mesh.nNumVertices, mesh.nNumFaces, mesh.aVertices, mesh.aNormals, mesh.aTangents, mesh.aBitangents, mesh.aUVs1, mesh.aColors, mesh.aIndices, mesh.sMaterialName);
 			if (!model) continue;
 			models.push_back(model);
-			delete[] vertices;
-			delete[] normals;
-			delete[] tangents;
-			delete[] bitangents;
-			delete[] uvs1;
-			delete[] uvs2;
-			delete[] colors;
-			delete[] faces;
+			mesh.Destroy();
 		}
 		return models;
 	}

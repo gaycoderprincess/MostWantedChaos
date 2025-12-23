@@ -12,6 +12,7 @@
 #include "nfsmw.h"
 
 #include "include/chloemenulib.h"
+#include "include/cwoeemodel.h"
 
 std::vector<void(*)()> aMainLoopFunctions;
 std::vector<void(*)()> aMainLoopFunctionsOnce;
