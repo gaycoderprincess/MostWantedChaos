@@ -20,8 +20,8 @@ std::vector<void(*)()> aDrawingLoopFunctions;
 std::vector<void(*)()> aDrawingLoopFunctionsOnce;
 std::vector<void(*)()> aDrawing3DLoopFunctions;
 
-#include "d3dhook.h"
 #include "util.h"
+#include "d3dhook.h"
 #include "components/achievements.h"
 #include "components/customcamera.h"
 #include "components/render3d.h"

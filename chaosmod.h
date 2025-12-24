@@ -264,8 +264,6 @@ void ChaosLoop() {
 		nNumPlayerCarChangesThisRace = 0;
 	}
 
-	DLLDirSetter _setdir;
-
 	static bool bOnce = true;
 	if (bOnce) {
 		DoChaosLoad();
