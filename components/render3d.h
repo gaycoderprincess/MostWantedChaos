@@ -149,7 +149,7 @@ namespace Render3D {
 	std::vector<tModel*> aAllModels;
 	std::vector<tTextureInfo> aAllTextures;
 
-	tModel* CreateOneModel(int numVertices, int numFaces, const NyaVec3* vertices, const NyaVec3* normals, const NyaVec3* tangents, const NyaVec3* bitangents, const NyaVec3* uvs, const NyaDrawing::CNyaRGBA32* colors, const int* indices, const std::string& material) {
+	tModel* CreateOneModel(int numVertices, int numFaces, const NyaVec3* vertices, const NyaVec3* normals, const NyaVec3* tangents, const NyaVec3* bitangents, const NyaVec3* uvs, const NyaDrawing::CNyaRGBA32* colors, const uint32_t* indices, const std::string& material) {
 		auto model = new tModel;
 
 		size_t vertexTotalSize = numVertices * sizeof(CwoeeVertexData);

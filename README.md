@@ -15,7 +15,7 @@ This is just a fun side project for me to mess around with while I learn how the
 
 Building is done on an Arch Linux system with CLion being used for the build process. 
 
-Before you begin, clone [nya-common](https://github.com/gaycoderprincess/nya-common), [nya-common-nfsmw](https://github.com/gaycoderprincess/nya-common-nfsmw) and [FlatOutUCMenuLib](https://github.com/gaycoderprincess/FlatOutUCMenuLib) to folders next to this one, so they can be found.
+Before you begin, clone [nya-common](https://github.com/gaycoderprincess/nya-common), [nya-common-nfsmw](https://github.com/gaycoderprincess/nya-common-nfsmw), [FlatOutUCMenuLib](https://github.com/gaycoderprincess/FlatOutUCMenuLib) and [CwoeeModelImporter](https://github.com/gaycoderprincess/CwoeeModelImporter) to folders next to this one, so they can be found.
 
 Required packages: `mingw-w64-gcc vcpkg`
 

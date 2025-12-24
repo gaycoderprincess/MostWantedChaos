@@ -1,3 +1,12 @@
+struct tObjectSaveNoCol {
+	UMath::Matrix4 matrix;
+};
+
+struct tObjectSaveWithCol {
+	UMath::Matrix4 matrix;
+	UMath::Vector3 colPos;
+};
+
 void DoChaosEffectSave() {
 	std::ofstream file("CwoeeChaos/save/effects.sav", std::iostream::out | std::iostream::binary);
 	if (!file.is_open()) return;
@@ -27,17 +36,8 @@ void DoChaosEffectLoad() {
 	}
 }
 
-struct t173Save {
-	UMath::Matrix4 matrix;
-};
-
-struct tTeddieSave {
-	UMath::Matrix4 matrix;
-	UMath::Vector3 colPos;
-};
-
 void DoChaos173Save() {
-	std::vector<t173Save> save;
+	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_173::aPeanutsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
@@ -66,14 +66,14 @@ void DoChaos173Load() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		t173Save save;
+		tObjectSaveNoCol save;
 		file.read((char*)&save, sizeof(save));
 		Effect_173::SpawnPeanut(save.matrix);
 	}
 }
 
 void DoChaosTeddieSave() {
-	std::vector<tTeddieSave> save;
+	std::vector<tObjectSaveWithCol> save;
 	for (auto& peanut : Effect_Teddie::aTeddiesInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
@@ -98,14 +98,14 @@ void DoChaosTeddieLoad() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		tTeddieSave save;
+		tObjectSaveWithCol save;
 		file.read((char*)&save, sizeof(save));
 		Effect_Teddie::SpawnTeddie(save.matrix, save.colPos);
 	}
 }
 
 void DoChaos8DownSave() {
-	std::vector<tTeddieSave> save;
+	std::vector<tObjectSaveWithCol> save;
 	for (auto& peanut : Effect_8Down::aObjectsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
@@ -130,9 +130,41 @@ void DoChaos8DownLoad() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		tTeddieSave save;
+		tObjectSaveWithCol save;
 		file.read((char*)&save, sizeof(save));
 		Effect_8Down::SpawnObject(save.matrix, save.colPos);
+	}
+}
+
+void DoChaosBombSave() {
+	std::vector<tObjectSaveNoCol> save;
+	for (auto& peanut : Effect_ReVoltBomb::aBombsInWorld) {
+		auto model = &Render3DObjects::aObjects[peanut];
+		if (model->IsEmpty()) continue;
+		save.push_back({model->mMatrix});
+	}
+
+	std::ofstream file("CwoeeChaos/save/pickup.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+}
+
+void DoChaosBombLoad() {
+	std::ifstream file("CwoeeChaos/save/pickup.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		tObjectSaveNoCol save;
+		file.read((char*)&save, sizeof(save));
+		Effect_ReVoltBomb::SpawnBomb(save.matrix);
 	}
 }
 
@@ -172,6 +204,7 @@ void DoChaosSave() {
 	DoChaos173Save();
 	DoChaosTeddieSave();
 	DoChaos8DownSave();
+	DoChaosBombSave();
 	DoChaosSettingsSave();
 }
 
@@ -180,5 +213,6 @@ void DoChaosLoad() {
 	DoChaos173Load();
 	DoChaosTeddieLoad();
 	DoChaos8DownLoad();
+	DoChaosBombLoad();
 	DoChaosSettingsLoad();
 }

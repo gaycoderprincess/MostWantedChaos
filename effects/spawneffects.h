@@ -211,10 +211,6 @@ public:
 	}
 
 	void InitFunction() override {
-		if (models.empty() || models[0]->bInvalidated) {
-			models = Render3D::CreateModels("scp173.fbx");
-		}
-
 		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
 			auto mat = UMath::Matrix4::kIdentity;
 			veh->GetMatrix4(&mat);
@@ -308,3 +304,98 @@ public:
 		}
 	}
 } E_8Down;
+
+class Effect_ReVoltBomb : public ChaosEffect {
+public:
+	Effect_ReVoltBomb() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Bomb Behind Player";
+	}
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = 0;
+	static inline float rZ = 0;
+	static inline float offX = 0;
+	static inline float offY = 1.5;
+	static inline float offZ = -6;
+	static inline float scale = 2;
+
+	static inline float rotSpeedX = 0;
+	static inline float rotSpeedY = 0;
+	static inline float rotSpeedZ = -1.5;
+
+	static inline std::vector<int> aBombsInWorld;
+
+	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
+		if (IsChaosBlocked()) return;
+
+		// using colposition to store the rotation delta
+		obj->vColPosition.x += delta;
+
+		auto p = obj->mMatrix.p;
+		obj->mMatrix = UMath::Matrix4::kIdentity;
+		obj->mMatrix.Rotate(NyaVec3(obj->vColPosition.x * rotSpeedX, obj->vColPosition.x * rotSpeedY, obj->vColPosition.x * rotSpeedZ));
+
+		UMath::Matrix4 rotation;
+		rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+		obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
+		obj->mMatrix.x *= scale;
+		obj->mMatrix.y *= scale;
+		obj->mMatrix.z *= scale;
+		obj->mMatrix.p = p;
+
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
+			if (distFromCar < 5) {
+				if (!IsCarDestroyed(car)) {
+					static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/puttbang.wav");
+					if (sound) {
+						NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+						NyaAudio::Play(sound);
+					}
+
+					if (auto rb = car->mCOMObject->Find<IRigidBody>()) {
+						auto vel = *rb->GetLinearVelocity();
+						vel.y += 10;
+						rb->SetLinearVelocity(&vel);
+
+						auto avel = *rb->GetAngularVelocity();
+						UMath::Vector3 right;
+						rb->GetForwardVector(&right);
+						avel.x += 10 * right.x;
+						avel.y += 10 * right.y;
+						avel.z += 10 * right.z;
+						rb->SetAngularVelocity(&vel);
+					}
+					car->mCOMObject->Find<IDamageable>()->Destroy();
+					obj->aModels.clear();
+				}
+			}
+		}
+	}
+
+	static void SpawnBomb(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("pickup.fbx");
+		}
+
+		aBombsInWorld.push_back(Render3DObjects::aObjects.size());
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, {0,0,0}, 0, BombOnTick));
+	}
+
+	void InitFunction() override {
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+			SpawnBomb(mat);
+		}
+	}
+	bool CanQuickTrigger() override { return false; }
+} E_ReVoltBomb;
