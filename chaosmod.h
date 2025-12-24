@@ -286,9 +286,12 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
-	if (ChaosVoting::bEnabled) {
+	if (ChaosVoting::IsEnabled()) {
 		ChaosVoting::pAllOfTheAbove = &E_VotingAll; // this is such a hack lol woof meow
 		ChaosVoting::DrawUI();
+	}
+	else if (ChaosVoting::bAutoReconnect && ChaosVoting::sChannelName[0]) {
+		ChaosVoting::Connect();
 	}
 
 	if (IsChaosBlocked()) {
@@ -329,7 +332,7 @@ void ChaosLoop() {
 				nSmartRNG--;
 				AddRunningEffect(effect);
 			}
-			else if (ChaosVoting::bEnabled) {
+			else if (ChaosVoting::IsEnabled()) {
 				ChaosVoting::TriggerHighestVotedEffect();
 			}
 			else {
@@ -368,6 +371,26 @@ void ChaosModMenu() {
 		QuickValueEditor("fEffectSize", fEffectSize);
 		QuickValueEditor("fEffectSpacing", fEffectSpacing);
 		QuickValueEditor("fEffectVotingSize", fEffectVotingSize);
+		ChloeMenuLib::EndMenu();
+	}
+
+	if (DrawMenuOption("Voting")) {
+		ChloeMenuLib::BeginMenu();
+		QuickValueEditor("Voting Options", ChaosVoting::nNumVoteOptions);
+		if (ChaosVoting::IsEnabled()) {
+			QuickValueEditor("Auto-Reconnect", ChaosVoting::bAutoReconnect);
+			if (DrawMenuOption("Disconnect From Channel")) {
+				ChaosVoting::Disconnect();
+			}
+		}
+		else {
+			QuickValueEditor("Channel Name", ChaosVoting::sChannelName, sizeof(ChaosVoting::sChannelName));
+			if (ChaosVoting::sChannelName[0]) {
+				if (DrawMenuOption("Connect To Channel")) {
+					ChaosVoting::Connect();
+				}
+			}
+		}
 		ChloeMenuLib::EndMenu();
 	}
 
@@ -500,8 +523,8 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
 			}
-			if (DrawMenuOption("Toggle Voting Test")) {
-				ChaosVoting::bEnabled = !ChaosVoting::bEnabled;
+			if (DrawMenuOption("Connect Test")) {
+				ChaosVoting::Connect();
 			}
 			if (DrawMenuOption("Trigger Busted")) {
 				NISListenerActivity::MessageBusted(nullptr, 0);

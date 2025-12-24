@@ -1,21 +1,26 @@
+#include "IRCClient/src/IRCClient.h"
+
 namespace ChaosVoting {
-	bool bEnabled = false;
-	bool bSelectingEffectsForVote = false;
+	bool bAutoReconnect = false;
+	char sChannelName[64] = "";
 	int nNumVoteOptions = 4;
+
+	IRCClient gIRCClient;
+	std::mutex mVotingMutex;
 
 	class VotingPopup {
 	public:
 		ChaosUIPopup Popup;
 		ChaosEffect* pEffect = nullptr;
 
-		int nVoteCount = 0;
-		int nVoteCountStreamer = 0;
+		std::vector<std::string> aVotes = {};
+		bool bVotedByStreamer = false;
 		float fVotePercentage = 0;
 
 		VotingPopup(ChaosEffect* effect) : pEffect(effect) {}
 
 		int GetVoteCount() {
-			return nVoteCount + (nVoteCountStreamer * 9999);
+			return aVotes.size() + (bVotedByStreamer * 9999);
 		}
 
 		void Draw(float y) {
@@ -31,6 +36,7 @@ namespace ChaosVoting {
 	int nLowestWins = 0;
 	int nStreamerVotes = 0;
 	ChaosEffect* pAllOfTheAbove = nullptr;
+	bool bSelectingEffectsForVote = false;
 
 	void GenerateNewVotes() {
 		aOldVotes = aNewVotes;
@@ -47,7 +53,7 @@ namespace ChaosVoting {
 	int GetTotalVoteCount() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
-			totalVotes += vote.nVoteCount + vote.nVoteCountStreamer;
+			totalVotes += vote.aVotes.size() + vote.bVotedByStreamer;
 		}
 		return totalVotes;
 	}
@@ -56,7 +62,7 @@ namespace ChaosVoting {
 		return GetTotalVoteCount() > 0;
 	}
 
-	void TriggerHighestVotedEffect() {
+	void TriggerHighestVotedEffectNoLock() {
 		auto votes = aNewVotes;
 		if (votes.empty()) return;
 
@@ -89,6 +95,12 @@ namespace ChaosVoting {
 		GenerateNewVotes();
 	}
 
+	void TriggerHighestVotedEffect() {
+		mVotingMutex.lock();
+		TriggerHighestVotedEffectNoLock();
+		mVotingMutex.unlock();
+	}
+
 	void UpdateVotePercentages() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
@@ -99,22 +111,34 @@ namespace ChaosVoting {
 		}
 	}
 
-	void OnVoteCast(int i) {
+	void OnVoteCast(const std::string& username, int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
-		aNewVotes[i].nVoteCount++;
+		for (auto& effect : aNewVotes) {
+			int pos = 0;
+			for (auto& vote : effect.aVotes) {
+				if (vote == username) {
+					effect.aVotes.erase(effect.aVotes.begin() + pos);
+					break;
+				}
+				pos++;
+			}
+		}
+		aNewVotes[i].aVotes.push_back(username);
 		UpdateVotePercentages();
 	}
 
 	void OnStreamerVoteCast(int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
 		for (auto& vote : aNewVotes) {
-			vote.nVoteCountStreamer = 0;
+			vote.bVotedByStreamer = false;
 		}
-		aNewVotes[i].nVoteCountStreamer++;
+		aNewVotes[i].bVotedByStreamer = true;
 		UpdateVotePercentages();
 	}
 
 	void DrawUI() {
+		mVotingMutex.lock();
+
 		// first frame
 		if (aNewVotes.empty()) {
 			GenerateNewVotes();
@@ -157,5 +181,77 @@ namespace ChaosVoting {
 		VoteDisabledPopup.bIsVotingDummy = true;
 		VoteDisabledPopup.Update(gTimer.fDeltaTime, nSmartRNG > 0);
 		VoteDisabledPopup.Draw("Voting is disabled!", y++, false);
+
+		mVotingMutex.unlock();
+	}
+
+	void OnMessageReceived(IRCMessage message, IRCClient* client) {
+		//message.parameters:
+		//#channel
+		//bark woof meow
+
+		if (message.parameters.size() < 2) return;
+
+		auto messageStr = message.parameters[1];
+
+		bool isVoteMessage = false;
+		if (messageStr[0] > '0' && messageStr[0] <= '9') {
+			if (messageStr.length() == 1) isVoteMessage = true;
+
+			// special case for 7tv antispam
+			if (messageStr.length() == 4 && (uint8_t)messageStr[1] == 0x20 && (uint8_t)messageStr[2] == 0xCD && (uint8_t)messageStr[3] == 0x8F) isVoteMessage = true;
+		}
+
+		if (isVoteMessage) {
+			mVotingMutex.lock();
+			OnVoteCast(message.prefix.user, (messageStr[0] - '1'));
+			mVotingMutex.unlock();
+		}
+	}
+
+	void IRCThread() {
+		while (gIRCClient.Connected()) {
+			gIRCClient.ReceiveData();
+		}
+		WriteLog("IRC thread quitting");
+	}
+
+	void Connect() {
+		if (gIRCClient.Connected()) return;
+
+		static bool bOnce = true;
+		if (bOnce) {
+			if (!gIRCClient.InitSocket()) {
+				MessageBoxA(0, "InitSocket failed", "nya?!~", MB_ICONERROR);
+				return;
+			}
+			gIRCClient.HookIRCCommand("PRIVMSG", &OnMessageReceived);
+			bOnce = false;
+		}
+
+		if (!gIRCClient.Connect("irc.chat.twitch.tv", 6667)) {
+			MessageBoxA(0, "Connect failed", "nya?!~", MB_ICONERROR);
+			return;
+		}
+		auto login = std::format("justinfan{}", GetRandomNumber(1024, 32767));
+		if (!gIRCClient.Login(login, login)) {
+			if (gIRCClient.Connected()) {
+				gIRCClient.Disconnect();
+			}
+			MessageBoxA(0, "Login failed", "nya?!~", MB_ICONERROR);
+			return;
+		}
+
+		gIRCClient.SendIRC(std::format("JOIN #{}", sChannelName));
+		std::thread(IRCThread).detach();
+	}
+
+	void Disconnect() {
+		bAutoReconnect = false;
+		gIRCClient.Disconnect();
+	}
+
+	bool IsEnabled() {
+		return gIRCClient.Connected();
 	}
 }

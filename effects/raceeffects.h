@@ -59,7 +59,7 @@ public:
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps < 2) return false;
-		if (!ChaosVoting::bEnabled || ChaosVoting::bSelectingEffectsForVote) {
+		if (!ChaosVoting::IsEnabled() || ChaosVoting::bSelectingEffectsForVote) {
 			return GetLocalPlayerCurrentLap() <= 0;
 		}
 		return true;
@@ -86,7 +86,7 @@ public:
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
-		if (!ChaosVoting::bEnabled || ChaosVoting::bSelectingEffectsForVote) {
+		if (!ChaosVoting::IsEnabled() || ChaosVoting::bSelectingEffectsForVote) {
 			return GetLocalPlayerCurrentLap() <= 0;
 		}
 		return true;
@@ -113,7 +113,7 @@ public:
 	bool IsAvailable() override {
 		auto laps = GetRaceNumLaps();
 		if (!laps || *laps >= 10) return false;
-		if (!ChaosVoting::bEnabled || ChaosVoting::bSelectingEffectsForVote) {
+		if (!ChaosVoting::IsEnabled() || ChaosVoting::bSelectingEffectsForVote) {
 			return GetLocalPlayerCurrentLap() <= 0;
 		}
 		return true;

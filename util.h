@@ -84,12 +84,52 @@ void ValueEditorMenu(float& value) {
 	ChloeMenuLib::EndMenu();
 }
 
+void ValueEditorMenu(int& value) {
+	ChloeMenuLib::BeginMenu();
+
+	static char inputString[1024] = {};
+	ChloeMenuLib::AddTextInputToString(inputString, 1024, true);
+	ChloeMenuLib::SetEnterHint("Apply");
+
+	if (DrawMenuOption(inputString + (std::string)"...", "", false, false) && inputString[0]) {
+		value = std::stoi(inputString);
+		memset(inputString,0,sizeof(inputString));
+		ChloeMenuLib::BackOut();
+	}
+
+	ChloeMenuLib::EndMenu();
+}
+
+void ValueEditorMenu(char* value, int len) {
+	ChloeMenuLib::BeginMenu();
+
+	static char inputString[1024] = {};
+	ChloeMenuLib::AddTextInputToString(inputString, 1024, false);
+	ChloeMenuLib::SetEnterHint("Apply");
+
+	if (DrawMenuOption(inputString + (std::string)"...", "", false, false) && inputString[0]) {
+		strcpy_s(value, len, inputString);
+		memset(inputString,0,sizeof(inputString));
+		ChloeMenuLib::BackOut();
+	}
+
+	ChloeMenuLib::EndMenu();
+}
+
 void QuickValueEditor(const char* name, float& value) {
+	if (DrawMenuOption(std::format("{} - {}", name, value))) { ValueEditorMenu(value); }
+}
+
+void QuickValueEditor(const char* name, int& value) {
 	if (DrawMenuOption(std::format("{} - {}", name, value))) { ValueEditorMenu(value); }
 }
 
 void QuickValueEditor(const char* name, bool& value) {
 	if (DrawMenuOption(std::format("{} - {}", name, value))) { value = !value; }
+}
+
+void QuickValueEditor(const char* name, char* value, int len) {
+	if (DrawMenuOption(std::format("{} - {}", name, value))) { ValueEditorMenu(value, len); }
 }
 
 inline float TOMPS(float kmh) { return kmh / 3.6; }

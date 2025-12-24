@@ -180,6 +180,10 @@ void DoChaosSettingsSave() {
 	file.write((char*)&fEffectSize, sizeof(fEffectSize));
 	file.write((char*)&fEffectSpacing, sizeof(fEffectSpacing));
 	file.write((char*)&fEffectVotingSize, sizeof(fEffectVotingSize));
+	bool connected = ChaosVoting::IsEnabled() || (ChaosVoting::sChannelName[0] && ChaosVoting::bAutoReconnect);
+	file.write((char*)&connected, sizeof(connected));
+	file.write(ChaosVoting::sChannelName, sizeof(ChaosVoting::sChannelName));
+	file.write((char*)ChaosVoting::nNumVoteOptions, sizeof(ChaosVoting::nNumVoteOptions));
 }
 
 void DoChaosSettingsLoad() {
@@ -194,6 +198,14 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&fEffectSize, sizeof(fEffectSize));
 	file.read((char*)&fEffectSpacing, sizeof(fEffectSpacing));
 	file.read((char*)&fEffectVotingSize, sizeof(fEffectVotingSize));
+	bool connected = false;
+	file.read((char*)&connected, sizeof(connected));
+	file.read(ChaosVoting::sChannelName, sizeof(ChaosVoting::sChannelName));
+	file.read((char*)ChaosVoting::nNumVoteOptions, sizeof(ChaosVoting::nNumVoteOptions));
+
+	if (connected && ChaosVoting::sChannelName[0]) {
+		ChaosVoting::Connect();
+	}
 }
 
 void DoChaosSave() {

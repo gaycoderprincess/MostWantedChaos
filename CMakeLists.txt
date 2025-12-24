@@ -37,6 +37,9 @@ add_library(NFSMWChaos SHARED
         ../nya-common/nya_commontimer.cpp
         ../nya-common/nya_commonaudio.cpp
         ../nya-common/nya_dx9_hookbase.cpp
+        IRCClient/src/IRCClient.cpp
+        IRCClient/src/IRCHandler.cpp
+        IRCClient/src/IRCSocket.cpp
         main.cpp)
 target_include_directories(NFSMWChaos PUBLIC ../nya-common)
 target_include_directories(NFSMWChaos PUBLIC ../nya-common/3rdparty)
@@ -70,3 +73,4 @@ set_target_properties(NFSMWChaos PROPERTIES SUFFIX "_gcp.asi")
 
 target_link_libraries(NFSMWChaos d3dx9)
 target_link_libraries(NFSMWChaos bass)
+target_link_libraries(NFSMWChaos ws2_32)

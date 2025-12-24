@@ -20,7 +20,7 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
-	bool IsAvailable() override { return ChaosVoting::bEnabled; }
+	bool IsAvailable() override { return ChaosVoting::IsEnabled(); }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 	void OnTimerRefill() override { InitFunction(); }
@@ -59,7 +59,7 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
-	bool IsAvailable() override { return ChaosVoting::bEnabled; }
+	bool IsAvailable() override { return ChaosVoting::IsEnabled(); }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 	void OnTimerRefill() override { InitFunction(); }

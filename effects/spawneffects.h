@@ -378,12 +378,16 @@ public:
 	}
 
 	static void SpawnBomb(UMath::Matrix4 mat) {
+		Render3D::nVertexColorValue = 0xFF808080;
+
 		if (models.empty() || models[0]->bInvalidated) {
 			models = Render3D::CreateModels("pickup.fbx");
 		}
 
 		aBombsInWorld.push_back(Render3DObjects::aObjects.size());
 		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, {0,0,0}, 0, BombOnTick));
+
+		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 	}
 
 	void InitFunction() override {
@@ -605,6 +609,9 @@ public:
 			mat.p = pos;
 			SpawnBomb(mat, target);
 		}
+	}
+	void DeinitFunction() override {
+		GetLocalPlayer()->ChargeGameBreaker(100);
 	}
 	bool HasTimer() override { return true; }
 	bool CanQuickTrigger() override { return false; }
