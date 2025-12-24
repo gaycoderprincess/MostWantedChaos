@@ -154,11 +154,11 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 			srand(time(0));
 
+			GetCurrentDirectoryW(MAX_PATH, gDLLDir);
+
 			for (auto& func : ChloeHook::aHooks) {
 				func();
 			}
-
-			GetCurrentDirectoryW(MAX_PATH, gDLLDir);
 
 			ChloeMenuLib::RegisterMenu("Cwoee Chaos", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
