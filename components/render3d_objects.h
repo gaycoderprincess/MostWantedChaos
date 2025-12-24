@@ -8,6 +8,7 @@ namespace Render3DObjects {
 		NyaVec3 vColPosition = UMath::Vector3::kZero;
 		float fColSize = 1;
 		void(*pTickFunction)(Object*, double) = nullptr;
+		void* CustomData = nullptr;
 
 		Object(std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {}
 

@@ -123,6 +123,8 @@ bool IsVehicleValidAndActive(IVehicle* vehicle) {
 
 IVehicle* GetClosestActiveVehicle(IVehicle* toVehicle) {
 	auto sourcePos = *toVehicle->GetPosition();
+	UMath::Vector3 sourceFwd;
+	toVehicle->mCOMObject->Find<IRigidBody>()->GetForwardVector(&sourceFwd);
 	IVehicle* out = nullptr;
 	float distance = 99999;
 	auto cars = GetActiveVehicles();
@@ -132,6 +134,28 @@ IVehicle* GetClosestActiveVehicle(IVehicle* toVehicle) {
 		if ((sourcePos - targetPos).length() < distance) {
 			out = car;
 			distance = (sourcePos - targetPos).length();
+		}
+	}
+	return out;
+}
+
+IVehicle* GetMostInFrontActiveVehicle(IVehicle* toVehicle, float maxDistance = 99999, float inFrontThreshold = 0) {
+	auto sourcePos = *toVehicle->GetPosition();
+	UMath::Vector3 sourceFwd;
+	toVehicle->mCOMObject->Find<IRigidBody>()->GetForwardVector(&sourceFwd);
+	IVehicle* out = nullptr;
+	float dot = 99999;
+	auto cars = GetActiveVehicles();
+	for (auto& car : cars) {
+		if (car == toVehicle) continue;
+		auto targetPos = *car->GetPosition();
+		auto dir = (sourcePos - targetPos);
+		dir.Normalize();
+		if (dir.Dot(sourceFwd) > -inFrontThreshold) continue;
+		if ((sourcePos - targetPos).length() > maxDistance) continue;
+		if (dir.Dot(sourceFwd) < dot) {
+			out = car;
+			dot = dir.Dot(sourceFwd);
 		}
 	}
 	return out;
