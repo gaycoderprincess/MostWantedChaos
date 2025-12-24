@@ -5,7 +5,7 @@ namespace ChaosVoting {
 	char sChannelName[64] = "";
 	int nNumVoteOptions = 4;
 
-	IRCClient gIRCClient;
+	IRCClient* pIRCClient = nullptr;
 	std::mutex mVotingMutex;
 
 	class VotingPopup {
@@ -31,6 +31,7 @@ namespace ChaosVoting {
 
 	std::vector<VotingPopup> aOldVotes;
 	std::vector<VotingPopup> aNewVotes;
+	std::vector<ChaosEffect*> aNextVotes;
 
 	// voting tweaks
 	int nLowestWins = 0;
@@ -38,16 +39,39 @@ namespace ChaosVoting {
 	ChaosEffect* pAllOfTheAbove = nullptr;
 	bool bSelectingEffectsForVote = false;
 
+	bool IsEffectInNextVotes(ChaosEffect* effect) {
+		for (auto& vote : aNextVotes) {
+			if (vote == effect) return true;
+		}
+		return false;
+	}
+
 	void GenerateNewVotes() {
+		aNextVotes.clear();
+
+		mVotingMutex.lock();
 		aOldVotes = aNewVotes;
 		aNewVotes.clear();
+		mVotingMutex.unlock();
+
+		// this shouldn't be in the mutex portion as some effects can check for voting being on
 		bSelectingEffectsForVote = true;
+		auto newVotesTemp = aNewVotes;
 		for (int i = 0; i < nNumVoteOptions; i++) {
-			aNewVotes.push_back(VotingPopup(GetRandomEffect(false)));
+			ChaosEffect* effect = nullptr;
+			do {
+				effect = GetRandomEffect(false);
+			} while (GetNumEffectsAvailableForRandom() > nNumVoteOptions && IsEffectInNextVotes(effect));
+			aNextVotes.push_back(effect);
+			newVotesTemp.push_back(VotingPopup(effect));
 		}
 		bSelectingEffectsForVote = false;
+
+		mVotingMutex.lock();
+		aNewVotes = newVotesTemp;
 		if (nLowestWins > 0) nLowestWins--;
 		if (nStreamerVotes > 0) nStreamerVotes--;
+		mVotingMutex.unlock();
 	}
 
 	int GetTotalVoteCount() {
@@ -62,7 +86,7 @@ namespace ChaosVoting {
 		return GetTotalVoteCount() > 0;
 	}
 
-	void TriggerHighestVotedEffectNoLock() {
+	void TriggerHighestVotedEffect() {
 		auto votes = aNewVotes;
 		if (votes.empty()) return;
 
@@ -93,12 +117,6 @@ namespace ChaosVoting {
 		}
 
 		GenerateNewVotes();
-	}
-
-	void TriggerHighestVotedEffect() {
-		mVotingMutex.lock();
-		TriggerHighestVotedEffectNoLock();
-		mVotingMutex.unlock();
 	}
 
 	void UpdateVotePercentages() {
@@ -137,12 +155,15 @@ namespace ChaosVoting {
 	}
 
 	void DrawUI() {
-		mVotingMutex.lock();
+		if (nNumVoteOptions < 2) nNumVoteOptions = 2;
+		if (nNumVoteOptions > 9) nNumVoteOptions = 9;
 
 		// first frame
 		if (aNewVotes.empty()) {
 			GenerateNewVotes();
 		}
+
+		mVotingMutex.lock();
 
 		if (nStreamerVotes > 0) {
 			for (int i = 0; i < aNewVotes.size(); i++) {
@@ -210,48 +231,62 @@ namespace ChaosVoting {
 	}
 
 	void IRCThread() {
-		while (gIRCClient.Connected()) {
-			gIRCClient.ReceiveData();
+		while (pIRCClient->Connected()) {
+			pIRCClient->ReceiveData();
 		}
+		mVotingMutex.lock();
+		if (pIRCClient) {
+			auto ptr = pIRCClient;
+			pIRCClient = nullptr;
+			delete ptr;
+		}
+		mVotingMutex.unlock();
 		WriteLog("IRC thread quitting");
 	}
 
 	void Connect() {
-		if (gIRCClient.Connected()) return;
+		if (pIRCClient && pIRCClient->Connected()) return;
+		pIRCClient = new IRCClient;
+		pIRCClient->HookIRCCommand("PRIVMSG", &OnMessageReceived);
 
-		static bool bOnce = true;
-		if (bOnce) {
-			if (!gIRCClient.InitSocket()) {
-				MessageBoxA(0, "InitSocket failed", "nya?!~", MB_ICONERROR);
-				return;
-			}
-			gIRCClient.HookIRCCommand("PRIVMSG", &OnMessageReceived);
-			bOnce = false;
+		if (!pIRCClient->InitSocket()) {
+			MessageBoxA(0, "InitSocket failed", "nya?!~", MB_ICONERROR);
+			return;
 		}
 
-		if (!gIRCClient.Connect("irc.chat.twitch.tv", 6667)) {
+		if (!pIRCClient->Connect("irc.chat.twitch.tv", 6667)) {
 			MessageBoxA(0, "Connect failed", "nya?!~", MB_ICONERROR);
 			return;
 		}
+
 		auto login = std::format("justinfan{}", GetRandomNumber(1024, 32767));
-		if (!gIRCClient.Login(login, login)) {
-			if (gIRCClient.Connected()) {
-				gIRCClient.Disconnect();
+		if (!pIRCClient->Login(login, login)) {
+			if (pIRCClient->Connected()) {
+				pIRCClient->Disconnect();
 			}
 			MessageBoxA(0, "Login failed", "nya?!~", MB_ICONERROR);
 			return;
 		}
 
-		gIRCClient.SendIRC(std::format("JOIN #{}", sChannelName));
+		pIRCClient->SendIRC(std::format("JOIN #{}", sChannelName));
 		std::thread(IRCThread).detach();
+	}
+
+	void Reconnect() {
+		mVotingMutex.lock();
+		Connect();
+		mVotingMutex.unlock();
 	}
 
 	void Disconnect() {
 		bAutoReconnect = false;
-		gIRCClient.Disconnect();
+		if (pIRCClient) pIRCClient->Disconnect();
 	}
 
 	bool IsEnabled() {
-		return gIRCClient.Connected();
+		mVotingMutex.lock();
+		auto b = pIRCClient && pIRCClient->Connected();
+		mVotingMutex.unlock();
+		return b;
 	}
 }

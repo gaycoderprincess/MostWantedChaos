@@ -169,6 +169,10 @@ void DoChaosBombLoad() {
 }
 
 void DoChaosSettingsSave() {
+	// using the non-mutex version here as this is called inside TriggerHighestVotedEffect
+	// also defining this here so the game can't crash while accessing the irc client and corrupt the savefile
+	bool connected = (ChaosVoting::sChannelName[0] && ChaosVoting::bAutoReconnect) || ChaosVoting::IsEnabled();
+
 	std::ofstream file("CwoeeChaos/save/settings.sav", std::iostream::out | std::iostream::binary);
 	if (!file.is_open()) return;
 
@@ -180,10 +184,10 @@ void DoChaosSettingsSave() {
 	file.write((char*)&fEffectSize, sizeof(fEffectSize));
 	file.write((char*)&fEffectSpacing, sizeof(fEffectSpacing));
 	file.write((char*)&fEffectVotingSize, sizeof(fEffectVotingSize));
-	bool connected = ChaosVoting::IsEnabled() || (ChaosVoting::sChannelName[0] && ChaosVoting::bAutoReconnect);
 	file.write((char*)&connected, sizeof(connected));
 	file.write(ChaosVoting::sChannelName, sizeof(ChaosVoting::sChannelName));
-	file.write((char*)ChaosVoting::nNumVoteOptions, sizeof(ChaosVoting::nNumVoteOptions));
+	file.write((char*)&ChaosVoting::nNumVoteOptions, sizeof(ChaosVoting::nNumVoteOptions));
+	file.write((char*)&ChaosVoting::bAutoReconnect, sizeof(ChaosVoting::bAutoReconnect));
 }
 
 void DoChaosSettingsLoad() {
@@ -201,7 +205,8 @@ void DoChaosSettingsLoad() {
 	bool connected = false;
 	file.read((char*)&connected, sizeof(connected));
 	file.read(ChaosVoting::sChannelName, sizeof(ChaosVoting::sChannelName));
-	file.read((char*)ChaosVoting::nNumVoteOptions, sizeof(ChaosVoting::nNumVoteOptions));
+	file.read((char*)&ChaosVoting::nNumVoteOptions, sizeof(ChaosVoting::nNumVoteOptions));
+	file.read((char*)&ChaosVoting::bAutoReconnect, sizeof(ChaosVoting::bAutoReconnect));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();

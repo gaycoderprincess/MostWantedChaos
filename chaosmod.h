@@ -291,7 +291,7 @@ void ChaosLoop() {
 		ChaosVoting::DrawUI();
 	}
 	else if (ChaosVoting::bAutoReconnect && ChaosVoting::sChannelName[0]) {
-		ChaosVoting::Connect();
+		ChaosVoting::Reconnect();
 	}
 
 	if (IsChaosBlocked()) {
@@ -384,7 +384,7 @@ void ChaosModMenu() {
 			}
 		}
 		else {
-			QuickValueEditor("Channel Name", ChaosVoting::sChannelName, sizeof(ChaosVoting::sChannelName));
+			QuickValueEditor("Twitch Channel Name", ChaosVoting::sChannelName, sizeof(ChaosVoting::sChannelName));
 			if (ChaosVoting::sChannelName[0]) {
 				if (DrawMenuOption("Connect To Channel")) {
 					ChaosVoting::Connect();

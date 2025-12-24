@@ -419,6 +419,17 @@ bool CanEffectBeSmartlyPicked(ChaosEffect* effect) {
 	return true;
 }
 
+int GetNumEffectsAvailableForRandom(bool quickTrigger = false) {
+	std::vector<ChaosEffect*> availableEffects;
+	for (auto& effect : ChaosEffect::aEffects) {
+		if (!CanEffectBeRandomlyPicked(effect)) continue;
+		if (quickTrigger && !effect->CanQuickTrigger()) continue;
+
+		availableEffects.push_back(effect);
+	}
+	return availableEffects.size();
+}
+
 ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
