@@ -232,6 +232,8 @@ namespace ChaosVoting {
 	}
 
 	void ProcessChatCheatRequest(const std::string& username, const std::string& message) {
+		DLLDirSetter _setdir;
+
 		if (!bRecordChatCheatDuplicates) {
 			for (auto& user : aChatCheatUsers) {
 				if (user == username) return;

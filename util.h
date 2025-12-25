@@ -351,12 +351,6 @@ FECarRecord* CreateStockCarRecord(const char* carModel) {
 
 int nNumPlayerCarChangesThisRace = 0;
 IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, bool forceNOS = false) {
-	// really weird hack for transparent car skins, change to a non-skinnable car first
-	// works but crashes the game after a few attempts
-	//if (hash != Attrib::StringHash32("cs_clio_trafpizza") && GetActiveVehicles(DRIVER_RACER).size() >= 3) {
-	//	ChangePlayerCarInWorld(Attrib::StringHash32("cs_clio_trafpizza"), nullptr);
-	//}
-
 	WriteLog(std::format("Changing car to {:X}", hash));
 
 	auto oldCar = GetLocalPlayerSimable();
