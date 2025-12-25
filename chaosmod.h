@@ -55,11 +55,10 @@ void MoneyChecker() {
 			}
 			else {
 				cashForEffect = cash;
-				AddRunningEffect(&TempEffect);
+				if (auto running = AddRunningEffect(&TempEffect)) {
+					running->sNameToDisplay = std::format("Money changed (${} -> ${})", cashForEffect, currentCash);
+				}
 			}
-			static std::string name;
-			name = std::format("Money changed (${} -> ${})", cashForEffect, currentCash);
-			TempEffect.sName = name.c_str();
 			cash = currentCash;
 
 			if (currentCash >= 2000000) {
@@ -89,11 +88,10 @@ void BountyChecker() {
 			}
 			else {
 				cashForEffect = cash;
-				AddRunningEffect(&TempEffect);
+				if (auto running = AddRunningEffect(&TempEffect)) {
+					running->sNameToDisplay = std::format("Bounty changed ({} -> {})", cashForEffect, currentCash);
+				}
 			}
-			static std::string name;
-			name = std::format("Bounty changed ({} -> {})", cashForEffect, currentCash);
-			TempEffect.sName = name.c_str();
 			cash = currentCash;
 		}
 	}
@@ -534,9 +532,6 @@ void ChaosModMenu() {
 			//QuickValueEditor("SceneryMove.y", SceneryMove.y);
 			//QuickValueEditor("SceneryMove.z", SceneryMove.z);
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
-			QuickValueEditor("ReVoltFirework::rX", Effect_ReVoltFirework::rX);
-			QuickValueEditor("ReVoltFirework::rY", Effect_ReVoltFirework::rY);
-			QuickValueEditor("ReVoltFirework::rZ", Effect_ReVoltFirework::rZ);
 			QuickValueEditor("ReVoltFirework::offX", Effect_ReVoltFirework::offX);
 			QuickValueEditor("ReVoltFirework::offY", Effect_ReVoltFirework::offY);
 			QuickValueEditor("ReVoltFirework::offZ", Effect_ReVoltFirework::offZ);

@@ -122,15 +122,13 @@ public:
 
 	void InitFunction() override {
 		ChaosVoting::ActivateChatCheat();
+
 		CwoeeHints::AddHint("Type an effect's name without spaces & symbols into chat!");
 		CwoeeHints::AddHint("Any valid effect will be activated.");
 
-		if (auto effect = GetRandomEffect(true)) {
-			CwoeeHints::AddHint(std::format("Example: {}", effect->GetCheatCode(PercentageChanceCheck(50))));
-		}
-		else {
-			CwoeeHints::AddHint("Example: SpawnTeddieFromPersona4");
-		}
+		ChaosEffect* effect = GetRandomEffect(true);
+		if (!effect) effect = &E_Teddie;
+		CwoeeHints::AddHint(std::format("Example: {}", effect->GetCheatCode(PercentageChanceCheck(50))));
 	}
 	void DeinitFunction() override {
 		ChaosVoting::DeactivateChatCheat();

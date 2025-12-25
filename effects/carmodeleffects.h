@@ -401,6 +401,10 @@ public:
 			ChangePlayerCarInWorld(Attrib::StringHash32(carModel), carTuning, true);
 		});
 	}
+	bool IsAvailable() override {
+		if (!EffectBase_OpponentInRaceConditional::IsAvailable()) return false;
+		return nNumPlayerCarChangesThisRace <= 0;
+	}
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandomOpponent;
