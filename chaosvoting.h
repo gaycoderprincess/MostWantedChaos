@@ -44,7 +44,7 @@ namespace ChaosVoting {
 	bool bRecordChatCheat = false;
 	bool bRecordChatCheatDuplicates = false;
 	int nNumVotingUsers = 0;
-	std::vector<std::string> aChatCheatMessages;
+	std::vector<ChaosEffect*> aChatCheatEffects;
 	std::vector<std::string> aChatCheatUsers;
 
 	bool IsEffectInNextVotes(ChaosEffect* effect) {
@@ -228,7 +228,7 @@ namespace ChaosVoting {
 	void DeactivateChatCheat() {
 		ChaosVoting::bRecordChatCheat = false;
 		ChaosVoting::aChatCheatUsers.clear();
-		ChaosVoting::aChatCheatMessages.clear();
+		ChaosVoting::aChatCheatEffects.clear();
 	}
 
 	void ProcessChatCheatRequest(const std::string& username, const std::string& message) {
@@ -248,13 +248,13 @@ namespace ChaosVoting {
 		if (!pEffect) return;
 
 		if (!pEffect->CanMultiTrigger()) {
-			for (auto& msg : aChatCheatMessages) {
-				if (msg == message) return;
+			for (auto& effect : aChatCheatEffects) {
+				if (pEffect == effect) return;
 			}
 		}
 
 		aChatCheatUsers.push_back(username);
-		aChatCheatMessages.push_back(message);
+		aChatCheatEffects.push_back(pEffect);
 
 		if (auto effect = AddRunningEffect(pEffect)) {
 			effect->sUsername = username;
