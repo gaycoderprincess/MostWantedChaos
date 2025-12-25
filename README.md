@@ -21,7 +21,7 @@ Required packages: `mingw-w64-gcc vcpkg`
 
 To install all dependencies, use:
 ```console
-vcpkg install tomlplusplus:x86-mingw-static assimp:x86-mingw-static
+vcpkg install tomlplusplus:x86-mingw-static
 ```
 
 To install the BASS audio library:
