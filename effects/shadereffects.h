@@ -111,8 +111,6 @@ public:
 	}
 } E_ShaderInverted;
 
-// ehh this is kinda lame, freeing up rng chances by removing it
-#ifdef CWOEECHAOS_VOTING_ENABLED
 class Effect_ShaderBlue : public EffectBase_ScreenShader {
 public:
 	Effect_ShaderBlue() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
@@ -121,8 +119,11 @@ public:
 		fTimerLength = 60;
 		sFileName = "blue";
 	}
+
+	// ehh this is kinda lame, freeing up rng chances by removing it if voting is off
+	bool IsAvailable() override { return ChaosVoting::IsEnabled(); }
+	bool AbortOnConditionFailed() override { return true; }
 } E_ShaderBlue;
-#endif
 
 class Effect_ShaderWide : public EffectBase_ScreenShader {
 public:
