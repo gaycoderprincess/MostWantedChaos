@@ -254,6 +254,27 @@ namespace ChaosVoting {
 	}
 
 	void Connect() {
+		static std::string url = "irc.chat.twitch.tv";
+		static int port = 6667;
+		static std::string username = "";
+		static std::string password = "";
+
+		static bool bOnce = true;
+		if (bOnce) {
+			if (std::filesystem::exists("CwoeeChaos/irc.toml")) {
+				auto toml = toml::parse_file("CwoeeChaos/irc.toml");
+				url = toml["url"].value_or(url);
+				port = toml["port"].value_or(port);
+				username = toml["username"].value_or(username);
+				password = toml["password"].value_or(password);
+			}
+			bOnce = false;
+
+			WriteLog("IRC config initialized");
+			WriteLog(std::format("URL: {}", url));
+			WriteLog(std::format("Port: {}", port));
+		}
+
 		if (pIRCClient && pIRCClient->Connected()) return;
 		pIRCClient = new IRCClient;
 		pIRCClient->HookIRCCommand("PRIVMSG", &OnMessageReceived);
@@ -266,7 +287,8 @@ namespace ChaosVoting {
 			return;
 		}
 
-		if (!pIRCClient->Connect("irc.chat.twitch.tv", 6667)) {
+		// this is stupid, the library takes non-const char* but doesn't ever modify it
+		if (!pIRCClient->Connect((char*)url.c_str(), port)) {
 			MessageBoxA(0, "Connect failed", "nya?!~", MB_ICONERROR);
 			delete pIRCClient;
 			pIRCClient = nullptr;
@@ -275,7 +297,8 @@ namespace ChaosVoting {
 		}
 
 		auto login = std::format("justinfan{}", GetRandomNumber(1024, 32767));
-		if (!pIRCClient->Login(login, login)) {
+		if (!username.empty()) login = username;
+		if (!pIRCClient->Login(login, login, password)) {
 			MessageBoxA(0, "Login failed", "nya?!~", MB_ICONERROR);
 			if (pIRCClient->Connected()) {
 				pIRCClient->Disconnect();

@@ -258,11 +258,13 @@ void AddRunningEffect(ChaosEffect* effect) {
 	effect->LastTriggerTime = std::time(0);
 	effect->nTotalTimesActivated++;
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
-	if (effect->InitImmediately()) {
-		effect->InitFunction();
-		aRunningEffects[aRunningEffects.size()-1].bFirstFrame = false;
-	}
 	WriteLog(std::format("Activating {}", effect->sName));
+
+	auto running = &aRunningEffects[aRunningEffects.size()-1];
+	if (running->pEffect->InitImmediately()) {
+		running->pEffect->InitFunction();
+		running->bFirstFrame = false;
+	}
 
 	DoChaosSave();
 

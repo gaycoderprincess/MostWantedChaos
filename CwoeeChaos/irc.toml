@@ -1,0 +1,7 @@
+# config for the IRC client when connecting to voting
+# defaults to Twitch but you can theoretically use this to connect to any IRC server and use it for reading votes
+
+url = "irc.chat.twitch.tv"
+port = 6667
+username = ""	# leave empty to use randomly generated anonymous justinfan accounts
+password = ""
