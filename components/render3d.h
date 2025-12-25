@@ -26,7 +26,7 @@ namespace Render3D {
 		uint32_t nFaceCount;
 		bool bInvalidated = false;
 
-		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD) const {
+		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD, bool zwrite = true) const {
 			if (bInvalidated) return;
 
 #ifdef RENDER3D_NOEFFECT
@@ -110,7 +110,7 @@ namespace Render3D {
 #endif
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
 			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 			g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
 			g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);

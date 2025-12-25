@@ -274,3 +274,198 @@ public:
 	bool ShouldAbort() override { return abort; }
 	bool CanQuickTrigger() override { return false; }
 } E_SuddenDeath;
+
+class Effect_MidnightClub : public EffectBase_InRaceConditional {
+public:
+	Effect_MidnightClub() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Midnight Club Mode";
+		fTimerLength = 240;
+	}
+
+	const static inline float fCylinderRotX = 90;
+	const static inline float fCylinderRotY = 0;
+	const static inline float fCylinderRotZ = 0;
+	const static inline float fCylinderSizeX = 3;
+	const static inline float fCylinderSizeY = 50;
+	const static inline float fCylinderSizeZ = 3;
+
+	const static inline float fConeRotX = 90;
+	const static inline float fConeRotY = 0;
+	const static inline float fConeRotZ = 0;
+	const static inline float fConeSize = 4;
+	const static inline float fConeMoveY = 1;
+
+	const static inline float fPlayerArrowRotX = 90;
+	const static inline float fPlayerArrowRotY = 0;
+	const static inline float fPlayerArrowRotZ = 90;
+	const static inline float fPlayerArrowSize = 0.6;
+	const static inline float fPlayerArrowMoveFwd = 3.7;
+	const static inline float fPlayerArrowMoveY = 1;
+
+	const static inline float fFinishRotX = 90;
+	const static inline float fFinishRotY = 0;
+	const static inline float fFinishRotZ = 0;
+	const static inline float fFinishSize = 2.5;
+	const static inline float fFinishMoveY = 2;
+
+	void RenderPlayerArrow(NyaVec3 player, NyaVec3 fwd, NyaVec3 next) {
+		Render3D::nVertexColorValue = 0xFF808080;
+
+		static auto models = Render3D::CreateModels("mc/arrow.fbx");
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("mc/arrow.fbx");
+		}
+
+		auto dir = player - next;
+		dir.y = 0;
+		dir.Normalize();
+
+		for (auto& mdl : models) {
+			auto mat = NyaMat4x4::LookAt(dir);
+			mat.x *= fPlayerArrowSize;
+			mat.y *= fPlayerArrowSize;
+			mat.z *= fPlayerArrowSize;
+			mat.p = player;
+			mat.p += fwd * fPlayerArrowMoveFwd;
+			mat.p.y += fPlayerArrowMoveY;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(fPlayerArrowRotX * 0.01745329, fPlayerArrowRotY * 0.01745329, fPlayerArrowRotZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+
+			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
+			mdl->RenderAt(mat, false);
+		}
+
+		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+	}
+
+	void RenderCheckpointCone(NyaVec3 cp, NyaVec3 next) {
+		Render3D::nVertexColorValue = 0xFF404040;
+
+		static auto models = Render3D::CreateModels("mc/cone_fwd_new.fbx");
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("mc/cone_fwd_new.fbx");
+		}
+
+		auto dir = cp - next;
+		dir.Normalize();
+
+		for (auto& mdl : models) {
+			auto mat = NyaMat4x4::LookAt(dir);
+			mat.x *= fConeSize;
+			mat.y *= fConeSize;
+			mat.z *= fConeSize;
+			mat.p = cp;
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			mat.p.y += fConeMoveY;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(fConeRotX * 0.01745329, fConeRotY * 0.01745329, fConeRotZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+
+			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
+			mdl->RenderAt(mat, false);
+		}
+
+		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+	}
+
+	void RenderCheckpointFinish(NyaVec3 fwd, NyaVec3 cp) {
+		Render3D::nVertexColorValue = 0xFF404040;
+
+		static auto models = Render3D::CreateModels("mc/finish.fbx");
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("mc/finish.fbx");
+		}
+
+		for (auto& mdl : models) {
+			auto mat = NyaMat4x4::LookAt(fwd);
+			mat.x *= fFinishSize;
+			mat.y *= fFinishSize;
+			mat.z *= fFinishSize;
+			mat.p = cp;
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			mat.p.y += fFinishMoveY;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(fFinishRotX * 0.01745329, fFinishRotY * 0.01745329, fFinishRotZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+
+			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
+			mdl->RenderAt(mat, false);
+		}
+
+		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+	}
+
+	void RenderCheckpointCylinder(NyaVec3 cp) {
+		Render3D::nVertexColorValue = 0xD0808080;
+
+		static auto models = Render3D::CreateModels("mc/cylinder.fbx");
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("mc/cylinder.fbx");
+		}
+
+		for (auto& mdl : models) {
+			auto mat = UMath::Matrix4::kIdentity;
+			mat.x *= fCylinderSizeX;
+			mat.y *= fCylinderSizeY;
+			mat.z *= fCylinderSizeZ;
+			mat.p = cp;
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			mat.p.y -= 1;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(fCylinderRotX * 0.01745329, fCylinderRotY * 0.01745329, fCylinderRotZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+
+			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
+			mdl->RenderAt(mat, true, EEFFECT_WORLD, false);
+		}
+
+		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+	}
+
+	void TickFunctionMain(double delta) override {
+		GRaceStatus::DisableBarriers();
+	}
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_3D) return;
+
+		auto race = GRaceStatus::fObj;
+		if (!race) return;
+		if (!race->mNextCheckpoint) return;
+
+		auto cp = race->mNextCheckpoint;
+		int checkpointId = 0;
+		for (int i = 0; i < race->mCheckpoints.size(); i++) {
+			if (cp == race->mCheckpoints[i]) checkpointId = i;
+		}
+
+		Render3D::sTextureSubdir = "mc/";
+
+		auto cam = GetLocalPlayerCamera()->CurrentKey.Matrix.Invert();
+		RenderCheckpointCylinder(cp->mWorldTrigger.fPosRadius);
+		if (checkpointId < race->mCheckpoints.size() - 1) {
+			RenderCheckpointCone(cp->mWorldTrigger.fPosRadius, race->mCheckpoints[checkpointId+1]->mWorldTrigger.fPosRadius);
+		}
+		else {
+			RenderCheckpointFinish(RenderToWorldCoords(cam.z), cp->mWorldTrigger.fPosRadius);
+		}
+
+		if (GetLocalPlayer()->GetHud()->IsHudVisible()) {
+			RenderPlayerArrow(RenderToWorldCoords(cam.p), RenderToWorldCoords(cam.z), cp->mWorldTrigger.fPosRadius);
+		}
+
+		Render3D::sTextureSubdir = "";
+	}
+	void DeinitFunction() override {
+		if (IsInNormalRace()) {
+			GRaceStatus::EnableBarriers(GRaceStatus::fObj);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsRehideable() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_MidnightClub;
