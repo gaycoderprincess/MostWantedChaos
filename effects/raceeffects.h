@@ -124,7 +124,7 @@ public:
 class Effect_RestartRace : public EffectBase_InAnyRaceConditional {
 public:
 	Effect_RestartRace() : EffectBase_InAnyRaceConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Restart Race";
+		sName = "Restart Event";
 	}
 
 	void InitFunction() override {

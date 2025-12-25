@@ -886,7 +886,8 @@ public:
 class Effect_SetCarMassInf : public ChaosEffect {
 public:
 	Effect_SetCarMassInf() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Infinite Player Mass";
+		sName = "Juggernaut";
+		sFriendlyName = "Infinite Player Mass";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("playermass");
 	}
