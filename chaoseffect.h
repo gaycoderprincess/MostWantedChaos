@@ -32,6 +32,26 @@ public:
 		return sName;
 	}
 
+	std::string GetCheatCode(bool friendly) const {
+		std::string str = friendly ? GetFriendlyName() : sName;
+
+		char bannedSymbols[] = {
+				' ',
+				'.',
+				',',
+				'-',
+				'_',
+				'/',
+				'(',
+				')',
+		};
+		for (auto& symbol : bannedSymbols) {
+			std::erase(str, symbol);
+		}
+
+		return str;
+	}
+
 	void AddToFilterGroup(const std::string& group) { FilterGroups.push_back(Attrib::StringHash32(group.c_str())); }
 	void MakeIncompatibleWithFilterGroup(const std::string& group) { IncompatibleFilterGroups.push_back(Attrib::StringHash32(group.c_str())); }
 	void AddToIncompatiblityGroup(const std::string& group) {
@@ -68,6 +88,17 @@ public:
 	virtual bool InitImmediately() { return false; }
 	virtual void OnAnyEffectTriggered() {}
 	virtual void OnTimerRefill() {}
+	virtual bool MatchesCheatCode(std::string code) {
+		std::string str1 = GetCheatCode(false);
+		std::string str2 = GetCheatCode(true);
+		std::transform(str1.begin(), str1.end(), str1.begin(), [](unsigned char c){ return std::tolower(c); });
+		std::transform(str2.begin(), str2.end(), str2.begin(), [](unsigned char c){ return std::tolower(c); });
+		std::transform(code.begin(), code.end(), code.begin(), [](unsigned char c){ return std::tolower(c); });
+
+		if (code == str1) return true;
+		if (code == str2) return true;
+		return false;
+	}
 };
 
 class ChaosEffectInstance {
@@ -78,6 +109,7 @@ public:
 	double fTimeConditionMet = 3;
 	bool bFirstFrame = true;
 	bool bAborted = false;
+	std::string sUsername = "";
 
 	ChaosUIPopup Popup;
 
@@ -125,7 +157,11 @@ public:
 		Popup.fTimerLength = pEffect->fTimerLength;
 		Popup.fTimer = fTimer;
 		Popup.bHasTimer = HasTimer();
-		Popup.Draw(GetName(), y, inMenu);
+		std::string name = GetName();
+		if (!sUsername.empty()) {
+			name += std::format(" ({})", sUsername);
+		}
+		Popup.Draw(name, y, inMenu);
 	}
 
 	void OnTick(ChaosEffect::eChaosHook hook, double delta) {
@@ -250,9 +286,9 @@ bool CanEffectActivate(ChaosEffect* effect) {
 	return true;
 }
 
-void AddRunningEffect(ChaosEffect* effect) {
-	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return;
-	if (!CanEffectActivate(effect)) return;
+ChaosEffectInstance* AddRunningEffect(ChaosEffect* effect) {
+	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return nullptr;
+	if (!CanEffectActivate(effect)) return nullptr;
 
 	effect->bTriggeredThisCycle = true;
 	effect->LastTriggerTime = std::time(0);
@@ -268,9 +304,10 @@ void AddRunningEffect(ChaosEffect* effect) {
 
 	DoChaosSave();
 
-	for (auto& running : aRunningEffects) {
-		running.pEffect->OnAnyEffectTriggered();
+	for (auto& other : aRunningEffects) {
+		other.pEffect->OnAnyEffectTriggered();
 	}
+	return running;
 }
 
 int GetRandomNumber(int min, int max) {

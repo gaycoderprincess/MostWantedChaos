@@ -41,6 +41,12 @@ namespace ChaosVoting {
 	ChaosEffect* pAllOfTheAbove = nullptr;
 	bool bSelectingEffectsForVote = false;
 
+	bool bRecordChatCheat = false;
+	bool bRecordChatCheatDuplicates = false;
+	int nNumVotingUsers = 0;
+	std::vector<std::string> aChatCheatMessages;
+	std::vector<std::string> aChatCheatUsers;
+
 	bool IsEffectInNextVotes(ChaosEffect* effect) {
 		for (auto& vote : aNextVotes) {
 			if (vote == effect) return true;
@@ -87,15 +93,14 @@ namespace ChaosVoting {
 		return totalVotes;
 	}
 
-	bool AnyEffectGotVotes() {
-		return GetTotalVoteCount() > 0;
-	}
-
 	void TriggerHighestVotedEffect() {
 		auto votes = aNewVotes;
 		if (votes.empty()) return;
 
-		if (!AnyEffectGotVotes()) {
+		auto voteCount = GetTotalVoteCount();
+		nNumVotingUsers = voteCount;
+
+		if (voteCount <= 0) {
 			AddRunningEffect(GetRandomEffect());
 			return;
 		}
@@ -215,6 +220,47 @@ namespace ChaosVoting {
 		mVotingMutex.unlock();
 	}
 
+	void ActivateChatCheat() {
+		ChaosVoting::bRecordChatCheat = true;
+		ChaosVoting::bRecordChatCheatDuplicates = ChaosVoting::nNumVotingUsers <= 3; // allow duplicate effects per user if the chat is small
+	}
+
+	void DeactivateChatCheat() {
+		ChaosVoting::bRecordChatCheat = false;
+		ChaosVoting::aChatCheatUsers.clear();
+		ChaosVoting::aChatCheatMessages.clear();
+	}
+
+	void ProcessChatCheatRequest(const std::string& username, const std::string& message) {
+		if (!bRecordChatCheatDuplicates) {
+			for (auto& user : aChatCheatUsers) {
+				if (user == username) return;
+			}
+		}
+
+		ChaosEffect* pEffect = nullptr;
+		for (auto& effect : ChaosEffect::aEffects) {
+			if (!effect->MatchesCheatCode(message)) continue;
+			if (!effect->CanQuickTrigger()) continue;
+			if (!CanEffectActivate(effect)) continue;
+			pEffect = effect;
+		}
+		if (!pEffect) return;
+
+		if (!pEffect->CanMultiTrigger()) {
+			for (auto& msg : aChatCheatMessages) {
+				if (msg == message) return;
+			}
+		}
+
+		aChatCheatUsers.push_back(username);
+		aChatCheatMessages.push_back(message);
+
+		if (auto effect = AddRunningEffect(pEffect)) {
+			effect->sUsername = username;
+		}
+	}
+
 	void OnMessageReceived(IRCMessage message, IRCClient* client) {
 		//message.parameters:
 		//#channel
@@ -236,6 +282,9 @@ namespace ChaosVoting {
 			mVotingMutex.lock();
 			OnVoteCast(message.prefix.user, (messageStr[0] - '1'));
 			mVotingMutex.unlock();
+		}
+		else if (bRecordChatCheat) {
+			ProcessChatCheatRequest(message.prefix.user, message.parameters[1]);
 		}
 	}
 

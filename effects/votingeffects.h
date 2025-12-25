@@ -109,7 +109,34 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override { return ChaosVoting::IsEnabled() && ChaosVoting::nNumVoteOptions < 9; }
 	bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 	void OnTimerRefill() override { InitFunction(); }
 	bool InitImmediately() override { return true; }
 } E_VotingAdd;
+
+class Effect_VotingCheat : public ChaosEffect {
+public:
+	Effect_VotingCheat() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Full Chat Chaos Control";
+		fTimerLength = 30;
+	}
+
+	void InitFunction() override {
+		ChaosVoting::ActivateChatCheat();
+		CwoeeHints::AddHint("Type an effect's name without spaces & symbols into chat!");
+		CwoeeHints::AddHint("Any valid effect will be activated.");
+
+		if (auto effect = GetRandomEffect(true)) {
+			CwoeeHints::AddHint(std::format("Example: {}", effect->GetCheatCode(PercentageChanceCheck(50))));
+		}
+		else {
+			CwoeeHints::AddHint("Example: SpawnTeddieFromPersona4");
+		}
+	}
+	void DeinitFunction() override {
+		ChaosVoting::DeactivateChatCheat();
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override { return ChaosVoting::IsEnabled(); }
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+} E_VotingCheat;

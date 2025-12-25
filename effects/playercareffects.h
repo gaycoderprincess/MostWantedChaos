@@ -1175,6 +1175,7 @@ public:
 	void InitFunction() override {
 		TeleportPlayer({-2200.7, 144.6, 1458.7}, {-0.14, 0.0, 0.99});
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_PlayerTPHidingSpot;
 
 class Effect_PlayerTPBridge : public ChaosEffect {
@@ -1186,6 +1187,7 @@ public:
 	void InitFunction() override {
 		TeleportPlayer({-2485.08, 207.38, -1348.54}, {-0.89, 0.0, -0.47});
 	}
+	bool CanQuickTrigger() override { return false; }
 } E_PlayerTPBridge;
 
 // this technically affects all cars but it's here in playercareffects since it mostly only affects the player
@@ -1196,6 +1198,9 @@ public:
 		fTimerLength = 45;
 	}
 
+	void InitFunction() override {
+		CwoeeHints::AddHint("Press and hold the NOS button to launch forward!");
+	}
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
