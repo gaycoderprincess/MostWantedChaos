@@ -57,9 +57,12 @@ void OnWinRace() {
 	if (GetEffectRunning(&E_LeakTank)) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_LEAKTANK"));
 	}
-	auto plyModel = GetLocalPlayerVehicle()->GetVehicleName();
-	if (!strcmp(plyModel, "cs_clio_trafpizza")) {
+	std::string plyModel = GetLocalPlayerVehicle()->GetVehicleName();
+	if (plyModel == "cs_clio_trafpizza" && IsInCareerMode()) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_TRAFPIZZA"));
+	}
+	if (plyModel.starts_with("semi")) {
+		Achievements::AwardAchievement(GetAchievement("WIN_RACE_SEMI"));
 	}
 }
 

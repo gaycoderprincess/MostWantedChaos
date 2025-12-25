@@ -65,6 +65,7 @@ public:
 	virtual bool IgnoreHUDState() { return false; } // display even when disable chaos hud is active
 	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
 	virtual bool CanMultiTrigger() { return false; } // multiple instances at once
+	virtual bool InitImmediately() { return false; }
 	virtual void OnAnyEffectTriggered() {}
 	virtual void OnTimerRefill() {}
 };
@@ -257,6 +258,10 @@ void AddRunningEffect(ChaosEffect* effect) {
 	effect->LastTriggerTime = std::time(0);
 	effect->nTotalTimesActivated++;
 	aRunningEffects.push_back(ChaosEffectInstance(effect));
+	if (effect->InitImmediately()) {
+		effect->InitFunction();
+		aRunningEffects[aRunningEffects.size()-1].bFirstFrame = false;
+	}
 	WriteLog(std::format("Activating {}", effect->sName));
 
 	DoChaosSave();

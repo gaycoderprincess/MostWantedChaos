@@ -89,3 +89,27 @@ public:
 	bool CanQuickTrigger() override { return false; }
 	void OnTimerRefill() override { InitFunction(); }
 } E_VotingSmart;
+
+class Effect_VotingAdd : public ChaosEffect {
+public:
+	Effect_VotingAdd() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Add Extra Voting Option";
+	}
+
+	static inline int max = 4;
+
+	void InitFunction() override {
+		ChaosVoting::nAddVotingOption = max;
+	}
+	void TickFunctionMain(double delta) override {
+		fTimerLength = max * 5;
+		EffectInstance->fTimer = ChaosVoting::nAddVotingOption * 5;
+	}
+	bool ShouldAbort() override { return !ChaosVoting::nAddVotingOption; }
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override { return ChaosVoting::IsEnabled() && ChaosVoting::nNumVoteOptions < 9; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanQuickTrigger() override { return false; }
+	void OnTimerRefill() override { InitFunction(); }
+	bool InitImmediately() override { return true; }
+} E_VotingAdd;

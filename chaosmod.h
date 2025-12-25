@@ -288,11 +288,12 @@ void ChaosLoop() {
 
 	if (ChaosVoting::IsEnabled()) {
 		ChaosVoting::pAllOfTheAbove = &E_VotingAll; // this is such a hack lol woof meow
-		ChaosVoting::DrawUI();
+		ChaosVoting::Update();
 	}
 	else if (ChaosVoting::bAutoReconnect && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Reconnect();
 	}
+	ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
@@ -371,8 +372,6 @@ void ChaosModMenu() {
 		QuickValueEditor("fEffectSize", fEffectSize);
 		QuickValueEditor("fEffectSpacing", fEffectSpacing);
 		QuickValueEditor("fEffectVotingSize", fEffectVotingSize);
-		QuickValueEditor("fEffectHintSize", fEffectHintSize);
-		QuickValueEditor("fEffectHintY", fEffectHintY);
 		ChloeMenuLib::EndMenu();
 	}
 

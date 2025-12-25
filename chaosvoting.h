@@ -37,6 +37,7 @@ namespace ChaosVoting {
 	// voting tweaks
 	int nLowestWins = 0;
 	int nStreamerVotes = 0;
+	int nAddVotingOption = 0;
 	ChaosEffect* pAllOfTheAbove = nullptr;
 	bool bSelectingEffectsForVote = false;
 
@@ -58,11 +59,13 @@ namespace ChaosVoting {
 		// this shouldn't be in the mutex portion as some effects can check for voting being on
 		bSelectingEffectsForVote = true;
 		auto newVotesTemp = aNewVotes;
-		for (int i = 0; i < nNumVoteOptions; i++) {
+		int numVoteOptions = nNumVoteOptions;
+		if (nAddVotingOption > 0) numVoteOptions++;
+		for (int i = 0; i < numVoteOptions; i++) {
 			ChaosEffect* effect = nullptr;
 			do {
 				effect = GetRandomEffect(false);
-			} while (GetNumEffectsAvailableForRandom() > nNumVoteOptions && IsEffectInNextVotes(effect));
+			} while (GetNumEffectsAvailableForRandom() > numVoteOptions && IsEffectInNextVotes(effect));
 			aNextVotes.push_back(effect);
 			newVotesTemp.push_back(VotingPopup(effect));
 		}
@@ -72,6 +75,7 @@ namespace ChaosVoting {
 		aNewVotes = newVotesTemp;
 		if (nLowestWins > 0) nLowestWins--;
 		if (nStreamerVotes > 0) nStreamerVotes--;
+		if (nAddVotingOption > 0) nAddVotingOption--;
 		mVotingMutex.unlock();
 	}
 
@@ -153,24 +157,8 @@ namespace ChaosVoting {
 		UpdateVotePercentages();
 	}
 
-	void DrawUI() {
-		if (nNumVoteOptions < 2) nNumVoteOptions = 2;
-		if (nNumVoteOptions > 9) nNumVoteOptions = 9;
-
-		// first frame
-		if (aNewVotes.empty()) {
-			GenerateNewVotes();
-		}
-
+	void DrawUI(bool on) {
 		mVotingMutex.lock();
-
-		if (nStreamerVotes > 0) {
-			for (int i = 0; i < aNewVotes.size(); i++) {
-				if (IsKeyJustPressed('1' + i)) {
-					OnStreamerVoteCast(i);
-				}
-			}
-		}
 
 		static CNyaTimer gTimer;
 		gTimer.Process();
@@ -187,7 +175,7 @@ namespace ChaosVoting {
 		}
 		else {
 			for (auto& vote : aNewVotes) {
-				vote.Popup.Update(gTimer.fDeltaTime, true);
+				vote.Popup.Update(gTimer.fDeltaTime, on);
 				vote.Draw(y++);
 			}
 		}
@@ -195,15 +183,35 @@ namespace ChaosVoting {
 		static ChaosUIPopup VoteCountPopup;
 		VoteCountPopup.bIsVotingOption = true;
 		VoteCountPopup.bLeftSide = true;
-		VoteCountPopup.Update(gTimer.fDeltaTime, true);
+		VoteCountPopup.Update(gTimer.fDeltaTime, on);
 		VoteCountPopup.Draw(std::format("Vote Count: {}", GetTotalVoteCount()), y++, false);
 
 		static ChaosUIPopup VoteDisabledPopup;
 		VoteDisabledPopup.bIsVotingOption = true;
 		VoteDisabledPopup.bLeftSide = true;
-		VoteDisabledPopup.Update(gTimer.fDeltaTime, nSmartRNG > 0);
+		VoteDisabledPopup.Update(gTimer.fDeltaTime, on && nSmartRNG > 0);
 		VoteDisabledPopup.Draw("Voting is disabled!", y++, false);
 
+		mVotingMutex.unlock();
+	}
+
+	void Update() {
+		if (nNumVoteOptions < 2) nNumVoteOptions = 2;
+		if (nNumVoteOptions > 9) nNumVoteOptions = 9;
+
+		// first frame
+		if (aNewVotes.empty()) {
+			GenerateNewVotes();
+		}
+
+		mVotingMutex.lock();
+		if (nStreamerVotes > 0) {
+			for (int i = 0; i < aNewVotes.size(); i++) {
+				if (IsKeyJustPressed('1' + i)) {
+					OnStreamerVoteCast(i);
+				}
+			}
+		}
 		mVotingMutex.unlock();
 	}
 
@@ -252,20 +260,29 @@ namespace ChaosVoting {
 
 		if (!pIRCClient->InitSocket()) {
 			MessageBoxA(0, "InitSocket failed", "nya?!~", MB_ICONERROR);
+			delete pIRCClient;
+			pIRCClient = nullptr;
+			bAutoReconnect = false;
 			return;
 		}
 
 		if (!pIRCClient->Connect("irc.chat.twitch.tv", 6667)) {
 			MessageBoxA(0, "Connect failed", "nya?!~", MB_ICONERROR);
+			delete pIRCClient;
+			pIRCClient = nullptr;
+			bAutoReconnect = false;
 			return;
 		}
 
 		auto login = std::format("justinfan{}", GetRandomNumber(1024, 32767));
 		if (!pIRCClient->Login(login, login)) {
+			MessageBoxA(0, "Login failed", "nya?!~", MB_ICONERROR);
 			if (pIRCClient->Connected()) {
 				pIRCClient->Disconnect();
 			}
-			MessageBoxA(0, "Login failed", "nya?!~", MB_ICONERROR);
+			delete pIRCClient;
+			pIRCClient = nullptr;
+			bAutoReconnect = false;
 			return;
 		}
 
