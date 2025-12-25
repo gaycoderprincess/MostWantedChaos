@@ -24,7 +24,8 @@ namespace ChaosVoting {
 		}
 
 		void Draw(float y) {
-			Popup.bIsVotingDummy = true;
+			Popup.bIsVotingOption = true;
+			Popup.bLeftSide = true;
 			Popup.Draw(std::format("{} ({}%)", pEffect->GetFriendlyName(), (int)fVotePercentage), y, false);
 		}
 	};
@@ -132,13 +133,11 @@ namespace ChaosVoting {
 	void OnVoteCast(const std::string& username, int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
 		for (auto& effect : aNewVotes) {
-			int pos = 0;
 			for (auto& vote : effect.aVotes) {
 				if (vote == username) {
-					effect.aVotes.erase(effect.aVotes.begin() + pos);
+					effect.aVotes.erase(effect.aVotes.begin() + (&vote - &effect.aVotes[0]));
 					break;
 				}
-				pos++;
 			}
 		}
 		aNewVotes[i].aVotes.push_back(username);
@@ -194,12 +193,14 @@ namespace ChaosVoting {
 		}
 
 		static ChaosUIPopup VoteCountPopup;
-		VoteCountPopup.bIsVotingDummy = true;
+		VoteCountPopup.bIsVotingOption = true;
+		VoteCountPopup.bLeftSide = true;
 		VoteCountPopup.Update(gTimer.fDeltaTime, true);
 		VoteCountPopup.Draw(std::format("Vote Count: {}", GetTotalVoteCount()), y++, false);
 
 		static ChaosUIPopup VoteDisabledPopup;
-		VoteDisabledPopup.bIsVotingDummy = true;
+		VoteDisabledPopup.bIsVotingOption = true;
+		VoteDisabledPopup.bLeftSide = true;
 		VoteDisabledPopup.Update(gTimer.fDeltaTime, nSmartRNG > 0);
 		VoteDisabledPopup.Draw("Voting is disabled!", y++, false);
 

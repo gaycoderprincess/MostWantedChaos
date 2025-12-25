@@ -1269,6 +1269,10 @@ public:
 
 	static inline float DeltaMult = 0.002;
 
+	void InitFunction() override {
+		CwoeeHints::AddHint("Turn left to lower your heat level,");
+		CwoeeHints::AddHint("Turn right to raise your heat level.");
+	}
 	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			auto heat = GetLocalPlayerInterface<IPerpetrator>()->GetHeat();
@@ -1302,6 +1306,8 @@ public:
 	float fMinSpeed = fMinSpeedSlow;
 
 	void InitFunction() override {
+		CwoeeHints::AddHint("Stay above the target speed!");
+
 		bActive = false;
 		fInactiveTimer = 0;
 		fLeewayTimer = 0;

@@ -22,11 +22,14 @@ std::vector<void(*)()> aDrawing3DLoopFunctions;
 
 #include "util.h"
 #include "d3dhook.h"
+#include "chaosvars.h"
+#include "chaospopup.h"
 #include "components/achievements.h"
 #include "components/customcamera.h"
 #include "components/render3d.h"
 #include "components/render3d_objects.h"
 #include "components/customcar.h"
+#include "components/hints.h"
 namespace FlatOutHUD {
 	#include "components/fo1hud/common.h"
 	#include "components/fo1hud/ingame.h"
@@ -43,7 +46,6 @@ namespace FlatOutHUD {
 #include "hooks/worldrender.h"
 #include "hooks/input.h"
 #include "hooks/busted.h"
-#include "chaosvars.h"
 #include "chaoseffect.h"
 #include "chaosmod.h"
 #include "chaossave.h"

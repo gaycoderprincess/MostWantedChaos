@@ -439,7 +439,7 @@ public:
 	static inline float scale = 2;
 	static inline float moveSpeed = 55;
 	static inline float rotSpeed = 2.5;
-	static inline float inFrontThreshold = 0.33;
+	static inline float inFrontThreshold = 0.6;
 	static inline float crosshairSize = 0.02;
 
 	static inline NyaAudio::NyaSound FireSound = 0;
@@ -571,6 +571,8 @@ public:
 	}
 
 	void InitFunction() override {
+		CwoeeHints::AddHint("Press X to fire a rocket.");
+		CwoeeHints::AddHint("The green reticule displays your lock-on target.");
 		if (!FireSound) FireSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firefire.wav");
 		if (!ExplodeSound) ExplodeSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firebang.wav");
 	}
@@ -588,15 +590,6 @@ public:
 			static auto texture = LoadTexture("CwoeeChaos/data/textures/firework_crosshair.png");
 			DrawRectangle(screenPos.x - crosshairSize * GetAspectRatioInv(), screenPos.x + crosshairSize * GetAspectRatioInv(), screenPos.y - crosshairSize, screenPos.y + crosshairSize, {0,255,0,255}, 0, texture);
 		}
-
-		tNyaStringData data;
-		data.x = 0.5;
-		data.y = 0.85;
-		data.size = 0.04;
-		data.XCenterAlign = true;
-		data.outlinea = 255;
-		data.outlinedist = 0.025;
-		DrawString(data, "Press X to fire a rocket!");
 
 		GetLocalPlayer()->ResetGameBreaker(false);
 		if (!IsKeyJustPressed('X') && !IsPadKeyJustPressed(NYA_PAD_KEY_X)) return;

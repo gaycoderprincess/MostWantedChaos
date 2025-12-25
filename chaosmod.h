@@ -12,7 +12,7 @@ void ProcessChaosEffectsMain(double fDeltaTime, bool inMenu, bool blockedByOther
 		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
 		if (bDisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
 		effect.Draw(y, inMenu || blockedByOtherMeans);
-		y += 1 - (inMenu ? 0 : effect.GetOffscreenPercentage());
+		y += 1 - (inMenu ? 0 : effect.Popup.GetOffscreenPercentage());
 	}
 
 	while (RunningEffectsCleanup()) {}
@@ -371,6 +371,8 @@ void ChaosModMenu() {
 		QuickValueEditor("fEffectSize", fEffectSize);
 		QuickValueEditor("fEffectSpacing", fEffectSpacing);
 		QuickValueEditor("fEffectVotingSize", fEffectVotingSize);
+		QuickValueEditor("fEffectHintSize", fEffectHintSize);
+		QuickValueEditor("fEffectHintY", fEffectHintY);
 		ChloeMenuLib::EndMenu();
 	}
 
@@ -522,9 +524,6 @@ void ChaosModMenu() {
 			ChloeMenuLib::BeginMenu();
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
-			}
-			if (DrawMenuOption("Connect Test")) {
-				ChaosVoting::Connect();
 			}
 			if (DrawMenuOption("Trigger Busted")) {
 				NISListenerActivity::MessageBusted(nullptr, 0);
