@@ -124,7 +124,7 @@ public:
 		ChaosVoting::ActivateChatCheat();
 
 		CwoeeHints::AddHint("Type an effect's name without spaces & symbols into chat!");
-		CwoeeHints::AddHint("Any valid effect will be activated.");
+		CwoeeHints::AddHint("Any valid effect will be activated immediately.");
 
 		ChaosEffect* effect = GetRandomEffect(true);
 		if (!effect) effect = &E_Teddie;
