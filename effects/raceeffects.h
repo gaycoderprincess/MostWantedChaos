@@ -141,6 +141,7 @@ public:
 	Effect_DisableBarriers() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Race Barriers";
 		fTimerLength = 120;
+		AddToIncompatiblityGroup("remove_barriers");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -280,6 +281,7 @@ public:
 	Effect_MidnightClub() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Midnight Club Mode";
 		fTimerLength = 240;
+		AddToIncompatiblityGroup("remove_barriers");
 	}
 
 	const static inline float fCylinderRotX = 90;
