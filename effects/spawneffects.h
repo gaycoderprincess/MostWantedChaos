@@ -120,6 +120,7 @@ public:
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
 			SpawnTeddie(mat, colPos);
+			DoChaosSave();
 		}
 	}
 } E_Teddie;
@@ -228,6 +229,7 @@ public:
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
 			SpawnPeanut(mat);
+			DoChaosSave();
 
 			veh->SetLinearVelocity(&UMath::Vector3::kZero);
 			veh->SetAngularVelocity(&UMath::Vector3::kZero);
@@ -247,6 +249,7 @@ public:
 		mat.p.x = GetRandomNumber(-5000, 5000);
 		mat.p.z = GetRandomNumber(-5000, 5000);
 		Effect_173::SpawnPeanut(mat);
+		DoChaosSave();
 	}
 	bool IsAvailable() override { return Effect_173::bPeanutEverSpawned; }
 	bool AbortOnConditionFailed() override { return true; }
@@ -301,6 +304,7 @@ public:
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
 			SpawnObject(mat, colPos);
+			DoChaosSave();
 		}
 	}
 } E_8Down;
@@ -391,6 +395,12 @@ public:
 	}
 
 	void InitFunction() override {
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/pickgen.wav");
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::Play(sound);
+		}
+
 		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
 			auto mat = UMath::Matrix4::kIdentity;
 			veh->GetMatrix4(&mat);
@@ -400,6 +410,7 @@ public:
 			mat.p += mat.y * offY;
 			mat.p += mat.z * offZ;
 			SpawnBomb(mat);
+			DoChaosSave();
 		}
 	}
 	bool CanQuickTrigger() override { return false; }

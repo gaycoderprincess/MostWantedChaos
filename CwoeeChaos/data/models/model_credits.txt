@@ -5,3 +5,5 @@ greenwood - Rockstar Games
 mona - ATLUS
 scp173 - Undertow Games
 8down - Bugbear Entertainment
+firework - Acclaim Entertainment
+pickup - Acclaim Entertainment

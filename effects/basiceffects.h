@@ -401,6 +401,7 @@ public:
 			"",
 			"With additional help from",
 			"xan1242",
+			"fredimachado's C++ IRC Client",
 			"",
 	};
 	static inline float fScrollSpeed = 0.1;
