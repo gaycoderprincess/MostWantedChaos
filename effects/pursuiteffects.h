@@ -452,4 +452,5 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool IsRehideable() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 } E_DropCash;

@@ -376,6 +376,7 @@ void ChaosModMenu() {
 	if (DrawMenuOption("Voting")) {
 		ChloeMenuLib::BeginMenu();
 		QuickValueEditor("Voting Options", ChaosVoting::nNumVoteOptions);
+		QuickValueEditor("Random Effect Option", ChaosVoting::bRandomEffectOption);
 		if (ChaosVoting::IsEnabled()) {
 			QuickValueEditor("Auto-Reconnect", ChaosVoting::bAutoReconnect);
 			if (DrawMenuOption("Disconnect From Channel")) {

@@ -4,6 +4,7 @@ namespace ChaosVoting {
 	bool bAutoReconnect = false;
 	char sChannelName[64] = "";
 	int nNumVoteOptions = 4;
+	bool bRandomEffectOption = false;
 
 	IRCClient* pIRCClient = nullptr;
 	std::mutex mVotingMutex;
@@ -16,6 +17,8 @@ namespace ChaosVoting {
 		std::vector<std::string> aVotes = {};
 		bool bVotedByStreamer = false;
 		float fVotePercentage = 0;
+
+		bool bEffectActivated = false;
 
 		VotingPopup(ChaosEffect* effect) : pEffect(effect) {}
 
@@ -30,8 +33,8 @@ namespace ChaosVoting {
 		}
 	};
 
-	std::vector<VotingPopup> aOldVotes;
-	std::vector<VotingPopup> aNewVotes;
+	std::vector<VotingPopup*> aOldVotes;
+	std::vector<VotingPopup*> aNewVotes;
 	std::vector<ChaosEffect*> aNextVotes;
 
 	// voting tweaks
@@ -39,6 +42,7 @@ namespace ChaosVoting {
 	int nStreamerVotes = 0;
 	int nAddVotingOption = 0;
 	ChaosEffect* pAllOfTheAbove = nullptr;
+	ChaosEffect* pRandomEffect = nullptr;
 	bool bSelectingEffectsForVote = false;
 
 	bool bRecordChatCheat = false;
@@ -50,6 +54,22 @@ namespace ChaosVoting {
 	bool IsEffectInNextVotes(ChaosEffect* effect) {
 		for (auto& vote : aNextVotes) {
 			if (vote == effect) return true;
+		}
+		return false;
+	}
+
+	void AddRandomEffectToVotes() {
+		static auto randomEffect = ChaosEffect("DUMMY", false);
+		if (!randomEffect.sName) {
+			randomEffect.sName = "Random Effect";
+		}
+		pRandomEffect = &randomEffect;
+		aNewVotes.push_back(new VotingPopup(pRandomEffect));
+	}
+
+	bool IsRandomEffectInVotes() {
+		for (auto& vote : aNewVotes) {
+			if (vote->pEffect == pRandomEffect) return true;
 		}
 		return false;
 	}
@@ -73,7 +93,7 @@ namespace ChaosVoting {
 				effect = GetRandomEffect(false);
 			} while (GetNumEffectsAvailableForRandom() > numVoteOptions && IsEffectInNextVotes(effect));
 			aNextVotes.push_back(effect);
-			newVotesTemp.push_back(VotingPopup(effect));
+			newVotesTemp.push_back(new VotingPopup(effect));
 		}
 		bSelectingEffectsForVote = false;
 
@@ -82,13 +102,16 @@ namespace ChaosVoting {
 		if (nLowestWins > 0) nLowestWins--;
 		if (nStreamerVotes > 0) nStreamerVotes--;
 		if (nAddVotingOption > 0) nAddVotingOption--;
+		if (bRandomEffectOption) {
+			AddRandomEffectToVotes();
+		}
 		mVotingMutex.unlock();
 	}
 
 	int GetTotalVoteCount() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
-			totalVotes += vote.aVotes.size() + vote.bVotedByStreamer;
+			totalVotes += vote->aVotes.size() + vote->bVotedByStreamer;
 		}
 		return totalVotes;
 	}
@@ -105,24 +128,30 @@ namespace ChaosVoting {
 			return;
 		}
 
-		std::sort(votes.begin(), votes.end(), [](const VotingPopup& a, const VotingPopup& b) {
-			if (nLowestWins > 0) return a.fVotePercentage < b.fVotePercentage;
-			return a.fVotePercentage > b.fVotePercentage;
+		std::sort(votes.begin(), votes.end(), [](const VotingPopup* a, const VotingPopup* b) {
+			if (nLowestWins > 0) return a->fVotePercentage < b->fVotePercentage;
+			return a->fVotePercentage > b->fVotePercentage;
 		});
-		bool allOfTheAbove = votes[0].pEffect == pAllOfTheAbove;
+		bool allOfTheAbove = votes[0]->pEffect == pAllOfTheAbove;
 
 		VotingPopup* highestVoted = nullptr;
 		int highestVoteCount = 0;
 
 		// activate highest voted activatable effect
 		for (auto& vote : votes) {
-			if (!CanEffectActivate(vote.pEffect)) continue;
+			if (!CanEffectActivate(vote->pEffect)) continue;
 
 			// also trigger any tied votes
-			if (allOfTheAbove || !highestVoted || highestVoteCount == vote.GetVoteCount()) {
-				AddRunningEffect(vote.pEffect);
-				highestVoted = &vote;
-				highestVoteCount = vote.GetVoteCount();
+			if (allOfTheAbove || !highestVoted || highestVoteCount == vote->GetVoteCount()) {
+				if (vote->pEffect == pRandomEffect) {
+					AddRunningEffect(GetRandomEffect());
+				}
+				else {
+					AddRunningEffect(vote->pEffect);
+				}
+				vote->bEffectActivated = true;
+				highestVoted = vote;
+				highestVoteCount = vote->GetVoteCount();
 			}
 		}
 
@@ -132,33 +161,33 @@ namespace ChaosVoting {
 	void UpdateVotePercentages() {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
-			totalVotes += vote.GetVoteCount();
+			totalVotes += vote->GetVoteCount();
 		}
 		for (auto& vote : aNewVotes) {
-			vote.fVotePercentage = (vote.GetVoteCount() / (double)totalVotes) * 100.0;
+			vote->fVotePercentage = (vote->GetVoteCount() / (double)totalVotes) * 100.0;
 		}
 	}
 
 	void OnVoteCast(const std::string& username, int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
 		for (auto& effect : aNewVotes) {
-			for (auto& vote : effect.aVotes) {
+			for (auto& vote : effect->aVotes) {
 				if (vote == username) {
-					effect.aVotes.erase(effect.aVotes.begin() + (&vote - &effect.aVotes[0]));
+					effect->aVotes.erase(effect->aVotes.begin() + (&vote - &effect->aVotes[0]));
 					break;
 				}
 			}
 		}
-		aNewVotes[i].aVotes.push_back(username);
+		aNewVotes[i]->aVotes.push_back(username);
 		UpdateVotePercentages();
 	}
 
 	void OnStreamerVoteCast(int i) {
 		if (i < 0 || i >= aNewVotes.size()) return;
 		for (auto& vote : aNewVotes) {
-			vote.bVotedByStreamer = false;
+			vote->bVotedByStreamer = false;
 		}
-		aNewVotes[i].bVotedByStreamer = true;
+		aNewVotes[i]->bVotedByStreamer = true;
 		UpdateVotePercentages();
 	}
 
@@ -172,16 +201,38 @@ namespace ChaosVoting {
 
 		// clear old votes
 		if (!aOldVotes.empty()) {
+			// update unvoted effects first
+			// if all unvoted effects disappeared, update the activated effects
+
+			bool unvotedTimersDone = true;
 			for (auto& vote : aOldVotes) {
-				vote.Popup.Update(gTimer.fDeltaTime, false);
-				vote.Draw(y++);
+				if (vote->bEffectActivated) continue;
+				vote->Popup.Update(gTimer.fDeltaTime, false);
+				if (vote->Popup.fTextTimer > 0) unvotedTimersDone = false;
 			}
-			if (aOldVotes[0].Popup.fTextTimer <= 0) aOldVotes.clear();
+
+			bool timersDone = true;
+			for (auto& vote : aOldVotes) {
+				if (!vote->bEffectActivated) continue;
+				vote->Popup.Update(gTimer.fDeltaTime, !unvotedTimersDone);
+				if (vote->Popup.fTextTimer > 0) timersDone = false;
+			}
+
+			for (auto& vote : aOldVotes) {
+				vote->Draw(y++);
+			}
+
+			if (timersDone && unvotedTimersDone) {
+				for (auto& vote : aOldVotes) {
+					delete vote;
+				}
+				aOldVotes.clear();
+			}
 		}
 		else {
 			for (auto& vote : aNewVotes) {
-				vote.Popup.Update(gTimer.fDeltaTime, on);
-				vote.Draw(y++);
+				vote->Popup.Update(gTimer.fDeltaTime, on);
+				vote->Draw(y++);
 			}
 		}
 
@@ -207,6 +258,15 @@ namespace ChaosVoting {
 		// first frame
 		if (aNewVotes.empty()) {
 			GenerateNewVotes();
+		}
+
+		if (bRandomEffectOption && !IsRandomEffectInVotes()) {
+			AddRandomEffectToVotes();
+		}
+		if (!bRandomEffectOption && IsRandomEffectInVotes()) {
+			// remove the last member of the vote list - this is always random effect in this case
+			delete aNewVotes[aNewVotes.size()-1];
+			aNewVotes.pop_back();
 		}
 
 		mVotingMutex.lock();
