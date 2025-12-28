@@ -531,7 +531,7 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_ReversedRaces;
 
-/*class Effect_ReverseRace : public ChaosEffect {
+class Effect_ReverseRace : public ChaosEffect {
 public:
 	Effect_ReverseRace() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Reverse Current Race";

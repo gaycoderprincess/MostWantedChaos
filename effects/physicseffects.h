@@ -25,9 +25,13 @@ public:
 
 	void InitFunction() override {
 		NyaHookLib::Patch(0x8ABB60, 0x6B20E1);
+		NyaHookLib::Patch<uint64_t>(0x74FCD0, 0xB60F900000084AE9); // render brakes
+		NyaHookLib::Patch<uint64_t>(0x74F2ED, 0x046A90000009B7E9); // render tires
 	}
 	void DeinitFunction() override {
 		NyaHookLib::Patch(0x8ABB60, 0x6B1DD0);
+		NyaHookLib::Patch<uint64_t>(0x74FCD0, 0xB60F00000849840F);
+		NyaHookLib::Patch<uint64_t>(0x74F2ED, 0x046A000009B68F0F);
 	}
 	bool HasTimer() override { return true; }
 } E_NoTirePhysics2;
