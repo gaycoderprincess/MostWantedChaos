@@ -230,7 +230,7 @@ public:
 		fLeewayTimer = 0;
 	}
 	void TickFunctionMain(double delta) override {
-		if (GetLocalPlayerVehicle()->IsStaging()) {
+		if (IsLocalPlayerStaging()) {
 			ranking = GRaceStatus::fObj->mRacerCount;
 		}
 
@@ -471,3 +471,173 @@ public:
 	bool IsRehideable() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_MidnightClub;
+
+// doesn't work at all, checkpoints can't be reversed
+// not even the game's own reverse system works????
+/*class Effect_ReverseRaces : public ChaosEffect {
+public:
+	Effect_ReverseRaces() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Reversed Races";
+		fTimerLength = 480;
+	}
+
+	static void __stdcall ExtractDirectionReverse(Attrib::Instance* a1, UMath::Vector3* a2, float a3) {
+		GRaceParameters::ExtractDirection(a1, a2, a3);
+		*a2 *= -1;
+	}
+
+	void InitFunction() override {
+		// set GRaceParameters checkpoint functions to GRaceCustom ones
+		NyaHookLib::Patch(0x8A39B8, 0x5FD680);
+		NyaHookLib::Patch(0x8A39BC, 0x5FD6F0);
+		NyaHookLib::Patch<uint16_t>(0x5FD688, 0x9090); // always use reverse code path in GetCheckpointPosition
+		NyaHookLib::Patch<uint16_t>(0x5FD710, 0x9090); // always use reverse code path in GetCheckpointDirection
+		NyaHookLib::Patch<uint8_t>(0x5FD7B8, 0xEB); // always use reverse code path in GetCheckpointDirection
+		NyaHookLib::Patch<uint8_t>(0x5FB541 + 1, 0x95); // reverse barriers
+
+		// reverse racestart and racefinish accesses
+		// this somehow still isn't enough to make the start work properly so tickfunction takes care of that
+		NyaHookLib::Patch(0x5DA312 + 1, 0xB0A24ADC);
+		NyaHookLib::Patch(0x5FAD75 + 1, 0xB0A24ADC);
+		NyaHookLib::Patch(0x5FAE65 + 1, 0xB0A24ADC);
+		NyaHookLib::Patch(0x5DA292 + 1, 0xE43B2CCC);
+		NyaHookLib::Patch(0x5FAFD5 + 1, 0xE43B2CCC);
+		NyaHookLib::Patch(0x5FB0C5 + 1, 0xE43B2CCC);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FAEAF, &ExtractDirectionReverse);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FB10F, &ExtractDirectionReverse);
+
+		if (IsInNormalRace()) {
+			aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
+		}
+	}
+	void TickFunctionMain(double delta) override {
+		if (IsLocalPlayerStaging()) {
+			UMath::Vector3 pos, dir;
+			GRaceParameters::GetStartPosition(GRaceStatus::fObj->mRaceParms, &pos);
+			GRaceParameters::GetStartDirection(GRaceStatus::fObj->mRaceParms, &dir);
+
+			auto cars = VEHICLE_LIST::GetList(VEHICLE_RACERS);
+			for (int i = 0; i < cars.size(); i++) {
+				auto car = cars[i];
+				car->SetVehicleOnGround(&pos, &dir);
+				car->mCOMObject->Find<IRBVehicle>()->SetInvulnerability(INVULNERABLE_FROM_RESET, 1.0);
+			}
+		}
+	}
+
+	bool IsAvailable() override {
+		return !cFrontendDatabase::IsFinalEpicChase(FEDatabase);
+	}
+	bool AbortOnConditionFailed() override { return true; }
+} E_ReversedRaces;
+
+/*class Effect_ReverseRace : public ChaosEffect {
+public:
+	Effect_ReverseRace() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Reverse Current Race";
+	}
+
+	static void ReverseCheckpoints() {
+		std::vector<GTrigger*> checkpoints;
+		auto race = GRaceStatus::fObj;
+		if (race->mCheckpoints.empty()) return;
+		for (int i = 0; i < race->mCheckpoints.size(); i++) {
+			checkpoints.push_back(race->mCheckpoints[i]);
+		}
+		std::reverse(checkpoints.begin(), checkpoints.end());
+		for (int i = 0; i < race->mCheckpoints.size(); i++) {
+			race->mCheckpoints[i] = checkpoints[i];
+			race->mCheckpoints[i]->mDirection *= -1;
+		}
+	}
+
+	static void __stdcall ExtractDirectionReverse(Attrib::Instance* a1, UMath::Vector3* a2, float a3) {
+		GRaceParameters::ExtractDirection(a1, a2, a3);
+		*a2 *= -1;
+	}
+
+	static void __cdecl StartRaceHooked(GRuntimeInstance* a1) {
+		Game_StartRace(a1);
+		ReverseCheckpoints();
+	}
+
+	static void __thiscall GetCheckpointPositionHooked(GRaceParameters* a1, unsigned int index, UMath::Vector3* pos) {
+		GRaceParameters::_GetCheckpointPosition(a1, GRaceParameters::GetNumCheckpoints(a1) - index - 1, pos);
+	}
+
+	static void __thiscall GetCheckpointDirectionHooked(GRaceParameters* a1, unsigned int index, UMath::Vector3* dir) {
+		GRaceParameters::_GetCheckpointDirection(a1, GRaceParameters::GetNumCheckpoints(a1) - index - 1, dir);
+		*dir *= -1;
+	}
+
+	void InitFunction() override {
+		// flip start and finish
+		NyaHookLib::Patch(0x5FAD75 + 1, 0xB0A24ADC);
+		NyaHookLib::Patch(0x5FAE65 + 1, 0xB0A24ADC);
+		NyaHookLib::Patch(0x5FAFD5 + 1, 0xE43B2CCC);
+		NyaHookLib::Patch(0x5FB0C5 + 1, 0xE43B2CCC);
+		NyaHookLib::Patch(0x61E9EC + 1, &StartRaceHooked);
+		NyaHookLib::Patch(0x8A39B8, &GetCheckpointPositionHooked);
+		NyaHookLib::Patch(0x8A39BC, &GetCheckpointDirectionHooked);
+		NyaHookLib::Patch(0x8A39C4, &GetCheckpointPositionHooked);
+		NyaHookLib::Patch(0x8A39C8, &GetCheckpointDirectionHooked);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FAEAF, &ExtractDirectionReverse);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FB10F, &ExtractDirectionReverse);
+		//NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FB2F2, &ExtractDirectionReverse);
+		//NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FD7D3, &ExtractDirectionReverse);
+
+		if (GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete < 50) {
+			aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
+		}
+		else {
+			ReverseCheckpoints();
+		}
+	}
+	void TickFunctionMain(double delta) override {
+		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) {
+			EffectInstance->fTimer = -1;
+			return;
+		}
+		else {
+			EffectInstance->fTimer = fTimerLength;
+		}
+
+		if (IsLocalPlayerStaging()) {
+			UMath::Vector3 pos, dir;
+			GRaceParameters::GetStartPosition(GRaceStatus::fObj->mRaceParms, &pos);
+			GRaceParameters::GetStartDirection(GRaceStatus::fObj->mRaceParms, &dir);
+
+			auto cars = VEHICLE_LIST::GetList(VEHICLE_RACERS);
+			for (int i = 0; i < cars.size(); i++) {
+				auto car = cars[i];
+				car->SetVehicleOnGround(&pos, &dir);
+				car->mCOMObject->Find<IRBVehicle>()->SetInvulnerability(INVULNERABLE_FROM_RESET, 3);
+			}
+		}
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x5FAD75 + 1, 0xE43B2CCC);
+		NyaHookLib::Patch(0x5FAE65 + 1, 0xE43B2CCC);
+		NyaHookLib::Patch(0x5FAFD5 + 1, 0xB0A24ADC);
+		NyaHookLib::Patch(0x5FB0C5 + 1, 0xB0A24ADC);
+		NyaHookLib::Patch(0x61E9EC + 1, 0x60DBD0);
+		NyaHookLib::Patch(0x8A39B8, 0x5FB150);
+		NyaHookLib::Patch(0x8A39BC, 0x5FB240);
+		NyaHookLib::Patch(0x8A39C4, 0x5FD680);
+		NyaHookLib::Patch(0x8A39C8, 0x5FD6F0);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FAEAF, 0x5DCD00);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FB10F, 0x5DCD00);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FB2F2, 0x5DCD00);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x5FD7D3, 0x5DCD00);
+	}
+	bool IsAvailable() override {
+		if (!IsInNormalRace()) return false;
+		if (GetActiveVehicles(DRIVER_RACER).empty()) return false; // no tollbooths
+		if (IsLocalPlayerStaging()) return false;
+		//if (!GRaceParameters::IsLoopingRace(GRaceStatus::fObj->mRaceParms)) return false;
+		return true;
+	}
+	bool RunInMenus() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool ShouldAbort() override { return TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || !IsInNormalRace(); }
+} E_ReverseRace;*/

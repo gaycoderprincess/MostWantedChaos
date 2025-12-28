@@ -27,7 +27,7 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		if (GetLocalPlayerVehicle()->IsStaging()) {
+		if (IsLocalPlayerStaging()) {
 			NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x58CA50, 0x57CA60);
 		}
 		else {

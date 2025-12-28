@@ -59,7 +59,7 @@ namespace ChaosVoting {
 	}
 
 	void AddRandomEffectToVotes() {
-		static auto randomEffect = ChaosEffect("DUMMY", false);
+		static auto randomEffect = ChaosEffect("DUMMY", true);
 		if (!randomEffect.sName) {
 			randomEffect.sName = "Random Effect";
 		}

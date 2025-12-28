@@ -1328,7 +1328,7 @@ public:
 		}
 	}
 	void TickFunctionMain(double delta) override {
-		if (GetLocalPlayerVehicle()->IsStaging()) return;
+		if (IsLocalPlayerStaging()) return;
 
 		auto speed = GetLocalPlayerInterface<IRigidBody>()->GetSpeed();
 

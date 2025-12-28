@@ -166,7 +166,7 @@ public:
 		"COPSPORTGHOST",
 		"COPSPORT",
 		"COPSUV",
-		"COPSUVL",
+		//"COPSUVL", // looks about the same as the copsuv and sinks into the ground a bit too
 	};
 	std::string sCurrentReplacedCar;
 

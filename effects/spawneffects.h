@@ -60,6 +60,12 @@ public:
 				pos.y += fwd.y * 10;
 				pos.z += fwd.z * 10;
 				rb->SetPosition(&pos);
+
+				static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/truck.mp3");
+				if (sound) {
+					NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					NyaAudio::Play(sound);
+				}
 			}
 		}
 		else {
