@@ -29,7 +29,7 @@ namespace ChaosVoting {
 		void Draw(float y) {
 			Popup.bIsVotingOption = true;
 			Popup.bLeftSide = true;
-			Popup.Draw(std::format("{}. {} ({}%)", (int)y, pEffect->GetFriendlyName(), (int)fVotePercentage), y, false);
+			Popup.Draw(std::format("{}. {} ({}%)", (int)(y + 1), pEffect->GetFriendlyName(), (int)fVotePercentage), y, false);
 		}
 	};
 
