@@ -19,7 +19,7 @@ public:
 class Effect_NoTirePhysics2 : public ChaosEffect {
 public:
 	Effect_NoTirePhysics2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Remove All Tires";
+		sName = "Remove All Wheels";
 		fTimerLength = 10;
 	}
 

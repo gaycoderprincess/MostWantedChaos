@@ -145,7 +145,12 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		GRaceStatus::DisableBarriers();
+		static double timer = 0;
+		timer += delta;
+		if (timer > 0.5) {
+			GRaceStatus::DisableBarriers();
+			timer -= 0.5;
+		}
 	}
 	void DeinitFunction() override {
 		if (IsInNormalRace()) {
@@ -430,7 +435,12 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		GRaceStatus::DisableBarriers();
+		static double timer = 0;
+		timer += delta;
+		if (timer > 0.5) {
+			GRaceStatus::DisableBarriers();
+			timer -= 0.5;
+		}
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_3D) return;
@@ -468,6 +478,7 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
+	bool AbortOnConditionFailed() override { return true; }
 	bool IsRehideable() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_MidnightClub;
