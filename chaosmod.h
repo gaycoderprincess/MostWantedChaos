@@ -52,6 +52,7 @@ void MoneyChecker() {
 			static int cashForEffect = 0;
 			if (auto effect = GetEffectRunning(&TempEffect)) {
 				effect->fTimer = TempEffect.fTimerLength;
+				effect->sNameToDisplay = std::format("Money changed (${} -> ${})", cashForEffect, currentCash);
 			}
 			else {
 				cashForEffect = cash;
@@ -85,6 +86,7 @@ void BountyChecker() {
 			static int cashForEffect = 0;
 			if (auto effect = GetEffectRunning(&TempEffect)) {
 				effect->fTimer = TempEffect.fTimerLength;
+				effect->sNameToDisplay = std::format("Bounty changed (${} -> ${})", cashForEffect, currentCash);
 			}
 			else {
 				cashForEffect = cash;

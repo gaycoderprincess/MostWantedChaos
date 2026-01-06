@@ -440,7 +440,7 @@ public:
 	}
 
 	void InitFunction() override {
-		bool mil = FEDatabase->mUserProfile->TheCareerSettings.CurrentBin < BIN_MING;
+		bool mil = FEDatabase->mUserProfile->TheCareerSettings.CurrentBin < BIN_MING || FEPlayerCarDB::GetTotalBounty(GetPlayerCarDB()) >= 1500000;
 		int amount = mil ? 1000000 : 100000;
 		GetPlayerCarDB()->SoldHistoryBounty -= amount;
 		if (mil) {
