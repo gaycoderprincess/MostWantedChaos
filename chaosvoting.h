@@ -139,7 +139,7 @@ namespace ChaosVoting {
 
 		// activate highest voted activatable effect
 		for (auto& vote : votes) {
-			if (!CanEffectActivate(vote->pEffect)) continue;
+			if (vote->pEffect != pAllOfTheAbove && !CanEffectActivate(vote->pEffect)) continue;
 
 			// also trigger any tied votes
 			if (allOfTheAbove || !highestVoted || highestVoteCount == vote->GetVoteCount()) {
