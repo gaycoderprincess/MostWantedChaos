@@ -351,7 +351,7 @@ public:
 
 	Effect_SnakeCars() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Snake";
-		sFriendlyName = "Cars Follow Player";
+		sFriendlyName = "Cars Snake Behind Player";
 		fTimerLength = 45;
 		AddToIncompatiblityGroup("car_lag");
 	}

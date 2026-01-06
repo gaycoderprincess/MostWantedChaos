@@ -115,7 +115,7 @@ class Effect_VotingCheat : public ChaosEffect {
 public:
 	Effect_VotingCheat() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Full Chat Chaos Control";
-		fTimerLength = 30;
+		fTimerLength = 45;
 	}
 
 	void InitFunction() override {

@@ -291,7 +291,6 @@ void ChaosLoop() {
 	else if (ChaosVoting::bAutoReconnect && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Reconnect();
 	}
-	ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
@@ -299,6 +298,8 @@ void ChaosLoop() {
 		return;
 	}
 	ProcessChaosEffectsMain(gTimer.fDeltaTime, false, false);
+
+	ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 
 	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) {
