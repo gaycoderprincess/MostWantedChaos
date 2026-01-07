@@ -5,6 +5,7 @@ namespace ChaosVoting {
 	char sChannelName[64] = "";
 	int nNumVoteOptions = 4;
 	bool bRandomEffectOption = false;
+	bool bCVotes = false;
 
 	IRCClient* pIRCClient = nullptr;
 	std::mutex mVotingMutex;
@@ -29,7 +30,7 @@ namespace ChaosVoting {
 		void Draw(float y) {
 			Popup.bIsVotingOption = true;
 			Popup.bLeftSide = true;
-			Popup.Draw(std::format("{}. {} ({}%)", (int)(y + 1), pEffect->GetFriendlyName(), (int)fVotePercentage), y, false);
+			Popup.Draw(std::format("{}{}. {} ({}%)", bCVotes ? "c" : "", (int)(y + 1), pEffect->GetFriendlyName(), (int)fVotePercentage), y, false);
 		}
 	};
 
@@ -43,6 +44,7 @@ namespace ChaosVoting {
 	int nAddVotingOption = 0;
 	ChaosEffect* pAllOfTheAbove = nullptr;
 	ChaosEffect* pRandomEffect = nullptr;
+
 	bool bSelectingEffectsForVote = false;
 
 	bool bRecordChatCheat = false;
@@ -323,6 +325,17 @@ namespace ChaosVoting {
 		}
 	}
 
+	bool IsVoteMessage(const char* messageStr) {
+		if (messageStr[0] > '0' && messageStr[0] <= '9') {
+			if (strlen(messageStr) == 1) return true;
+
+			// special case for 7tv antispam
+			if (strlen(messageStr) == 4 && (uint8_t)messageStr[1] == 0x20 && (uint8_t)messageStr[2] == 0xCD && (uint8_t)messageStr[3] == 0x8F) return true;
+		}
+
+		return false;
+	}
+
 	void OnMessageReceived(IRCMessage message, IRCClient* client) {
 		//message.parameters:
 		//#channel
@@ -333,11 +346,14 @@ namespace ChaosVoting {
 		auto messageStr = message.parameters[1];
 
 		bool isVoteMessage = false;
-		if (messageStr[0] > '0' && messageStr[0] <= '9') {
-			if (messageStr.length() == 1) isVoteMessage = true;
-
-			// special case for 7tv antispam
-			if (messageStr.length() == 4 && (uint8_t)messageStr[1] == 0x20 && (uint8_t)messageStr[2] == 0xCD && (uint8_t)messageStr[3] == 0x8F) isVoteMessage = true;
+		if (!bCVotes) {
+			isVoteMessage = IsVoteMessage(messageStr.c_str());
+		}
+		else if (messageStr[0] == 'c') {
+			isVoteMessage = IsVoteMessage(messageStr.c_str() + 1);
+			if (isVoteMessage) {
+				messageStr.erase(messageStr.begin());
+			}
 		}
 
 		if (isVoteMessage) {

@@ -297,10 +297,10 @@ void ChaosLoop() {
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 		ProcessChaosEffectsMain(gTimer.fDeltaTime, inMenu, !inMenu);
+		ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 		return;
 	}
 	ProcessChaosEffectsMain(gTimer.fDeltaTime, false, false);
-
 	ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 
 	static ChaosEffect TempEffect("DUMMY", true);
@@ -379,6 +379,7 @@ void ChaosModMenu() {
 	if (DrawMenuOption("Voting")) {
 		ChloeMenuLib::BeginMenu();
 		QuickValueEditor("Voting Options", ChaosVoting::nNumVoteOptions);
+		QuickValueEditor("Two-Character Vote Command", ChaosVoting::bCVotes);
 		QuickValueEditor("Random Effect Option", ChaosVoting::bRandomEffectOption);
 		if (ChaosVoting::IsEnabled()) {
 			QuickValueEditor("Auto-Reconnect", ChaosVoting::bAutoReconnect);
