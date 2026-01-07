@@ -364,6 +364,7 @@ public:
 		}
 	}
 	bool CanQuickTrigger() override { return false; }
+	bool RigProportionalChances() override { return true; }
 } E_10Effects;
 
 class Effect_RefillActiveTimers : public ChaosEffect {
