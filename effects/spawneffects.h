@@ -678,3 +678,214 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_ReVoltFirework2;
+
+class Effect_Vergil : public ChaosEffect {
+public:
+	Effect_Vergil() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Griefer Vergil";
+		nFrequency *= 3;
+	}
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = 0;
+	static inline float rZ = 0;
+	static inline float offX = 0;
+	static inline float offY = -1;
+	static inline float offZ = 4;
+	static inline float scale = 1.5;
+	static inline float colScale = 0.65;
+	static inline float attackFrequency = 0.5;
+	static inline float sfxRange = 250;
+	static inline float sfxVolume = 2;
+	static inline float attackVolume = 5;
+	static inline float targetRange = 20;
+	static inline float attackRange = 25;
+	static inline float attackStingerRange = 10;
+	static inline float attackPower = 100;
+	static inline float attackPowerAng = 25;
+
+	static inline std::vector<int> aVergilsInWorld;
+
+	enum eAttacks {
+		ATTACK_IDLE,
+	};
+
+	struct tVergilData {
+		IVehicle* target = nullptr;
+		NyaVec3 direction = {};
+		int attackType = ATTACK_IDLE; // todo
+		double attackTimer = 0;
+		NyaAudio::NyaSound audio = 0;
+	};
+
+	static void VergilGenericAttack(NyaVec3 attackPos, float range, float extraUp, bool playSound) {
+		auto cars = GetActiveVehicles();
+		for (auto& car: cars) {
+			auto pos = *car->GetPosition();
+			auto dist = (pos - attackPos).length();
+			if (dist < range) {
+				auto dir = (pos - attackPos);
+				dir.Normalize();
+
+				auto rb = car->mCOMObject->Find<IRigidBody>();
+
+				auto vel = *rb->GetLinearVelocity();
+				vel += dir * attackPower;
+				vel.y += extraUp;
+				rb->SetLinearVelocity(&vel);
+
+				auto avel = *rb->GetAngularVelocity();
+				avel += dir * attackPowerAng;
+				rb->SetAngularVelocity(&avel);
+
+				if (car->GetDriverClass() == DRIVER_COP) {
+					car->mCOMObject->Find<IDamageable>()->Destroy();
+				}
+			}
+		}
+
+		if (playSound) {
+			static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/swing_hard.mp3");
+			static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/up.mp3");
+
+			auto sound = extraUp > 0 ? sound2 : sound1;
+			if (sound) {
+				NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
+				NyaAudio::Play(sound);
+			}
+		}
+	}
+
+	static void VergilForwardAttack(Render3DObjects::Object* obj) {
+		VergilGenericAttack(obj->vColPosition, attackStingerRange, 0, false);
+
+		auto data = (tVergilData*)obj->CustomData;
+		obj->vColPosition += data->direction * 5;
+
+		VergilGenericAttack(obj->vColPosition, attackStingerRange, 0, false);
+
+		static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger.mp3");
+		static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger_2.mp3");
+
+		auto sound = PercentageChanceCheck(50) ? sound1 : sound2;
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
+			NyaAudio::Play(sound);
+		}
+	}
+
+	static void VergilTeleport(Render3DObjects::Object* obj) {
+		auto ply = *GetLocalPlayerVehicle()->GetPosition();
+		UMath::Vector3 fwd;
+		GetLocalPlayerInterface<IRigidBody>()->GetForwardVector(&fwd);
+
+		obj->vColPosition = ply + fwd * 5;
+
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/teleport.mp3");
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
+			NyaAudio::Play(sound);
+		}
+	}
+
+	static void VergilOnTick(Render3DObjects::Object* obj, double delta) {
+		auto data = (tVergilData*)obj->CustomData;
+
+		NyaVec3 plyPos = {0,0,0};
+		auto ply = GetLocalPlayerVehicle();
+		if (ply) plyPos = *ply->GetPosition();
+
+		auto plyDist = (obj->vColPosition - plyPos).length();
+
+		if (auto closestCar = GetClosestActiveVehicle(obj->vColPosition)) {
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
+
+			auto dir = (obj->vColPosition - *closestCar->GetPosition());
+			dir.y = 0;
+			dir.Normalize();
+			data->direction = dir;
+
+			obj->mMatrix = NyaMat4x4::LookAt(dir);
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
+
+			obj->mMatrix.x *= scale;
+			obj->mMatrix.y *= scale;
+			obj->mMatrix.z *= scale;
+			obj->mMatrix.p = obj->vColPosition;
+		}
+
+		data->attackTimer -= delta * Sim::Internal::mSystem->mSpeed;
+		if (data->attackTimer <= 0) {
+			auto cars = GetActiveVehicles();
+			for (auto& car: cars) {
+				auto pos = *car->GetPosition();
+				auto dist = (pos - obj->vColPosition).length();
+				if (dist < targetRange) {
+					// sometimes teleport to player instead of attacking if far away
+					auto ply = *GetLocalPlayerVehicle()->GetPosition();
+					if ((obj->vColPosition - ply).length() > attackRange && PercentageChanceCheck(20)) {
+						VergilTeleport(obj);
+					}
+					else {
+						if (PercentageChanceCheck(75)) {
+							VergilGenericAttack(obj->vColPosition, attackRange, PercentageChanceCheck(50) ? 25 : 0, true);
+						}
+						else {
+							VergilForwardAttack(obj);
+						}
+					}
+					data->attackTimer = attackFrequency;
+					break;
+				}
+			}
+		}
+
+		if (data->audio) {
+			auto volume = (sfxRange - plyDist) / sfxRange;
+			volume *= sfxVolume;
+			if (volume > 1) volume = 1;
+			if (volume < 0) volume = 0;
+			if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
+			NyaAudio::SetVolume(data->audio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * volume);
+			if (NyaAudio::IsFinishedPlaying(data->audio)) {
+				NyaAudio::Play(data->audio);
+			}
+		}
+		else {
+			data->audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/btl.mp3");
+		}
+	}
+
+	static void SpawnVergil(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("vergil.fbx");
+		}
+
+		int id = Render3DObjects::aObjects.size();
+		aVergilsInWorld.push_back(id);
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, VergilOnTick));
+		Render3DObjects::aObjects[id].CustomData = new tVergilData;
+	}
+
+	void InitFunction() override {
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+			SpawnVergil(mat);
+			DoChaosSave();
+		}
+	}
+} E_Vergil;

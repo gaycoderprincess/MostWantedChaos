@@ -168,6 +168,38 @@ void DoChaosBombLoad() {
 	}
 }
 
+void DoChaosVergilSave() {
+	std::vector<tObjectSaveNoCol> save;
+	for (auto& peanut : Effect_Vergil::aVergilsInWorld) {
+		auto model = &Render3DObjects::aObjects[peanut];
+		if (model->IsEmpty()) continue;
+		save.push_back({model->mMatrix});
+	}
+
+	std::ofstream file("CwoeeChaos/save/vergil.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+}
+
+void DoChaosVergilLoad() {
+	std::ifstream file("CwoeeChaos/save/vergil.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		tObjectSaveNoCol save;
+		file.read((char*)&save, sizeof(save));
+		Effect_Vergil::SpawnVergil(save.matrix);
+	}
+}
+
 void DoChaosSettingsSave() {
 	// using the non-mutex version here as this is called inside TriggerHighestVotedEffect
 	// also defining this here so the game can't crash while accessing the irc client and corrupt the savefile
@@ -226,6 +258,7 @@ void DoChaosSave() {
 	DoChaosTeddieSave();
 	DoChaos8DownSave();
 	DoChaosBombSave();
+	DoChaosVergilSave();
 	DoChaosSettingsSave();
 }
 
@@ -235,5 +268,6 @@ void DoChaosLoad() {
 	DoChaosTeddieLoad();
 	DoChaos8DownLoad();
 	DoChaosBombLoad();
+	DoChaosVergilLoad();
 	DoChaosSettingsLoad();
 }
