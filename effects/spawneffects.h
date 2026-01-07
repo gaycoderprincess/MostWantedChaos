@@ -567,8 +567,28 @@ public:
 		data->speed = moveSpeed + GetLocalPlayerVehicle()->GetSpeed();
 		data->timeLeft = 2;
 		Render3DObjects::aObjects[id].CustomData = data;
+	}
 
-		if (FireSound) {
+	static void LaunchRocketFromPlayer(IRigidBody* veh, IVehicle* target) {
+		auto mat = UMath::Matrix4::kIdentity;
+		veh->GetMatrix4(&mat);
+		auto pos = *veh->GetPosition();
+		pos += mat.x * offX;
+		pos += mat.y * offY;
+		pos += mat.z * offZ;
+
+		UMath::Matrix4 rotation;
+		if (target) {
+			rotation.Rotate(NyaVec3(rotOffX * 0.01745329, rotOffY * 0.01745329, rotOffZ * 0.01745329));
+		}
+		else {
+			rotation.Rotate(NyaVec3(rotOffXNoTarget * 0.01745329, rotOffY * 0.01745329, rotOffZ * 0.01745329));
+		}
+		mat = (UMath::Matrix4)(mat * rotation);
+		mat.p = pos;
+		SpawnBomb(mat, target);
+
+		if (veh == GetLocalPlayerInterface<IRigidBody>() && FireSound) {
 			NyaAudio::Stop(FireSound);
 			NyaAudio::SkipTo(FireSound, 0, false);
 			NyaAudio::SetVolume(FireSound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
@@ -576,48 +596,38 @@ public:
 		}
 	}
 
+	static void DrawCrosshair(IVehicle* target, bool isPlayerCrosshair) {
+		bVector3 screenPos;
+		auto worldPos = WorldToRenderCoords(*target->GetPosition());
+		eViewPlatInterface::GetScreenPosition(&eViews[EVIEW_PLAYER1], &screenPos, (bVector3*)&worldPos);
+
+		screenPos.x /= (double)nResX;
+		screenPos.y /= (double)nResY;
+
+		static auto texture = LoadTexture("CwoeeChaos/data/textures/firework_crosshair.png");
+		DrawRectangle(screenPos.x - crosshairSize * GetAspectRatioInv(), screenPos.x + crosshairSize * GetAspectRatioInv(), screenPos.y - crosshairSize, screenPos.y + crosshairSize, isPlayerCrosshair ? NyaDrawing::CNyaRGBA32(0,255,0,255) : NyaDrawing::CNyaRGBA32(255,0,0,255), 0, texture);
+	}
+
+	static void LoadSounds() {
+		if (!FireSound) FireSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firefire.wav");
+		if (!ExplodeSound) ExplodeSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firebang.wav");
+	}
+
 	void InitFunction() override {
 		CwoeeHints::AddHint("Press X to fire a rocket.");
 		CwoeeHints::AddHint("The green reticule displays your lock-on target.");
-		if (!FireSound) FireSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firefire.wav");
-		if (!ExplodeSound) ExplodeSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firebang.wav");
+		LoadSounds();
 	}
 	void TickFunctionMain(double delta) override {
 		//auto target = GetClosestActiveVehicle(GetLocalPlayerVehicle(), true, inFrontThreshold);
 		auto target = GetMostInFrontActiveVehicle(GetLocalPlayerVehicle(), 200, inFrontThreshold);
 		if (target) {
-			bVector3 screenPos;
-			auto worldPos = WorldToRenderCoords(*target->GetPosition());
-			eViewPlatInterface::GetScreenPosition(&eViews[EVIEW_PLAYER1], &screenPos, (bVector3*)&worldPos);
-
-			screenPos.x /= (double)nResX;
-			screenPos.y /= (double)nResY;
-
-			static auto texture = LoadTexture("CwoeeChaos/data/textures/firework_crosshair.png");
-			DrawRectangle(screenPos.x - crosshairSize * GetAspectRatioInv(), screenPos.x + crosshairSize * GetAspectRatioInv(), screenPos.y - crosshairSize, screenPos.y + crosshairSize, {0,255,0,255}, 0, texture);
+			DrawCrosshair(target, true);
 		}
 
 		GetLocalPlayer()->ResetGameBreaker(false);
-		if (!IsKeyJustPressed('X') && !IsPadKeyJustPressed(NYA_PAD_KEY_X)) return;
-
-		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
-			auto mat = UMath::Matrix4::kIdentity;
-			veh->GetMatrix4(&mat);
-			auto pos = *veh->GetPosition();
-			pos += mat.x * offX;
-			pos += mat.y * offY;
-			pos += mat.z * offZ;
-
-			UMath::Matrix4 rotation;
-			if (target) {
-				rotation.Rotate(NyaVec3(rotOffX * 0.01745329, rotOffY * 0.01745329, rotOffZ * 0.01745329));
-			}
-			else {
-				rotation.Rotate(NyaVec3(rotOffXNoTarget * 0.01745329, rotOffY * 0.01745329, rotOffZ * 0.01745329));
-			}
-			mat = (UMath::Matrix4)(mat * rotation);
-			mat.p = pos;
-			SpawnBomb(mat, target);
+		if (IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X)) {
+			LaunchRocketFromPlayer(GetLocalPlayerInterface<IRigidBody>(), target);
 		}
 	}
 	void DeinitFunction() override {
@@ -626,3 +636,45 @@ public:
 	bool HasTimer() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_ReVoltFirework;
+
+class Effect_ReVoltFirework2 : public ChaosEffect {
+public:
+	Effect_ReVoltFirework2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Give Other Cars Firework Rockets";
+		fTimerLength = 120;
+	}
+
+	double timer = 0;
+
+	void InitFunction() override {
+		timer = 0;
+		Effect_ReVoltFirework::LoadSounds();
+	}
+	void TickFunctionMain(double delta) override {
+		auto cars = GetActiveVehicles();
+		for (auto& veh : cars) {
+			if (veh == GetLocalPlayerVehicle()) continue;
+			if (IsCarDestroyed(veh)) continue;
+			auto target = GetMostInFrontActiveVehicle(veh, 200, Effect_ReVoltFirework::inFrontThreshold);
+			if (target == GetLocalPlayerVehicle()) {
+				Effect_ReVoltFirework::DrawCrosshair(target, false);
+			}
+		}
+
+		timer += delta;
+		if (timer > 1) {
+			for (auto& veh : cars) {
+				if (veh == GetLocalPlayerVehicle()) continue;
+				if (IsCarDestroyed(veh)) continue;
+				if (PercentageChanceCheck(25)) {
+					auto target = GetMostInFrontActiveVehicle(veh, 200, Effect_ReVoltFirework::inFrontThreshold);
+					if (!target) continue;
+					if (veh->GetDriverClass() == DRIVER_COP && target->GetDriverClass() == DRIVER_COP) continue; // prevent cop friendly fire
+					Effect_ReVoltFirework::LaunchRocketFromPlayer(veh->mCOMObject->Find<IRigidBody>(), target);
+				}
+			}
+			timer -= 1;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_ReVoltFirework2;

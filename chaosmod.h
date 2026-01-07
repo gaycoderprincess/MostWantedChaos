@@ -14,6 +14,7 @@ void ProcessChaosEffectsMain(double fDeltaTime, bool inMenu, bool blockedByOther
 		effect.Draw(y, inMenu || blockedByOtherMeans);
 		y += 1 - (inMenu ? 0 : effect.Popup.GetOffscreenPercentage());
 	}
+	ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 
 	while (RunningEffectsCleanup()) {}
 }
@@ -297,25 +298,23 @@ void ChaosLoop() {
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 		ProcessChaosEffectsMain(gTimer.fDeltaTime, inMenu, !inMenu);
-		ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 		return;
 	}
 	ProcessChaosEffectsMain(gTimer.fDeltaTime, false, false);
-	ChaosVoting::DrawUI(ChaosVoting::IsEnabled());
 
-	static ChaosEffect TempEffect("DUMMY", true);
-	if (!TempEffect.sName) {
+	static ChaosEffect SplashEffect("DUMMY", true);
+	if (!SplashEffect.sName) {
 		static char tmp[256];
 		strcpy_s(tmp, 256, std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str());
-		TempEffect.sName = tmp;
-		AddRunningEffect(&TempEffect);
+		SplashEffect.sName = tmp;
+		AddRunningEffect(&SplashEffect);
 	}
 
 	if (bTimerEnabled) {
-		static ChaosEffect TempEffect("DUMMY", true);
-		if (!TempEffect.sName) {
-			TempEffect.sName = "mod active! awruff :3";
-			AddRunningEffect(&TempEffect);
+		static ChaosEffect ActiveEffect("DUMMY", true);
+		if (!ActiveEffect.sName) {
+			ActiveEffect.sName = "mod active! awruff :3";
+			AddRunningEffect(&ActiveEffect);
 		}
 
 		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
