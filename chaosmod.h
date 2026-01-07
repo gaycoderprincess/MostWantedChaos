@@ -379,6 +379,7 @@ void ChaosModMenu() {
 		ChloeMenuLib::BeginMenu();
 		QuickValueEditor("Voting Options", ChaosVoting::nNumVoteOptions);
 		QuickValueEditor("Two-Character Vote Command", ChaosVoting::bCVotes);
+		QuickValueEditor("Proportional Voting", ChaosVoting::bProportionalVotes);
 		QuickValueEditor("Random Effect Option", ChaosVoting::bRandomEffectOption);
 		if (ChaosVoting::IsEnabled()) {
 			QuickValueEditor("Auto-Reconnect", ChaosVoting::bAutoReconnect);

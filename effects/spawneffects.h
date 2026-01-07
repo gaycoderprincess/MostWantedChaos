@@ -447,6 +447,7 @@ public:
 	static inline float rotSpeed = 2.5;
 	static inline float inFrontThreshold = 0.6;
 	static inline float crosshairSize = 0.02;
+	static inline float sfxVolume = 0.5;
 
 	static inline NyaAudio::NyaSound FireSound = 0;
 	static inline NyaAudio::NyaSound ExplodeSound = 0;
@@ -516,7 +517,7 @@ public:
 			if (ExplodeSound) {
 				NyaAudio::Stop(ExplodeSound);
 				NyaAudio::SkipTo(ExplodeSound, 0, false);
-				NyaAudio::SetVolume(ExplodeSound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+				NyaAudio::SetVolume(ExplodeSound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * sfxVolume);
 				NyaAudio::Play(ExplodeSound);
 			}
 
@@ -591,7 +592,7 @@ public:
 		if (veh == GetLocalPlayerInterface<IRigidBody>() && FireSound) {
 			NyaAudio::Stop(FireSound);
 			NyaAudio::SkipTo(FireSound, 0, false);
-			NyaAudio::SetVolume(FireSound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(FireSound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * sfxVolume);
 			NyaAudio::Play(FireSound);
 		}
 	}
@@ -698,7 +699,7 @@ public:
 	static inline float colScale = 0.65;
 	static inline float attackFrequency = 0.5;
 	static inline float sfxRange = 250;
-	static inline float sfxVolume = 2;
+	static inline float sfxVolume = 1;
 	static inline float attackVolume = 5;
 	static inline float targetRange = 20;
 	static inline float attackRange = 25;
@@ -723,6 +724,11 @@ public:
 	static void VergilGenericAttack(NyaVec3 attackPos, float range, float extraUp, bool playSound) {
 		auto cars = GetActiveVehicles();
 		for (auto& car: cars) {
+			auto invuln = car->mCOMObject->Find<IRBVehicle>()->GetInvulnerability();
+			if (invuln != INVULNERABLE_NONE && invuln != INVULNERABLE_FROM_MANUAL_RESET) {
+				continue;
+			}
+
 			auto pos = *car->GetPosition();
 			auto dist = (pos - attackPos).length();
 			if (dist < range) {

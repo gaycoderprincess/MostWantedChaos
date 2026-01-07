@@ -6,6 +6,7 @@ namespace ChaosVoting {
 	int nNumVoteOptions = 4;
 	bool bRandomEffectOption = false;
 	bool bCVotes = false;
+	bool bProportionalVotes = false;
 
 	IRCClient* pIRCClient = nullptr;
 	std::mutex mVotingMutex;
@@ -130,30 +131,44 @@ namespace ChaosVoting {
 			return;
 		}
 
-		std::sort(votes.begin(), votes.end(), [](const VotingPopup* a, const VotingPopup* b) {
-			if (nLowestWins > 0) return a->fVotePercentage < b->fVotePercentage;
-			return a->fVotePercentage > b->fVotePercentage;
-		});
-		bool allOfTheAbove = votes[0]->pEffect == pAllOfTheAbove;
-
-		VotingPopup* highestVoted = nullptr;
-		int highestVoteCount = 0;
-
-		// activate highest voted activatable effect
-		for (auto& vote : votes) {
-			if (vote->pEffect != pAllOfTheAbove && !CanEffectActivate(vote->pEffect)) continue;
-
-			// also trigger any tied votes
-			if (allOfTheAbove || !highestVoted || highestVoteCount == vote->GetVoteCount()) {
-				if (vote->pEffect == pRandomEffect) {
-					AddRunningEffect(GetRandomEffect());
+		if (bProportionalVotes) {
+			std::vector<VotingPopup*> effects;
+			for (auto& vote : votes) {
+				for (int i = 0; i < vote->GetVoteCount(); i++) {
+					effects.push_back(vote);
 				}
-				else {
-					AddRunningEffect(vote->pEffect);
+			}
+
+			auto effect = effects[GetRandomNumber(0, effects.size())];
+			AddRunningEffect(effect->pEffect == pRandomEffect ? GetRandomEffect() : effect->pEffect);
+			effect->bEffectActivated = true;
+		}
+		else {
+			std::sort(votes.begin(), votes.end(), [](const VotingPopup* a, const VotingPopup* b) {
+				if (nLowestWins > 0) return a->fVotePercentage < b->fVotePercentage;
+				return a->fVotePercentage > b->fVotePercentage;
+			});
+			bool allOfTheAbove = votes[0]->pEffect == pAllOfTheAbove;
+
+			VotingPopup* highestVoted = nullptr;
+			int highestVoteCount = 0;
+
+			// activate highest voted activatable effect
+			for (auto& vote : votes) {
+				if (vote->pEffect != pAllOfTheAbove && !CanEffectActivate(vote->pEffect)) continue;
+
+				// also trigger any tied votes
+				if (allOfTheAbove || !highestVoted || highestVoteCount == vote->GetVoteCount()) {
+					if (vote->pEffect == pRandomEffect) {
+						AddRunningEffect(GetRandomEffect());
+					}
+					else {
+						AddRunningEffect(vote->pEffect);
+					}
+					vote->bEffectActivated = true;
+					highestVoted = vote;
+					highestVoteCount = vote->GetVoteCount();
 				}
-				vote->bEffectActivated = true;
-				highestVoted = vote;
-				highestVoteCount = vote->GetVoteCount();
 			}
 		}
 

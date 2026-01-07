@@ -70,7 +70,7 @@ public:
 		nFrequency *= 2;
 	}
 
-	static inline int max = 6;
+	static inline int max = 5;
 
 	void InitFunction() override {
 		for (auto& effect : aEffects) {
