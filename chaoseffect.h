@@ -86,6 +86,7 @@ public:
 	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
 	virtual bool CanMultiTrigger() { return false; } // multiple instances at once
 	virtual bool InitImmediately() { return false; }
+	virtual bool RigProportionalChances() { return false; } // always activate if it's the highest voted, even in proportional voting
 	virtual void OnAnyEffectTriggered() {}
 	virtual void OnTimerRefill() {}
 	virtual bool MatchesCheatCode(std::string code) {
@@ -318,7 +319,7 @@ int GetRandomNumber(int min, int max) {
 }
 
 bool CanEffectBeRandomlyPicked(ChaosEffect* effect) {
-	if (effect->bTriggeredThisCycle) return false;
+	if (bRNGCycles && effect->bTriggeredThisCycle) return false;
 
 	// wait 30 minutes minimum before repeating an effect
 	auto time = std::time(0);

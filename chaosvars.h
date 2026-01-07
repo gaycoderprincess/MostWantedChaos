@@ -3,6 +3,7 @@ float fEffectCycleTimer = 30;
 float fEffectCycleTimerSpeedMult = 1;
 double fTimeSinceLastEffect = 0;
 bool bDisableChaosHUD = false;
+bool bRNGCycles = false;
 int nSmartRNG = 0;
 
 bool bDarkMode = false;

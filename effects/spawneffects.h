@@ -719,9 +719,10 @@ public:
 		int attackType = ATTACK_IDLE; // todo
 		double attackTimer = 0;
 		NyaAudio::NyaSound audio = 0;
+		double styleRanking = 0;
 	};
 
-	static void VergilGenericAttack(NyaVec3 attackPos, float range, float extraUp, bool playSound) {
+	static void VergilGenericAttack(Render3DObjects::Object* obj, float range, float extraUp, bool playSound) {
 		auto cars = GetActiveVehicles();
 		for (auto& car: cars) {
 			auto invuln = car->mCOMObject->Find<IRBVehicle>()->GetInvulnerability();
@@ -730,9 +731,9 @@ public:
 			}
 
 			auto pos = *car->GetPosition();
-			auto dist = (pos - attackPos).length();
+			auto dist = (pos - obj->vColPosition).length();
 			if (dist < range) {
-				auto dir = (pos - attackPos);
+				auto dir = (pos - obj->vColPosition);
 				dir.Normalize();
 
 				auto rb = car->mCOMObject->Find<IRigidBody>();
@@ -745,6 +746,9 @@ public:
 				auto avel = *rb->GetAngularVelocity();
 				avel += dir * attackPowerAng;
 				rb->SetAngularVelocity(&avel);
+
+				auto data = (tVergilData*)obj->CustomData;
+				data->styleRanking += 0.5;
 
 				if (car->GetDriverClass() == DRIVER_COP) {
 					car->mCOMObject->Find<IDamageable>()->Destroy();
@@ -765,12 +769,12 @@ public:
 	}
 
 	static void VergilForwardAttack(Render3DObjects::Object* obj) {
-		VergilGenericAttack(obj->vColPosition, attackStingerRange, 0, false);
+		VergilGenericAttack(obj, attackStingerRange, 0, false);
 
 		auto data = (tVergilData*)obj->CustomData;
 		obj->vColPosition += data->direction * 5;
 
-		VergilGenericAttack(obj->vColPosition, attackStingerRange, 0, false);
+		VergilGenericAttack(obj, attackStingerRange, 0, false);
 
 		static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger.mp3");
 		static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger_2.mp3");
@@ -811,7 +815,7 @@ public:
 			auto dir = (obj->vColPosition - *closestCar->GetPosition());
 			dir.y = 0;
 			dir.Normalize();
-			data->direction = dir;
+			data->direction = -dir;
 
 			obj->mMatrix = NyaMat4x4::LookAt(dir);
 
@@ -824,6 +828,9 @@ public:
 			obj->mMatrix.z *= scale;
 			obj->mMatrix.p = obj->vColPosition;
 		}
+
+		data->styleRanking -= delta * Sim::Internal::mSystem->mSpeed;
+		if (data->styleRanking < 0) data->styleRanking = 0;
 
 		data->attackTimer -= delta * Sim::Internal::mSystem->mSpeed;
 		if (data->attackTimer <= 0) {
@@ -839,7 +846,7 @@ public:
 					}
 					else {
 						if (PercentageChanceCheck(75)) {
-							VergilGenericAttack(obj->vColPosition, attackRange, PercentageChanceCheck(50) ? 25 : 0, true);
+							VergilGenericAttack(obj, attackRange, PercentageChanceCheck(50) ? 25 : 0, true);
 						}
 						else {
 							VergilForwardAttack(obj);
@@ -894,4 +901,5 @@ public:
 			DoChaosSave();
 		}
 	}
+	bool RigProportionalChances() override { return true; }
 } E_Vergil;

@@ -524,6 +524,9 @@ void ChaosModMenu() {
 
 		if (DrawMenuOption("Effect Debug")) {
 			ChloeMenuLib::BeginMenu();
+			if (DrawMenuOption(std::format("RNG Style - {}", !bRNGCycles ? "Time-Based" : "Effect Cycles", !bRNGCycles ? "Effects can be re-activated after 30 minutes" : "Effects can only activate once"))) {
+				bRNGCycles = !bRNGCycles;
+			}
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
 			}

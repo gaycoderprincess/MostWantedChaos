@@ -223,6 +223,7 @@ void DoChaosSettingsSave() {
 	file.write((char*)&ChaosVoting::bRandomEffectOption, sizeof(ChaosVoting::bRandomEffectOption));
 	file.write((char*)&ChaosVoting::bCVotes, sizeof(ChaosVoting::bCVotes));
 	file.write((char*)&ChaosVoting::bProportionalVotes, sizeof(ChaosVoting::bProportionalVotes));
+	file.write((char*)&bRNGCycles, sizeof(bRNGCycles));
 }
 
 void DoChaosSettingsLoad() {
@@ -245,6 +246,7 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&ChaosVoting::bRandomEffectOption, sizeof(ChaosVoting::bRandomEffectOption));
 	file.read((char*)&ChaosVoting::bCVotes, sizeof(ChaosVoting::bCVotes));
 	file.read((char*)&ChaosVoting::bProportionalVotes, sizeof(ChaosVoting::bProportionalVotes));
+	file.read((char*)&bRNGCycles, sizeof(bRNGCycles));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();

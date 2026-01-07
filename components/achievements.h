@@ -37,7 +37,7 @@ namespace Achievements {
 		new CAchievement("ANTI_MILLIONAIRE", "Student Loan Simulator", "'Earn' -$2,000,000"),
 		new CAchievement("LAPS_10", "Time Waster", "Up a race to 10 laps"),
 		new CAchievement("LAPS_1", "Lap Glitch", "Lower a race to 1 lap"),
-		new CAchievement("RESTART_LATE", "Trolled", "Have a race restart at over 90% complete"),
+		new CAchievement("RESTART_LATE", "Trolled", "Have a race randomly restart at over 90% complete"),
 		new CAchievement("DESTROY_RANDOM_PLAYER", "Millions To One", "Get totaled from Destroy Random Car"),
 		new CAchievement("EVADE_WRECKED", "100% Skilled Luck", "Escape a pursuit while totaled"),
 		new CAchievement("REFUEL", "Second Chance", "Get your leaking gas tank refueled"),

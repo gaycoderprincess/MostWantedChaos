@@ -43,6 +43,7 @@ namespace ChaosVoting {
 	int nLowestWins = 0;
 	int nStreamerVotes = 0;
 	int nAddVotingOption = 0;
+	int nForceMajorityVoting = 0;
 	ChaosEffect* pAllOfTheAbove = nullptr;
 	ChaosEffect* pRandomEffect = nullptr;
 
@@ -105,6 +106,7 @@ namespace ChaosVoting {
 		if (nLowestWins > 0) nLowestWins--;
 		if (nStreamerVotes > 0) nStreamerVotes--;
 		if (nAddVotingOption > 0) nAddVotingOption--;
+		if (nForceMajorityVoting > 0) nForceMajorityVoting--;
 		if (bRandomEffectOption) {
 			AddRandomEffectToVotes();
 		}
@@ -131,23 +133,38 @@ namespace ChaosVoting {
 			return;
 		}
 
-		if (bProportionalVotes) {
+		std::sort(votes.begin(), votes.end(), [](const VotingPopup* a, const VotingPopup* b) {
+			if (nLowestWins > 0) return a->fVotePercentage < b->fVotePercentage;
+			return a->fVotePercentage > b->fVotePercentage;
+		});
+
+		bool forcedMajority = nForceMajorityVoting > 0;
+		if (votes[0]->pEffect->RigProportionalChances() && CanEffectActivate(votes[0]->pEffect)) forcedMajority = true;
+
+		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
+		if (bProportionalVotes && !forcedMajority) {
 			std::vector<VotingPopup*> effects;
 			for (auto& vote : votes) {
+				if (!CanEffectActivate(vote->pEffect)) continue;
 				for (int i = 0; i < vote->GetVoteCount(); i++) {
 					effects.push_back(vote);
 				}
 			}
 
 			auto effect = effects[GetRandomNumber(0, effects.size())];
-			AddRunningEffect(effect->pEffect == pRandomEffect ? GetRandomEffect() : effect->pEffect);
-			effect->bEffectActivated = true;
+			if (effect->pEffect == pAllOfTheAbove) {
+				for (auto& vote : votes) {
+					if (!CanEffectActivate(vote->pEffect)) continue;
+					AddRunningEffect(effect->pEffect == pRandomEffect ? GetRandomEffect() : effect->pEffect);
+					effect->bEffectActivated = true;
+				}
+			}
+			else {
+				AddRunningEffect(effect->pEffect == pRandomEffect ? GetRandomEffect() : effect->pEffect);
+				effect->bEffectActivated = true;
+			}
 		}
 		else {
-			std::sort(votes.begin(), votes.end(), [](const VotingPopup* a, const VotingPopup* b) {
-				if (nLowestWins > 0) return a->fVotePercentage < b->fVotePercentage;
-				return a->fVotePercentage > b->fVotePercentage;
-			});
 			bool allOfTheAbove = votes[0]->pEffect == pAllOfTheAbove;
 
 			VotingPopup* highestVoted = nullptr;
@@ -155,22 +172,18 @@ namespace ChaosVoting {
 
 			// activate highest voted activatable effect
 			for (auto& vote : votes) {
-				if (vote->pEffect != pAllOfTheAbove && !CanEffectActivate(vote->pEffect)) continue;
+				if (!CanEffectActivate(vote->pEffect)) continue;
 
 				// also trigger any tied votes
 				if (allOfTheAbove || !highestVoted || highestVoteCount == vote->GetVoteCount()) {
-					if (vote->pEffect == pRandomEffect) {
-						AddRunningEffect(GetRandomEffect());
-					}
-					else {
-						AddRunningEffect(vote->pEffect);
-					}
+					AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
 					vote->bEffectActivated = true;
 					highestVoted = vote;
 					highestVoteCount = vote->GetVoteCount();
 				}
 			}
 		}
+		bSelectingEffectsForVote = false;
 
 		GenerateNewVotes();
 	}

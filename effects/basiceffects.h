@@ -357,8 +357,10 @@ public:
 		for (int i = 0; i < 10; i++) {
 			// since this basically makes the game unplayable, reset all trigger flags just in case an actually cool effect happened here
 			auto effect = GetRandomEffect(true);
+			auto bakTime = effect->LastTriggerTime;
 			AddRunningEffect(effect);
 			effect->bTriggeredThisCycle = false;
+			effect->LastTriggerTime = bakTime;
 		}
 	}
 	bool CanQuickTrigger() override { return false; }

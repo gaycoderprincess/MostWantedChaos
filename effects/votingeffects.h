@@ -35,6 +35,7 @@ public:
 	bool IsAvailable() override { return ChaosVoting::bSelectingEffectsForVote; }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
+	bool RigProportionalChances() override { return true; }
 } E_VotingAll;
 
 class Effect_VotingStreamer : public ChaosEffect {
@@ -135,4 +136,28 @@ public:
 	bool IsAvailable() override { return ChaosVoting::IsEnabled(); }
 	bool AbortOnConditionFailed() override { return true; }
 	bool CanQuickTrigger() override { return false; }
+	bool RigProportionalChances() override { return true; }
 } E_VotingCheat;
+
+class Effect_VotingMajority : public ChaosEffect {
+public:
+	Effect_VotingMajority() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Majority Voting";
+	}
+
+	static inline int max = 4;
+
+	void InitFunction() override {
+		ChaosVoting::nForceMajorityVoting = max;
+	}
+	void TickFunctionMain(double delta) override {
+		fTimerLength = max * 5;
+		EffectInstance->fTimer = ChaosVoting::nForceMajorityVoting * 5;
+	}
+	bool ShouldAbort() override { return !ChaosVoting::nForceMajorityVoting; }
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override { return ChaosVoting::IsEnabled() && ChaosVoting::bProportionalVotes; }
+	bool AbortOnConditionFailed() override { return true; }
+	void OnTimerRefill() override { InitFunction(); }
+	bool InitImmediately() override { return true; }
+} E_VotingMajority;

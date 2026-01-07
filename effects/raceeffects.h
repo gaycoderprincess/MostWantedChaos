@@ -191,7 +191,7 @@ public:
 	bool active = false;
 
 	Effect_RestartRaceOn99() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Exit To Menu At 99% Completion";
+		sName = "Restart Event At 99% Completion";
 	}
 
 	void InitFunction() override {
@@ -201,8 +201,8 @@ public:
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
 			if ((IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) || (cFrontendDatabase::IsFinalEpicChase(FEDatabase) && IsPlayerApproachingOldBridge())) {
-				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
-				//aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
+				//aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+				aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
 			}
 		}
