@@ -704,7 +704,7 @@ public:
 	static inline float styleVolume = 5;
 	static inline float targetRange = 20;
 	static inline float attackRange = 25;
-	static inline float attackStingerRange = 10;
+	static inline float attackStingerRange = 15;
 	static inline float attackPower = 100;
 	static inline float attackPowerAng = 25;
 

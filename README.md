@@ -2,6 +2,8 @@
 
 A mod for Need for Speed: Most Wanted that occasionally does random things
 
+Featuring Vergil from the Devil May Cry™ series
+
 Similar to [NFS Chat Chaos Mod by berkayylmao](https://github.com/berkayylmao/NFS-Chat-Chaos-Mod) and [NFS Most Wanted Chaos Mod (ZChaos) by Zolika1351](https://zolika.dev/mods/nfsmwchaos), but please don't take this as an equivalent or replacement for them!  
 This is just a fun side project for me to mess around with while I learn how the game works :3
 

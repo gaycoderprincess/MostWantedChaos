@@ -1098,6 +1098,38 @@ public:
 	bool HasTimer() override { return true; }
 } E_PlayerNoSteering;
 
+class Effect_PlayerBrokenSteering : public ChaosEffect {
+public:
+	Effect_PlayerBrokenSteering() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Crazy Player Steering";
+		fTimerLength = 30;
+	}
+
+	double timer = 0;
+	bool forcedDirection = false;
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
+		timer += delta;
+		if (timer > 3) {
+			forcedDirection = PercentageChanceCheck(50);
+			timer -= 3;
+		}
+
+		if (auto ply = GetLocalPlayerInterface<IInput>()) {
+			auto controls = ply->GetControls();
+			if (forcedDirection) {
+				controls->fSteering = std::abs(controls->fSteering);
+			}
+			else {
+				controls->fSteering = -std::abs(controls->fSteering);
+			}
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerBrokenSteering;
+
 class Effect_PlayerHalfSteering : public ChaosEffect {
 public:
 	Effect_PlayerHalfSteering() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
