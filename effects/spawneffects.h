@@ -700,35 +700,87 @@ public:
 	static inline float attackFrequency = 0.5;
 	static inline float sfxRange = 250;
 	static inline float sfxVolume = 1;
-	static inline float attackVolume = 5;
+	static inline float attackVolume = 4;
+	static inline float styleVolume = 5;
 	static inline float targetRange = 20;
 	static inline float attackRange = 25;
 	static inline float attackStingerRange = 10;
 	static inline float attackPower = 100;
 	static inline float attackPowerAng = 25;
 
+	static inline float attackStyleIncrease = 0.75;
+	static inline float styleDecay = 1;
+
 	static inline std::vector<int> aVergilsInWorld;
 
-	enum eAttacks {
-		ATTACK_IDLE,
+	enum eStyle {
+		STYLE_NONE,
+		STYLE_D,
+		STYLE_C,
+		STYLE_B,
+		STYLE_A,
+		STYLE_S,
+		STYLE_SS,
+		STYLE_SSS,
+		NUM_STYLES,
 	};
 
 	struct tVergilData {
 		IVehicle* target = nullptr;
 		NyaVec3 direction = {};
-		int attackType = ATTACK_IDLE; // todo
 		double attackTimer = 0;
 		NyaAudio::NyaSound audio = 0;
 		double styleRanking = 0;
+		bool stylesCalledOut[NUM_STYLES] = {};
 	};
 
-	static void VergilGenericAttack(Render3DObjects::Object* obj, float range, float extraUp, bool playSound) {
+	static bool CanCarBeTargeted(IVehicle* veh) {
+		auto invuln = veh->mCOMObject->Find<IRBVehicle>()->GetInvulnerability();
+		if (invuln != INVULNERABLE_NONE && invuln != INVULNERABLE_FROM_MANUAL_RESET) return false;
+		if (veh->IsStaging()) return false;
+		// don't target racers during NISs
+		if (veh->GetDriverClass() == DRIVER_RACER || veh->GetDriverClass() == DRIVER_HUMAN) {
+			if (INIS::mInstance) return false;
+		}
+		return true;
+	}
+
+	static void VergilStyleAnnouncer(Render3DObjects::Object* obj) {
+		auto data = (tVergilData*)obj->CustomData;
+
+		int currentStyle = (int)data->styleRanking;
+		if ((int)data->styleRanking >= STYLE_B && !data->stylesCalledOut[currentStyle]) {
+			for (int i = 0; i < currentStyle; i++) {
+				data->stylesCalledOut[i] = true;
+			}
+			data->stylesCalledOut[currentStyle] = true;
+
+			static NyaAudio::NyaSound styles[] = {
+					0,
+					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/d.wav"),
+					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/c.wav"),
+					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/b.wav"),
+					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/a.wav"),
+					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/s.wav"),
+					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/ss.wav"),
+					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/sss.wav"),
+			};
+
+			if (auto sound = styles[currentStyle]) {
+				NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * styleVolume);
+				NyaAudio::Play(sound);
+			}
+		}
+
+		if (data->styleRanking > NUM_STYLES) data->styleRanking = NUM_STYLES; // cap at top of SSS
+	}
+
+	static void VergilGenericAttack(Render3DObjects::Object* obj, float range, float extraUp) {
+		auto data = (tVergilData*)obj->CustomData;
+
 		auto cars = GetActiveVehicles();
 		for (auto& car: cars) {
-			auto invuln = car->mCOMObject->Find<IRBVehicle>()->GetInvulnerability();
-			if (invuln != INVULNERABLE_NONE && invuln != INVULNERABLE_FROM_MANUAL_RESET) {
-				continue;
-			}
+			if (!CanCarBeTargeted(car)) continue;
 
 			auto pos = *car->GetPosition();
 			auto dist = (pos - obj->vColPosition).length();
@@ -747,34 +799,24 @@ public:
 				avel += dir * attackPowerAng;
 				rb->SetAngularVelocity(&avel);
 
-				auto data = (tVergilData*)obj->CustomData;
-				data->styleRanking += 0.5;
+				data->styleRanking += attackStyleIncrease;
 
 				if (car->GetDriverClass() == DRIVER_COP) {
 					car->mCOMObject->Find<IDamageable>()->Destroy();
 				}
 			}
 		}
-
-		if (playSound) {
-			static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/swing_hard.mp3");
-			static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/up.mp3");
-
-			auto sound = extraUp > 0 ? sound2 : sound1;
-			if (sound) {
-				NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
-				NyaAudio::Play(sound);
-			}
-		}
 	}
 
 	static void VergilForwardAttack(Render3DObjects::Object* obj) {
-		VergilGenericAttack(obj, attackStingerRange, 0, false);
+		VergilGenericAttack(obj, attackStingerRange, 0);
 
 		auto data = (tVergilData*)obj->CustomData;
-		obj->vColPosition += data->direction * 5;
-
-		VergilGenericAttack(obj, attackStingerRange, 0, false);
+		auto newPosition = obj->vColPosition + data->direction * 7.5;
+		if (WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&newPosition, &newPosition.y, nullptr)) {
+			obj->vColPosition = newPosition;
+			VergilGenericAttack(obj, attackStingerRange, 0);
+		}
 
 		static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger.mp3");
 		static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger_2.mp3");
@@ -791,7 +833,10 @@ public:
 		UMath::Vector3 fwd;
 		GetLocalPlayerInterface<IRigidBody>()->GetForwardVector(&fwd);
 
-		obj->vColPosition = ply + fwd * 5;
+		// check ground exists before teleporting
+		auto newPosition = ply + fwd * 5;
+		if (!WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&newPosition, &newPosition.y, nullptr)) return;
+		obj->vColPosition = newPosition;
 
 		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/teleport.mp3");
 		if (sound) {
@@ -829,13 +874,18 @@ public:
 			obj->mMatrix.p = obj->vColPosition;
 		}
 
-		data->styleRanking -= delta * Sim::Internal::mSystem->mSpeed;
-		if (data->styleRanking < 0) data->styleRanking = 0;
+		data->styleRanking -= styleDecay * delta * Sim::Internal::mSystem->mSpeed;
+		if (data->styleRanking < 0) {
+			data->styleRanking = 0;
+			memset(data->stylesCalledOut, 0, sizeof(data->stylesCalledOut));
+		}
 
 		data->attackTimer -= delta * Sim::Internal::mSystem->mSpeed;
 		if (data->attackTimer <= 0) {
 			auto cars = GetActiveVehicles();
 			for (auto& car: cars) {
+				if (!CanCarBeTargeted(car)) continue;
+
 				auto pos = *car->GetPosition();
 				auto dist = (pos - obj->vColPosition).length();
 				if (dist < targetRange) {
@@ -846,11 +896,22 @@ public:
 					}
 					else {
 						if (PercentageChanceCheck(75)) {
-							VergilGenericAttack(obj, attackRange, PercentageChanceCheck(50) ? 25 : 0, true);
+							bool up = PercentageChanceCheck(50);
+							VergilGenericAttack(obj, attackRange, up ? 15 : 0);
+
+							static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/swing_hard.mp3");
+							static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/up.mp3");
+
+							auto sound = up ? sound2 : sound1;
+							if (sound) {
+								NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
+								NyaAudio::Play(sound);
+							}
 						}
 						else {
 							VergilForwardAttack(obj);
 						}
+						VergilStyleAnnouncer(obj);
 					}
 					data->attackTimer = attackFrequency;
 					break;

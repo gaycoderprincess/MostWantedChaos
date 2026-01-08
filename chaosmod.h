@@ -548,11 +548,14 @@ void ChaosModMenu() {
 			QuickValueEditor("Vergil::attackFrequency", Effect_Vergil::attackFrequency);
 			QuickValueEditor("Vergil::sfxVolume", Effect_Vergil::sfxVolume);
 			QuickValueEditor("Vergil::attackVolume", Effect_Vergil::attackVolume);
+			QuickValueEditor("Vergil::styleVolume", Effect_Vergil::styleVolume);
 			QuickValueEditor("Vergil::sfxRange", Effect_Vergil::sfxRange);
 			QuickValueEditor("Vergil::targetRange", Effect_Vergil::targetRange);
 			QuickValueEditor("Vergil::attackRange", Effect_Vergil::attackRange);
 			QuickValueEditor("Vergil::attackPower", Effect_Vergil::attackPower);
 			QuickValueEditor("Vergil::attackPowerAng", Effect_Vergil::attackPowerAng);
+			QuickValueEditor("Vergil::attackStyleIncrease", Effect_Vergil::attackStyleIncrease);
+			QuickValueEditor("Vergil::styleDecay", Effect_Vergil::styleDecay);
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
 			QuickValueEditor("ReVoltFirework::offX", Effect_ReVoltFirework::offX);
 			QuickValueEditor("ReVoltFirework::offY", Effect_ReVoltFirework::offY);
