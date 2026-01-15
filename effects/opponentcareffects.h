@@ -206,14 +206,40 @@ public:
 		AddToIncompatiblityGroup("rubberband");
 	}
 
+	static inline bool bPerfCandidateSearch  = false;
+	static void OnPerfCandidateSearch() {
+		bPerfCandidateSearch = true;
+	}
+
+	static inline uintptr_t PerformanceCandidatesHookedASM_jmp = 0x60D580;
+	static void __attribute__((naked)) PerformanceCandidatesHookedASM() {
+		__asm__ (
+			"pushad\n\t"
+			"call %1\n\t"
+			"popad\n\t"
+			"jmp %0\n\t"
+				:
+				:  "m" (PerformanceCandidatesHookedASM_jmp), "i" (OnPerfCandidateSearch)
+		);
+	}
+
 	static float __thiscall GetCatchupCheatHooked(ICheater* pThis) {
 		return 0;
 	}
 
-	static bool __thiscall GetPerformanceHooked(IVehicle* pThis, Physics::Info::Performance* out) {
-		out->Acceleration = 1.0;
-		out->Handling = 1.0;
-		out->TopSpeed = 1.0;
+	static bool __thiscall GetPerformanceHooked(uint32_t pThis, Physics::Info::Performance* out) {
+		if (bPerfCandidateSearch) {
+			bPerfCandidateSearch = false;
+			out->TopSpeed = *(float*)(pThis + 0xEC);
+			out->Handling = *(float*)(pThis + 0xF0);
+			out->Acceleration = *(float*)(pThis + 0xF4);
+			return *(bool*)(pThis + 0xF8);
+		}
+		else {
+			out->Acceleration = 1.0;
+			out->Handling = 1.0;
+			out->TopSpeed = 1.0;
+		}
 		return true;
 	}
 
@@ -226,6 +252,7 @@ public:
 	}
 
 	void InitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x61DDE3, &PerformanceCandidatesHookedASM);
 		NyaHookLib::Patch(0x8925C8, &GetCatchupCheatHooked);
 		NyaHookLib::Patch(0x8AA8FC, &GetPerformanceHooked);
 		NyaHookLib::Patch(0x892A64, &GetTopSpeedHooked);
