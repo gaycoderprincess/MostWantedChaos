@@ -26,7 +26,7 @@ void WriteLog(const std::string& str) {
 }
 
 void DisableKeyboardInput(bool disable) {
-	NyaHooks::bInputsBlocked = disable;
+	NyaHooks::InputBlockerHook::bInputsBlocked = disable;
 }
 
 FEPlayerCarDB* GetPlayerCarDB() {

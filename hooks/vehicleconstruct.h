@@ -126,7 +126,7 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 }
 
 ChloeHook Hook_VehicleConstruct([]() {
-	NyaHooks::aLateInitFuncs.push_back([]() { *(void**)0x92C534 = (void*)&VehicleConstructHooked; });
+	NyaHooks::LateInitHook::aFunctions.push_back([]() { *(void**)0x92C534 = (void*)&VehicleConstructHooked; });
 
 	// use SuspensionRacer instead of SuspensionSimple for racers - fixes popped tire behavior
 	NyaHookLib::Patch(0x6380CB + 1, "SuspensionRacer");

@@ -98,5 +98,5 @@ int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVe
 ChloeHook Hook_CarRender([]() {
 	CarGetVisibleStateOrig = (int(__thiscall*)(eView*, const bVector3*, const bVector3*, bMatrix4*))NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x74E346, &CarGetVisibleStateHooked);
 	NyaHookLib::PatchRelative(NyaHookLib::JMP, 0x73786A, 0x73790A); // don't reset CarScaleMatrix when exiting to menu
-	NyaHooks::aLateInitFuncs.push_back([]() { CarScaleMatrix = UMath::Matrix4::kIdentity; });
+	NyaHooks::LateInitHook::aFunctions.push_back([]() { CarScaleMatrix = UMath::Matrix4::kIdentity; });
 });

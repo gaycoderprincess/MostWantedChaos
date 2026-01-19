@@ -276,6 +276,6 @@ namespace Render3D {
 	}
 
 	ChloeHook Init([](){
-		NyaHooks::aD3DResetFuncs.push_back(OnD3DReset);
+		NyaHooks::D3DResetHook::aFunctions.push_back(OnD3DReset);
 	});
 }
