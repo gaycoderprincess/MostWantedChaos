@@ -103,17 +103,18 @@ void BountyChecker() {
 ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 	if (!nSmartRNG) return nullptr;
 
-	if (!redo) {
-		if (nSmartRNG == 2 && PercentageChanceCheck(25)) {
-			if (CanEffectBeSmartlyPicked(&E_RefillActiveTimers)) return &E_RefillActiveTimers;
-		}
-		if (nSmartRNG == 1 && PercentageChanceCheck(25)) {
-			if (CanEffectBeSmartlyPicked(&E_RefillActiveTimers)) {
-				nSmartRNG++; // this won't work if smart rng is 1, since it'll be set to 0 before refill can trigger
-				return &E_RefillActiveTimers;
-			}
-		}
-	}
+	// this might be too much?
+	//if (!redo) {
+	//	if (nSmartRNG == 2 && PercentageChanceCheck(25)) {
+	//		if (CanEffectBeSmartlyPicked(&E_RefillActiveTimers)) return &E_RefillActiveTimers;
+	//	}
+	//	if (nSmartRNG == 1 && PercentageChanceCheck(25)) {
+	//		if (CanEffectBeSmartlyPicked(&E_RefillActiveTimers)) {
+	//			nSmartRNG++; // this won't work if smart rng is 1, since it'll be set to 0 before refill can trigger
+	//			return &E_RefillActiveTimers;
+	//		}
+	//	}
+	//}
 
 	bool isInFreeroamPursuit = IsInCareerMode() && !IsInNormalRace() && GetLocalPlayerInterface<IVehicleAI>()->GetPursuit();
 
@@ -130,7 +131,6 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 		if (CanEffectBeSmartlyPicked(&E_PlayerCarSpike1)) { effects.push_back(&E_PlayerCarSpike1); }
 		if (CanEffectBeSmartlyPicked(&E_10Effects)) { effects.push_back(&E_10Effects); }
 		if (CanEffectBeSmartlyPicked(&E_SpawnCarTruck)) { effects.push_back(&E_SpawnCarTruck); }
-		if (CanEffectBeSmartlyPicked(&E_RefillActiveTimers)) { effects.push_back(&E_RefillActiveTimers); }
 		if (CanEffectBeSmartlyPicked(&E_GetBustedInstant)) { effects.push_back(&E_GetBustedInstant); }
 		//if (CanEffectBeSmartlyPicked(&E_CrashChance)) { effects.push_back(&E_CrashChance); } // the chance is too low for this one
 
