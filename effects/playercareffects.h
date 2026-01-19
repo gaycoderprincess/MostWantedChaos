@@ -347,7 +347,7 @@ class Effect_PlayerCarSpin : public ChaosEffect {
 public:
 	Effect_PlayerCarSpin() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spain but the A is silent";
-		sFriendlyName = "Make Player Spin";
+		sFriendlyName = "Spinning Player";
 		fTimerLength = 10;
 	}
 
@@ -1351,11 +1351,14 @@ public:
 		fLeewayTimer = 0;
 		fMinSpeed = fMinSpeedMid;
 		if (IsInCareerMode()) {
-			if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= BIN_BARON) {
-				fMinSpeed = fMinSpeedSlow;
-			}
-			else if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin <= BIN_BULL) {
-				fMinSpeed = fMinSpeedFast;
+			// 150km/h in prologue
+			if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin != BIN_ROG) {
+				if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= BIN_BARON) {
+					fMinSpeed = fMinSpeedSlow;
+				}
+				else if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin <= BIN_BULL) {
+					fMinSpeed = fMinSpeedFast;
+				}
 			}
 		}
 	}

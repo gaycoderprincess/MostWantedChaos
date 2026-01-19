@@ -45,7 +45,7 @@ public:
 
 	Effect_SpawnCarTruck() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Obligatory Truck Effect";
-		sFriendlyName = "Spawn Truck In Front Of Player";
+		sFriendlyName = "Spawn Truck On Player";
 	}
 
 	void InitFunction() override {
@@ -739,9 +739,9 @@ public:
 		if (invuln != INVULNERABLE_NONE && invuln != INVULNERABLE_FROM_MANUAL_RESET) return false;
 		if (veh->IsStaging()) return false;
 		// don't target racers during NISs
-		if (veh->GetDriverClass() == DRIVER_RACER || veh->GetDriverClass() == DRIVER_HUMAN) {
-			if (INIS::mInstance) return false;
-		}
+		//if (veh->GetDriverClass() == DRIVER_RACER || veh->GetDriverClass() == DRIVER_HUMAN) {
+		//	if (INIS::mInstance) return false;
+		//}
 		return true;
 	}
 

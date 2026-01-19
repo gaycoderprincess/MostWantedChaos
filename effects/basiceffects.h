@@ -421,7 +421,7 @@ public:
 		data.outlinea = 255;
 		data.outlinedist = 0.025;
 		DrawString(data, str);
-		return y > -0.25;
+		return data.y > -0.1;
 	}
 
 	void InitFunction() override {

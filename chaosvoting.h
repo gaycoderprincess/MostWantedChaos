@@ -138,7 +138,7 @@ namespace ChaosVoting {
 			return a->fVotePercentage > b->fVotePercentage;
 		});
 
-		bool forcedMajority = nForceMajorityVoting > 0;
+		bool forcedMajority = nForceMajorityVoting > 0 || nLowestWins > 0;
 		if (votes[0]->pEffect->RigProportionalChances() && CanEffectActivate(votes[0]->pEffect)) forcedMajority = true;
 
 		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate

@@ -146,10 +146,6 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 			}
 		}
 
-		if (!IsInNormalRace()) {
-			if (CanEffectBeSmartlyPicked(&E_OpponentsJunkman)) { effects.push_back(&E_OpponentsJunkman); }
-		}
-
 		if (!effects.empty()) {
 			return effects[rand() % effects.size()];
 		}

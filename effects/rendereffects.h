@@ -154,7 +154,7 @@ class Effect_Pep : public ChaosEffect {
 public:
 	Effect_Pep() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Pep";
-		sFriendlyName = "Change Car To FO1 Pepper (Visual)";
+		sFriendlyName = "Change Car To FlatOut Pepper (Visual)";
 		fTimerLength = 180;
 		//AddToIncompatiblityGroup("customplayercar");
 		MakeIncompatibleWithFilterGroup("change_player_car");

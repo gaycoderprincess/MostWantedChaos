@@ -88,7 +88,8 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayerRandom;
 
-class Effect_OpponentsJunkman : public EffectBase_NotInPursuitConditional {
+// all opponents are already fully upgraded
+/*class Effect_OpponentsJunkman : public EffectBase_NotInPursuitConditional {
 public:
 	Effect_OpponentsJunkman() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "New Opponents Are Junkman";
@@ -107,7 +108,7 @@ public:
 	}
 	bool HasTimer() override { return LastOpponentFullyTuned; }
 	bool AbortOnConditionFailed() override { return true; }
-} E_OpponentsJunkman;
+} E_OpponentsJunkman;*/
 
 // pretty lame, also reduces traffic density
 /*class Effect_AllTrafficPizza : public ChaosEffect {
