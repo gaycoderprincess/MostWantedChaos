@@ -1,4 +1,14 @@
 namespace TextHook {
+	void EnableSubtitles() {
+		static bool bOnce = false;
+		if (bOnce) return;
+		bOnce = true;
+
+		NyaHookLib::Patch<uint8_t>(0x542DB5, 0xEB);
+		NyaHookLib::Patch<uint8_t>(0x54EE73, 0xEB);
+		NyaHookLib::Patch<uint8_t>(0x54F214, 0xEB);
+	}
+
 	bool bReverseText = false;
 	bool bRandomText = false;
 	const char* pReplaceText = nullptr;

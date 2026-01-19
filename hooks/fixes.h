@@ -40,10 +40,56 @@ bool IsCarUnlockedFixed(void* a1, uint32_t a2, int a3) {
 	return IsCarUnlockedOrig(a1, a2, a3);
 }
 
+// return ntsc or pal based on what videos are in the movies folder
+bool IsPALFixed() {
+	const char* movies[] = {
+		"attract_movie_english",
+		"blacklist_01_english",
+		"blacklist_02_english",
+		"blacklist_03_english",
+		"blacklist_04_english",
+		"blacklist_05_english",
+		"blacklist_06_english",
+		"blacklist_07_english",
+		"blacklist_08_english",
+		"blacklist_09_english",
+		"blacklist_10_english",
+		"blacklist_11_english",
+		"blacklist_12_english",
+		"blacklist_13_english",
+		"blacklist_14_english",
+		"blacklist_15_english",
+		"bounty_tutorial_english",
+		"drag_tutorial_english",
+		"eahd_bumper_english",
+		"ealogo_english",
+		"psa_english",
+		"pursuit_tutorial_english",
+		"speedtrap_tutorial_english",
+		"storyfmv_bla134_english",
+		"storyfmv_bus12_english",
+		"storyfmv_cro06_coh06a_english",
+		"storyfmv_her136_english",
+		"storyfmv_pin11_english",
+		"storyfmv_rac01_english",
+		"storyfmv_rap30_english",
+		"storyfmv_raz08_english",
+		"storyfmv_saf25_english",
+		"tollbooth_tutorial_english",
+	};
+
+	for (auto& filename : movies) {
+		if (std::filesystem::exists(std::format("MOVIES/{}_ntsc.vp6", filename))) return false;
+		if (std::filesystem::exists(std::format("MOVIES/{}_pal.vp6", filename))) return true;
+	}
+	return BuildRegion::IsPal();
+}
+
 ChloeHook Hook_GameFixes([]() {
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63C093, &TotalVehicleFixed);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x63839A, &BlowEngineFixed);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x4F0E70, &GetClosestPlayerCarFixed);
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x516137, &IsPALFixed);
 
 	// always reuse dummy_skin1 if there are no free skin slots left
 	NyaHookLib::Patch<uint16_t>(0x75D2B9, 0x9090);

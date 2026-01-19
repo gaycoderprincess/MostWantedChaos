@@ -13,6 +13,10 @@ This is just a fun side project for me to mess around with while I learn how the
 - Plop the files into your game folder, press F5 in game to open the menu.
 - Enjoy, nya~ :3
 
+## Recommended mods
+
+- [XtendedInput](https://github.com/xan1242/NFS-XtendedInput/releases/latest) (only if you're using a controller!)
+
 ## Building
 
 Building is done on an Arch Linux system with CLion being used for the build process. 

@@ -10,6 +10,7 @@ public:
 	}
 
 	void InitFunction() override {
+		TextHook::EnableSubtitles();
 		SummonChyron("Trans Rights", "Trans Rights", "Trans Rights");
 		TextHook::pReplaceText = "Trans Rights";
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0xEB); // remove duplicate racer name check
@@ -40,6 +41,7 @@ public:
 	NyaAudio::NyaSound sound[3] = {};
 
 	void InitFunction() override {
+		TextHook::EnableSubtitles();
 		SummonChyron("Let That Sink In", "Let That Sink In", "Let That Sink In");
 		TextHook::pReplaceText = "Let That Sink In";
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0xEB); // remove duplicate racer name check
@@ -82,6 +84,7 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
+		TextHook::EnableSubtitles();
 		TextHook::bReverseText = true;
 	}
 	void DeinitFunction() override {
@@ -101,6 +104,7 @@ public:
 	}
 
 	void InitFunction() override {
+		TextHook::EnableSubtitles();
 		TextHook::bRandomText = true;
 	}
 	void DeinitFunction() override {
@@ -119,6 +123,7 @@ public:
 	}
 
 	void InitFunction() override {
+		TextHook::EnableSubtitles();
 		TextHook::bShuffledText = true;
 	}
 	void DeinitFunction() override {
@@ -138,6 +143,7 @@ public:
 	}
 
 	void InitFunction() override {
+		TextHook::EnableSubtitles();
 		TextHook::nInterspersedTextRuns++;
 		TextHook::pInterspersedText = "cock";
 		TextHook::pInterspersedTextUpper = "COCK";

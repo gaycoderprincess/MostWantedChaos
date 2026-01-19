@@ -726,7 +726,6 @@ public:
 	};
 
 	struct tVergilData {
-		IVehicle* target = nullptr;
 		NyaVec3 direction = {};
 		double attackTimer = 0;
 		NyaAudio::NyaSound audio = 0;
@@ -964,3 +963,126 @@ public:
 	}
 	bool RigProportionalChances() override { return true; }
 } E_Vergil;
+
+/*class Effect_Franklin : public ChaosEffect {
+public:
+	Effect_Franklin() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Franklin shows up to defend his home";
+		nFrequency *= 3;
+	}
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = 0;
+	static inline float rZ = 0;
+	static inline float offX = 0;
+	static inline float offY = -1;
+	static inline float offZ = 4;
+	static inline float scale = 1.5;
+	static inline float colScale = 0.65;
+	static inline float attackFrequency = 0.5;
+	static inline float sfxRange = 250;
+	static inline float sfxVolume = 1;
+	static inline float attackVolume = 4;
+	static inline float targetRange = 20;
+	static inline float attackRange = 25;
+
+	static inline std::vector<int> aFranklinsInWorld;
+
+	struct tFranklinData {
+		NyaVec3 direction = {};
+		double attackTimer = 0;
+		NyaAudio::NyaSound audio = 0;
+	};
+
+	static void FranklinOnTick(Render3DObjects::Object* obj, double delta) {
+		auto data = (tFranklinData*)obj->CustomData;
+
+		NyaVec3 plyPos = {0,0,0};
+		auto ply = GetLocalPlayerVehicle();
+		if (ply) plyPos = *ply->GetPosition();
+
+		auto plyDist = (obj->vColPosition - plyPos).length();
+
+		if (auto closestCar = GetClosestActiveVehicle(obj->vColPosition)) {
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
+
+			auto dir = (obj->vColPosition - *closestCar->GetPosition());
+			dir.y = 0;
+			dir.Normalize();
+			data->direction = -dir;
+
+			obj->mMatrix = NyaMat4x4::LookAt(dir);
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
+
+			obj->mMatrix.x *= scale;
+			obj->mMatrix.y *= scale;
+			obj->mMatrix.z *= scale;
+			obj->mMatrix.p = obj->vColPosition;
+		}
+
+		data->attackTimer -= delta * Sim::Internal::mSystem->mSpeed;
+		if (data->attackTimer <= 0) {
+			auto cars = GetActiveVehicles();
+			for (auto& car: cars) {
+				//if (!CanCarBeTargeted(car)) continue;
+
+				auto pos = *car->GetPosition();
+				auto dist = (pos - obj->vColPosition).length();
+				if (dist < targetRange) {
+
+					data->attackTimer = attackFrequency;
+					break;
+				}
+			}
+		}
+
+		if (data->audio) {
+			auto volume = (sfxRange - plyDist) / sfxRange;
+			volume *= sfxVolume;
+			if (volume > 1) volume = 1;
+			if (volume < 0) volume = 0;
+			if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
+			NyaAudio::SetVolume(data->audio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * volume);
+			if (NyaAudio::IsFinishedPlaying(data->audio)) {
+				NyaAudio::Play(data->audio);
+			}
+		}
+		else {
+			data->audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/franklin/bugatti.mp3");
+		}
+	}
+
+	static void SpawnFranklin(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("franklin.fbx");
+		}
+
+		int id = Render3DObjects::aObjects.size();
+		aFranklinsInWorld.push_back(id);
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, FranklinOnTick));
+		Render3DObjects::aObjects[id].CustomData = new tFranklinData;
+	}
+
+	void InitFunction() override {
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+			SpawnFranklin(mat);
+			DoChaosSave();
+		}
+	}
+	bool RigProportionalChances() override { return true; }
+} E_Franklin;*/
