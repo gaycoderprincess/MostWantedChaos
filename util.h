@@ -435,7 +435,7 @@ IVehicle* SpawnCarInWorld(uint32_t hash, FECustomizationRecord* record, IVehicle
 	return nullptr;
 }
 
-void DrawTopBar(float progress, NyaDrawing::CNyaRGBA32 rgb, IDirect3DTexture9* texture = nullptr) {
+void DrawTopBar(float progress, NyaDrawing::CNyaRGBA32 rgb) {
 	DrawRectangle(0, 1, 0, 0.025, {0, 0, 0, 255});
 	DrawRectangle(0, progress, 0, 0.025, rgb);
 }
@@ -444,7 +444,7 @@ void DrawBottomBar(float progress, NyaDrawing::CNyaRGBA32 rgb, IDirect3DTexture9
 	if (texture) {
 		// reverse the order - cover up a texture with the black background
 		DrawRectangle(0, 1, 0.975, 1, rgb);
-		DrawRectangle(1 - (GetAspectRatioInv() / 0.5625), 1, 0.975, 1, rgb, 0, texture);
+		DrawRectangle(1 - (GetAspectRatioInv() / 0.5625), 1, 0.975, 1, texture ? NyaDrawing::CNyaRGBA32(255,255,255,255) : rgb, 0, texture);
 		DrawRectangle(progress, 1, 0.975, 1, {0, 0, 0, 255});
 	}
 	else {
