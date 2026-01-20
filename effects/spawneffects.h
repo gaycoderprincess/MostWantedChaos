@@ -712,6 +712,7 @@ public:
 	static inline float styleDecay = 1;
 
 	static inline std::vector<int> aVergilsInWorld;
+	static inline bool bVergilEverSpawned = false;
 
 	enum eStyle {
 		STYLE_NONE,
@@ -943,6 +944,8 @@ public:
 		aVergilsInWorld.push_back(id);
 		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, VergilOnTick));
 		Render3DObjects::aObjects[id].CustomData = new tVergilData;
+
+		bVergilEverSpawned = true;
 	}
 
 	void InitFunction() override {
@@ -963,6 +966,29 @@ public:
 	}
 	bool RigProportionalChances() override { return true; }
 } E_Vergil;
+
+class Effect_VergilSomewhere : public ChaosEffect {
+public:
+	Effect_VergilSomewhere() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Griefer Vergils Somewhere";
+		sFriendlyName = "Spawn Griefer Vergils At Old Bridge";
+	}
+
+	void InitFunction() override {
+		auto mat = UMath::Matrix4::kIdentity;
+		NyaVec3 pos = {-2699.25, 199.60, -880.87};
+		for (int i = 0; i < 8; i++) {
+			mat.p = pos;
+			mat.p.x += GetRandomNumber(-500, 500) * 0.01;
+			mat.p.z += GetRandomNumber(-500, 500) * 0.01;
+			Effect_Vergil::SpawnVergil(mat);
+		}
+		DoChaosSave();
+	}
+	bool IsAvailable() override { return Effect_Vergil::bVergilEverSpawned; }
+	bool AbortOnConditionFailed() override { return true; }
+	bool CanMultiTrigger() override { return true; }
+} E_VergilSomewhere;
 
 /*class Effect_Franklin : public ChaosEffect {
 public:

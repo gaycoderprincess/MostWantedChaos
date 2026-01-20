@@ -184,6 +184,8 @@ void DoChaosVergilSave() {
 	for (auto& data : save) {
 		file.write((char*)&data, sizeof(data));
 	}
+
+	file.write((char*)&Effect_Vergil::bVergilEverSpawned, sizeof(Effect_Vergil::bVergilEverSpawned));
 }
 
 void DoChaosVergilLoad() {
@@ -198,6 +200,8 @@ void DoChaosVergilLoad() {
 		file.read((char*)&save, sizeof(save));
 		Effect_Vergil::SpawnVergil(save.matrix);
 	}
+
+	file.read((char*)&Effect_Vergil::bVergilEverSpawned, sizeof(Effect_Vergil::bVergilEverSpawned));
 }
 
 void DoChaosSettingsSave() {
