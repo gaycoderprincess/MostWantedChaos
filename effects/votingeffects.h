@@ -69,6 +69,7 @@ public:
 	Effect_VotingSmart() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Insanely Unfair RNG";
 		nFrequency *= 2;
+		fTriggerTimeMultiplier = 2;
 	}
 
 	static inline int max = 5;

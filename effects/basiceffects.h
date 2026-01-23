@@ -60,6 +60,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_PortraitMode;
 
 class Effect_43Borders : public ChaosEffect {
@@ -85,6 +86,7 @@ public:
 	}
 	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_43Borders;
 
 class Effect_WidescreenMode : public ChaosEffect {
@@ -101,6 +103,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_WidescreenMode;
 
 class Effect_FakeCrash : public ChaosEffect {
@@ -139,6 +142,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_Lag;
 
 class Effect_CrashChance : public ChaosEffect {
@@ -195,6 +199,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 	bool CanQuickTrigger() override { return false; }
 } E_BlockyCover;
 
@@ -222,6 +227,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_BlockyCoverMissing;*/
 
 class Effect_NoChaosHUD : public ChaosEffect {

@@ -10,6 +10,7 @@ public:
 	const char* sListCategory = nullptr;
 	const char* sAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
 	int nFrequency = 10; // 10 is standard, make this higher or lower to make an effect more or less likely to appear
+	float fTriggerTimeMultiplier = 1;
 
 	std::time_t LastTriggerTime = 0;
 	uint32_t nTotalTimesActivated = 0;
@@ -44,6 +45,7 @@ public:
 				'/',
 				'(',
 				')',
+				'\'',
 		};
 		for (auto& symbol : bannedSymbols) {
 			std::erase(str, symbol);
@@ -321,10 +323,10 @@ int GetRandomNumber(int min, int max) {
 bool CanEffectBeRandomlyPicked(ChaosEffect* effect) {
 	if (bRNGCycles && effect->bTriggeredThisCycle) return false;
 
-	// wait 30 minutes minimum before repeating an effect
+	// wait 60 minutes minimum before repeating an effect
 	auto time = std::time(0);
 	int timeDiff = time - effect->LastTriggerTime;
-	if (timeDiff < 30 * 60) return false;
+	if (timeDiff < (60 * 60 * effect->fTriggerTimeMultiplier)) return false;
 
 	if (!CanEffectActivate(effect)) return false;
 	return true;

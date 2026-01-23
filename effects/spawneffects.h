@@ -680,11 +680,10 @@ public:
 	bool HasTimer() override { return true; }
 } E_ReVoltFirework2;
 
-class Effect_Vergil : public ChaosEffect {
+class Effect_Vergil : public EffectBase_NotInPrologueConditional {
 public:
-	Effect_Vergil() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_Vergil() : EffectBase_NotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Griefer Vergil";
-		nFrequency *= 3;
 	}
 
 	static inline std::vector<Render3D::tModel*> models;
@@ -948,6 +947,10 @@ public:
 		bVergilEverSpawned = true;
 	}
 
+	static bool CanVergilBeDeleted(Render3DObjects::Object* obj) {
+		return (obj->vColPosition - NyaVec3(-2699.25, 199.60, -880.87)).length() > 50;
+	}
+
 	void InitFunction() override {
 		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
 			auto mat = UMath::Matrix4::kIdentity;
@@ -960,6 +963,20 @@ public:
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
+
+			// despawn all other vergils
+			for (auto& id : aVergilsInWorld) {
+				auto obj = &Render3DObjects::aObjects[id];
+				if (!CanVergilBeDeleted(obj)) continue;
+				if (!obj->IsActive()) continue;
+
+				auto data = (tVergilData*)obj->CustomData;
+				if (data->audio) {
+					NyaAudio::Stop(data->audio);
+				}
+				obj->aModels.clear();
+			}
+
 			SpawnVergil(mat);
 			DoChaosSave();
 		}
@@ -1060,7 +1077,6 @@ public:
 				auto pos = *car->GetPosition();
 				auto dist = (pos - obj->vColPosition).length();
 				if (dist < targetRange) {
-
 					data->attackTimer = attackFrequency;
 					break;
 				}

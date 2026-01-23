@@ -59,7 +59,6 @@ public:
 	bool RunWhenBlocked() override { return true; }
 } E_NoVisualTreatment;
 
-
 class Effect_Millionaire : public EffectBase_CareerConditional {
 public:
 	Effect_Millionaire() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
@@ -81,6 +80,18 @@ public:
 		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash -= 1000000;
 	}
 } E_Millionaire2;
+
+class Effect_5Grand : public EffectBase_CareerConditional {
+public:
+	Effect_5Grand() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "FIVE GRAND";
+		sFriendlyName = "Give $5000";
+	}
+
+	void InitFunction() override {
+		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 5000;
+	}
+} E_5Grand;
 
 class Effect_ManualTrans : public ChaosEffect {
 public:
