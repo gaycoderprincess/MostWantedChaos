@@ -308,6 +308,7 @@ ChaosEffectInstance* AddRunningEffect(ChaosEffect* effect) {
 	DoChaosSave();
 
 	for (auto& other : aRunningEffects) {
+		if (!other.IsActive()) continue;
 		other.pEffect->OnAnyEffectTriggered();
 	}
 	return running;
