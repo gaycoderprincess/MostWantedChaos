@@ -1158,6 +1158,7 @@ public:
 	struct tScientistData {
 		double timer = 0;
 		NyaAudio::NyaSound audio = 0;
+		NyaAudio::NyaSound launchAudio = 0;
 	};
 
 	NyaAudio::NyaSound sound = 0;
@@ -1201,6 +1202,14 @@ public:
 				rb->SetAngularVelocity(&avel);
 
 				NyaAudio::Delete(&data->audio);
+
+				if (!data->launchAudio) data->launchAudio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/sci_pain4.wav");
+				if (data->launchAudio) {
+					NyaAudio::SetVolume(data->launchAudio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					if (NyaAudio::IsFinishedPlaying(data->launchAudio)) {
+						NyaAudio::Play(data->launchAudio);
+					}
+				}
 			}
 		}
 		else {
