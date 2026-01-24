@@ -395,6 +395,12 @@ void ChaosModMenu() {
 		ChloeMenuLib::EndMenu();
 	}
 
+	if (DrawMenuOption("Effects")) {
+		ChloeMenuLib::BeginMenu();
+		QuickValueEditor("Allow Multiple Vergils", Effect_Vergil::bAllowMultipleVergils);
+		ChloeMenuLib::EndMenu();
+	}
+
 	if (DrawMenuOption("Stats")) {
 		ChloeMenuLib::BeginMenu();
 		if (DrawMenuOption("Achievement Stats")) {
@@ -533,6 +539,11 @@ void ChaosModMenu() {
 			//QuickValueEditor("SceneryMove.x", SceneryMove.x);
 			//QuickValueEditor("SceneryMove.y", SceneryMove.y);
 			//QuickValueEditor("SceneryMove.z", SceneryMove.z);
+			QuickValueEditor("Scientist::rX", Effect_Scientist::rX);
+			QuickValueEditor("Scientist::rY", Effect_Scientist::rY);
+			QuickValueEditor("Scientist::rZ", Effect_Scientist::rZ);
+			QuickValueEditor("Scientist::scale", Effect_Scientist::scale);
+			QuickValueEditor("Scientist::colScale", Effect_Scientist::colScale);
 			QuickValueEditor("Vergil::offX", Effect_Vergil::offX);
 			QuickValueEditor("Vergil::offY", Effect_Vergil::offY);
 			QuickValueEditor("Vergil::offZ", Effect_Vergil::offZ);

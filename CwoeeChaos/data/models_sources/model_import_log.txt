@@ -1,0 +1,45 @@
+Info,  T1112: Load scientist/scientist.fbx
+Debug, T1112: Assimp 5.3.0 x86 gcc singlethreadedsingle : 
+Info,  T1112: Found a matching importer for this file format: Autodesk FBX Importer.
+Info,  T1112: Import root directory is 'scientist\'
+Debug, T1112: Reading FBX file
+Debug, T1112: Tokenizing binary FBX file
+Debug, T1112: FBX version: 7400
+Debug, T1112: Parsing FBX tokens
+Debug, T1112: Creating FBX Document
+Debug, T1112: FBX Version: 7400
+Debug, T1112: UpdateImporterScale scale set: 0.01
+Info,  T1112: Entering post processing pipeline
+Debug, T1112: RemoveRedundantMatsProcess begin
+Debug, T1112: RemoveRedundantMatsProcess finished 
+Debug, T1112: GenUVCoordsProcess begin
+Debug, T1112: GenUVCoordsProcess finished
+Debug, T1112: TriangulateProcess begin
+Debug, T1112: TriangulateProcess finished. There was nothing to be done.
+Debug, T1112: Generate spatially-sorted vertex cache
+Debug, T1112: GenVertexNormalsProcess begin
+Debug, T1112: GenVertexNormalsProcess finished. Normals are already there
+Debug, T1112: CalcTangentsProcess begin
+Info,  T1112: CalcTangentsProcess finished. Tangents have been calculated
+Debug, T1112: JoinVerticesProcess begin
+Debug, T1112: Mesh 0 (mesh0) | Verts in: 195 out: 92 | ~52.8205%
+Debug, T1112: Mesh 1 (mesh0) | Verts in: 18 out: 10 | ~44.4444%
+Debug, T1112: Mesh 2 (mesh0) | Verts in: 246 out: 100 | ~59.3496%
+Debug, T1112: Mesh 3 (mesh0) | Verts in: 66 out: 19 | ~71.2121%
+Debug, T1112: Mesh 4 (mesh0) | Verts in: 246 out: 138 | ~43.9024%
+Debug, T1112: Mesh 5 (mesh0) | Verts in: 99 out: 27 | ~72.7273%
+Debug, T1112: Mesh 6 (mesh0) | Verts in: 57 out: 19 | ~66.6667%
+Debug, T1112: Mesh 7 (mesh0) | Verts in: 96 out: 32 | ~66.6667%
+Debug, T1112: Mesh 8 (mesh0) | Verts in: 120 out: 42 | ~65%
+Debug, T1112: Mesh 9 (mesh0) | Verts in: 75 out: 45 | ~40%
+Debug, T1112: Mesh 10 (mesh0) | Verts in: 66 out: 19 | ~71.2121%
+Debug, T1112: Mesh 11 (mesh0) | Verts in: 75 out: 26 | ~65.3333%
+Debug, T1112: Mesh 12 (mesh0) | Verts in: 75 out: 24 | ~68%
+Debug, T1112: Mesh 13 (mesh0) | Verts in: 75 out: 34 | ~54.6667%
+Debug, T1112: Mesh 14 (mesh0) | Verts in: 315 out: 90 | ~71.4286%
+Debug, T1112: Mesh 15 (mesh0) | Verts in: 180 out: 54 | ~70%
+Debug, T1112: Mesh 16 (mesh0) | Verts in: 84 out: 34 | ~59.5238%
+Debug, T1112: Mesh 17 (mesh0) | Verts in: 54 out: 32 | ~40.7407%
+Debug, T1112: Mesh 18 (mesh0) | Verts in: 24 out: 12 | ~50%
+Info,  T1112: JoinVerticesProcess finished | Verts in: 2166 out: 849 | ~60.8033
+Info,  T1112: Leaving post processing pipeline

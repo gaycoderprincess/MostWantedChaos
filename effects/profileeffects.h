@@ -88,8 +88,16 @@ public:
 		sFriendlyName = "Give $5000";
 	}
 
+	NyaAudio::NyaSound sound = 0;
+
 	void InitFunction() override {
 		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 5000;
+
+		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/5grand.mp3");
+		if (sound) {
+			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * 1.5);
+			NyaAudio::Play(sound);
+		}
 	}
 } E_5Grand;
 

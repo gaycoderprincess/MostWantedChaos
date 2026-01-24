@@ -368,3 +368,29 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_MissingWorld;
+
+class Effect_ObsoleteWorld : public ChaosEffect {
+public:
+	Effect_ObsoleteWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "OBSOLETE";
+		sFriendlyName = "Replace Every Texture With OBSOLETE";
+		fTimerLength = 60;
+		AddToIncompatiblityGroup("world_textures");
+	}
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		switch (hook) {
+			case HOOK_PRE3D:
+			case HOOK_PREPROPS:
+				static auto texture = LoadTexture("CwoeeChaos/data/textures/obsolete.png");
+				pWorldTextureOverride = texture;
+				break;
+			case HOOK_POST3D:
+			case HOOK_POSTPROPS:
+				pWorldTextureOverride = nullptr;
+				break;
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_ObsoleteWorld;

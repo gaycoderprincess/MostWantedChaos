@@ -713,6 +713,8 @@ public:
 	static inline std::vector<int> aVergilsInWorld;
 	static inline bool bVergilEverSpawned = false;
 
+	static inline bool bAllowMultipleVergils = false;
+
 	enum eStyle {
 		STYLE_NONE,
 		STYLE_D,
@@ -948,6 +950,7 @@ public:
 	}
 
 	static bool CanVergilBeDeleted(Render3DObjects::Object* obj) {
+		if (bAllowMultipleVergils) return false;
 		return (obj->vColPosition - NyaVec3(-2699.25, 199.60, -880.87)).length() > 50;
 	}
 
@@ -973,6 +976,7 @@ public:
 				auto data = (tVergilData*)obj->CustomData;
 				if (data->audio) {
 					NyaAudio::Stop(data->audio);
+					NyaAudio::Delete(&data->audio);
 				}
 				obj->aModels.clear();
 			}
@@ -1128,3 +1132,153 @@ public:
 	}
 	bool RigProportionalChances() override { return true; }
 } E_Franklin;*/
+
+class Effect_Scientist : public ChaosEffect {
+public:
+	Effect_Scientist() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Scientist In A Hiding Spot";
+	}
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = 0;
+	static inline float rZ = 0;
+	static inline float scale = 3;
+	static inline float colScale = 0.65;
+	static inline float attackPower = 100;
+	static inline float attackPowerAng = 25;
+
+	static inline std::vector<int> aObjectsInWorld;
+
+	struct tScientistData {
+		double timer = 0;
+		NyaAudio::NyaSound audio = 0;
+	};
+
+	NyaAudio::NyaSound sound = 0;
+
+	static void ScientistOnTick(Render3DObjects::Object* obj, double delta) {
+		auto ply = GetLocalPlayerVehicle();
+		if (!ply) return;
+
+		auto dist = (*ply->GetPosition() - obj->vColPosition).length();
+
+		auto data = (tScientistData*)obj->CustomData;
+		data->timer -= delta;
+		if (data->timer > 0) {
+			auto movePos = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition);
+			movePos.y = 0;
+			movePos.Normalize();
+			
+			obj->mMatrix = NyaMat4x4::LookAt(-movePos);
+			obj->mMatrix.x *= scale;
+			obj->mMatrix.y *= scale;
+			obj->mMatrix.z *= scale;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
+
+			obj->mMatrix.p = obj->vColPosition;
+
+			if (data->audio && NyaAudio::IsFinishedPlaying(data->audio) && dist < 10) {
+				auto dir = (*ply->GetPosition() - obj->vColPosition);
+				dir.Normalize();
+
+				auto rb = ply->mCOMObject->Find<IRigidBody>();
+
+				auto vel = *rb->GetLinearVelocity();
+				vel += dir * attackPower;
+				rb->SetLinearVelocity(&vel);
+
+				auto avel = *rb->GetAngularVelocity();
+				avel += dir * attackPowerAng;
+				rb->SetAngularVelocity(&avel);
+
+				NyaAudio::Delete(&data->audio);
+			}
+		}
+		else {
+			auto dist = (*ply->GetPosition() - obj->vColPosition).length();
+			if (dist < 10) {
+				// snap to ground
+				WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
+
+				if (!data->audio) data->audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/c1a4_sci_gener.wav");
+				if (data->audio) {
+					NyaAudio::SetVolume(data->audio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					if (NyaAudio::IsFinishedPlaying(data->audio)) {
+						NyaAudio::Play(data->audio);
+					}
+					data->timer = 15;
+				}
+			}
+		}
+	}
+
+	static void SpawnObject(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			Render3D::sTextureSubdir = "scientist/";
+			models = Render3D::CreateModels("scientist/scientist.fbx");
+			Render3D::sTextureSubdir = "";
+		}
+
+		int id = Render3DObjects::aObjects.size();
+		aObjectsInWorld.push_back(id);
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, ScientistOnTick));
+		Render3DObjects::aObjects[id].CustomData = new tScientistData;
+	}
+
+	static inline NyaVec3 aHidingSpots[] = {
+			{-2200, 144.6, 1460}, // perfect hiding spot
+			{-2247, 155.5, 708}, // wotr pork
+			{-2179.5, 151.8, 1140.2}, // gas station car wash
+			{-3139, 188.9, -180}, // stadium
+	};
+
+	static bool IsHidingSpotOccupied(NyaVec3 pos) {
+		for (auto& id : aObjectsInWorld) {
+			auto obj = Render3DObjects::aObjects[id];
+			if ((pos - obj.vColPosition).length() < 15) return true;
+		}
+		return false;
+	}
+
+	static NyaVec3* FindHidingSpot() {
+		for (auto& spot : aHidingSpots) {
+			if (!IsHidingSpotOccupied(spot)) return &spot;
+		}
+		return nullptr;
+	}
+
+	void InitFunction() override {
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+
+			auto pos = FindHidingSpot();
+			if (!pos) return;
+
+			mat.p = *pos;
+			if (pos != &aHidingSpots[2]) { // gas station car wash
+				mat.p.x += GetRandomNumber(-250, 250) * 0.01;
+				mat.p.z += GetRandomNumber(-250, 250) * 0.01;
+			}
+
+			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+
+			mat.x *= scale;
+			mat.y *= scale;
+			mat.z *= scale;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+			SpawnObject(mat);
+			DoChaosSave();
+		}
+	}
+	bool IsAvailable() override { return FindHidingSpot() != nullptr; }
+	bool AbortOnConditionFailed() override { return true; }
+} E_Scientist;

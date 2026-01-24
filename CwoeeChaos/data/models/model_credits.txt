@@ -8,3 +8,4 @@ scp173 - Undertow Games
 firework - Acclaim Entertainment
 pickup - Acclaim Entertainment
 vergil - DeviantArt, muffinofgood
+scientist - Valve
