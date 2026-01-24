@@ -397,7 +397,8 @@ void ChaosModMenu() {
 
 	if (DrawMenuOption("Effects")) {
 		ChloeMenuLib::BeginMenu();
-		QuickValueEditor("Allow Multiple Vergils", Effect_Vergil::bAllowMultipleVergils);
+		QuickValueEditor("Allow multiple Vergils", Effect_Vergil::bAllowMultipleVergils);
+		QuickValueEditor("Despawn SCP-173 after a kill", Effect_173::bDespawnPeanuts);
 		ChloeMenuLib::EndMenu();
 	}
 

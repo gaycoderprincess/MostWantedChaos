@@ -155,6 +155,8 @@ public:
 	static inline std::vector<int> aPeanutsInWorld;
 	static inline bool bPeanutEverSpawned = false;
 
+	static inline bool bDespawnPeanuts = true;
+
 	static void PeanutMove(Render3DObjects::Object* obj, double delta) {
 		if (IsChaosBlocked()) return;
 		auto objDir = (GetLocalPlayerCamera()->CurrentKey.Position - WorldToRenderCoords(obj->vColPosition));
@@ -188,7 +190,9 @@ public:
 							NyaAudio::Play(sound);
 						}
 
-						obj->aModels.clear(); // despawn after one kill
+						if (bDespawnPeanuts) {
+							obj->aModels.clear(); // despawn after one kill
+						}
 						aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 
 						DoChaosSave();
@@ -1170,7 +1174,7 @@ public:
 			auto movePos = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition);
 			movePos.y = 0;
 			movePos.Normalize();
-			
+
 			obj->mMatrix = NyaMat4x4::LookAt(-movePos);
 			obj->mMatrix.x *= scale;
 			obj->mMatrix.y *= scale;
