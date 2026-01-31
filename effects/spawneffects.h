@@ -63,7 +63,7 @@ public:
 
 				static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/truck.mp3");
 				if (sound) {
-					NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					NyaAudio::SetVolume(sound, GetSFXVolume());
 					NyaAudio::Play(sound);
 				}
 			}
@@ -186,7 +186,7 @@ public:
 					static auto soundAlt = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap1.ogg");
 					if (car == GetLocalPlayerVehicle()) {
 						if (sound) {
-							NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+							NyaAudio::SetVolume(sound, GetSFXVolume());
 							NyaAudio::Play(sound);
 						}
 
@@ -199,7 +199,7 @@ public:
 					}
 					else if (!IsCarDestroyed(car)) {
 						if (soundAlt) {
-							NyaAudio::SetVolume(soundAlt, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+							NyaAudio::SetVolume(soundAlt, GetSFXVolume());
 							NyaAudio::Play(soundAlt);
 						}
 
@@ -367,7 +367,7 @@ public:
 				if (!IsCarDestroyed(car)) {
 					static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/puttbang.wav");
 					if (sound) {
-						NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+						NyaAudio::SetVolume(sound, GetSFXVolume());
 						NyaAudio::Play(sound);
 					}
 
@@ -407,7 +407,7 @@ public:
 	void InitFunction() override {
 		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/pickgen.wav");
 		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
 		}
 
@@ -521,7 +521,7 @@ public:
 			if (ExplodeSound) {
 				NyaAudio::Stop(ExplodeSound);
 				NyaAudio::SkipTo(ExplodeSound, 0, false);
-				NyaAudio::SetVolume(ExplodeSound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * sfxVolume);
+				NyaAudio::SetVolume(ExplodeSound, GetSFXVolume() * sfxVolume);
 				NyaAudio::Play(ExplodeSound);
 			}
 
@@ -596,7 +596,7 @@ public:
 		if (veh == GetLocalPlayerInterface<IRigidBody>() && FireSound) {
 			NyaAudio::Stop(FireSound);
 			NyaAudio::SkipTo(FireSound, 0, false);
-			NyaAudio::SetVolume(FireSound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * sfxVolume);
+			NyaAudio::SetVolume(FireSound, GetSFXVolume() * sfxVolume);
 			NyaAudio::Play(FireSound);
 		}
 	}
@@ -772,7 +772,7 @@ public:
 			};
 
 			if (auto sound = styles[currentStyle]) {
-				NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * styleVolume);
+				NyaAudio::SetVolume(sound, GetSFXVolume() * styleVolume);
 				NyaAudio::Play(sound);
 			}
 		}
@@ -828,7 +828,7 @@ public:
 
 		auto sound = PercentageChanceCheck(50) ? sound1 : sound2;
 		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
+			NyaAudio::SetVolume(sound, GetSFXVolume() * attackVolume);
 			NyaAudio::Play(sound);
 		}
 	}
@@ -845,7 +845,7 @@ public:
 
 		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/teleport.mp3");
 		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
+			NyaAudio::SetVolume(sound, GetSFXVolume() * attackVolume);
 			NyaAudio::Play(sound);
 		}
 	}
@@ -909,7 +909,7 @@ public:
 
 							auto sound = up ? sound2 : sound1;
 							if (sound) {
-								NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * attackVolume);
+								NyaAudio::SetVolume(sound, GetSFXVolume() * attackVolume);
 								NyaAudio::Play(sound);
 							}
 						}
@@ -930,7 +930,7 @@ public:
 			if (volume > 1) volume = 1;
 			if (volume < 0) volume = 0;
 			if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
-			NyaAudio::SetVolume(data->audio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * volume);
+			NyaAudio::SetVolume(data->audio, GetSFXVolume() * volume);
 			if (NyaAudio::IsFinishedPlaying(data->audio)) {
 				NyaAudio::Play(data->audio);
 			}
@@ -1097,7 +1097,7 @@ public:
 			if (volume > 1) volume = 1;
 			if (volume < 0) volume = 0;
 			if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
-			NyaAudio::SetVolume(data->audio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * volume);
+			NyaAudio::SetVolume(data->audio, GetSFXVolume() * volume);
 			if (NyaAudio::IsFinishedPlaying(data->audio)) {
 				NyaAudio::Play(data->audio);
 			}
@@ -1205,7 +1205,7 @@ public:
 
 				if (!data->launchAudio) data->launchAudio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/sci_pain4.wav");
 				if (data->launchAudio) {
-					NyaAudio::SetVolume(data->launchAudio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					NyaAudio::SetVolume(data->launchAudio, GetSFXVolume());
 					if (NyaAudio::IsFinishedPlaying(data->launchAudio)) {
 						NyaAudio::Play(data->launchAudio);
 					}
@@ -1220,7 +1220,7 @@ public:
 
 				if (!data->audio) data->audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/c1a4_sci_gener.wav");
 				if (data->audio) {
-					NyaAudio::SetVolume(data->audio, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					NyaAudio::SetVolume(data->audio, GetSFXVolume());
 					if (NyaAudio::IsFinishedPlaying(data->audio)) {
 						NyaAudio::Play(data->audio);
 					}

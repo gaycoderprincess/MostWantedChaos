@@ -8,7 +8,7 @@ public:
 	}
 	
 	void InitFunction() override {
-		strcpy_s(FEDatabase->mUserProfile->m_aProfileName, 32, "NUL");
+		strcpy_s(FEDatabase->CurrentUserProfiles[0]->m_aProfileName, 32, "NUL");
 	}
 } E_DisableSave;
 

@@ -515,7 +515,7 @@ public:
 		CarScaleMatrix.z.z *= 1 + (easeInOutQuart(state) * 0.33);
 
 		if (sound && NyaAudio::IsFinishedPlaying(sound)) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
 		}
 	}

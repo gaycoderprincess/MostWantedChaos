@@ -93,7 +93,7 @@ public:
 		if (playerSpeed < 5) playerSpeed = 5;
 		TankTimer += playerSpeed * Sim::Internal::mSystem->mSpeed * delta;
 		while (TankTimer > TankDrainRate) {
-			FEDatabase->mUserProfile->TheCareerSettings.CurrentCash -= 1;
+			FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash -= 1;
 			TankTimer -= TankDrainRate;
 		}
 	}

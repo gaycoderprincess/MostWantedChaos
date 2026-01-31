@@ -34,7 +34,7 @@ public:
 	void InitFunction() override {
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/flashbang_explode2.wav");
 		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
 		}
 	}
@@ -292,7 +292,7 @@ public:
 	void InitFunction() override {
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/fish.mp3");
 		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
 		}
 	}
@@ -320,7 +320,7 @@ public:
 			if (PercentageChanceCheck(10)) {
 				int r = rand() % 9;
 				if (sound[r]) {
-					NyaAudio::SetVolume(sound[r], FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+					NyaAudio::SetVolume(sound[r], GetSFXVolume());
 					NyaAudio::Play(sound[r]);
 				}
 			}
@@ -330,7 +330,7 @@ public:
 	void DeinitFunction() override {
 		// play backstreet9.mp3
 		if (sound[8]) {
-			NyaAudio::SetVolume(sound[8], FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(sound[8], GetSFXVolume());
 			NyaAudio::Play(sound[8]);
 		}
 	}

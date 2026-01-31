@@ -356,7 +356,7 @@ public:
 	void InitFunction() override {
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/funky.mp3");
 		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
 		}
 	}
@@ -1352,11 +1352,11 @@ public:
 		fMinSpeed = fMinSpeedMid;
 		if (IsInCareerMode()) {
 			// 150km/h in prologue
-			if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin != BIN_ROG) {
-				if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= BIN_BARON) {
+			if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin != BIN_ROG) {
+				if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin >= BIN_BARON) {
 					fMinSpeed = fMinSpeedSlow;
 				}
-				else if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin <= BIN_BULL) {
+				else if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin <= BIN_BULL) {
 					fMinSpeed = fMinSpeedFast;
 				}
 			}

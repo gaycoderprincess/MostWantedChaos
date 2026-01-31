@@ -7,10 +7,10 @@ public:
 	}
 
 	void InitFunction() override {
-		FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.JumpCam = true;
+		FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.JumpCam = true;
 	}
 	bool IsAvailable() override {
-		return !FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.JumpCam;
+		return !FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.JumpCam;
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_EnableMomentCam;
@@ -23,13 +23,13 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = false;
+		FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = false;
 	}
 	void DeinitFunction() override {
-		FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = true;
+		FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = true;
 	}
 	bool IsAvailable() override {
-		return FEDatabase->mUserProfile->TheOptionsSettings.TheGameplaySettings.AutoSaveOn;
+		return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.AutoSaveOn;
 	}
 	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
@@ -66,7 +66,7 @@ public:
 	}
 
 	void InitFunction() override {
-		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 1000000;
+		FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += 1000000;
 	}
 } E_Millionaire;
 
@@ -77,7 +77,7 @@ public:
 	}
 
 	void InitFunction() override {
-		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash -= 1000000;
+		FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash -= 1000000;
 	}
 } E_Millionaire2;
 
@@ -91,11 +91,11 @@ public:
 	NyaAudio::NyaSound sound = 0;
 
 	void InitFunction() override {
-		FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 5000;
+		FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += 5000;
 
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/5grand.mp3");
 		if (sound) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * 1.5);
+			NyaAudio::SetVolume(sound, GetSFXVolume() * 1.5);
 			NyaAudio::Play(sound);
 		}
 	}
@@ -323,7 +323,7 @@ public:
 		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
 		EffectInstance->sNameToDisplay = std::format("{} ({})", sName, selectedMarker.name);
 		if (selectedMarker.type == FEMarkerManager::MARKER_CASH) {
-			FEDatabase->mUserProfile->TheCareerSettings.CurrentCash += 50000;
+			FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += 50000;
 		}
 		else if (selectedMarker.type == FEMarkerManager::MARKER_PINK_SLIP) {
 			Achievements::AwardAchievement(GetAchievement("WIN_PINKSLIP"));
@@ -361,7 +361,7 @@ public:
 	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
 			if (PercentageChanceCheck(10)) {
-				FEDatabase->mUserProfile->TheCareerSettings.CurrentBin--;
+				FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin--;
 				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng"); });
 				EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
 			}
@@ -372,7 +372,7 @@ public:
 		}
 	}
 	bool IsAvailable() override {
-		return FEDatabase->mUserProfile->TheCareerSettings.CurrentBin > 1;
+		return FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > 1;
 	}
 	bool IsConditionallyAvailable() override { return true; }
 	bool AbortOnConditionFailed() override { return true; }
@@ -392,7 +392,7 @@ public:
 		obj->StartLicensedMusic(song->PathEvent);
 	}
 	bool IsAvailable() override {
-		return FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
+		return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
 	}
 	bool AbortOnConditionFailed() override { return true; }
 } E_SkipMusic;
@@ -459,7 +459,7 @@ public:
 	}
 
 	void InitFunction() override {
-		bool mil = FEDatabase->mUserProfile->TheCareerSettings.CurrentBin < BIN_MING || FEPlayerCarDB::GetTotalBounty(GetPlayerCarDB()) >= 1500000;
+		bool mil = FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin < BIN_MING || FEPlayerCarDB::GetTotalBounty(GetPlayerCarDB()) >= 1500000;
 		int amount = mil ? 1000000 : 100000;
 		GetPlayerCarDB()->SoldHistoryBounty -= amount;
 		if (mil) {

@@ -60,7 +60,7 @@ public:
 			if (PercentageChanceCheck(25)) {
 				int r = rand() % 3;
 				if (sound[r]) {
-					NyaAudio::SetVolume(sound[r], FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol * 1.5);
+					NyaAudio::SetVolume(sound[r], GetSFXVolume() * 1.5);
 					NyaAudio::Play(sound[r]);
 				}
 			}

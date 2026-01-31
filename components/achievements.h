@@ -245,7 +245,7 @@ namespace Achievements {
 
 			static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/achievement/unlock.mp3");
 			if (sound) {
-				NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+				NyaAudio::SetVolume(sound, GetSFXVolume());
 				NyaAudio::Play(sound);
 			}
 		}

@@ -29,8 +29,12 @@ void DisableKeyboardInput(bool disable) {
 	NyaHooks::InputBlockerHook::bInputsBlocked = disable;
 }
 
+int GetSFXVolume() {
+	return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheAudioSettings.SoundEffectsVol;
+}
+
 FEPlayerCarDB* GetPlayerCarDB() {
-	return &FEDatabase->mUserProfile->PlayersCarStable;
+	return &FEDatabase->CurrentUserProfiles[0]->PlayersCarStable;
 }
 
 IPlayer* GetLocalPlayer() {
@@ -270,7 +274,7 @@ FECustomizationRecord CreateRandomCustomizations(uint32_t carModel) {
 }
 
 FECarRecord* GetCurrentCareerCar() {
-	auto id = FEDatabase->mUserProfile->TheCareerSettings.CurrentCar;
+	auto id = FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCar;
 	if (id < 0) return nullptr;
 	if (id >= 200) return nullptr;
 	return &GetPlayerCarDB()->CarTable[id];
@@ -661,7 +665,7 @@ void ExecuteRenderData_WithHooks();
 Camera* pMoverCamera = nullptr;
 
 bool IsInCareerMode() {
-	return GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext == kRaceContext_Career;
+	return GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext == GRace::kRaceContext_Career;
 }
 
 void ForceEnableCops() {

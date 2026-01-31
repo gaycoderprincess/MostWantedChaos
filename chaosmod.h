@@ -45,10 +45,10 @@ void MoneyChecker() {
 
 	static int cash = 0;
 	if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
-		cash = FEDatabase->mUserProfile->TheCareerSettings.CurrentCash;
+		cash = FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash;
 	}
 	else if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
-		int currentCash = FEDatabase->mUserProfile->TheCareerSettings.CurrentCash;
+		int currentCash = FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash;
 		if (cash != currentCash) {
 			static int cashForEffect = 0;
 			if (auto effect = GetEffectRunning(&TempEffect)) {
@@ -141,7 +141,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 		if (IsInCareerMode()) {
 			if (CanEffectBeSmartlyPicked(&E_Millionaire2)) { effects.push_back(&E_Millionaire2); }
 			if (CanEffectBeSmartlyPicked(&E_OverwriteCareerCar)) { effects.push_back(&E_OverwriteCareerCar); }
-			if (FEDatabase->mUserProfile->TheCareerSettings.CurrentBin >= 13) {
+			if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin >= 13) {
 				if (CanEffectBeSmartlyPicked(&E_SubtractBounty)) { effects.push_back(&E_SubtractBounty); }
 			}
 		}
@@ -161,7 +161,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 			if (CanEffectBeSmartlyPicked(&E_RestartRace)) return &E_RestartRace;
 			if (CanEffectBeSmartlyPicked(&E_Safehouse)) return &E_Safehouse;
 			// don't disable saving during razor's chapter - that might genuinely be useless
-			if (!IsInCareerMode() || FEDatabase->mUserProfile->TheCareerSettings.CurrentBin > BIN_RAZOR) {
+			if (!IsInCareerMode() || FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > BIN_RAZOR) {
 				if (CanEffectBeSmartlyPicked(&E_DisableSave)) return &E_DisableSave;
 			}
 			if (CanEffectBeSmartlyPicked(&E_GetBustedInstant)) return &E_GetBustedInstant;
@@ -187,7 +187,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 		if (CanEffectBeSmartlyPicked(&E_PlayerResetTransform)) { effects.push_back(&E_PlayerResetTransform); }
 
 		// the mustang and clio will be a lot slower than any other car by this point
-		if (IsInCareerMode() && completion < 50 && FEDatabase->mUserProfile->TheCareerSettings.CurrentBin < 5) {
+		if (IsInCareerMode() && completion < 50 && FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin < 5) {
 			if (CanEffectBeSmartlyPicked(&E_SetCarRazor)) { effects.push_back(&E_SetCarRazor); }
 			if (CanEffectBeSmartlyPicked(&E_SetCarTRAFPIZZA)) { effects.push_back(&E_SetCarTRAFPIZZA); }
 		}
@@ -482,7 +482,7 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
 				DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
 				DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
-				DrawMenuOption(std::format("Player Car: {}", FEDatabase->mUserProfile->TheCareerSettings.CurrentCar));
+				DrawMenuOption(std::format("Player Car: {}", FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCar));
 				DrawMenuOption(std::format("Sim Timestep: {:.2f}", Sim::Internal::mSystem->mTimeStep));
 				DrawMenuOption(std::format("Sim Speed: {:.2f}", Sim::Internal::mSystem->mSpeed));
 				DrawMenuOption(std::format("Sim Target Speed: {:.2f}", Sim::Internal::mSystem->mTargetSpeed));
@@ -504,7 +504,7 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Racers: {}", VEHICLE_LIST::GetList(VEHICLE_AIRACERS).size()));
 				DrawMenuOption(std::format("Cops: {}", VEHICLE_LIST::GetList(VEHICLE_AICOPS).size()));
 				DrawMenuOption(std::format("Traffic: {}", VEHICLE_LIST::GetList(VEHICLE_AITRAFFIC).size()));
-				DrawMenuOption(std::format("CurrentBin: {}", FEDatabase->mUserProfile->TheCareerSettings.CurrentBin));
+				DrawMenuOption(std::format("CurrentBin: {}", FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin));
 				DrawMenuOption(std::format("IsFinalEpicChase: {}", cFrontendDatabase::IsFinalEpicChase(FEDatabase)));
 				if (auto heat = GetMaxHeat()) {
 					DrawMenuOption(std::format("Max Heat: {:.2f}", *heat));

@@ -68,7 +68,7 @@ public:
 		GameSpeedModifier = 2;
 
 		if (sound && NyaAudio::IsFinishedPlaying(sound)) {
-			NyaAudio::SetVolume(sound, FEDatabase->mUserProfile->TheOptionsSettings.TheAudioSettings.SoundEffectsVol);
+			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
 		}
 
