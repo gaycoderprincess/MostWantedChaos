@@ -51,14 +51,14 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 		}
 		if (RandomizePlayerTuning) {
 			vehicle->customization = new FECustomizationRecord;
-			*vehicle->customization = CreateRandomCustomizations(vehicle->carType);
+			*vehicle->customization = NyaHelpers::CreateRandomCarCustomizations(vehicle->carType);
 		}
 		PlayerCarModel = vehicle->carType;
 		if (vehicle->customization) {
 			PlayerCarCustomizations = *vehicle->customization;
 		}
 		else {
-			PlayerCarCustomizations = CreateStockCustomizations(vehicle->carType);
+			PlayerCarCustomizations = NyaHelpers::CreateStockCarCustomizations(vehicle->carType);
 		}
 	}
 	if (vehicle->carClass == DRIVER_RACER) {
@@ -110,7 +110,7 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 		}
 		if (RandomizeOpponentTuning) {
 			vehicle->customization = new FECustomizationRecord;
-			*vehicle->customization = CreateRandomCustomizations(vehicle->carType);
+			*vehicle->customization = NyaHelpers::CreateRandomCarCustomizations(vehicle->carType);
 		}
 	}
 	if (vehicle->carClass == DRIVER_TRAFFIC && ForcedTrafficVehicle) {

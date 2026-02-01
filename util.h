@@ -244,35 +244,6 @@ bool IsInMovie() {
 	return gMoviePlayer;
 }
 
-FECustomizationRecord CreateStockCustomizations(uint32_t carModel) {
-	FECustomizationRecord record;
-	FECustomizationRecord::Default(&record);
-
-	FECarRecord tmp;
-	tmp.FEKey = carModel;
-	tmp.VehicleKey = carModel;
-	RideInfo info;
-	RideInfo::Init(&info, FECarRecord::GetType(&tmp), CarRenderUsage_Player, false, false);
-	RideInfo::SetStockParts(&info);
-	FECustomizationRecord::WriteRideIntoRecord(&record, &info);
-	return record;
-}
-
-FECustomizationRecord CreateRandomCustomizations(uint32_t carModel) {
-	FECustomizationRecord record;
-	FECustomizationRecord::Default(&record);
-
-	FECarRecord tmp;
-	tmp.FEKey = carModel;
-	tmp.VehicleKey = carModel;
-	RideInfo info;
-	RideInfo::Init(&info, FECarRecord::GetType(&tmp), CarRenderUsage_Player, false, false);
-	RideInfo::SetRandomParts(&info);
-	//RideInfo::SetRandomPaint(&info);
-	FECustomizationRecord::WriteRideIntoRecord(&record, &info);
-	return record;
-}
-
 FECarRecord* GetCurrentCareerCar() {
 	auto id = FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCar;
 	if (id < 0) return nullptr;
@@ -307,17 +278,6 @@ bool HasPinkSlip(uint32_t model) {
 		return true;
 	}
 	return false;
-}
-
-FECarRecord* CreatePinkSlipPreset(const char* presetName) {
-	uint32_t rideHash = FEngHashString(presetName);
-	auto cars = GetPlayerCarDB();
-	for (auto& car : cars->CarTable) {
-		if (car.Handle == rideHash) {
-			return &car;
-		}
-	}
-	return FEPlayerCarDB::CreateNewPresetCar(cars, presetName);
 }
 
 uint32_t GetCarFEKey(uint32_t modelHash) {

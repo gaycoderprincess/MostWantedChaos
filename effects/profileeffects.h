@@ -154,7 +154,7 @@ public:
 		if (!car) return;
 		auto customization = FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization);
 		if (!customization) return;
-		auto random = CreateRandomCustomizations(car->VehicleKey);
+		auto random = NyaHelpers::CreateRandomCarCustomizations(car->VehicleKey);
 		memcpy(customization->InstalledPartIndices, random.InstalledPartIndices, sizeof(random.InstalledPartIndices));
 		//ChangePlayerCarInWorld(car->VehicleKey, customization);
 	}
@@ -335,7 +335,7 @@ public:
 				}
 			}
 			else {
-				CreatePinkSlipPreset(ride.preset);
+				NyaHelpers::CreatePinkSlipCar(ride.preset);
 				FEPlayerCarDB::AwardRivalCar(GetPlayerCarDB(), FEngHashString(ride.preset));
 			}
 		}
@@ -415,7 +415,7 @@ public:
 				*customization = *current;
 			}
 			else {
-				*customization = CreateStockCustomizations(car->VehicleKey);
+				*customization = NyaHelpers::CreateStockCarCustomizations(car->VehicleKey);
 			}
 			customization->Handle = oldId;
 		}

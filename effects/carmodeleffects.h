@@ -294,7 +294,7 @@ public:
 
 	void InitFunction() override {
 		aMainLoopFunctionsOnce.push_back([]() {
-			auto car = CreatePinkSlipPreset("RAZORMUSTANG");
+			auto car = NyaHelpers::CreatePinkSlipCar("RAZORMUSTANG");
 			ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization), true);
 		});
 	}
@@ -318,7 +318,7 @@ public:
 			}
 			auto car = validCars[rand() % validCars.size()];
 			auto pCustomization = FEPlayerCarDB::GetCustomizationRecordByHandle(cars, car->Customization);
-			auto customization = pCustomization ? *pCustomization : CreateRandomCustomizations(car->VehicleKey);
+			auto customization = pCustomization ? *pCustomization : NyaHelpers::CreateRandomCarCustomizations(car->VehicleKey);
 			ChangePlayerCarInWorld(car->VehicleKey, &customization, (car->FilterBits & 1) != 0); // add nitro if they're stock
 		});
 	}
