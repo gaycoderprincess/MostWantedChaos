@@ -26,6 +26,7 @@ public:
 	Effect_CarMagnetRandom() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Magnet On Random Car";
 		fTimerLength = 15;
+		bIsRehideable = true;
 	}
 
 	void GenerateRandomCar() {
@@ -45,7 +46,6 @@ public:
 		DoCarMagnet(pRandomCar, delta);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
 } E_CarMagnetRandom;
 
 class Effect_CarForcefieldRandom : public EffectBase_ActiveCarsConditional {
@@ -55,6 +55,7 @@ public:
 	Effect_CarForcefieldRandom() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Forcefield On Random Car";
 		fTimerLength = 60;
+		bIsRehideable = true;
 	}
 
 	void GenerateRandomCar() {
@@ -74,7 +75,6 @@ public:
 		DoCarForcefield(pRandomCar);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
 } E_CarForcefieldRandom;
 
 class Effect_CarBouncy : public ChaosEffect {
@@ -226,6 +226,7 @@ public:
 		sFriendlyName = "Lag For All Cars";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("car_lag");
+		bIsRehideable = true;
 	}
 
 	void CaptureAllCars() {
@@ -269,7 +270,6 @@ public:
 		lastStates.clear();
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
 } E_FreezeEveryone;
 
 class Effect_FreezeEveryoneNoPlayer : public EffectBase_ActiveCarsConditional {
@@ -287,6 +287,7 @@ public:
 		sName = "Lag For All Other Cars";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("car_lag");
+		bIsRehideable = true;
 	}
 
 	void CaptureAllCars() {
@@ -341,7 +342,6 @@ public:
 		lastStates.clear();
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
 } E_FreezeEveryoneNoPlayer;
 
 class Effect_SnakeCars : public EffectBase_ActiveCarsConditional {
@@ -403,6 +403,7 @@ public:
 	Effect_BouncyMod() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Bouncy Mod";
 		fTimerLength = 90;
+		bIsRehideable = true;
 	}
 
 	static inline const char* collections[] = {
@@ -448,7 +449,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
 } E_BouncyMod;
 
 class Effect_WideCars : public ChaosEffect {
@@ -536,6 +536,7 @@ class Effect_TeleportAllCars : public EffectBase_ActiveCarsConditional {
 public:
 	Effect_TeleportAllCars() : EffectBase_ActiveCarsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Teleport All Cars To Player";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -547,7 +548,6 @@ public:
 			car->SetVehicleOnGround(&pos, &fwd);
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_TeleportAllCars;
 
 class Effect_LaggyLookingCars : public ChaosEffect {
@@ -655,6 +655,7 @@ public:
 		sName = "Fragile Cars";
 		fTimerLength = 60;
 		MakeIncompatibleWithFilterGroup("player_godmode");
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -666,5 +667,4 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_Fragile;

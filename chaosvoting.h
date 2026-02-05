@@ -139,7 +139,7 @@ namespace ChaosVoting {
 		});
 
 		bool forcedMajority = nForceMajorityVoting > 0 || nLowestWins > 0;
-		if (votes[0]->pEffect->RigProportionalChances() && CanEffectActivate(votes[0]->pEffect)) forcedMajority = true;
+		if (votes[0]->pEffect->bRigProportionalChances && CanEffectActivate(votes[0]->pEffect)) forcedMajority = true;
 
 		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
 		if (bProportionalVotes && !forcedMajority) {
@@ -333,13 +333,13 @@ namespace ChaosVoting {
 		ChaosEffect* pEffect = nullptr;
 		for (auto& effect : ChaosEffect::aEffects) {
 			if (!effect->MatchesCheatCode(message)) continue;
-			if (!effect->CanQuickTrigger()) continue;
+			if (!effect->bCanQuickTrigger) continue;
 			if (!CanEffectActivate(effect)) continue;
 			pEffect = effect;
 		}
 		if (!pEffect) return;
 
-		if (!pEffect->CanMultiTrigger()) {
+		if (!pEffect->bCanMultiTrigger) {
 			for (auto& effect : aChatCheatEffects) {
 				if (pEffect == effect) return;
 			}

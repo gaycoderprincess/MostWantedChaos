@@ -140,6 +140,7 @@ public:
 		sName = "Cocksbot";
 		fTimerLength = 120;
 		nFrequency *= 4;
+		bCanMultiTrigger = true;
 	}
 
 	void InitFunction() override {
@@ -158,5 +159,4 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
-	bool CanMultiTrigger() override { return true; }
 } E_InterspersedText;

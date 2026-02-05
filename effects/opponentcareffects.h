@@ -22,6 +22,7 @@ class Effect_BlowEngineOpponents1 : public EffectBase_OpponentAliveInRaceConditi
 public:
 	Effect_BlowEngineOpponents1() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Blow One Opponent's Engine";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -32,7 +33,6 @@ public:
 		if (!engine) return;
 		engine->Sabotage(1);
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_BlowEngineOpponents1;
 
 // todo this doesnt do anything...?
@@ -55,6 +55,7 @@ class Effect_LaunchCarBwdOpponents : public EffectBase_OpponentInRaceConditional
 public:
 	Effect_LaunchCarBwdOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Backwards";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -63,13 +64,13 @@ public:
 			racer->SetSpeed(TOMPS(-200));
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarBwdOpponents;
 
 class Effect_LaunchCarSideOpponents : public EffectBase_OpponentInRaceConditional {
 public:
 	Effect_LaunchCarSideOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Sideways";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -84,13 +85,13 @@ public:
 			ply->SetLinearVelocity(&side);
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarSideOpponents;
 
 class Effect_LaunchCarUpOpponents : public EffectBase_OpponentInRaceConditional {
 public:
 	Effect_LaunchCarUpOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Launch Opponents Up";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -103,7 +104,6 @@ public:
 			ply->SetLinearVelocity(&vel);
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_LaunchCarUpOpponents;
 
 class Effect_SpinningOpponents : public EffectBase_OpponentInRaceConditional {
@@ -111,6 +111,7 @@ public:
 	Effect_SpinningOpponents() : EffectBase_OpponentInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Spinning Opponents";
 		fTimerLength = 30;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -123,7 +124,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_SpinningOpponents;
 
 class Effect_RubberbandOpponents : public EffectBase_OpponentAliveInRaceConditional {
@@ -133,6 +133,7 @@ public:
 		sFriendlyName = "Opponents Rubberband";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("rubberband");
+		bAbortOnConditionFailed = true;
 	}
 
 	static float __thiscall GetCatchupCheatHooked(ICheater* pThis) {
@@ -173,7 +174,6 @@ public:
 		NyaHookLib::Patch(0x892A68, 0x4223E0);
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_RubberbandOpponents;
 
 class Effect_NoRubberbandOpponents : public EffectBase_OpponentAliveInRaceConditional {
@@ -182,6 +182,7 @@ public:
 		sName = "Disable Rubberbanding";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("rubberband");
+		bAbortOnConditionFailed = true;
 	}
 
 	static float __thiscall GetCatchupCheatHooked(ICheater* pThis) {
@@ -195,7 +196,6 @@ public:
 		NyaHookLib::Patch(0x8925C8, 0x409390);
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_NoRubberbandOpponents;
 
 class Effect_FairOpponents : public EffectBase_OpponentAliveInRaceConditional {
@@ -204,6 +204,7 @@ public:
 		sName = "Realistic Opponent Performance";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("rubberband");
+		bAbortOnConditionFailed = true;
 	}
 
 	static inline bool bPerfCandidateSearch  = false;
@@ -265,13 +266,13 @@ public:
 		NyaHookLib::Patch(0x892A68, 0x4223E0);
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_FairOpponents;
 
 class Effect_SpikeAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
 	Effect_SpikeAllOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Puncture Opponents' Tires";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -284,13 +285,13 @@ public:
 			ply->Puncture(3);
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_SpikeAllOpponents;
 
 /*class Effect_SendOffAllOpponents : public EffectBase_OpponentAliveInRaceConditional {
 public:
 	Effect_SendOffAllOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Make All Opponents Leave";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -300,7 +301,6 @@ public:
 			ply->QuitRace();
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_SendOffAllOpponents;*/
 
 class Effect_SetOpponentMass0 : public EffectBase_OpponentAliveInRaceConditional {
@@ -308,6 +308,7 @@ public:
 	Effect_SetOpponentMass0() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Zero Opponent Mass";
 		fTimerLength = 60;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -327,7 +328,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_SetOpponentMass0;
 
 class Effect_SetOpponentPittable : public EffectBase_OpponentAliveInRaceConditional {
@@ -335,6 +335,7 @@ public:
 	Effect_SetOpponentPittable() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Pittable Opponents";
 		fTimerLength = 90;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -356,7 +357,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_SetOpponentPittable;
 
 class Effect_NoNitroOpponents : public EffectBase_OpponentAliveInRaceConditional {
@@ -364,6 +364,7 @@ public:
 	Effect_NoNitroOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Opponents' Nitro";
 		fTimerLength = 90;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -373,7 +374,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_NoNitroOpponents;
 
 class Effect_LockOpponents : public EffectBase_OpponentAliveInRaceConditional {
@@ -388,6 +388,7 @@ public:
 	Effect_LockOpponents() : EffectBase_OpponentAliveInRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Lock Opponents In Place";
 		fTimerLength = 15;
+		bAbortOnConditionFailed = true;
 	}
 
 	void CaptureAllCars() {
@@ -415,5 +416,4 @@ public:
 		ApplyAllCars();
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_LockOpponents;

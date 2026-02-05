@@ -54,6 +54,7 @@ public:
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("fillmode");
 		//AddToIncompatiblityGroup("world_textures"); // if rainbow road replaces this, it gives a unique effect
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -80,7 +81,6 @@ public:
 	bool IsAvailable() override {
 		return g_VisualTreatment;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_WireframeWorld2;
@@ -91,6 +91,7 @@ public:
 		sName = "Laser-Scanned World";
 		fTimerLength = 30;
 		AddToIncompatiblityGroup("fillmode");
+		bCanQuickTrigger = false;
 	}
 
 	//static inline float PointSize = 4;
@@ -105,7 +106,6 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_LaserScanWorld;
 
 class Effect_SlipperyWorld : public ChaosEffect {
@@ -288,6 +288,8 @@ public:
 		sName = "Snowy World";
 		fTimerLength = 120;
 		AddToIncompatiblityGroup("world_textures");
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 	}
 
 	static inline const char* aBannedModelNames[] = {
@@ -338,10 +340,8 @@ public:
 
 		return g_VisualTreatment;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_Snow;
 
 class Effect_MissingWorld : public ChaosEffect {

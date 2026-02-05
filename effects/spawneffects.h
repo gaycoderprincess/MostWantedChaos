@@ -46,6 +46,7 @@ public:
 	Effect_SpawnCarTruck() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Obligatory Truck Effect";
 		sFriendlyName = "Spawn Truck On Player";
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -75,7 +76,6 @@ public:
 	bool ShouldAbort() override {
 		return abort;
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_SpawnCarTruck;
 
 class Effect_Teddie : public ChaosEffect {
@@ -135,6 +135,7 @@ class Effect_173 : public ChaosEffect {
 public:
 	Effect_173() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn SCP-173";
+		bCanQuickTrigger = false;
 	}
 
 	static inline std::vector<Render3D::tModel*> models;
@@ -245,13 +246,14 @@ public:
 			veh->SetAngularVelocity(&UMath::Vector3::kZero);
 		}
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_173;
 
 class Effect_173Somewhere : public ChaosEffect {
 public:
 	Effect_173Somewhere() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn SCP-173 Somewhere";
+		bAbortOnConditionFailed = true;
+		bCanMultiTrigger = true;
 	}
 
 	void InitFunction() override {
@@ -262,8 +264,6 @@ public:
 		DoChaosSave();
 	}
 	bool IsAvailable() override { return Effect_173::bPeanutEverSpawned; }
-	bool AbortOnConditionFailed() override { return true; }
-	bool CanMultiTrigger() override { return true; }
 } E_173Somewhere;
 
 class Effect_8Down : public ChaosEffect {
@@ -323,6 +323,7 @@ class Effect_ReVoltBomb : public ChaosEffect {
 public:
 	Effect_ReVoltBomb() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Bomb Behind Player";
+		bCanQuickTrigger = false;
 	}
 
 	static inline std::vector<Render3D::tModel*> models;
@@ -423,7 +424,6 @@ public:
 			DoChaosSave();
 		}
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_ReVoltBomb;
 
 class Effect_ReVoltFirework : public ChaosEffect {
@@ -432,6 +432,7 @@ public:
 		sName = "Give Player Firework Rockets";
 		fTimerLength = 60;
 		MakeIncompatibleWithFilterGroup("speedbreaker");
+		bCanQuickTrigger = false;
 	}
 
 	static inline std::vector<Render3D::tModel*> models;
@@ -639,7 +640,6 @@ public:
 		GetLocalPlayer()->ChargeGameBreaker(100);
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_ReVoltFirework;
 
 class Effect_ReVoltFirework2 : public ChaosEffect {
@@ -688,6 +688,7 @@ class Effect_Vergil : public EffectBase_NotInPrologueConditional {
 public:
 	Effect_Vergil() : EffectBase_NotInPrologueConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Griefer Vergil";
+		bRigProportionalChances = true;
 	}
 
 	static inline std::vector<Render3D::tModel*> models;
@@ -989,7 +990,6 @@ public:
 			DoChaosSave();
 		}
 	}
-	bool RigProportionalChances() override { return true; }
 } E_Vergil;
 
 class Effect_VergilSomewhere : public ChaosEffect {
@@ -997,6 +997,8 @@ public:
 	Effect_VergilSomewhere() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Griefer Vergils Somewhere";
 		sFriendlyName = "Spawn Griefer Vergils At Old Bridge";
+		bAbortOnConditionFailed = true;
+		bCanMultiTrigger = true;
 	}
 
 	void InitFunction() override {
@@ -1011,8 +1013,6 @@ public:
 		DoChaosSave();
 	}
 	bool IsAvailable() override { return Effect_Vergil::bVergilEverSpawned; }
-	bool AbortOnConditionFailed() override { return true; }
-	bool CanMultiTrigger() override { return true; }
 } E_VergilSomewhere;
 
 /*class Effect_Franklin : public ChaosEffect {
@@ -1141,6 +1141,7 @@ class Effect_Scientist : public ChaosEffect {
 public:
 	Effect_Scientist() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Scientist In A Hiding Spot";
+		bAbortOnConditionFailed = true;
 	}
 
 	static inline std::vector<Render3D::tModel*> models;
@@ -1293,5 +1294,4 @@ public:
 		}
 	}
 	bool IsAvailable() override { return FindHidingSpot() != nullptr; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_Scientist;

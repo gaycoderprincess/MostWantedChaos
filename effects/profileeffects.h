@@ -4,6 +4,7 @@ class Effect_EnableMomentCam : public ChaosEffect {
 public:
 	Effect_EnableMomentCam() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Enable Game Moment Camera";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -12,7 +13,6 @@ public:
 	bool IsAvailable() override {
 		return !FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.JumpCam;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_EnableMomentCam;
 
 class Effect_NoAutosave : public ChaosEffect {
@@ -20,6 +20,7 @@ public:
 	Effect_NoAutosave() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Autosave";
 		fTimerLength = 240;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -31,7 +32,6 @@ public:
 	bool IsAvailable() override {
 		return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.AutoSaveOn;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
@@ -42,6 +42,7 @@ public:
 	Effect_NoVisualTreatment() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Visual Treatment";
 		fTimerLength = 60;
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -53,7 +54,6 @@ public:
 	bool IsAvailable() override {
 		return g_VisualTreatment;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
@@ -107,6 +107,7 @@ public:
 		sName = "Force Manual Transmission";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("transmission");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -118,7 +119,6 @@ public:
 	bool IsAvailable() override {
 		return GetLocalPlayerInterface<IInput>()->IsAutomaticShift();
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 } E_ManualTrans;
 
@@ -128,6 +128,7 @@ public:
 		sName = "Force Automatic Transmission";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("transmission");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -139,7 +140,6 @@ public:
 	bool IsAvailable() override {
 		return !GetLocalPlayerInterface<IInput>()->IsAutomaticShift();
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool HasTimer() override { return true; }
 } E_AutoTrans;
 
@@ -147,6 +147,8 @@ class Effect_PlayerCarRandomTuning : public EffectBase_TriggerInMenu {
 public:
 	Effect_PlayerCarRandomTuning() : EffectBase_TriggerInMenu(EFFECT_CATEGORY_TEMP) {
 		sName = "Randomize Active Car's Visuals";
+		//bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -161,9 +163,6 @@ public:
 	//bool IsAvailable() override {
 	//	return GRaceStatus::fObj && GRaceStatus::fObj->mRaceContext == kRaceContext_Career;
 	//}
-	//bool IsConditionallyAvailable() override { return true; }
-	//bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerCarRandomTuning;
 
 // nothing to do with strikes and impound boxes does anything meaningful really, only leaving the add one strike effect
@@ -226,6 +225,7 @@ class Effect_AddRandomTuningMarker : public EffectBase_CareerConditional {
 public:
 	Effect_AddRandomTuningMarker() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Random Tuning Marker";
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -257,13 +257,13 @@ public:
 		EffectInstance->sNameToDisplay = std::format("{} ({})", sName, selectedMarker.name);
 		FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_AddRandomTuningMarker;
 
 class Effect_AddRandomBonusMarker : public EffectBase_CareerConditional {
 public:
 	Effect_AddRandomBonusMarker() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Random Bonus Marker";
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -343,7 +343,6 @@ public:
 			FEMarkerManager::AddMarkerToInventory(&TheFEMarkerManager, selectedMarker.type, 0);
 		}
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_AddRandomBonusMarker;
 
 // todo this breaks speedtraps and milestones
@@ -383,6 +382,7 @@ class Effect_SkipMusic : public ChaosEffect {
 public:
 	Effect_SkipMusic() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Skip Current Song";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -394,13 +394,14 @@ public:
 	bool IsAvailable() override {
 		return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_SkipMusic;
 
 class Effect_OverwriteCareerCar : public ChaosEffect {
 public:
 	Effect_OverwriteCareerCar() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Overwrite Active Career Car";
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -435,20 +436,18 @@ public:
 		}
 		return true;
 	}
-	bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_OverwriteCareerCar;
 
 class Effect_AddBounty : public EffectBase_CareerConditional {
 public:
 	Effect_AddBounty() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 100K Bounty";
+		bCanMultiTrigger = true;
 	}
 
 	void InitFunction() override {
 		GetPlayerCarDB()->SoldHistoryBounty += 100000;
 	}
-	bool CanMultiTrigger() override { return true; }
 } E_AddBounty;
 
 class Effect_SubtractBounty : public EffectBase_CareerConditional {
@@ -456,6 +455,7 @@ public:
 	Effect_SubtractBounty() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Subtract 100K Bounty";
 		sFriendlyName = "Subtract Bounty (100K/1Mil)";
+		bCanMultiTrigger = true;
 	}
 
 	void InitFunction() override {
@@ -466,5 +466,4 @@ public:
 			EffectInstance->sNameToDisplay = "Subtract 1 Million Bounty";
 		}
 	}
-	bool CanMultiTrigger() override { return true; }
 } E_SubtractBounty;

@@ -118,11 +118,11 @@ public:
 		sFriendlyName = "Blue Screen Overlay";
 		fTimerLength = 60;
 		sFileName = "blue";
+		bAbortOnConditionFailed = true;
 	}
 
 	// ehh this is kinda lame, freeing up rng chances by removing it if voting is off
 	bool IsAvailable() override { return ChaosVoting::IsEnabled(); }
-	bool AbortOnConditionFailed() override { return true; }
 } E_ShaderBlue;
 
 class Effect_ShaderWide : public EffectBase_ScreenShader {

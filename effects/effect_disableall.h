@@ -3,6 +3,7 @@ public:
 	Effect_DisableAll() : ChaosEffect("Uncategorized") {
 		sName = "Disable Everything";
 		fTimerLength = 10;
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -51,5 +52,4 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_DisableAll;

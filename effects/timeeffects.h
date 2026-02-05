@@ -7,6 +7,7 @@ public:
 		fTimerLength = 30;
 		AddToIncompatiblityGroup("gamespeed");
 		MakeIncompatibleWithFilterGroup("speedbreaker");
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -20,7 +21,6 @@ public:
 		GameSpeedModifier = 1.0;
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_SpeedSlow;
 
 class Effect_SpeedFast : public ChaosEffect {
@@ -30,6 +30,7 @@ public:
 		fTimerLength = 30;
 		AddToIncompatiblityGroup("gamespeed");
 		MakeIncompatibleWithFilterGroup("speedbreaker");
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -43,7 +44,6 @@ public:
 		GameSpeedModifier = 1.0;
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_SpeedFast;
 
 class Effect_SpeedSpeedBased : public ChaosEffect {
@@ -53,6 +53,7 @@ public:
 		fTimerLength = 30;
 		AddToIncompatiblityGroup("gamespeed");
 		MakeIncompatibleWithFilterGroup("speedbreaker");
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -73,7 +74,6 @@ public:
 		GameSpeedModifier = 1.0;
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_SpeedSpeedBased;
 
 class Effect_RealTimeSpeedbrk : public ChaosEffect {

@@ -31,6 +31,7 @@ class Effect_Pursuit : public ChaosEffect {
 public:
 	Effect_Pursuit() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Trigger Police Pursuit";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -43,13 +44,13 @@ public:
 		}
 		return true;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_Pursuit;
 
 /*class Effect_ClearCostToState : public EffectBase_PursuitNoRaceConditional {
 public:
 	Effect_ClearCostToState() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Reset Cost To State";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -57,13 +58,13 @@ public:
 			pursuit->NotifyPropertyDamaged(-100000);
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_ClearCostToState;*/
 
 class Effect_AddCostToState : public EffectBase_PursuitNoRaceConditional {
 public:
 	Effect_AddCostToState() : EffectBase_PursuitNoRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 100K Cost To State";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -71,7 +72,6 @@ public:
 			pursuit->NotifyPropertyDamaged(100000);
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_AddCostToState;
 
 // needs a way to force cooldown
@@ -99,14 +99,14 @@ public:
 	Effect_NeverBusted() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Never Busted";
 		fTimerLength = 60;
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
 		ICopMgr::mInstance->SetAllBustedTimersToZero();
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
-	bool AbortOnConditionFailed() override { return true; }
 } E_NeverBusted;
 
 // todo this softlocks the game when starting a milestone or bounty event
@@ -115,6 +115,7 @@ public:
 	Effect_NoCops() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Cops";
 		fTimerLength = 60;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -127,7 +128,6 @@ public:
 	bool IsAvailable() override {
 		return !ICopMgr::mDisableCops;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_NoCops;
 
 class Effect_NoHidingSpots : public EffectBase_PursuitConditional {
@@ -135,6 +135,8 @@ public:
 	Effect_NoHidingSpots() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Hiding Spots";
 		fTimerLength = 120;
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -144,8 +146,6 @@ public:
 		NyaHookLib::Patch<uint8_t>(0x429949, 0x74);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_NoHidingSpots;
 
 class Effect_SetCopMassInf : public EffectBase_ActiveCopsConditional {
@@ -153,6 +153,7 @@ public:
 	Effect_SetCopMassInf() : EffectBase_ActiveCopsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Cop Mass";
 		fTimerLength = 60;
+		bIsRehideable = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -172,7 +173,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
 } E_SetCopMassInf;
 
 class Effect_GetBusted : public ChaosEffect {
@@ -182,6 +182,7 @@ public:
 	Effect_GetBusted() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "25% Chance Of Getting Busted";
 		fTimerLength = 1;
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -231,7 +232,6 @@ public:
 	void DeinitFunction() override {
 		NyaHookLib::Patch(0x4445CC + 2, 0x890DA4);
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_GetBusted;
 
 class Effect_RuthlessCopSpawns : public EffectBase_PursuitConditional {
@@ -241,6 +241,8 @@ public:
 		sFriendlyName = "Ruthless Cop Spawns";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("coprequest");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -269,8 +271,6 @@ public:
 		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_RuthlessCopSpawns;
 
 class Effect_RuthlessCopCross : public EffectBase_PursuitConditional {
@@ -280,6 +280,8 @@ public:
 		sFriendlyName = "Ruthless Cross Spawns";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("coprequest");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -295,8 +297,6 @@ public:
 		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_RuthlessCopCross;
 
 class Effect_NoCopSpawns : public EffectBase_PursuitConditional {
@@ -305,6 +305,8 @@ public:
 		sName = "Disable Cop Spawning";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("coprequest");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -318,8 +320,6 @@ public:
 		NyaHookLib::Patch(0x8927C0, 0x42BA50);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_NoCopSpawns;
 
 /*class Effect_EnterCooldown : public EffectBase_PursuitConditional {
@@ -342,6 +342,7 @@ public:
 		sName = "Invincible Player Tires";
 		fTimerLength = 60;
 		AddToFilterGroup("player_godmode");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -351,7 +352,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_InvincibleTires;
 
 class Effect_InvincibleCops : public EffectBase_PursuitConditional {
@@ -359,6 +359,7 @@ public:
 	Effect_InvincibleCops() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Invincible Cops";
 		fTimerLength = 60;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -375,7 +376,6 @@ public:
 		NyaHookLib::Patch<uint8_t>(0x42E930, 0x83);
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_InvincibleCops;
 
 class Effect_CopJenga : public EffectBase_ManyActiveCopsConditional {
@@ -383,6 +383,8 @@ public:
 	Effect_CopJenga() : EffectBase_ManyActiveCopsConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Cop Jenga Tower";
 		fTimerLength = 45;
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -396,8 +398,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_CopJenga;
 
 class Effect_DropCash : public EffectBase_PursuitConditional {
@@ -405,6 +405,8 @@ public:
 	Effect_DropCash() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Cops Drop Cash";
 		fTimerLength = 90;
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	struct tCarAssoc {
@@ -451,6 +453,4 @@ public:
 		CaptureAllCars();
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_DropCash;

@@ -90,6 +90,7 @@ public:
 		sName = "FlatOut Style HUD";
 		fTimerLength = 120;
 		AddToIncompatiblityGroup("hud_replace");
+		bIsRehideable = true;
 	}
 
 	static uint32_t __thiscall DetermineHudFeaturesHooked(IHud* pThis, IPlayer* a2) {
@@ -130,5 +131,4 @@ public:
 	bool IsAvailable() override {
 		return IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
 	}
-	bool IsRehideable() override { return true; }
 } E_FO1HUD;

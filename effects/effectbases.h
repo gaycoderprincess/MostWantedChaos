@@ -2,6 +2,7 @@ class EffectBase_PlayerCarHasNitro : public ChaosEffect {
 public:
 	EffectBase_PlayerCarHasNitro(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Player Has Nitro";
+		bAbortOnConditionFailed = true;
 	}
 
 	bool IsAvailable() override {
@@ -10,7 +11,6 @@ public:
 		}
 		return false;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 };
 
 class EffectBase_OpponentInRaceOrRoamingConditional : public ChaosEffect {
@@ -199,6 +199,7 @@ class EffectBase_HasTuningConditional : public ChaosEffect {
 public:
 	EffectBase_HasTuningConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Has Tuning Conditional";
+		bAbortOnConditionFailed = true;
 	}
 
 	bool IsAvailable() override {
@@ -207,54 +208,53 @@ public:
 		}
 		return false;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 };
 
 class EffectBase_NotInPrologueConditional : public ChaosEffect {
 public:
 	EffectBase_NotInPrologueConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Not In Prologue Conditional";
+		bAbortOnConditionFailed = true;
 	}
 
 	bool IsAvailable() override {
 		return FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 };
 
 class EffectBase_InCareerNotInPrologueConditional : public ChaosEffect {
 public:
 	EffectBase_InCareerNotInPrologueConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) In Career & Not In Prologue Conditional";
+		bAbortOnConditionFailed = true;
 	}
 
 	bool IsAvailable() override {
 		return IsInCareerMode() && FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 };
 
 class EffectBase_CareerConditional : public ChaosEffect {
 public:
 	EffectBase_CareerConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) Career Conditional";
+		bAbortOnConditionFailed = true;
 	}
 
 	bool IsAvailable() override {
 		if (!IsInCareerMode()) return false;
 		return true;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 };
 
 class EffectBase_NoCarChangeYetConditional : public ChaosEffect {
 public:
 	EffectBase_NoCarChangeYetConditional(const char* category) : ChaosEffect(category) {
 		sName = "(EFFECT BASE) No Car Change Yet Conditional";
+		bAbortOnConditionFailed = true;
 	}
 
 	bool IsAvailable() override {
 		return nNumPlayerCarChangesThisRace <= 0;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 };

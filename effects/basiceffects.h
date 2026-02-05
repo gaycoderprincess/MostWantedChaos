@@ -13,13 +13,13 @@ public:
 	Effect_Blind() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Blind";
 		fTimerLength = 10;
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
 		DrawRectangle(0, 1, 0, 1, {0,0,0,255});
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_Blind;
 
 class Effect_Flash : public ChaosEffect {
@@ -69,6 +69,7 @@ public:
 		sName = "4:3 Letterboxed";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("letterbox_aspect");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -84,7 +85,6 @@ public:
 	bool IsAvailable() override {
 		return (((4.0 / 3.0) / GetAspectRatio()) * 0.5) < 0.99;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_43Borders;
@@ -151,6 +151,8 @@ public:
 
 	Effect_CrashChance() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "10% Chance Of Game Crash";
+		bCanQuickTrigger = false;
+		bIgnoreHUDState = true;
 	}
 
 	void InitFunction() override {
@@ -167,8 +169,6 @@ public:
 			chanceFired = true;
 		}
 	}
-	bool IgnoreHUDState() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_CrashChance;
 
 class Effect_Nothing : public ChaosEffect {
@@ -184,6 +184,7 @@ public:
 		sName = "Chess Board";
 		sFriendlyName = "Chess Board Screen Overlay";
 		fTimerLength = 30;
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -200,7 +201,6 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_BlockyCover;
 
 // the texture replacer makes this obsolete
@@ -235,6 +235,8 @@ public:
 	Effect_NoChaosHUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Chaos Mod HUD";
 		fTimerLength = 60;
+		bCanQuickTrigger = false;
+		bIgnoreHUDState = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -244,8 +246,6 @@ public:
 		bDisableChaosHUD = false;
 	}
 	bool HasTimer() override { return true; }
-	bool IgnoreHUDState() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_NoChaosHUD;
 
 class Effect_PunchHole : public ChaosEffect {
@@ -254,6 +254,7 @@ public:
 		sName = "Punch-Hole";
 		sFriendlyName = "Punch-Hole Screen Overlay";
 		fTimerLength = 30;
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -261,7 +262,6 @@ public:
 		DrawRectangle(0, 1, 0, 1, {255,255,255,255}, 0, texture);
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_PunchHole;
 
 class Effect_RandomChaosTimer : public ChaosEffect {
@@ -343,6 +343,7 @@ public:
 public:
 	Effect_3Effects() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Activate 3 Effects";
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -350,13 +351,14 @@ public:
 			AddRunningEffect(GetRandomEffect(true));
 		}
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_3Effects;*/
 
 class Effect_10Effects : public ChaosEffect {
 public:
 	Effect_10Effects() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Activate 10 Effects";
+		bCanQuickTrigger = false;
+		bRigProportionalChances = true;
 	}
 
 	void InitFunction() override {
@@ -369,14 +371,14 @@ public:
 			effect->LastTriggerTime = bakTime;
 		}
 	}
-	bool CanQuickTrigger() override { return false; }
-	bool RigProportionalChances() override { return true; }
 } E_10Effects;
 
 class Effect_RefillActiveTimers : public ChaosEffect {
 public:
 	Effect_RefillActiveTimers() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Refill Effect Timers";
+		bCanQuickTrigger = false;
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -389,8 +391,6 @@ public:
 	bool IsAvailable() override {
 		return GetNumEffectsRunning(this) > 0;
 	}
-	bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_RefillActiveTimers;
 
 // this is a pretty useless effect *but* it serves as a good way to put the credits in your face that wouldn't ever be shown otherwise

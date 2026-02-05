@@ -44,6 +44,7 @@ class Effect_RemoveLap : public ChaosEffect {
 public:
 	Effect_RemoveLap() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Remove A Lap";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -64,13 +65,13 @@ public:
 		}
 		return true;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_RemoveLap;
 
 class Effect_AddLap : public ChaosEffect {
 public:
 	Effect_AddLap() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add A Lap";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -91,13 +92,13 @@ public:
 		}
 		return true;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_AddLap;
 
 class Effect_Add3Laps : public ChaosEffect {
 public:
 	Effect_Add3Laps() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Add 3 Laps";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -118,13 +119,13 @@ public:
 		}
 		return true;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_Add3Laps;
 
 class Effect_RestartRace : public EffectBase_InAnyRaceConditional {
 public:
 	Effect_RestartRace() : EffectBase_InAnyRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Restart Event";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -133,7 +134,6 @@ public:
 		}
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_RestartRace;
 
 class Effect_DisableBarriers : public EffectBase_InRaceConditional {
@@ -142,6 +142,7 @@ public:
 		sName = "Disable Race Barriers";
 		fTimerLength = 120;
 		AddToIncompatiblityGroup("remove_barriers");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -158,7 +159,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_DisableBarriers;
 
 class Effect_FalseStarts : public ChaosEffect {
@@ -166,6 +166,8 @@ public:
 	Effect_FalseStarts() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "False Starts";
 		fTimerLength = 120;
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -182,8 +184,6 @@ public:
 		//}
 		return true;
 	}
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_FalseStarts;
 
 class Effect_RestartRaceOn99 : public ChaosEffect {
@@ -192,6 +192,8 @@ public:
 
 	Effect_RestartRaceOn99() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Restart Event At 99% Completion";
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -211,9 +213,7 @@ public:
 		return !active;
 	}
 	bool IsAvailable() override { return IsInNormalRace() || cFrontendDatabase::IsFinalEpicChase(FEDatabase); }
-	bool AbortOnConditionFailed() override { return true; }
 	bool RunInMenus() override { return active; }
-	bool CanQuickTrigger() override { return false; }
 } E_RestartRaceOn99;
 
 class Effect_SuddenDeath : public ChaosEffect {
@@ -223,6 +223,9 @@ public:
 		sFriendlyName = "Blow Engine On Position Loss";
 		fTimerLength = 60;
 		MakeIncompatibleWithFilterGroup("player_godmode");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 	}
 
 	int ranking = 0;
@@ -275,10 +278,7 @@ public:
 		}
 		return true;
 	}
-	bool IsRehideable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 	bool ShouldAbort() override { return abort; }
-	bool CanQuickTrigger() override { return false; }
 } E_SuddenDeath;
 
 class Effect_MidnightClub : public EffectBase_InRaceConditional {
@@ -287,6 +287,9 @@ public:
 		sName = "Midnight Club Mode";
 		fTimerLength = 240;
 		AddToIncompatiblityGroup("remove_barriers");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 	}
 
 	const static inline float fCylinderRotX = 90;
@@ -478,9 +481,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
-	bool IsRehideable() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_MidnightClub;
 
 // doesn't work at all, checkpoints can't be reversed

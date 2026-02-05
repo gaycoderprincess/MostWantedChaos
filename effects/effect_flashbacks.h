@@ -48,6 +48,7 @@ public:
 		lastStates.clear();
 		CaptureAllCars();
 		CwoeeHints::AddHint("Press the reset button to rewind time!");
+		bCanQuickTrigger = false;
 	}
 	void TickFunctionMain(double delta) override {
 		timer += delta;
@@ -76,5 +77,4 @@ public:
 		lastStates.clear();
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_Flashbacks;

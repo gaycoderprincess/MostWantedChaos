@@ -219,6 +219,7 @@ class Effect_SetHeat6 : public EffectBase_NotInPursuitConditional {
 public:
 	Effect_SetHeat6() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Set Heat Level to 6";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -229,7 +230,6 @@ public:
 			ply->SetHeat(6);
 		}
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_SetHeat6;
 
 class Effect_SetHeatDown : public ChaosEffect {
@@ -266,6 +266,7 @@ public:
 	Effect_BlowEngine() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Blow Player's Engine";
 		MakeIncompatibleWithFilterGroup("player_godmode");
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -273,7 +274,6 @@ public:
 			ply->Sabotage(3);
 		}
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_BlowEngine;
 
 class Effect_AutoDrive : public ChaosEffect {
@@ -612,6 +612,7 @@ class Effect_PlayerCarReset : public ChaosEffect {
 public:
 	Effect_PlayerCarReset() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Reset Player";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -620,7 +621,6 @@ public:
 		}
 	}
 	bool IsAvailable() override { return !NoResetCount; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_PlayerCarReset;
 
 class Effect_PlayerCarSpike1 : public ChaosEffect {
@@ -672,6 +672,7 @@ class Effect_FixPlayerCar : public ChaosEffect {
 public:
 	Effect_FixPlayerCar() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Fix Player's Tires";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -687,7 +688,6 @@ public:
 		}
 		return false;
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_FixPlayerCar;
 
 class Effect_NoReset : public ChaosEffect {
@@ -711,6 +711,7 @@ public:
 	Effect_ResetImmune() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Disable Instant Bust On Reset";
 		fTimerLength = 120;
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -720,7 +721,6 @@ public:
 		ManualResetImmunity = false;
 	}
 	bool HasTimer() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_ResetImmune;
 
 float CarMagnetForce = 3;
@@ -942,6 +942,7 @@ public:
 		sName = "Piggyback Ride";
 		sFriendlyName = "Place Player Onto Closest Car";
 		fTimerLength = 15;
+		bIsRehideable = true;
 	}
 
 	void InitFunction() override {
@@ -956,7 +957,6 @@ public:
 		NoResetCount--;
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
 } E_Piggyback;
 
 class Effect_LockPlayer : public ChaosEffect {
@@ -997,9 +997,9 @@ public:
 
 class Effect_SwapPlayerWithOpponent : public EffectBase_OpponentInRaceOrRoamingConditional {
 public:
-
 	Effect_SwapPlayerWithOpponent() : EffectBase_OpponentInRaceOrRoamingConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Swap Places With Random Opponent";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -1013,7 +1013,6 @@ public:
 		player.Apply(targetCar);
 		target.Apply(playerCar);
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_SwapPlayerWithOpponent;
 
 class Effect_PlayerResetTransform : public ChaosEffect {
@@ -1203,24 +1202,24 @@ class Effect_PlayerTPHidingSpot : public ChaosEffect {
 public:
 	Effect_PlayerTPHidingSpot() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Teleport To Perfect Hiding Spot";
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
 		TeleportPlayer({-2200.7, 144.6, 1458.7}, {-0.14, 0.0, 0.99});
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerTPHidingSpot;
 
 class Effect_PlayerTPBridge : public ChaosEffect {
 public:
 	Effect_PlayerTPBridge() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Teleport Behind The Old Bridge";
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
 		TeleportPlayer({-2485.08, 207.38, -1348.54}, {-0.89, 0.0, -0.47});
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerTPBridge;
 
 // this technically affects all cars but it's here in playercareffects since it mostly only affects the player
@@ -1330,6 +1329,7 @@ public:
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("top_bar");
 		MakeIncompatibleWithFilterGroup("player_godmode");
+		bCanQuickTrigger = false;
 	}
 
 	static inline float fMinSpeedSlow = TOMPS(100);
@@ -1418,7 +1418,6 @@ public:
 	bool ShouldAbort() override {
 		return IsCarDestroyed(GetLocalPlayerVehicle());
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_MinSpeed;
 
 class Effect_PlayerRandomInput : public ChaosEffect {
@@ -1427,6 +1426,7 @@ public:
 		sName = "ChatGPT Take The Wheel";
 		sFriendlyName = "Randomize Player Input";
 		fTimerLength = 20;
+		bCanQuickTrigger = false;
 	}
 
 	float gas = 0;
@@ -1475,7 +1475,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerRandomInput;
 
 class Effect_PlayerForceSpeedbrk : public ChaosEffect {
@@ -1485,6 +1484,8 @@ public:
 		fTimerLength = 30;
 		fUnhideTime = 0;
 		AddToIncompatiblityGroup("speedbreaker");
+		bCanQuickTrigger = false;
+		bIsRehideable = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -1502,7 +1503,5 @@ public:
 		}
 	}
 	bool IsAvailable() override { return GetLocalPlayerVehicle()->GetSpeed() > TOMPS(60); }
-	bool IsRehideable() override { return true; }
 	bool HasTimer() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_PlayerForceSpeedbrk;

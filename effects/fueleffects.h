@@ -65,6 +65,7 @@ class Effect_LeakTankRefuel : public ChaosEffect {
 public:
 	Effect_LeakTankRefuel() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Refuel Player Car";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -74,7 +75,6 @@ public:
 	bool IsAvailable() override {
 		return GetEffectRunning(&E_LeakTank);
 	}
-	bool AbortOnConditionFailed() override { return true; }
 } E_LeakTankRefuel;
 
 class Effect_LeakTankCash : public EffectBase_InCareerNotInPrologueConditional {

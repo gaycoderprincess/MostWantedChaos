@@ -9,8 +9,16 @@ public:
 	std::vector<uint32_t> IncompatibleFilterGroups; // effects that contain these in FilterGroups are incompatible with this
 	const char* sListCategory = nullptr;
 	const char* sAuthor = "gaycoderprincess"; // in case anyone else contributes or helps meaningfully! :3
+
 	int nFrequency = 10; // 10 is standard, make this higher or lower to make an effect more or less likely to appear
-	float fTriggerTimeMultiplier = 1;
+	float fCycleTimeMultiplier = 1; // multiplier * 60 minutes before the effect can activate again
+	bool bRigProportionalChances = false; // always activate if it's the highest voted, even in proportional voting
+	bool bIsRehideable = false; // hide even after initfunction has run if the conditions aren't met anymore
+	bool bAbortOnConditionFailed = false;
+	bool bIgnoreHUDState = false; // display even when disable chaos hud is active
+	bool bCanQuickTrigger = true; // activate 3 effects and such
+	bool bCanMultiTrigger = false; // multiple instances at once
+	bool bInitImmediately = false; // run initfunction immediately instead of waiting for the next effect tick
 
 	std::time_t LastTriggerTime = 0;
 	uint32_t nTotalTimesActivated = 0;
@@ -78,17 +86,10 @@ public:
 	virtual void DeinitFunction() {}
 	virtual bool HasTimer() { return false; }
 	virtual bool IsAvailable() { return true; }
-	virtual bool IsRehideable() { return false; }
 	virtual bool HideFromPlayer() { return false; }
-	virtual bool AbortOnConditionFailed() { return false; }
 	virtual bool RunInMenus() { return false; } // frontend specifically
 	virtual bool RunWhenBlocked() { return false; } // pause menu, race end screen, etc.
 	virtual bool ShouldAbort() { return false; }
-	virtual bool IgnoreHUDState() { return false; } // display even when disable chaos hud is active
-	virtual bool CanQuickTrigger() { return true; } // activate 3 effects and such
-	virtual bool CanMultiTrigger() { return false; } // multiple instances at once
-	virtual bool InitImmediately() { return false; }
-	virtual bool RigProportionalChances() { return false; } // always activate if it's the highest voted, even in proportional voting
 	virtual void OnAnyEffectTriggered() {}
 	virtual void OnTimerRefill() {}
 	virtual bool MatchesCheatCode(std::string code) {
@@ -151,7 +152,7 @@ public:
 	}
 
 	bool IsHidden() const {
-		return pEffect->IsRehideable() && !pEffect->IsAvailable();
+		return pEffect->bIsRehideable && !pEffect->IsAvailable();
 	}
 
 	void Draw(float y, bool inMenu) {
@@ -197,7 +198,7 @@ public:
 			}
 			else {
 				fTimeConditionMet = 0;
-				if (pEffect->AbortOnConditionFailed()) bAborted = true;
+				if (pEffect->bAbortOnConditionFailed) bAborted = true;
 				return;
 			}
 		}
@@ -275,14 +276,14 @@ bool IsEffectRunningFromFilterGroup(uint32_t IncompatibilityGroup) {
 }
 
 bool CanEffectActivate(ChaosEffect* effect) {
-	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return false;
+	if (!effect->bCanMultiTrigger && GetEffectRunning(effect)) return false;
 	for (auto& group : effect->FilterGroups) {
 		if (IsEffectRunningFromIncompatibleGroup(group)) return false;
 	}
 	for (auto& group : effect->IncompatibleFilterGroups) {
 		if (IsEffectRunningFromFilterGroup(group)) return false;
 	}
-	if (effect->AbortOnConditionFailed()) {
+	if (effect->bAbortOnConditionFailed) {
 		if (IsChaosBlocked()) return false; // IsAvailable can run in-game code, so always skip abortonconditionfailed effects in menus
 		if (!effect->IsAvailable()) return false;
 	}
@@ -290,7 +291,7 @@ bool CanEffectActivate(ChaosEffect* effect) {
 }
 
 ChaosEffectInstance* AddRunningEffect(ChaosEffect* effect) {
-	if (!effect->CanMultiTrigger() && GetEffectRunning(effect)) return nullptr;
+	if (!effect->bCanMultiTrigger && GetEffectRunning(effect)) return nullptr;
 	if (!CanEffectActivate(effect)) return nullptr;
 
 	effect->bTriggeredThisCycle = true;
@@ -300,7 +301,7 @@ ChaosEffectInstance* AddRunningEffect(ChaosEffect* effect) {
 	WriteLog(std::format("Activating {}", effect->sName));
 
 	auto running = &aRunningEffects[aRunningEffects.size()-1];
-	if (running->pEffect->InitImmediately()) {
+	if (running->pEffect->bInitImmediately) {
 		running->pEffect->InitFunction();
 		running->bFirstFrame = false;
 	}
@@ -327,7 +328,7 @@ bool CanEffectBeRandomlyPicked(ChaosEffect* effect) {
 	// wait 60 minutes minimum before repeating an effect
 	auto time = std::time(0);
 	int timeDiff = time - effect->LastTriggerTime;
-	if (timeDiff < (60 * 60 * effect->fTriggerTimeMultiplier)) return false;
+	if (timeDiff < (60 * 60 * effect->fCycleTimeMultiplier)) return false;
 
 	if (!CanEffectActivate(effect)) return false;
 	return true;
@@ -343,7 +344,7 @@ int GetNumEffectsAvailableForRandom(bool quickTrigger = false) {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
 		if (!CanEffectBeRandomlyPicked(effect)) continue;
-		if (quickTrigger && !effect->CanQuickTrigger()) continue;
+		if (quickTrigger && !effect->bCanQuickTrigger) continue;
 
 		availableEffects.push_back(effect);
 	}
@@ -354,7 +355,7 @@ ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 	std::vector<ChaosEffect*> availableEffects;
 	for (auto& effect : ChaosEffect::aEffects) {
 		if (!CanEffectBeRandomlyPicked(effect)) continue;
-		if (quickTrigger && !effect->CanQuickTrigger()) continue;
+		if (quickTrigger && !effect->bCanQuickTrigger) continue;
 
 		for (int i = 0; i < effect->nFrequency; i++) {
 			availableEffects.push_back(effect);

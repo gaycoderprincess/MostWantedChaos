@@ -10,7 +10,7 @@ void ProcessChaosEffectsMain(double fDeltaTime, bool inMenu, bool blockedByOther
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
 		if (blockedByOtherMeans && !effect.pEffect->RunWhenBlocked()) continue;
-		if (bDisableChaosHUD && !effect.pEffect->IgnoreHUDState()) continue;
+		if (bDisableChaosHUD && !effect.pEffect->bIgnoreHUDState) continue;
 		effect.Draw(y, inMenu || blockedByOtherMeans);
 		y += 1 - (inMenu ? 0 : effect.Popup.GetOffscreenPercentage());
 	}
@@ -653,7 +653,7 @@ void ChaosModMenu() {
 			std::ofstream fout("cwoee_effects_quick.txt", std::ios::out);
 			if (fout.is_open()) {
 				for (auto& effect : ChaosEffect::aEffects) {
-					if (!effect->CanQuickTrigger()) continue;
+					if (!effect->bCanQuickTrigger) continue;
 
 					fout << effect->GetFriendlyName();
 					if (effect->sFriendlyName) fout << std::format(" ({})", effect->sName);

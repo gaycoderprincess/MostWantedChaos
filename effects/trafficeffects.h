@@ -7,6 +7,7 @@ public:
 	Effect_RacerAITraffic() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Racer AI For Traffic";
 		fTimerLength = 120;
+		bIsRehideable = true;
 	}
 
 	void InitFunction() override {
@@ -29,7 +30,6 @@ public:
 		NyaHookLib::Patch<uint16_t>(0x411E9E, 0x1674);
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; }
 } E_RacerAITraffic;
 
 class Effect_LobotomyTraffic : public EffectBase_ActiveTrafficConditional {
@@ -37,6 +37,7 @@ public:
 	Effect_LobotomyTraffic() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Lobotomized Traffic";
 		fTimerLength = 60;
+		bIsRehideable = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -47,7 +48,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
 } E_LobotomyTraffic;
 
 class Effect_SpinningTraffic : public EffectBase_ActiveTrafficConditional {
@@ -55,6 +55,7 @@ public:
 	Effect_SpinningTraffic() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Spinning Traffic";
 		fTimerLength = 60;
+		bIsRehideable = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -68,7 +69,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
 } E_SpinningTraffic;
 
 class Effect_SetTrafficMassInf : public EffectBase_ActiveTrafficConditional {
@@ -76,6 +76,7 @@ public:
 	Effect_SetTrafficMassInf() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Infinite Traffic Mass";
 		fTimerLength = 60;
+		bIsRehideable = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -97,7 +98,6 @@ public:
 		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsRehideable() override { return true; };
 } E_SetTrafficMassInf;
 
 /*class Effect_HeavyTraffic : public EffectBase_NotInPursuitConditional {

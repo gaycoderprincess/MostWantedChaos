@@ -8,6 +8,7 @@ public:
 		sName = "Quick-Time Event";
 		fTimerLength = 5;
 		MakeIncompatibleWithFilterGroup("player_godmode");
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -39,5 +40,4 @@ public:
 			Achievements::AwardAchievement(GetAchievement("QTE"));
 		}
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_QTE;

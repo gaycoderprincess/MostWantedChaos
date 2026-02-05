@@ -6,6 +6,7 @@ public:
 		sName = "New Opponents Are M3 GTRs";
 		fTimerLength = 240;
 		AddToIncompatiblityGroup("opponent_car_model");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -20,7 +21,6 @@ public:
 		RandomizeOpponentTuning = false;
 	}
 	bool HasTimer() override { return LastOpponentVehicleSpawn == Attrib::StringHash32("bmwm3gtre46"); }
-	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsRazor;
 
 class Effect_OpponentsGolf : public EffectBase_NotInPursuitConditional {
@@ -29,6 +29,7 @@ public:
 		sName = "New Opponents Are Golfs";
 		fTimerLength = 240;
 		AddToIncompatiblityGroup("opponent_car_model");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -43,7 +44,6 @@ public:
 		RandomizeOpponentTuning = false;
 	}
 	bool HasTimer() override { return LastOpponentVehicleSpawn == Attrib::StringHash32("gti"); }
-	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsGolf;
 
 class Effect_OpponentsPlayer : public EffectBase_NotInPursuitConditional {
@@ -52,6 +52,7 @@ public:
 		sName = "New Opponents Copy Your Car";
 		fTimerLength = 240;
 		AddToIncompatiblityGroup("opponent_car_model");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -64,7 +65,6 @@ public:
 		OpponentPlayerCar = false;
 	}
 	bool HasTimer() override { return LastOpponentPlayerCar; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayer;
 
 class Effect_OpponentsPlayerRandom : public EffectBase_NotInPursuitConditional {
@@ -73,6 +73,7 @@ public:
 		sName = "New Opponents Steal Your Cars";
 		fTimerLength = 240;
 		AddToIncompatiblityGroup("opponent_car_model");
+		bAbortOnConditionFailed = true;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -85,7 +86,6 @@ public:
 		OpponentPlayerCarRandom = false;
 	}
 	bool HasTimer() override { return LastOpponentPlayerCarRandom; }
-	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsPlayerRandom;
 
 // all opponents are already fully upgraded
@@ -275,6 +275,7 @@ public:
 		sName = "It's Pizza Time";
 		sFriendlyName = "Change Car To TRAFPIZZA";
 		AddToFilterGroup("change_player_car");
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -282,7 +283,6 @@ public:
 			ChangePlayerCarInWorld(Attrib::StringHash32("cs_clio_trafpizza"), nullptr);
 		});
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_SetCarTRAFPIZZA;
 
 class Effect_SetCarRazor : public EffectBase_NoCarChangeYetConditional {
@@ -290,6 +290,7 @@ public:
 	Effect_SetCarRazor() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Razor's Mustang";
 		AddToFilterGroup("change_player_car");
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -298,7 +299,6 @@ public:
 			ChangePlayerCarInWorld(Attrib::StringHash32("mustanggt"), FEPlayerCarDB::GetCustomizationRecordByHandle(GetPlayerCarDB(), car->Customization), true);
 		});
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_SetCarRazor;
 
 class Effect_SetCarRandom : public EffectBase_NoCarChangeYetConditional {
@@ -306,6 +306,7 @@ public:
 	Effect_SetCarRandom() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To Random Model";
 		AddToFilterGroup("change_player_car");
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -322,7 +323,6 @@ public:
 			ChangePlayerCarInWorld(car->VehicleKey, &customization, (car->FilterBits & 1) != 0); // add nitro if they're stock
 		});
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandom;
 
 class Effect_SetCarRandomAI : public ChaosEffect {
@@ -330,6 +330,7 @@ public:
 	Effect_SetCarRandomAI() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To AI Traffic/Police Car";
 		AddToFilterGroup("change_player_car");
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -379,7 +380,6 @@ public:
 			ChangePlayerCarInWorld(model, nullptr);
 		});
 	}
-	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandomAI;
 
 // this can crash sometimes?
@@ -389,6 +389,8 @@ public:
 		sName = "Grand Theft Auto";
 		sFriendlyName = "Steal Car From Random Opponent";
 		AddToFilterGroup("change_player_car");
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
@@ -406,6 +408,4 @@ public:
 		if (!EffectBase_OpponentInRaceConditional::IsAvailable()) return false;
 		return nNumPlayerCarChangesThisRace <= 0;
 	}
-	bool AbortOnConditionFailed() override { return true; }
-	bool CanQuickTrigger() override { return false; }
 } E_SetCarRandomOpponent;
