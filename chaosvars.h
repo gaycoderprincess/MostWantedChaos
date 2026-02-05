@@ -5,6 +5,7 @@ double fTimeSinceLastEffect = 0;
 bool bDisableChaosHUD = false;
 bool bRNGCycles = false;
 int nSmartRNG = 0;
+bool bDisableEpilepticEffects = false;
 
 bool bDarkMode = false;
 

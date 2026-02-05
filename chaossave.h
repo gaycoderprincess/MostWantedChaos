@@ -261,6 +261,7 @@ void DoChaosSettingsSave() {
 	file.write((char*)&ChaosVoting::bProportionalVotes, sizeof(ChaosVoting::bProportionalVotes));
 	file.write((char*)&Effect_Vergil::bAllowMultipleVergils, sizeof(Effect_Vergil::bAllowMultipleVergils));
 	file.write((char*)&Effect_173::bDespawnPeanuts, sizeof(Effect_173::bDespawnPeanuts));
+	file.write((char*)&bDisableEpilepticEffects, sizeof(bDisableEpilepticEffects));
 }
 
 void DoChaosSettingsLoad() {
@@ -285,6 +286,7 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&ChaosVoting::bProportionalVotes, sizeof(ChaosVoting::bProportionalVotes));
 	file.read((char*)&Effect_Vergil::bAllowMultipleVergils, sizeof(Effect_Vergil::bAllowMultipleVergils));
 	file.read((char*)&Effect_173::bDespawnPeanuts, sizeof(Effect_173::bDespawnPeanuts));
+	file.read((char*)&bDisableEpilepticEffects, sizeof(bDisableEpilepticEffects));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();

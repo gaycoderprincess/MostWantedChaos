@@ -19,6 +19,7 @@ public:
 	bool bCanQuickTrigger = true; // activate 3 effects and such
 	bool bCanMultiTrigger = false; // multiple instances at once
 	bool bInitImmediately = false; // run initfunction immediately instead of waiting for the next effect tick
+	bool bEpilepsyWarning = false;
 
 	std::time_t LastTriggerTime = 0;
 	uint32_t nTotalTimesActivated = 0;
@@ -276,6 +277,7 @@ bool IsEffectRunningFromFilterGroup(uint32_t IncompatibilityGroup) {
 }
 
 bool CanEffectActivate(ChaosEffect* effect) {
+	if (bDisableEpilepticEffects && effect->bEpilepsyWarning) return false;
 	if (!effect->bCanMultiTrigger && GetEffectRunning(effect)) return false;
 	for (auto& group : effect->FilterGroups) {
 		if (IsEffectRunningFromIncompatibleGroup(group)) return false;

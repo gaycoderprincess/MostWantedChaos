@@ -244,6 +244,7 @@ public:
 		sName = "Acid Trip";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("world_textures");
+		bEpilepsyWarning = true;
 	}
 
 	void InitFunction() override {
