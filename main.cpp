@@ -186,12 +186,6 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::CameraMoverHook::Init();
 			NyaHooks::CameraMoverHook::aFunctions.push_back(CameraHook);
 			NyaHooks::LateInitHook::Init();
-			NyaHooks::LateInitHook::aFunctions.push_back([]() {
-				if (GetModuleHandleA("NFSMWLimitAdjuster.asi")) {
-					MessageBoxA(nullptr, "Incompatible mod detected! Please remove NFSMWLimitAdjuster.asi from your game before using this mod.", "nya?!~", MB_ICONERROR);
-					exit(0);
-				}
-			});
 			NyaHooks::RenderWorldHook::Init();
 			NyaHooks::RenderWorldHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PRE3D>);
 			NyaHooks::RenderWorldHook::aPostFunctions.push_back(Render3DLoop);
