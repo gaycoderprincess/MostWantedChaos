@@ -154,7 +154,7 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 	if (IsInNormalRace()) {
 		if (CanEffectBeSmartlyPicked(&E_Add3Laps)) return &E_Add3Laps;
 
-		auto completion = GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete;
+		auto completion = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete;
 
 		// above 90% completion -> restart race
 		if (completion >= 90) {
@@ -399,7 +399,7 @@ void ChaosModMenu() {
 		ChloeMenuLib::BeginMenu();
 		QuickValueEditor("Allow multiple Vergils", Effect_Vergil::bAllowMultipleVergils);
 		QuickValueEditor("Despawn SCP-173 after a kill", Effect_173::bDespawnPeanuts);
-		QuickValueEditor("Disable Epileptic Effects", bDisableEpilepticEffects);
+		QuickValueEditor("Disable epileptic effects", bDisableEpilepticEffects);
 		ChloeMenuLib::EndMenu();
 	}
 
@@ -514,7 +514,7 @@ void ChaosModMenu() {
 					DrawMenuOption(std::format("Aerodynamics: {:.2f}", tune->Value[Physics::Tunings::AERODYNAMICS]));
 				}
 				if (GRaceStatus::fObj && IsInNormalRace()) {
-					DrawMenuOption(std::format("Race Completion: {:.2f}", GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete));
+					DrawMenuOption(std::format("Race Completion: {:.2f}", GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete));
 				}
 				if (DrawMenuOption("Debug Camera")) {
 					CameraAI::SetAction(1, "CDActionDebug");

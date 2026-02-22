@@ -20,7 +20,7 @@ void SetRaceNumLaps(int lapCount) {
 }
 
 int GetLocalPlayerCurrentLap() {
-	return GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted;
+	return GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mLapsCompleted;
 }
 
 /*class Effect_RemoveLapProgress : public ChaosEffect {
@@ -129,7 +129,7 @@ public:
 	}
 
 	void InitFunction() override {
-		if (GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 90) {
+		if (GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete >= 90) {
 			Achievements::AwardAchievement(GetAchievement("RESTART_LATE"));
 		}
 		aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
@@ -202,7 +202,7 @@ public:
 	void TickFunctionMain(double delta) override {
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
-			if ((IsInNormalRace() && GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete >= 99) || (cFrontendDatabase::IsFinalEpicChase(FEDatabase) && IsPlayerApproachingOldBridge())) {
+			if ((IsInNormalRace() && GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete >= 99) || (cFrontendDatabase::IsFinalEpicChase(FEDatabase) && IsPlayerApproachingOldBridge())) {
 				//aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 				aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
@@ -233,7 +233,7 @@ public:
 	double fLeewayTimer = 0;
 
 	void InitFunction() override {
-		ranking = GRaceStatus::fObj->mRacerInfo[0].mRanking;
+		ranking = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mRanking;
 		abort = false;
 		fLeewayTimer = 0;
 	}
@@ -251,7 +251,7 @@ public:
 		data.outlinedist = 0.025;
 		DrawString(data, std::format("Stay in #{}{}!", ranking, ranking == 1 ? "" : " or better"));
 
-		auto currRanking = GRaceStatus::fObj->mRacerInfo[0].mRanking;
+		auto currRanking = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mRanking;
 		if (currRanking < ranking) {
 			ranking = currRanking;
 		}

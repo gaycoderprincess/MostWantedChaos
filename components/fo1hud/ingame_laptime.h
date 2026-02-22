@@ -21,7 +21,7 @@ public:
 		}
 
 		bool showingLastLap = false;
-		auto ply = &GRaceStatus::fObj->mRacerInfo[0];
+		auto ply = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable());
 		int lapTime = (Sim::GetTime() - ply->mLapTimer.mStartTime) * 1000;
 		lapTimes[ply->mLapsCompleted] = lapTime;
 		if (ply->mLapsCompleted > 0 && lapTime < 3000) {

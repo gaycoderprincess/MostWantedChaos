@@ -76,7 +76,7 @@ public:
 				bWrecked[i] = false;
 				continue;
 			}
-			auto ply = &GRaceStatus::fObj->mRacerInfo[i];
+			auto ply = GRaceStatus::fObj->GetRacerInfo(i);
 			bool wrecked = IsRacerKOd(ply);
 			if (wrecked && !bWrecked[i]) {
 				if (ply->mKnockedOut) AddKONotif(ply);

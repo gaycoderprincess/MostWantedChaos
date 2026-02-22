@@ -29,7 +29,7 @@ public:
 		for (int i = 0; i < GRaceStatus::fObj->mRacerCount; i++) {
 			if (i == nPlayerId) continue;
 
-			auto plyInfo = &GRaceStatus::fObj->mRacerInfo[i];
+			auto plyInfo = GRaceStatus::fObj->GetRacerInfo(i);
 			auto ply = GetRacerFromHandle(plyInfo->mhSimable);
 			if (!ply) continue;
 
@@ -113,7 +113,7 @@ public:
 
 			Draw1080pSprite(JUSTIFY_LEFT, 0+nXOffset, 1920+nXOffset, 0+nYOffset, 1080+nYOffset, {255,255,255,(uint8_t)alpha}, ai_damage_meter_bg);
 
-			auto plyInfo = &GRaceStatus::fObj->mRacerInfo[i];
+			auto plyInfo = GRaceStatus::fObj->GetRacerInfo(i);
 			auto ply = GetRacerFromHandle(plyInfo->mhSimable);
 			if (!ply) continue;
 

@@ -61,7 +61,7 @@ std::vector<GRacerInfo*> GetSortedPlayerScores() {
 	std::vector<GRacerInfo*> racers;
 	if (!GRaceStatus::fObj) return racers;
 	for (int i = 0; i < GRaceStatus::fObj->mRacerCount; i++) {
-		racers.push_back(&GRaceStatus::fObj->mRacerInfo[i]);
+		racers.push_back(GRaceStatus::fObj->GetRacerInfo(i));
 	}
 	std::sort(racers.begin(), racers.end(), [](GRacerInfo *a, GRacerInfo *b) {
 		return a->mRanking < b->mRanking;

@@ -353,6 +353,7 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, b
 	if (auto newCar = PVehicle::Construct(param)) {
 		nNumPlayerCarChangesThisRace++;
 
+		auto racer = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable());
 		newCar->Attach(GetLocalPlayer());
 		oldCar->Detach(GetLocalPlayer());
 		oldCar->Kill();
@@ -362,8 +363,8 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, b
 		newCar->mCOMObject->Find<IRigidBody>()->SetLinearVelocity(&oldVel);
 		newCar->mCOMObject->Find<IRigidBody>()->SetAngularVelocity(&oldAVel);
 		newCar->mCOMObject->Find<ITransmission>()->Shift(oldGear);
-		if (GRaceStatus::fObj->mRacerInfo[0].mhSimable == oldHandle) {
-			GRaceStatus::fObj->mRacerInfo[0].mhSimable = newCar->GetOwnerHandle();
+		if (racer->mhSimable == oldHandle) {
+			racer->mhSimable = newCar->GetOwnerHandle();
 		}
 		if (GRaceStatus::fObj->mRaceParms && GRaceParameters::GetRaceType(GRaceStatus::fObj->mRaceParms) != 8) {
 			EAXSound::ReStartRace(g_pEAXSound, true);

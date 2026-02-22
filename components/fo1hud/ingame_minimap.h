@@ -185,13 +185,13 @@ public:
 
 		// draw wrecked players first, opponents after, then arcade checkpoint, local player on top
 		for (int i = 0; i < GRaceStatus::fObj->mRacerCount; i++) {
-			auto ply = &GRaceStatus::fObj->mRacerInfo[i];
+			auto ply = GRaceStatus::fObj->GetRacerInfo(i);
 			if (ply->mIndex == 0) continue;
 			if (!IsRacerKOd(ply)) continue;
 			DrawPlayerOnMap(GetRacerFromHandle(ply->mhSimable), false);
 		}
 		for (int i = 0; i < GRaceStatus::fObj->mRacerCount; i++) {
-			auto ply = &GRaceStatus::fObj->mRacerInfo[i];
+			auto ply = GRaceStatus::fObj->GetRacerInfo(i);
 			if (ply->mIndex == 0) continue;
 			if (IsRacerKOd(ply)) continue;
 			DrawPlayerOnMap(GetRacerFromHandle(ply->mhSimable), false);

@@ -10,28 +10,30 @@ public:
 	void Process() override {
 		if (!IsRaceHUDUp()) return;
 		if (IsInRace()) {
+			auto racer = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable());
+
 			int numLaps = 1;
 			if (auto laps = GetRaceNumLaps()) {
 				numLaps = *laps;
 			}
 
 			std::string posNth = "th";
-			int pos = GRaceStatus::fObj->mRacerInfo[0].mRanking;
+			int pos = racer->mRanking;
 			if (pos < 10 || pos > 20) {
 				if ((pos % 10) == 1) posNth = "st";
 				if ((pos % 10) == 2) posNth = "nd";
 				if ((pos % 10) == 3) posNth = "rd";
 			}
 
-			auto time = (Sim::GetTime() - GRaceStatus::fObj->mRacerInfo[0].mRaceTimer.mStartTime) * 1000;
+			auto time = (Sim::GetTime() - racer->mRaceTimer.mStartTime) * 1000;
 			if (time < 0) time = 0;
 			DrawElement(0, "TOTAL TIME", FormatGameTime(time));
-			DrawElementRight(0, "POSITION", std::format("{}{}", GRaceStatus::fObj->mRacerInfo[0].mRanking, posNth));
+			DrawElementRight(0, "POSITION", std::format("{}{}", racer->mRanking, posNth));
 			if (numLaps <= 1) {
-				DrawElementRight(1, "COMPLETE", std::format("{:.0f}%", GRaceStatus::fObj->mRacerInfo[0].mPctRaceComplete));
+				DrawElementRight(1, "COMPLETE", std::format("{:.0f}%", racer->mPctRaceComplete));
 			}
 			else {
-				DrawElementRight(1, "LAP", std::format("{}/{}", GRaceStatus::fObj->mRacerInfo[0].mLapsCompleted+1, numLaps));
+				DrawElementRight(1, "LAP", std::format("{}/{}", racer->mLapsCompleted+1, numLaps));
 			}
 		}
 		else if (IsInPursuit()) {
