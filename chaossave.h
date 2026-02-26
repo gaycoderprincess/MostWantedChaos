@@ -7,9 +7,9 @@ struct tObjectSaveWithCol {
 	UMath::Vector3 colPos;
 };
 
-void DoChaosEffectSave() {
+bool DoChaosEffectSave() {
 	std::ofstream file("CwoeeChaos/save/effects.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	int num = ChaosEffect::aEffects.size();
 	file.write((char*)&num, sizeof(num));
@@ -19,6 +19,7 @@ void DoChaosEffectSave() {
 		file.write((char*)&effect->LastTriggerTime, sizeof(effect->LastTriggerTime));
 		file.write((char*)&effect->nTotalTimesActivated, sizeof(effect->nTotalTimesActivated));
 	}
+	return true;
 }
 
 void DoChaosEffectLoad() {
@@ -36,7 +37,7 @@ void DoChaosEffectLoad() {
 	}
 }
 
-void DoChaos173Save() {
+bool DoChaos173Save() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_173::aPeanutsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
@@ -45,7 +46,7 @@ void DoChaos173Save() {
 	}
 
 	std::ofstream file("CwoeeChaos/save/173.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	file.write((char*)&Effect_173::bPeanutEverSpawned, sizeof(Effect_173::bPeanutEverSpawned));
 
@@ -54,6 +55,7 @@ void DoChaos173Save() {
 	for (auto& data : save) {
 		file.write((char*)&data, sizeof(data));
 	}
+	return true;
 }
 
 void DoChaos173Load() {
@@ -72,7 +74,7 @@ void DoChaos173Load() {
 	}
 }
 
-void DoChaosTeddieSave() {
+bool DoChaosTeddieSave() {
 	std::vector<tObjectSaveWithCol> save;
 	for (auto& peanut : Effect_Teddie::aTeddiesInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
@@ -81,13 +83,14 @@ void DoChaosTeddieSave() {
 	}
 
 	std::ofstream file("CwoeeChaos/save/teddie.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	int count = save.size();
 	file.write((char*)&count, sizeof(count));
 	for (auto& data : save) {
 		file.write((char*)&data, sizeof(data));
 	}
+	return true;
 }
 
 void DoChaosTeddieLoad() {
@@ -104,7 +107,7 @@ void DoChaosTeddieLoad() {
 	}
 }
 
-void DoChaos8DownSave() {
+bool DoChaos8DownSave() {
 	std::vector<tObjectSaveWithCol> save;
 	for (auto& peanut : Effect_8Down::aObjectsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
@@ -113,13 +116,14 @@ void DoChaos8DownSave() {
 	}
 
 	std::ofstream file("CwoeeChaos/save/8down.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	int count = save.size();
 	file.write((char*)&count, sizeof(count));
 	for (auto& data : save) {
 		file.write((char*)&data, sizeof(data));
 	}
+	return true;
 }
 
 void DoChaos8DownLoad() {
@@ -136,7 +140,7 @@ void DoChaos8DownLoad() {
 	}
 }
 
-void DoChaosBombSave() {
+bool DoChaosBombSave() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_ReVoltBomb::aBombsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
@@ -145,13 +149,14 @@ void DoChaosBombSave() {
 	}
 
 	std::ofstream file("CwoeeChaos/save/pickup.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	int count = save.size();
 	file.write((char*)&count, sizeof(count));
 	for (auto& data : save) {
 		file.write((char*)&data, sizeof(data));
 	}
+	return true;
 }
 
 void DoChaosBombLoad() {
@@ -168,7 +173,7 @@ void DoChaosBombLoad() {
 	}
 }
 
-void DoChaosVergilSave() {
+bool DoChaosVergilSave() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_Vergil::aVergilsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
@@ -177,7 +182,7 @@ void DoChaosVergilSave() {
 	}
 
 	std::ofstream file("CwoeeChaos/save/vergil.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	int count = save.size();
 	file.write((char*)&count, sizeof(count));
@@ -186,6 +191,7 @@ void DoChaosVergilSave() {
 	}
 
 	file.write((char*)&Effect_Vergil::bVergilEverSpawned, sizeof(Effect_Vergil::bVergilEverSpawned));
+	return true;
 }
 
 void DoChaosVergilLoad() {
@@ -204,7 +210,7 @@ void DoChaosVergilLoad() {
 	file.read((char*)&Effect_Vergil::bVergilEverSpawned, sizeof(Effect_Vergil::bVergilEverSpawned));
 }
 
-void DoChaosScientistSave() {
+bool DoChaosScientistSave() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_Scientist::aObjectsInWorld) {
 		auto model = &Render3DObjects::aObjects[peanut];
@@ -213,13 +219,14 @@ void DoChaosScientistSave() {
 	}
 
 	std::ofstream file("CwoeeChaos/save/scientist.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	int count = save.size();
 	file.write((char*)&count, sizeof(count));
 	for (auto& data : save) {
 		file.write((char*)&data, sizeof(data));
 	}
+	return true;
 }
 
 void DoChaosScientistLoad() {
@@ -236,13 +243,13 @@ void DoChaosScientistLoad() {
 	}
 }
 
-void DoChaosSettingsSave() {
+bool DoChaosSettingsSave() {
 	// using the non-mutex version here as this is called inside TriggerHighestVotedEffect
 	// also defining this here so the game can't crash while accessing the irc client and corrupt the savefile
 	bool connected = (ChaosVoting::sChannelName[0] && ChaosVoting::bAutoReconnect) || ChaosVoting::IsEnabled();
 
 	std::ofstream file("CwoeeChaos/save/settings.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return;
+	if (!file.is_open()) return false;
 
 	file.write((char*)&bDarkMode, sizeof(bDarkMode));
 	file.write((char*)&nTimesBusted, sizeof(nTimesBusted));
@@ -262,6 +269,7 @@ void DoChaosSettingsSave() {
 	file.write((char*)&Effect_Vergil::bAllowMultipleVergils, sizeof(Effect_Vergil::bAllowMultipleVergils));
 	file.write((char*)&Effect_173::bDespawnPeanuts, sizeof(Effect_173::bDespawnPeanuts));
 	file.write((char*)&bDisableEpilepticEffects, sizeof(bDisableEpilepticEffects));
+	return true;
 }
 
 void DoChaosSettingsLoad() {
@@ -297,14 +305,14 @@ void DoChaosSave() {
 	std::filesystem::create_directory("CwoeeChaos");
 	std::filesystem::create_directory("CwoeeChaos/save");
 
-	DoChaosEffectSave();
-	DoChaos173Save();
-	DoChaosTeddieSave();
-	DoChaos8DownSave();
-	DoChaosBombSave();
-	DoChaosVergilSave();
-	DoChaosScientistSave();
-	DoChaosSettingsSave();
+	if (!DoChaosEffectSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaos173Save()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosTeddieSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaos8DownSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosBombSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosVergilSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosScientistSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 }
 
 void DoChaosLoad() {
