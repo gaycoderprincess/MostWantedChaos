@@ -125,8 +125,25 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 	return simable;
 }
 
+UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attrib::StringKey* mechanic) {
+	if (pThis->mDriverClass == DRIVER_HUMAN) {
+		if (mechanic == &BEHAVIOR_MECHANIC_RESET) {
+			result->mCRC = Attrib::StringHash32("ResetCar");
+			return result;
+		}
+		if (mechanic == &BEHAVIOR_MECHANIC_AUDIO) {
+			result->mCRC = Attrib::StringHash32("SoundRacer");
+			return result;
+		}
+	}
+	return PVehicle::LookupBehaviorSignature(pThis, result, mechanic);
+}
+
 ChloeHook Hook_VehicleConstruct([]() {
 	NyaHooks::LateInitHook::aFunctions.push_back([]() { *(void**)0x92C534 = (void*)&VehicleConstructHooked; });
+
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6855F6, &CarBehaviorHooked);
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6856C2, &CarBehaviorHooked);
 
 	// use SuspensionRacer instead of SuspensionSimple for racers - fixes popped tire behavior
 	NyaHookLib::Patch(0x6380CB + 1, "SuspensionRacer");
