@@ -136,6 +136,12 @@ UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attr
 			return result;
 		}
 	}
+	if (pThis->mDriverClass == DRIVER_COP) {
+		if (mechanic == &BEHAVIOR_MECHANIC_DAMAGE) {
+			result->mCRC = Attrib::StringHash32("DamageCopCar");
+			return result;
+		}
+	}
 	return PVehicle::LookupBehaviorSignature(pThis, result, mechanic);
 }
 
@@ -144,6 +150,7 @@ ChloeHook Hook_VehicleConstruct([]() {
 
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6855F6, &CarBehaviorHooked);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6856C2, &CarBehaviorHooked);
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x68554E, &CarBehaviorHooked);
 
 	// use SuspensionRacer instead of SuspensionSimple for racers - fixes popped tire behavior
 	NyaHookLib::Patch(0x6380CB + 1, "SuspensionRacer");

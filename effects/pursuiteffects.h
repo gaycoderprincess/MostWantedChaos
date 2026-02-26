@@ -299,6 +299,59 @@ public:
 	bool HasTimer() override { return true; }
 } E_RuthlessCopCross;
 
+class Effect_RuthlessCopTraffic : public EffectBase_PursuitConditional {
+public:
+	Effect_RuthlessCopTraffic() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Truly Undercover";
+		sFriendlyName = "Cops Drive Traffic Cars";
+		fTimerLength = 120;
+		AddToIncompatiblityGroup("coprequest");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
+	}
+
+	static inline std::vector<std::string> aTrafficCars = {
+			"traf4dseda",
+			"traf4dsedb",
+			"traf4dsedc",
+			"trafamb",
+			"trafcemtr",
+			"trafcourt",
+			"trafdmptr",
+			"trafficcoup",
+			"traffire",
+			"trafgarb",
+			"trafha",
+			"trafminivan",
+			"trafnews",
+			"trafpickupa",
+			"trafpizza",
+			"trafstwag",
+			"trafstwagb",
+			"trafsuva",
+			"traftaxi",
+			"trafvanb"
+	};
+
+	static inline auto CopRequest = (const char*(__cdecl*)(IPursuit*))0x42BA50;
+	static const char* __thiscall CopRequestHooked(IPursuit* pThis) {
+		//if (auto car = CopRequest(pThis)) {
+			return aTrafficCars[rand()%aTrafficCars.size()].c_str();
+		//}
+		//return nullptr;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch(0x8927C0, &CopRequestHooked);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x9090);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8927C0, 0x42BA50);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
+	}
+	bool HasTimer() override { return true; }
+} E_RuthlessCopTraffic;
+
 class Effect_NoCopSpawns : public EffectBase_PursuitConditional {
 public:
 	Effect_NoCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
