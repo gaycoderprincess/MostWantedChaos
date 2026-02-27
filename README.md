@@ -15,11 +15,11 @@ This is just a fun side project for me to mess around with while I learn how the
 
 ## Recommended mods
 
+- [Open Limit Adjuster](https://github.com/gaycoderprincess/MostWantedOpenLimitAdjuster/releases/latest)
 - [XtendedInput](https://github.com/xan1242/NFS-XtendedInput/releases/latest) (only if you're using a controller!)
 
 ## Incompatible mods
 
-- NFSMWLimitAdjuster (breaks all effects related to racers)
 - Extended Customization (crashes the game during Acid Trip)
 
 ## Building
