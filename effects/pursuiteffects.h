@@ -246,6 +246,8 @@ public:
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
+		if (GetActiveVehicles(DRIVER_COP).size() >= 128) return nullptr;
+
 		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
 			float heat = ply->GetHeat();
 			if (heat < 2) return "copmidsize";
@@ -285,6 +287,7 @@ public:
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
+		if (GetActiveVehicles(DRIVER_COP).size() >= 128) return nullptr;
 		return "copcross";
 	}
 
