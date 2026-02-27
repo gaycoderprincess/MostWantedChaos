@@ -375,7 +375,7 @@ namespace Achievements {
 
 	ChloeHook Init([]() {
 		Load();
-		aDrawingLoopFunctionsOnce.push_back([](){ NyaAudio::Init(ghWnd); });
+		aDrawingLoopFunctionsOnce.push_back([](){ NyaAudio::Init(GameWindow); });
 		aDrawingLoopFunctions.push_back(OnTick);
 	});
 }

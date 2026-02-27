@@ -516,6 +516,7 @@ void ChaosModMenu() {
 				if (GRaceStatus::fObj && IsInNormalRace()) {
 					DrawMenuOption(std::format("Race Completion: {:.2f}", GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete));
 				}
+				DrawMenuOption(std::format("SoundEffectsVol: {}", FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheAudioSettings.SoundEffectsVol));
 				if (DrawMenuOption("Debug Camera")) {
 					CameraAI::SetAction(1, "CDActionDebug");
 				}

@@ -29,7 +29,7 @@ void DisableKeyboardInput(bool disable) {
 	NyaHooks::InputBlockerHook::bInputsBlocked = disable;
 }
 
-int GetSFXVolume() {
+float GetSFXVolume() {
 	return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheAudioSettings.SoundEffectsVol;
 }
 
