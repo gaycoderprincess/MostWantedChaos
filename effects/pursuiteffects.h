@@ -337,7 +337,7 @@ public:
 	};
 
 	static const char* __thiscall CopRequestHooked(IPursuit* pThis) {
-		if (GetActiveVehicles(DRIVER_COP).size() >= 64) return nullptr;
+		if (GetActiveVehicles(DRIVER_COP).size() >= 32) return nullptr;
 		return aTrafficCars[rand()%aTrafficCars.size()].c_str();
 	}
 

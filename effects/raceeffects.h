@@ -652,3 +652,38 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 	bool ShouldAbort() override { return TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING || !IsInNormalRace(); }
 } E_ReverseRace;*/
+
+// requires DUMMY_SKIN stuff
+/*class Effect_Opponents16 : public EffectBase_NotInPursuitConditional {
+public:
+	Effect_Opponents16() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Races Have 16 Opponents";
+		fTimerLength = 240;
+		bAbortOnConditionFailed = true;
+	}
+
+	static int __thiscall GetNumOpponentsHooked(GRaceParameters* pThis) {
+		auto orig = GRaceParameters::GetNumOpponents(pThis);
+		if (orig <= 1) return orig;
+		return 15;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x426CA6, &GetNumOpponentsHooked);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x431533, &GetNumOpponentsHooked);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x611902, &GetNumOpponentsHooked);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x61DCB7, &GetNumOpponentsHooked);
+	}
+	void TickFunctionMain(double delta) override {
+		if (!HasTimer()) {
+			EffectInstance->fTimer = fTimerLength;
+		}
+	}
+	void DeinitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x426CA6, 0x5FACD0);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x431533, 0x5FACD0);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x611902, 0x5FACD0);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x61DCB7, 0x5FACD0);
+	}
+	bool HasTimer() override { return GetActiveVehicles(DRIVER_RACER).size() >= 10; }
+} E_Opponents16;*/
