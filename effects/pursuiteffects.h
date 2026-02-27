@@ -335,10 +335,12 @@ public:
 
 	static inline auto CopRequest = (const char*(__cdecl*)(IPursuit*))0x42BA50;
 	static const char* __thiscall CopRequestHooked(IPursuit* pThis) {
-		//if (auto car = CopRequest(pThis)) {
+		if (GetActiveVehicles(DRIVER_COP).size() < 64) return aTrafficCars[rand()%aTrafficCars.size()].c_str();
+
+		if (auto car = CopRequest(pThis)) {
 			return aTrafficCars[rand()%aTrafficCars.size()].c_str();
-		//}
-		//return nullptr;
+		}
+		return nullptr;
 	}
 
 	void InitFunction() override {
