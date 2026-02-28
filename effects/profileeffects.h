@@ -402,6 +402,7 @@ public:
 		sName = "Overwrite Active Career Car";
 		bAbortOnConditionFailed = true;
 		bCanQuickTrigger = false;
+		bRigProportionalChances = true;
 	}
 
 	void InitFunction() override {

@@ -33,6 +33,7 @@ public:
 		bAbortOnConditionFailed = true;
 		bRigProportionalChances = true;
 		bCanQuickTrigger = false;
+		bRigProportionalChances = true;
 	}
 
 	bool IsAvailable() override { return ChaosVoting::bSelectingEffectsForVote; }
@@ -120,6 +121,7 @@ public:
 		fTimerLength = 45;
 		bAbortOnConditionFailed = true;
 		bCanQuickTrigger = false;
+		bRigProportionalChances = true;
 	}
 
 	void InitFunction() override {

@@ -123,6 +123,13 @@ namespace ChaosVoting {
 
 	void TriggerHighestVotedEffect() {
 		auto votes = aNewVotes;
+		votes.clear();
+		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
+		for (auto& vote : aNewVotes) {
+			if (CanEffectActivate(vote->pEffect)) votes.push_back(vote);
+		}
+		bSelectingEffectsForVote = false;
+
 		if (votes.empty()) return;
 
 		auto voteCount = GetTotalVoteCount();
@@ -145,7 +152,6 @@ namespace ChaosVoting {
 		if (bProportionalVotes && !forcedMajority) {
 			std::vector<VotingPopup*> effects;
 			for (auto& vote : votes) {
-				if (!CanEffectActivate(vote->pEffect)) continue;
 				for (int i = 0; i < vote->GetVoteCount(); i++) {
 					effects.push_back(vote);
 				}
@@ -154,7 +160,6 @@ namespace ChaosVoting {
 			auto effect = effects[GetRandomNumber(0, effects.size())];
 			if (effect->pEffect == pAllOfTheAbove) {
 				for (auto& vote : votes) {
-					if (!CanEffectActivate(vote->pEffect)) continue;
 					AddRunningEffect(effect->pEffect == pRandomEffect ? GetRandomEffect() : effect->pEffect);
 					effect->bEffectActivated = true;
 				}
@@ -172,8 +177,6 @@ namespace ChaosVoting {
 
 			// activate highest voted activatable effect
 			for (auto& vote : votes) {
-				if (!CanEffectActivate(vote->pEffect)) continue;
-
 				// also trigger any tied votes
 				if (allOfTheAbove || !highestVoted || highestVoteCount == vote->GetVoteCount()) {
 					AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);

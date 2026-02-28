@@ -194,6 +194,7 @@ public:
 		sName = "Restart Event At 99% Completion";
 		bAbortOnConditionFailed = true;
 		bCanQuickTrigger = false;
+		bRigProportionalChances = true;
 	}
 
 	void InitFunction() override {
