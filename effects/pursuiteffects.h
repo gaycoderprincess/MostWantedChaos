@@ -480,13 +480,14 @@ public:
 		lastStates = state;
 	}
 
-	static int GetCashRewardForCarModel(const char* model) {
-		if (auto collection = Attrib::FindCollection(Attrib::StringHash32("aivehicle"), Attrib::StringHash32(model))) {
-			if (auto rep = Attrib::Collection::GetData(collection, Attrib::StringHash32("RepPointsForDestroying"), 0)) {
-				return *(int*)rep;
-			}
-		}
-		return 1000;
+	static int GetCashRewardForCar(IVehicle* veh) {
+		auto ai = veh->GetAIVehiclePtr();
+		if (!ai) return 1000;
+		auto instance = ai->GetAttributes();
+		if (!instance) return 1000;
+		auto rep = Attrib::Instance::GetAttributePointer(instance, Attrib::StringHash32("RepPointsForDestroying"), 0);
+		if (!rep) return 1000;
+		return *(int*)rep;
 	}
 
 	void CheckAllCars() {
@@ -495,7 +496,7 @@ public:
 			if (state.destroyed) continue;
 			if (!IsCarDestroyed(state.vehicle)) continue;
 
-			FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += GetCashRewardForCarModel(state.vehicle->GetVehicleName());
+			FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += GetCashRewardForCar(state.vehicle);
 		}
 	}
 

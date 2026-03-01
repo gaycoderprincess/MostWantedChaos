@@ -341,45 +341,11 @@ namespace ChaosVoting {
 		mVotingMutex.unlock();
 	}
 
-	void Update() {
-		if (nNumVoteOptions < 2) nNumVoteOptions = 2;
-		if (nNumVoteOptions > 9) nNumVoteOptions = 9;
-
-		// first frame
-		if (aNewVotes.empty()) {
-			GenerateNewVotes();
-		}
-
-		if (bRandomEffectOption && !IsRandomEffectInVotes()) {
-			AddRandomEffectToVotes();
-		}
-		if (!bRandomEffectOption && IsRandomEffectInVotes()) {
-			// remove the last member of the vote list - this is always random effect in this case
-			delete aNewVotes[aNewVotes.size()-1];
-			aNewVotes.pop_back();
-		}
-
-		mVotingMutex.lock();
-		if (nStreamerVotes > 0) {
-			for (int i = 0; i < aNewVotes.size(); i++) {
-				if (IsKeyJustPressed('1' + i)) {
-					OnStreamerVoteCast(i);
-				}
-			}
-		}
-		mVotingMutex.unlock();
-	}
-
-	void ActivateChatCheat() {
-		ChaosVoting::bRecordChatCheat = true;
-		ChaosVoting::bRecordChatCheatDuplicates = ChaosVoting::nNumVotingUsers <= 3; // allow duplicate effects per user if the chat is small
-	}
-
-	void DeactivateChatCheat() {
-		ChaosVoting::bRecordChatCheat = false;
-		ChaosVoting::aChatCheatUsers.clear();
-		ChaosVoting::aChatCheatEffects.clear();
-	}
+	struct ChatCheatRequest {
+		std::string username;
+		std::string message;
+	};
+	std::vector<ChatCheatRequest> aChatCheatPool;
 
 	void ProcessChatCheatRequest(const std::string& username, const std::string& message) {
 		DLLDirSetter _setdir;
@@ -411,6 +377,62 @@ namespace ChaosVoting {
 		if (auto effect = AddRunningEffect(pEffect)) {
 			effect->sUsername = username;
 		}
+	}
+
+	void Update() {
+		if (nNumVoteOptions < 2) nNumVoteOptions = 2;
+		if (nNumVoteOptions > 9) nNumVoteOptions = 9;
+
+		// first frame
+		if (aNewVotes.empty()) {
+			GenerateNewVotes();
+		}
+
+		if (!IsChaosBlocked()) { // only activate chat cheat requests if in-game so the effect condition checks can pass
+			mVotingMutex.lock();
+			auto chatCheat = aChatCheatPool;
+			mVotingMutex.unlock();
+
+			if (!chatCheat.empty()) {
+				for (auto& cheat: chatCheat) {
+					ProcessChatCheatRequest(cheat.username, cheat.message);
+				}
+
+				mVotingMutex.lock();
+				aChatCheatPool.clear();
+				mVotingMutex.unlock();
+			}
+		}
+
+		if (bRandomEffectOption && !IsRandomEffectInVotes()) {
+			AddRandomEffectToVotes();
+		}
+		if (!bRandomEffectOption && IsRandomEffectInVotes()) {
+			// remove the last member of the vote list - this is always random effect in this case
+			delete aNewVotes[aNewVotes.size()-1];
+			aNewVotes.pop_back();
+		}
+
+		mVotingMutex.lock();
+		if (nStreamerVotes > 0) {
+			for (int i = 0; i < aNewVotes.size(); i++) {
+				if (IsKeyJustPressed('1' + i)) {
+					OnStreamerVoteCast(i);
+				}
+			}
+		}
+		mVotingMutex.unlock();
+	}
+
+	void ActivateChatCheat() {
+		ChaosVoting::bRecordChatCheat = true;
+		ChaosVoting::bRecordChatCheatDuplicates = ChaosVoting::nNumVotingUsers <= 3; // allow duplicate effects per user if the chat is small
+	}
+
+	void DeactivateChatCheat() {
+		ChaosVoting::bRecordChatCheat = false;
+		ChaosVoting::aChatCheatUsers.clear();
+		ChaosVoting::aChatCheatEffects.clear();
 	}
 
 	bool IsVoteMessage(const char* messageStr) {
@@ -450,7 +472,9 @@ namespace ChaosVoting {
 			mVotingMutex.unlock();
 		}
 		else if (bRecordChatCheat) {
-			ProcessChatCheatRequest(message.prefix.user, message.parameters[1]);
+			mVotingMutex.lock();
+			aChatCheatPool.push_back({message.prefix.user, message.parameters[1]});
+			mVotingMutex.unlock();
 		}
 	}
 
