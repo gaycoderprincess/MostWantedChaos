@@ -7,6 +7,7 @@ namespace ChaosVoting {
 	bool bRandomEffectOption = false;
 	bool bCVotes = false;
 	bool bProportionalVotes = false;
+	bool bTiebreakerRandom = false;
 
 	IRCClient* pIRCClient = nullptr;
 	std::mutex mVotingMutex;
@@ -121,7 +122,7 @@ namespace ChaosVoting {
 		return totalVotes;
 	}
 
-	void TriggerHighestVotedEffect() {
+	std::vector<VotingPopup*> GetValidVotingEffects() {
 		auto votes = aNewVotes;
 		votes.clear();
 		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
@@ -129,60 +130,116 @@ namespace ChaosVoting {
 			if (CanEffectActivate(vote->pEffect)) votes.push_back(vote);
 		}
 		bSelectingEffectsForVote = false;
+		return votes;
+	}
 
-		if (votes.empty()) return;
-
-		auto voteCount = GetTotalVoteCount();
-		nNumVotingUsers = voteCount;
-
-		if (voteCount <= 0) {
-			AddRunningEffect(GetRandomEffect());
-			return;
-		}
+	std::vector<VotingPopup*> GetHighestVotedEffects() {
+		auto votes = GetValidVotingEffects();
+		if (votes.empty()) return votes;
 
 		std::sort(votes.begin(), votes.end(), [](const VotingPopup* a, const VotingPopup* b) {
 			if (nLowestWins > 0) return a->fVotePercentage < b->fVotePercentage;
 			return a->fVotePercentage > b->fVotePercentage;
 		});
 
-		bool forcedMajority = nForceMajorityVoting > 0 || nLowestWins > 0;
-		if (votes[0]->pEffect->bRigProportionalChances && CanEffectActivate(votes[0]->pEffect)) forcedMajority = true;
+		VotingPopup* highestVoted = nullptr;
+		int highestVoteCount = 0;
+		bool allOfTheAbove = false;
+
+		// check if any are all of the above first
+		for (auto& vote : votes) {
+			if (!highestVoted || highestVoteCount == vote->GetVoteCount()) {
+				if (vote->pEffect == pAllOfTheAbove) allOfTheAbove = true;
+				highestVoted = vote;
+				highestVoteCount = vote->GetVoteCount();
+			}
+		}
+
+		if (allOfTheAbove) {
+			return votes;
+		}
+		else {
+			highestVoted = nullptr;
+			highestVoteCount = 0;
+
+			std::vector<VotingPopup*> out;
+			for (auto& vote : votes) {
+				// also collect any tied votes
+				if (!highestVoted || highestVoteCount == vote->GetVoteCount()) {
+					out.push_back(vote);
+					highestVoted = vote;
+					highestVoteCount = vote->GetVoteCount();
+				}
+			}
+			return out;
+		}
+	}
+
+	std::vector<VotingPopup*> GetProportionalVotingEffects() {
+		auto votes = GetValidVotingEffects();
+		if (votes.empty()) return votes;
+
+		std::vector<VotingPopup*> proportionalPool;
+		for (auto& vote : votes) {
+			for (int i = 0; i < vote->GetVoteCount(); i++) {
+				proportionalPool.push_back(vote);
+			}
+		}
+
+		auto effect = proportionalPool[GetRandomNumber(0, proportionalPool.size())];
+		if (effect->pEffect == pAllOfTheAbove) return votes;
+		return { effect };
+	}
+
+	void TriggerHighestVotedEffect() {
+		auto voteCount = GetTotalVoteCount();
+		nNumVotingUsers = voteCount;
+		if (voteCount <= 0) {
+			AddRunningEffect(GetRandomEffect());
+			return;
+		}
 
 		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
-		if (bProportionalVotes && !forcedMajority) {
-			std::vector<VotingPopup*> effects;
-			for (auto& vote : votes) {
-				for (int i = 0; i < vote->GetVoteCount(); i++) {
-					effects.push_back(vote);
-				}
-			}
+		auto majority = GetHighestVotedEffects();
+		auto proportional = GetProportionalVotingEffects();
+		bSelectingEffectsForVote = false;
 
-			auto effect = effects[GetRandomNumber(0, effects.size())];
-			if (effect->pEffect == pAllOfTheAbove) {
-				for (auto& vote : votes) {
-					AddRunningEffect(effect->pEffect == pRandomEffect ? GetRandomEffect() : effect->pEffect);
-					effect->bEffectActivated = true;
-				}
+		if (majority.empty() && proportional.empty()) {
+			AddRunningEffect(GetRandomEffect());
+			return;
+		}
+
+		bool proportionalVoting = bProportionalVotes;
+		if (nForceMajorityVoting > 0 || nLowestWins > 0) proportionalVoting = false;
+
+		if (proportionalVoting) {
+			for (auto& vote : majority) {
+				if (vote->pEffect->bRigProportionalChances) proportionalVoting = false;
 			}
-			else {
-				AddRunningEffect(effect->pEffect == pRandomEffect ? GetRandomEffect() : effect->pEffect);
-				effect->bEffectActivated = true;
+		}
+
+		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
+		if (proportionalVoting) {
+			for (auto& vote : proportional) {
+				AddRunningEffect(vote->pEffect);
+				vote->bEffectActivated = true;
 			}
 		}
 		else {
-			bool allOfTheAbove = votes[0]->pEffect == pAllOfTheAbove;
+			bool tiebreakerRandom = bTiebreakerRandom;
+			for (auto& vote : majority) {
+				if (vote->pEffect == pAllOfTheAbove) tiebreakerRandom = false;
+			}
 
-			VotingPopup* highestVoted = nullptr;
-			int highestVoteCount = 0;
-
-			// activate highest voted activatable effect
-			for (auto& vote : votes) {
-				// also trigger any tied votes
-				if (allOfTheAbove || !highestVoted || highestVoteCount == vote->GetVoteCount()) {
-					AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
+			if (tiebreakerRandom) {
+				auto vote = majority[GetRandomNumber(0, majority.size())];
+				AddRunningEffect(vote->pEffect);
+				vote->bEffectActivated = true;
+			}
+			else {
+				for (auto& vote : majority) {
+					AddRunningEffect(vote->pEffect);
 					vote->bEffectActivated = true;
-					highestVoted = vote;
-					highestVoteCount = vote->GetVoteCount();
 				}
 			}
 		}

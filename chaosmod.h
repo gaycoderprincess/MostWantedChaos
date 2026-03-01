@@ -334,7 +334,7 @@ void ChaosLoop() {
 				ChaosVoting::TriggerHighestVotedEffect();
 			}
 			else {
-				AddRunningEffect(GetRandomEffect(cycleTimer < 5));
+				AddRunningEffect(GetRandomEffect());
 			}
 		}
 	}
@@ -377,6 +377,11 @@ void ChaosModMenu() {
 		QuickValueEditor("Voting Options", ChaosVoting::nNumVoteOptions);
 		QuickValueEditor("Two-Character Vote Command", ChaosVoting::bCVotes);
 		QuickValueEditor("Proportional Voting", ChaosVoting::bProportionalVotes);
+		if (!ChaosVoting::bProportionalVotes) {
+			if (DrawMenuOption(std::format("Tiebreaker - {}", ChaosVoting::bTiebreakerRandom ? "Randomly Pick One Effect" : "Activate All Tied Effects"))) {
+				ChaosVoting::bTiebreakerRandom = !ChaosVoting::bTiebreakerRandom;
+			}
+		}
 		QuickValueEditor("Random Effect Option", ChaosVoting::bRandomEffectOption);
 		if (ChaosVoting::IsEnabled()) {
 			QuickValueEditor("Auto-Reconnect", ChaosVoting::bAutoReconnect);

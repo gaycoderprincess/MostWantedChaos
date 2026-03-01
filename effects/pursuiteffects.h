@@ -311,6 +311,7 @@ public:
 		AddToIncompatiblityGroup("coprequest");
 		bIsRehideable = true;
 		bAbortOnConditionFailed = true;
+		bRigProportionalChances = true;
 	}
 
 	static inline std::vector<std::string> aTrafficCars = {
