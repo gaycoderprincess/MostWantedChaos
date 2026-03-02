@@ -308,8 +308,9 @@ void ChaosLoop() {
 	}
 	ProcessChaosEffectsMain(gTimer.fDeltaTime, false, false);
 
+	// just to rub it in a little
 	static bool bSMSSent = false;
-	if (!bSMSSent && nTimesBusted > 0 && IsInCareerMode() && !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
+	if (!bSMSSent && nTimesBusted > 0 && IsInCareerMode() && GetUserProfile()->TheCareerSettings.CurrentBin >= 15 && !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
 		SendSMS(98, true, true);
 		bSMSSent = true;
 	}

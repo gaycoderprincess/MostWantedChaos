@@ -482,3 +482,23 @@ public:
 		NyaHookLib::Patch<uint16_t>(0x548B55, 0x9090);
 	}
 } E_FillInbox;
+
+class Effect_RandomTextMessage : public ChaosEffect {
+public:
+	Effect_RandomTextMessage() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Ring Ring";
+		sFriendlyName = "Random Phone Call";
+		bCanQuickTrigger = false;
+	}
+
+	void InitFunction() override {
+		std::vector<int> messages;
+		for (int i = 0; i < 150; i++) {
+			auto message = &GetUserProfile()->TheCareerSettings.SMSMessages[i];
+			if (!message->IsValid()) continue;
+			if (!SMSMessage::IsVoice(message)) continue;
+			messages.push_back(i);
+		}
+		SendSMS(messages[rand()%messages.size()], !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued(), false);
+	}
+} E_RandomTextMessage;
