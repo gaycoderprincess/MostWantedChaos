@@ -465,6 +465,16 @@ void ChaosModMenu() {
 					FEPlayerCarDB::CreateNewCareerCar(GetPlayerCarDB(), car->Handle);
 				}
 			}
+			if (DrawMenuOption("Capture Car And Camera Positions")) {
+				auto cam = GetLocalPlayerCamera();
+				auto camMat = PrepareCameraMatrix(cam);
+
+				auto file = std::ofstream("camera.dat", std::ios::out | std::ios::binary);
+				file.write((char*)&camMat, sizeof(camMat));
+				file.write((char*)&cam->CurrentKey.FieldOfView, sizeof(cam->CurrentKey.FieldOfView));
+				auto file2 = std::ofstream("carrender.dat", std::ios::out | std::ios::binary);
+				file2.write((char*)&CarRender_LastMatrix, sizeof(CarRender_LastMatrix));
+			}
 			if (auto ply = GetLocalPlayer()) {
 				DrawMenuOption(std::format("IPlayer: {:X}", (uintptr_t)ply));
 				DrawMenuOption(std::format("ISimable: {:X}", (uintptr_t)ply->GetSimable()));
@@ -561,6 +571,7 @@ void ChaosModMenu() {
 			//QuickValueEditor("SceneryMove.x", SceneryMove.x);
 			//QuickValueEditor("SceneryMove.y", SceneryMove.y);
 			//QuickValueEditor("SceneryMove.z", SceneryMove.z);
+			QuickValueEditor("DanceGame::fYOffset", Effect_DanceGame::fYOffset);
 			QuickValueEditor("Scientist::rX", Effect_Scientist::rX);
 			QuickValueEditor("Scientist::rY", Effect_Scientist::rY);
 			QuickValueEditor("Scientist::rZ", Effect_Scientist::rZ);

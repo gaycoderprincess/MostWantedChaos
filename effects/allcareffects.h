@@ -531,6 +531,7 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
 } E_GroovyCars;
 
 class Effect_TeleportAllCars : public EffectBase_ActiveCarsConditional {
