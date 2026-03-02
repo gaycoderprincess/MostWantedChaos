@@ -64,6 +64,14 @@ void OnWinRace() {
 	if (plyModel.starts_with("semi")) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_SEMI"));
 	}
+	if (IsInNamedRace("16.2.1")) {
+		Achievements::AwardAchievement(GetAchievement("WIN_RACE_PROLOGUE"));
+		if (FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) <= 0) {
+			const char* preset = "M3GTRCAREERSTART";
+			NyaHelpers::CreatePinkSlipCar(preset);
+			FEPlayerCarDB::AwardRivalCar(GetPlayerCarDB(), FEngHashString(preset));
+		}
+	}
 }
 
 void PlayerInputLoop() {

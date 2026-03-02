@@ -1505,3 +1505,27 @@ public:
 	bool IsAvailable() override { return GetLocalPlayerVehicle()->GetSpeed() > TOMPS(60); }
 	bool HasTimer() override { return true; }
 } E_PlayerForceSpeedbrk;
+
+class Effect_InvinciblePlayer : public ChaosEffect {
+public:
+	Effect_InvinciblePlayer() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Invincible Player Engine";
+		fTimerLength = 120;
+		AddToFilterGroup("player_godmode");
+		bAbortOnConditionFailed = true;
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x60AB66, 0xEB);
+	}
+	void TickFunctionMain(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IDamageable>()) {
+			ply->ResetDamage();
+		}
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x60AB66, 0x74);
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override { return IsInNamedRace("16.2.1"); }
+} E_InvinciblePlayer;

@@ -29,6 +29,10 @@ void DisableKeyboardInput(bool disable) {
 	NyaHooks::InputBlockerHook::bInputsBlocked = disable;
 }
 
+auto GetUserProfile() {
+	return FEDatabase->CurrentUserProfiles[0];
+}
+
 float GetSFXVolume() {
 	return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheAudioSettings.SoundEffectsVol;
 }
@@ -631,6 +635,12 @@ bool IsInPursuitRace() {
 	if (!GRaceStatus::fObj->mRaceParms) return false;
 	if (!GRaceParameters::GetIsPursuitRace(GRaceStatus::fObj->mRaceParms)) return false;
 	return true;
+}
+
+bool IsInNamedRace(const char* eventId) {
+	if (!GRaceStatus::fObj) return false;
+	if (!GRaceStatus::fObj->mRaceParms) return false;
+	return !strcmp(GRaceParameters::GetEventID(GRaceStatus::fObj->mRaceParms), eventId);
 }
 
 bool IsPlayerApproachingOldBridge() {
