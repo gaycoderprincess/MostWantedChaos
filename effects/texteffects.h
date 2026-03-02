@@ -141,6 +141,7 @@ public:
 		fTimerLength = 120;
 		nFrequency *= 4;
 		bCanMultiTrigger = true;
+		bSaveStateToDisk = true;
 	}
 
 	void InitFunction() override {

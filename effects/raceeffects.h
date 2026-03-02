@@ -195,6 +195,7 @@ public:
 		bAbortOnConditionFailed = true;
 		bCanQuickTrigger = false;
 		bRigProportionalChances = true;
+		bSaveStateToDisk = true;
 	}
 
 	void InitFunction() override {

@@ -20,6 +20,7 @@ public:
 	bool bCanMultiTrigger = false; // multiple instances at once
 	bool bInitImmediately = false; // run initfunction immediately instead of waiting for the next effect tick
 	bool bEpilepsyWarning = false;
+	bool bSaveStateToDisk = false;
 
 	std::time_t LastTriggerTime = 0;
 	uint32_t nTotalTimesActivated = 0;
@@ -231,7 +232,8 @@ public:
 		pEffect->EffectInstance = nullptr;
 	}
 };
-static inline std::vector<ChaosEffectInstance> aRunningEffects;
+std::vector<ChaosEffectInstance> aRunningEffects;
+std::vector<ChaosEffect*> aEffectsFromSavegame;
 
 void DoChaosSave();
 void DoChaosLoad();
@@ -292,9 +294,9 @@ bool CanEffectActivate(ChaosEffect* effect) {
 	return true;
 }
 
-ChaosEffectInstance* AddRunningEffect(ChaosEffect* effect) {
+ChaosEffectInstance* AddRunningEffect(ChaosEffect* effect, bool ignoreConditions = false) {
 	if (!effect->bCanMultiTrigger && GetEffectRunning(effect)) return nullptr;
-	if (!CanEffectActivate(effect)) return nullptr;
+	if (!ignoreConditions && !CanEffectActivate(effect)) return nullptr;
 
 	effect->bTriggeredThisCycle = true;
 	effect->LastTriggerTime = std::time(0);
@@ -303,7 +305,7 @@ ChaosEffectInstance* AddRunningEffect(ChaosEffect* effect) {
 	WriteLog(std::format("Activating {}", effect->sName));
 
 	auto running = &aRunningEffects[aRunningEffects.size()-1];
-	if (running->pEffect->bInitImmediately) {
+	if (ignoreConditions || running->pEffect->bInitImmediately) {
 		running->pEffect->InitFunction();
 		running->bFirstFrame = false;
 	}

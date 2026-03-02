@@ -243,6 +243,7 @@ public:
 		AddToIncompatiblityGroup("coprequest");
 		bIsRehideable = true;
 		bAbortOnConditionFailed = true;
+		bSaveStateToDisk = true;
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -284,6 +285,7 @@ public:
 		AddToIncompatiblityGroup("coprequest");
 		bIsRehideable = true;
 		bAbortOnConditionFailed = true;
+		bSaveStateToDisk = true;
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -312,6 +314,7 @@ public:
 		bIsRehideable = true;
 		bAbortOnConditionFailed = true;
 		bRigProportionalChances = true;
+		bSaveStateToDisk = true;
 	}
 
 	static inline std::vector<std::string> aTrafficCars = {

@@ -7,6 +7,13 @@ struct tObjectSaveWithCol {
 	UMath::Vector3 colPos;
 };
 
+int GetEffectIDForSave(ChaosEffect* effect) {
+	for (auto& tmp : ChaosEffect::aEffects) {
+		if (tmp == effect) return &tmp - &ChaosEffect::aEffects[0];
+	}
+	return -1;
+}
+
 bool DoChaosEffectSave() {
 	std::ofstream file("CwoeeChaos/save/effects.sav", std::iostream::out | std::iostream::binary);
 	if (!file.is_open()) return false;
@@ -19,6 +26,18 @@ bool DoChaosEffectSave() {
 		file.write((char*)&effect->LastTriggerTime, sizeof(effect->LastTriggerTime));
 		file.write((char*)&effect->nTotalTimesActivated, sizeof(effect->nTotalTimesActivated));
 	}
+
+	std::vector<int> effects;
+	for (auto& effect : aRunningEffects) {
+		if (!effect.IsActive()) continue;
+		if (!effect.pEffect->bSaveStateToDisk) continue;
+		if (effect.fTimer < 3) continue;
+		effects.push_back(GetEffectIDForSave(effect.pEffect));
+	}
+
+	num = effects.size();
+	file.write((char*)&num, sizeof(num));
+	file.write((char*)&effects[0], sizeof(effects[0])*effects.size());
 	return true;
 }
 
@@ -34,6 +53,17 @@ void DoChaosEffectLoad() {
 		file.read((char*)&effect->bTriggeredThisCycle, sizeof(effect->bTriggeredThisCycle));
 		file.read((char*)&effect->LastTriggerTime, sizeof(effect->LastTriggerTime));
 		file.read((char*)&effect->nTotalTimesActivated, sizeof(effect->nTotalTimesActivated));
+	}
+
+	num = 0;
+	file.read((char*)&num, sizeof(num));
+	for (int i = 0; i < num; i++) {
+		int id = -1;
+		file.read((char*)&id, sizeof(id));
+		if (id < 0 || id >= ChaosEffect::aEffects.size()) return;
+		auto effect = ChaosEffect::aEffects[id];
+		aEffectsFromSavegame.push_back(effect);
+		WriteLog(std::format("Loading {}", effect->sName));
 	}
 }
 

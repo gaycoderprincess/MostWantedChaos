@@ -307,6 +307,11 @@ void ChaosLoop() {
 		AddRunningEffect(&SplashEffect);
 	}
 
+	for (auto& effect : aEffectsFromSavegame) {
+		AddRunningEffect(effect, true);
+	}
+	aEffectsFromSavegame.clear();
+
 	if (bTimerEnabled) {
 		static ChaosEffect ActiveEffect("DUMMY", true);
 		if (!ActiveEffect.sName) {
