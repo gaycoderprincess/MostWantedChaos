@@ -236,6 +236,28 @@ bool IsInLoadingScreen() {
 	return false;
 }
 
+bool IsInSplashScreenOrIntros() {
+	if (TheGameFlowManager.CurrentGameFlowState < GAMEFLOW_STATE_IN_FRONTEND) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "LS_EA_hidef.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_LS_EA_hidef.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "LS_EALogo.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_LS_EALogo.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "LS_PSA.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_LS_PSA.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "MW_LS_AttractFMV.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_MW_LS_AttractFMV.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "MW_LS_Splash.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_MW_LS_Splash.fng")) return true;
+
+	// savegame selection
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Main.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Main_GC.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Bootup.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Bootup_GC.fng")) return true;
+	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_List.fng")) return true;
+	return false;
+}
+
 bool IsInNIS() {
 	return INIS::mInstance && INIS::mInstance->IsPlaying();
 }

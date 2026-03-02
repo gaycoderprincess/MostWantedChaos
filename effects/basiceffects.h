@@ -303,6 +303,7 @@ public:
 	Effect_SFXBody() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Occasional Backstreet Boys";
 		fTimerLength = 120;
+		bSaveStateToDisk = true;
 	}
 
 	double timer = 0;

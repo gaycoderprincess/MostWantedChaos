@@ -233,7 +233,8 @@ public:
 	}
 };
 std::vector<ChaosEffectInstance> aRunningEffects;
-std::vector<ChaosEffect*> aEffectsFromSavegame;
+std::vector<ChaosEffect*> aEffectsFromSavegameIngame;
+std::vector<ChaosEffect*> aEffectsFromSavegameInstant;
 
 void DoChaosSave();
 void DoChaosLoad();

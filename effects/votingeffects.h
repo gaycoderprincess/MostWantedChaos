@@ -72,6 +72,7 @@ public:
 		nFrequency *= 2;
 		fCycleTimeMultiplier = 2;
 		bCanQuickTrigger = false;
+		bSaveStateToDisk = true;
 	}
 
 	static inline int max = 5;

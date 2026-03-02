@@ -292,6 +292,15 @@ void ChaosLoop() {
 	}
 	bRNGCycles = !ChaosVoting::IsEnabled();
 
+	if (IsInSplashScreenOrIntros()) {
+		return;
+	}
+
+	for (auto& effect : aEffectsFromSavegameInstant) {
+		AddRunningEffect(effect);
+	}
+	aEffectsFromSavegameInstant.clear();
+
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 		ProcessChaosEffectsMain(gTimer.fDeltaTime, inMenu, !inMenu);
@@ -307,10 +316,10 @@ void ChaosLoop() {
 		AddRunningEffect(&SplashEffect);
 	}
 
-	for (auto& effect : aEffectsFromSavegame) {
+	for (auto& effect : aEffectsFromSavegameIngame) {
 		AddRunningEffect(effect, true);
 	}
-	aEffectsFromSavegame.clear();
+	aEffectsFromSavegameIngame.clear();
 
 	if (bTimerEnabled) {
 		static ChaosEffect ActiveEffect("DUMMY", true);
@@ -669,6 +678,19 @@ void ChaosModMenu() {
 
 					fout << effect->GetFriendlyName();
 					if (effect->sFriendlyName) fout << std::format(" ({})", effect->sName);
+					fout << "\n";
+				}
+			}
+		}
+
+		if (DrawMenuOption("Dump Cheat Codes")) {
+			std::ofstream fout("cwoee_cheat_codes.txt", std::ios::out);
+			if (fout.is_open()) {
+				for (auto& effect : ChaosEffect::aEffects) {
+					if (!effect->bCanQuickTrigger) continue;
+
+					fout << effect->GetCheatCode(true);
+					if (effect->sFriendlyName) fout << std::format(" ({})", effect->GetCheatCode(false));
 					fout << "\n";
 				}
 			}

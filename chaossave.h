@@ -62,7 +62,12 @@ void DoChaosEffectLoad() {
 		file.read((char*)&id, sizeof(id));
 		if (id < 0 || id >= ChaosEffect::aEffects.size()) return;
 		auto effect = ChaosEffect::aEffects[id];
-		aEffectsFromSavegame.push_back(effect);
+		if (!effect->bAbortOnConditionFailed && effect->RunInMenus()) {
+			aEffectsFromSavegameInstant.push_back(effect);
+		}
+		else {
+			aEffectsFromSavegameIngame.push_back(effect);
+		}
 		WriteLog(std::format("Loading {}", effect->sName));
 	}
 }

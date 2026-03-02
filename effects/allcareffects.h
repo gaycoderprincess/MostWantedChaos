@@ -486,6 +486,7 @@ public:
 		//sFriendlyName = "Groovy Cars";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("car_scale");
+		bSaveStateToDisk = true;
 	}
 
 	NyaAudio::NyaSound sound = 0;
