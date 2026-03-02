@@ -224,7 +224,7 @@ namespace ChaosVoting {
 		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
 		if (proportionalVoting) {
 			for (auto& vote : proportional) {
-				AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : pRandomEffect);
+				AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
 				vote->bEffectActivated = true;
 			}
 		}
@@ -236,12 +236,12 @@ namespace ChaosVoting {
 
 			if (tiebreakerRandom) {
 				auto vote = majority[GetRandomNumber(0, majority.size())];
-				AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : pRandomEffect);
+				AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
 				vote->bEffectActivated = true;
 			}
 			else {
 				for (auto& vote : majority) {
-					AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : pRandomEffect);
+					AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
 					vote->bEffectActivated = true;
 				}
 			}
