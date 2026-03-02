@@ -13,6 +13,7 @@ public:
 	int nFrequency = 10; // 10 is standard, make this higher or lower to make an effect more or less likely to appear
 	float fCycleTimeMultiplier = 1; // multiplier * 60 minutes before the effect can activate again
 	bool bRigProportionalChances = false; // always activate if it's the highest voted, even in proportional voting
+	bool bRigAgainstProportionalChances = false; // only activate if it's the highest voted, even in proportional voting
 	bool bIsRehideable = false; // hide even after initfunction has run if the conditions aren't met anymore
 	bool bAbortOnConditionFailed = false;
 	bool bIgnoreHUDState = false; // display even when disable chaos hud is active

@@ -555,6 +555,7 @@ bool IsChaosBlocked() {
 	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return true;
 	if (IsInLoadingScreen() || IsInNIS() || IsInMovie()) return true;
 	if (FEManager::mPauseRequest) return true;
+	if (PhotoFinishScreen::mActive) return true;
 	return false;
 }
 
@@ -620,6 +621,12 @@ NyaVec3 GetRelativeCarOffset(IVehicle* veh, NyaVec3 v) {
 	UMath::Matrix4 mat;
 	GetLocalPlayerInterface<IRigidBody>()->GetMatrix4(&mat);
 	return mat.Invert() * v;
+}
+
+bool IsInAnyRace() {
+	if (!GRaceStatus::fObj) return false;
+	if (!GRaceStatus::fObj->mRaceParms) return false;
+	return true;
 }
 
 // returns false in pursuit races
@@ -734,6 +741,13 @@ const char* GetReplacedAICarName(const std::string& aiCar, bool includeOriginalC
 
 bool PercentageChanceCheck(int percent) {
 	return rand() % 100 < percent;
+}
+
+void SendSMS(int id, bool popup, bool once) {
+	if (once && GetUserProfile()->TheCareerSettings.SMSMessages[id].IsInInbox()) return;
+
+	if (popup) return GManager::AddSMS(GManager::mObj, id);
+	return GManager::DispatchSMSMessage(GManager::mObj, id);
 }
 
 wchar_t gDLLDir[MAX_PATH];

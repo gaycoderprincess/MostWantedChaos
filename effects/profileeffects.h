@@ -346,12 +346,14 @@ public:
 } E_AddRandomBonusMarker;
 
 // todo this breaks speedtraps and milestones
-/*class Effect_SkipChance : public ChaosEffect {
+class Effect_SkipChance : public ChaosEffect {
 public:
 	bool chanceFired = false;
 
 	Effect_SkipChance() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "10% Chance Of Boss Skip";
+		sName = "15% Chance Of Boss Skip";
+		bAbortOnConditionFailed = true;
+		bIgnoreHUDState = true;
 	}
 
 	void InitFunction() override {
@@ -359,9 +361,11 @@ public:
 	}
 	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
-			if (PercentageChanceCheck(10)) {
-				FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin--;
-				aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng"); });
+			if (PercentageChanceCheck(15)) {
+				aMainLoopFunctionsOnce.push_back([]() {
+					EEnterBin::Create(FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin - 1);
+					EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng");
+				});
 				EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
 			}
 			else {
@@ -373,10 +377,9 @@ public:
 	bool IsAvailable() override {
 		return FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > 1;
 	}
-	bool IsConditionallyAvailable() override { return true; }
-	bool AbortOnConditionFailed() override { return true; }
-	bool IgnoreHUDState() override { return true; }
-} E_SkipChance;*/
+	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_SkipChance;
 
 class Effect_SkipMusic : public ChaosEffect {
 public:
@@ -468,3 +471,14 @@ public:
 		}
 	}
 } E_SubtractBounty;
+
+class Effect_FillInbox : public EffectBase_CareerConditional {
+public:
+	Effect_FillInbox() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Fill SMS Mailbox";
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch<uint16_t>(0x548B55, 0x9090);
+	}
+} E_FillInbox;

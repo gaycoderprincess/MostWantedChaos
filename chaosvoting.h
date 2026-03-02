@@ -213,6 +213,9 @@ namespace ChaosVoting {
 		if (nForceMajorityVoting > 0 || nLowestWins > 0) proportionalVoting = false;
 
 		if (proportionalVoting) {
+			for (auto& vote : proportional) {
+				if (vote->pEffect->bRigAgainstProportionalChances) proportionalVoting = false;
+			}
 			for (auto& vote : majority) {
 				if (vote->pEffect->bRigProportionalChances) proportionalVoting = false;
 			}
@@ -226,7 +229,7 @@ namespace ChaosVoting {
 			}
 		}
 		else {
-			bool tiebreakerRandom = bTiebreakerRandom;
+			bool tiebreakerRandom = bTiebreakerRandom && !bProportionalVotes;
 			for (auto& vote : majority) {
 				if (vote->pEffect == pAllOfTheAbove) tiebreakerRandom = false;
 			}

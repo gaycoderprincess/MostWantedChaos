@@ -466,3 +466,15 @@ public:
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_Credits;
+
+class Effect_SFXHotshot : public ChaosEffect {
+public:
+	Effect_SFXHotshot() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Hey Hotshot!";
+		sFriendlyName = "Hey Hotshot! (Sound Effect)";
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([](){ SendSMS(95, false, false); });
+	}
+} E_SFXHotshot;

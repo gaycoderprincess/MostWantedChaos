@@ -689,3 +689,35 @@ public:
 	}
 	bool HasTimer() override { return GetActiveVehicles(DRIVER_RACER).size() >= 10; }
 } E_Opponents16;*/
+
+/*class Effect_FinishRace : public EffectBase_InRaceConditional {
+public:
+	Effect_FinishRace() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Win Current Race";
+		bAbortOnConditionFailed = true;
+		bRigAgainstProportionalChances = true;
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([](){
+			Game_NotifyRaceFinished(GetLocalPlayerSimable());
+			FE_ShowPostRaceScreen(true);
+		});
+	}
+} E_FinishRace;*/
+
+class Effect_FinishRaceFake : public EffectBase_InRaceConditional {
+public:
+	Effect_FinishRaceFake() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Fake Win Current Race";
+		bAbortOnConditionFailed = true;
+		bRigProportionalChances = true;
+	}
+
+	void InitFunction() override {
+		aMainLoopFunctionsOnce.push_back([](){ FE_ShowPostRaceScreen(true); });
+	}
+	void TickFunctionMain(double delta) override {
+
+	}
+} E_FinishRaceFake;

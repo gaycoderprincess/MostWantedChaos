@@ -308,6 +308,12 @@ void ChaosLoop() {
 	}
 	ProcessChaosEffectsMain(gTimer.fDeltaTime, false, false);
 
+	static bool bSMSSent = false;
+	if (!bSMSSent && nTimesBusted > 0 && IsInCareerMode() && !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
+		SendSMS(98, true, true);
+		bSMSSent = true;
+	}
+
 	static ChaosEffect SplashEffect("DUMMY", true);
 	if (!SplashEffect.sName) {
 		static char tmp[256];
@@ -443,6 +449,7 @@ void ChaosModMenu() {
 			}
 			ChloeMenuLib::EndMenu();
 		}
+		DrawMenuOption(std::format("Times Busted - {}", nTimesBusted));
 		ChloeMenuLib::EndMenu();
 	}
 
@@ -474,6 +481,21 @@ void ChaosModMenu() {
 				file.write((char*)&cam->CurrentKey.FieldOfView, sizeof(cam->CurrentKey.FieldOfView));
 				auto file2 = std::ofstream("carrender.dat", std::ios::out | std::ios::binary);
 				file2.write((char*)&CarRender_LastMatrix, sizeof(CarRender_LastMatrix));
+			}
+			if (DrawMenuOption("SMS Inbox")) {
+				ChloeMenuLib::BeginMenu();
+
+				for (int i = 0; i < 150; i++) {
+					auto content = FEngHashString(std::format("SMS_MESSAGE_{}", i).c_str());
+					auto from = FEngHashString(std::format("SMS_MESSAGE_{}_FROM", i).c_str());
+					auto subject = FEngHashString(std::format("SMS_MESSAGE_{}_SUBJECT", i).c_str());
+					DrawMenuOption(std::format("Message {}", i));
+					DrawMenuOption(std::format("From: {}", GetLocalizedString(from)));
+					DrawMenuOption(std::format("Subject: {}", GetLocalizedString(subject)));
+					//DrawMenuOption(GetLocalizedString(content));
+				}
+
+				ChloeMenuLib::EndMenu();
 			}
 			if (auto ply = GetLocalPlayer()) {
 				DrawMenuOption(std::format("IPlayer: {:X}", (uintptr_t)ply));
