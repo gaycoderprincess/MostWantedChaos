@@ -362,6 +362,9 @@ public:
 	void TickFunctionMain(double delta) override {
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
 			if (PercentageChanceCheck(15)) {
+				if (FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) <= 0) {
+					GivePinkSlipCar("M3GTRCAREERSTART");
+				}
 				aMainLoopFunctionsOnce.push_back([]() {
 					EEnterBin::Create(FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin - 1);
 					EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng");
@@ -375,11 +378,50 @@ public:
 		}
 	}
 	bool IsAvailable() override {
-		return FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > 1;
+		return FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > 1 && IsInCareerMode();
 	}
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_SkipChance;
+
+class Effect_SkipChance2 : public ChaosEffect {
+public:
+	bool chanceFired = false;
+
+	Effect_SkipChance2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "1% Chance Of Boss Skip To Razor";
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
+		bIgnoreHUDState = true;
+	}
+
+	void InitFunction() override {
+		chanceFired = false;
+	}
+	void TickFunctionMain(double delta) override {
+		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
+			if (PercentageChanceCheck(1)) {
+				if (FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) <= 0) {
+					GivePinkSlipCar("M3GTRCAREERSTART");
+				}
+				aMainLoopFunctionsOnce.push_back([]() {
+					EEnterBin::Create(1);
+					EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng");
+				});
+				EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
+			}
+			else {
+				EffectInstance->sNameToDisplay = std::format("{} (Failed)", sName);
+			}
+			chanceFired = true;
+		}
+	}
+	bool IsAvailable() override {
+		return FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > 1 && IsInCareerMode();
+	}
+	bool RunInMenus() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_SkipChance2;
 
 class Effect_SkipMusic : public ChaosEffect {
 public:

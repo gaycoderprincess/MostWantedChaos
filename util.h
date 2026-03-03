@@ -750,6 +750,11 @@ void SendSMS(int id, bool popup, bool once) {
 	return GManager::DispatchSMSMessage(GManager::mObj, id);
 }
 
+void GivePinkSlipCar(const char* preset) {
+	NyaHelpers::CreatePinkSlipCar(preset);
+	FEPlayerCarDB::AwardRivalCar(GetPlayerCarDB(), FEngHashString(preset));
+}
+
 wchar_t gDLLDir[MAX_PATH];
 class DLLDirSetter {
 public:
