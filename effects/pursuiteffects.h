@@ -358,6 +358,35 @@ public:
 	bool HasTimer() override { return true; }
 } E_RuthlessCopTraffic;
 
+class Effect_RuthlessCopTruck : public EffectBase_PursuitConditional {
+public:
+	Effect_RuthlessCopTruck() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Cops Drive Trucks";
+		fTimerLength = 120;
+		AddToIncompatiblityGroup("coprequest");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
+		bRigProportionalChances = true;
+		bSaveStateToDisk = true;
+	}
+
+	// cop semis with trailers crash the game
+	static const char* __thiscall CopRequestHooked(IPursuit* pThis) {
+		if (GetActiveVehicles(DRIVER_COP).size() >= 32) return nullptr;
+		return "semi";
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch(0x8927C0, &CopRequestHooked);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x9090);
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch(0x8927C0, 0x42BA50);
+		NyaHookLib::Patch<uint16_t>(0x43EB90, 0x517D);
+	}
+	bool HasTimer() override { return true; }
+} E_RuthlessCopTruck;
+
 class Effect_NoCopSpawns : public EffectBase_PursuitConditional {
 public:
 	Effect_NoCopSpawns() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {

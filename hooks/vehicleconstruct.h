@@ -1,7 +1,6 @@
 uint32_t ForcedPlayerVehicle = 0;
 std::string ForcedPlayerVehicleModel;
 uint32_t ForcedOpponentVehicle = 0;
-uint32_t ForcedTrafficVehicle = 0;
 bool PlayerFullyTuned = false;
 bool OpponentsFullyTuned = false;
 bool RandomizePlayerTuning = false;
@@ -113,10 +112,6 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 			*vehicle->customization = NyaHelpers::CreateRandomCarCustomizations(vehicle->carType);
 		}
 	}
-	if (vehicle->carClass == DRIVER_TRAFFIC && ForcedTrafficVehicle) {
-		vehicle->carType = ForcedTrafficVehicle;
-		vehicle->customization = nullptr;
-	}
 	auto simable = PVehicle::Construct(params);
 	if (modelBackup) {
 		auto model = GetPVehicleModelPointer(modelBackupHash);
@@ -141,6 +136,10 @@ UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attr
 			result->mCRC = Attrib::StringHash32("DamageCopCar");
 			return result;
 		}
+		if (mechanic == &BEHAVIOR_MECHANIC_RIGIDBODY) {
+			result->mCRC = Attrib::StringHash32("RBVehicle");
+			return result;
+		}
 	}
 	return PVehicle::LookupBehaviorSignature(pThis, result, mechanic);
 }
@@ -151,6 +150,7 @@ ChloeHook Hook_VehicleConstruct([]() {
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6855F6, &CarBehaviorHooked);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6856C2, &CarBehaviorHooked);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x68554E, &CarBehaviorHooked);
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x685363, &CarBehaviorHooked);
 
 	// use SuspensionRacer instead of SuspensionSimple for racers - fixes popped tire behavior
 	NyaHookLib::Patch(0x6380CB + 1, "SuspensionRacer");

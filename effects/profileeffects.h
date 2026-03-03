@@ -335,8 +335,7 @@ public:
 				}
 			}
 			else {
-				NyaHelpers::CreatePinkSlipCar(ride.preset);
-				FEPlayerCarDB::AwardRivalCar(GetPlayerCarDB(), FEngHashString(ride.preset));
+				GivePinkSlipCar(ride.preset);
 			}
 		}
 		else {
@@ -363,7 +362,9 @@ public:
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
 			if (PercentageChanceCheck(15)) {
 				if (FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) <= 0) {
-					GivePinkSlipCar("M3GTRCAREERSTART");
+					if (auto record = GivePinkSlipCar("M3GTRCAREERSTART")) {
+						GetUserProfile()->TheCareerSettings.CurrentCar = record->Handle;
+					}
 				}
 				aMainLoopFunctionsOnce.push_back([]() {
 					EEnterBin::Create(FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin - 1);
@@ -392,6 +393,7 @@ public:
 		sName = "1% Chance Of Boss Skip To Razor";
 		bAbortOnConditionFailed = true;
 		bCanQuickTrigger = false;
+		bRigAgainstProportionalChances = true;
 		bIgnoreHUDState = true;
 	}
 
@@ -402,7 +404,9 @@ public:
 		if (!chanceFired && EffectInstance->fTimer < fTimerLength - 3) {
 			if (PercentageChanceCheck(1)) {
 				if (FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) <= 0) {
-					GivePinkSlipCar("M3GTRCAREERSTART");
+					if (auto record = GivePinkSlipCar("M3GTRCAREERSTART")) {
+						GetUserProfile()->TheCareerSettings.CurrentCar = record->Handle;
+					}
 				}
 				aMainLoopFunctionsOnce.push_back([]() {
 					EEnterBin::Create(1);

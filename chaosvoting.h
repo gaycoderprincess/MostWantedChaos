@@ -12,6 +12,8 @@ namespace ChaosVoting {
 	IRCClient* pIRCClient = nullptr;
 	std::mutex mVotingMutex;
 
+	ChaosEffect* pRandomEffect = nullptr;
+
 	class VotingPopup {
 	public:
 		ChaosUIPopup Popup;
@@ -24,6 +26,10 @@ namespace ChaosVoting {
 		bool bEffectActivated = false;
 
 		VotingPopup(ChaosEffect* effect) : pEffect(effect) {}
+
+		ChaosEffect* GetEffect() {
+			return pEffect == pRandomEffect ? GetRandomEffect() : pEffect;
+		}
 
 		int GetVoteCount() {
 			return aVotes.size() + (bVotedByStreamer * 9999);
@@ -46,7 +52,6 @@ namespace ChaosVoting {
 	int nAddVotingOption = 0;
 	int nForceMajorityVoting = 0;
 	ChaosEffect* pAllOfTheAbove = nullptr;
-	ChaosEffect* pRandomEffect = nullptr;
 
 	bool bSelectingEffectsForVote = false;
 
@@ -224,7 +229,7 @@ namespace ChaosVoting {
 		bSelectingEffectsForVote = true; // to make sure voting-only effects can activate
 		if (proportionalVoting) {
 			for (auto& vote : proportional) {
-				AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
+				AddRunningEffect(vote->GetEffect());
 				vote->bEffectActivated = true;
 			}
 		}
@@ -236,12 +241,12 @@ namespace ChaosVoting {
 
 			if (tiebreakerRandom) {
 				auto vote = majority[GetRandomNumber(0, majority.size())];
-				AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
+				AddRunningEffect(vote->GetEffect());
 				vote->bEffectActivated = true;
 			}
 			else {
 				for (auto& vote : majority) {
-					AddRunningEffect(vote->pEffect == pRandomEffect ? GetRandomEffect() : vote->pEffect);
+					AddRunningEffect(vote->GetEffect());
 					vote->bEffectActivated = true;
 				}
 			}

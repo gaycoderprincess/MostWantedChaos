@@ -110,45 +110,83 @@ public:
 	bool AbortOnConditionFailed() override { return true; }
 } E_OpponentsJunkman;*/
 
-// pretty lame, also reduces traffic density
-/*class Effect_AllTrafficPizza : public ChaosEffect {
+class Effect_AllTrafficPizza : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_AllTrafficPizza() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_AllTrafficPizza() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "All Traffic Is TRAFPIZZA";
-		fTimerLength = 240;
+		fTimerLength = 120;
 		AddToIncompatiblityGroup("traffic_car_model");
+		bIsRehideable = true;
 	}
 
-	void TickFunctionMain(double delta) override {
-		ForcedTrafficVehicle = Attrib::StringHash32("trafpizza");
+	static uint32_t __thiscall TrafficNextSpawnHooked(AITrafficManager* pThis) {
+		return Attrib::StringHash32("trafpizza");
+	}
 
+	void InitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x439A44, &TrafficNextSpawnHooked);
+	}
+	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles(DRIVER_TRAFFIC);
 		for (auto& car : cars) {
-			if (strcmp(car->GetVehicleName(), "trafpizza")) car->mCOMObject->Find<ISimable>()->Kill();
+			if (!strcmp(car->GetVehicleName(), "trafpizza")) continue;
+			car->mCOMObject->Find<ISimable>()->Kill();
 		}
 	}
 	void DeinitFunction() override {
-		ForcedTrafficVehicle = 0;
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x439A44, 0x426230);
 	}
 	bool HasTimer() override { return true; }
-} E_AllTrafficPizza;*/
+} E_AllTrafficPizza;
 
-/*class Effect_AllTrafficTruck : public ChaosEffect {
+class Effect_AllTrafficTruck : public EffectBase_ActiveTrafficConditional {
 public:
-	Effect_AllTrafficTruck() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_AllTrafficTruck() : EffectBase_ActiveTrafficConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "All Traffic Is Trucks";
-		fTimerLength = 240;
-		IncompatibilityGroups.push_back(Attrib::StringHash32("traffic_car_model");
+		fTimerLength = 120;
+		AddToIncompatiblityGroup("traffic_car_model");
+		bIsRehideable = true;
 	}
 
+	static inline std::vector<std::string> aTrafficCars = {
+			"semia",
+			"semib",
+			"semicmt",
+			"semicon",
+			"semicrate",
+			"semilog",
+	};
+
+	static uint32_t __thiscall TrafficNextSpawnHooked(AITrafficManager* pThis) {
+		return Attrib::StringHash32(aTrafficCars[rand()%aTrafficCars.size()].c_str());
+	}
+
+	void InitFunction() override {
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x439A44, &TrafficNextSpawnHooked);
+	}
 	void TickFunctionMain(double delta) override {
-		ForcedTrafficVehicle = Attrib::StringHash32("semicrate");
+		auto cars = GetActiveVehicles(DRIVER_TRAFFIC);
+		for (auto& car : cars) {
+			if (!strcmp(car->GetVehicleName(), "semia")) continue;
+			if (!strcmp(car->GetVehicleName(), "semib")) continue;
+			if (!strcmp(car->GetVehicleName(), "semicmt")) continue;
+			if (!strcmp(car->GetVehicleName(), "semicon")) continue;
+			if (!strcmp(car->GetVehicleName(), "semicrate")) continue;
+			if (!strcmp(car->GetVehicleName(), "semilog")) continue;
+			if (!strcmp(car->GetVehicleName(), "trailera")) continue;
+			if (!strcmp(car->GetVehicleName(), "trailerb")) continue;
+			if (!strcmp(car->GetVehicleName(), "trailercmt")) continue;
+			if (!strcmp(car->GetVehicleName(), "trailercon")) continue;
+			if (!strcmp(car->GetVehicleName(), "trailercrate")) continue;
+			if (!strcmp(car->GetVehicleName(), "trailerlog")) continue;
+			car->mCOMObject->Find<ISimable>()->Kill();
+		}
 	}
 	void DeinitFunction() override {
-		ForcedTrafficVehicle = 0;
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x439A44, 0x426230);
 	}
 	bool HasTimer() override { return true; }
-} E_AllTrafficTruck;*/
+} E_AllTrafficTruck;
 
 class Effect_PlayerCarCopCorvette : public EffectBase_TriggerInMenu {
 public:

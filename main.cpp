@@ -68,7 +68,9 @@ void OnWinRace() {
 	if (IsInNamedRace("16.2.1")) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_PROLOGUE"));
 		if (FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) <= 0) {
-			GivePinkSlipCar("M3GTRCAREERSTART");
+			if (auto record = GivePinkSlipCar("M3GTRCAREERSTART")) {
+				GetUserProfile()->TheCareerSettings.CurrentCar = record->Handle;
+			}
 		}
 	}
 }
