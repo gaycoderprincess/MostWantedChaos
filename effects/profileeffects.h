@@ -352,6 +352,7 @@ public:
 	Effect_SkipChance() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "15% Chance Of Boss Skip";
 		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 		bIgnoreHUDState = true;
 	}
 
