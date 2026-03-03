@@ -126,6 +126,7 @@ public:
 	Effect_RestartRace() : EffectBase_InAnyRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Restart Event";
 		bAbortOnConditionFailed = true;
+		bRigProportionalChances = true;
 	}
 
 	void InitFunction() override {
@@ -690,11 +691,13 @@ public:
 	bool HasTimer() override { return GetActiveVehicles(DRIVER_RACER).size() >= 10; }
 } E_Opponents16;*/
 
+// doesn't continue cuz of lua crap
 /*class Effect_FinishRace : public EffectBase_InRaceConditional {
 public:
 	Effect_FinishRace() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Win Current Race";
 		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 		bRigAgainstProportionalChances = true;
 	}
 
@@ -706,11 +709,13 @@ public:
 	}
 } E_FinishRace;*/
 
-class Effect_FinishRaceFake : public EffectBase_InRaceConditional {
+// does too much related to winning the race, will actually win boss races, too buggy
+/*class Effect_FinishRaceFake : public EffectBase_InRaceConditional {
 public:
 	Effect_FinishRaceFake() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Fake Win Current Race";
 		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 		bRigProportionalChances = true;
 	}
 
@@ -720,4 +725,7 @@ public:
 	void TickFunctionMain(double delta) override {
 
 	}
-} E_FinishRaceFake;
+	void DeinitFunction() override {
+
+	}
+} E_FinishRaceFake;*/

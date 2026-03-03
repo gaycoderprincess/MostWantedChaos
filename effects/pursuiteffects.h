@@ -244,6 +244,7 @@ public:
 		bIsRehideable = true;
 		bAbortOnConditionFailed = true;
 		bSaveStateToDisk = true;
+		bRigProportionalChances = true;
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {
@@ -286,6 +287,7 @@ public:
 		bIsRehideable = true;
 		bAbortOnConditionFailed = true;
 		bSaveStateToDisk = true;
+		bRigProportionalChances = true;
 	}
 
 	static const char* __thiscall CopRequestHooked(void* pThis) {

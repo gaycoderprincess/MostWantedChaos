@@ -20,6 +20,7 @@ public:
 		DrawRectangle(0, 1, 0, 1, {0,0,0,255});
 	}
 	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; } // run in the pause menu but not main menu
 } E_Blind;
 
 class Effect_Flash : public ChaosEffect {

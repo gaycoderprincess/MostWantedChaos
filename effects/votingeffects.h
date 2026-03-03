@@ -51,6 +51,7 @@ public:
 	static inline int max = 3;
 
 	void InitFunction() override {
+		CwoeeHints::AddHint("Press 1, 2, 3 or 4 to vote for an effect!");
 		ChaosVoting::nStreamerVotes = max;
 	}
 	void TickFunctionMain(double delta) override {
