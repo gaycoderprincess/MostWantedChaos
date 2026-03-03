@@ -345,7 +345,6 @@ public:
 	}
 } E_AddRandomBonusMarker;
 
-// todo this breaks speedtraps and milestones
 class Effect_SkipChance : public ChaosEffect {
 public:
 	bool chanceFired = false;
