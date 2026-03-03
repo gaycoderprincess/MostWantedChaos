@@ -120,6 +120,8 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 	return simable;
 }
 
+const char* pForceCopSuspension = nullptr;
+const char* pForceCopDamage = nullptr;
 UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attrib::StringKey* mechanic) {
 	if (pThis->mDriverClass == DRIVER_HUMAN) {
 		if (mechanic == &BEHAVIOR_MECHANIC_RESET) {
@@ -133,11 +135,15 @@ UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attr
 	}
 	if (pThis->mDriverClass == DRIVER_COP) {
 		if (mechanic == &BEHAVIOR_MECHANIC_DAMAGE) {
-			result->mCRC = Attrib::StringHash32("DamageCopCar");
+			result->mCRC = Attrib::StringHash32(pForceCopDamage ? pForceCopDamage : "DamageCopCar");
 			return result;
 		}
 		if (mechanic == &BEHAVIOR_MECHANIC_RIGIDBODY) {
 			result->mCRC = Attrib::StringHash32("RBVehicle");
+			return result;
+		}
+		if (pForceCopSuspension && mechanic == &BEHAVIOR_MECHANIC_SUSPENSION) {
+			result->mCRC = Attrib::StringHash32(pForceCopSuspension);
 			return result;
 		}
 	}
@@ -147,10 +153,11 @@ UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attr
 ChloeHook Hook_VehicleConstruct([]() {
 	NyaHooks::LateInitHook::aFunctions.push_back([]() { *(void**)0x92C534 = (void*)&VehicleConstructHooked; });
 
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x685363, &CarBehaviorHooked);
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6854F3, &CarBehaviorHooked);
+	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x68554E, &CarBehaviorHooked);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6855F6, &CarBehaviorHooked);
 	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x6856C2, &CarBehaviorHooked);
-	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x68554E, &CarBehaviorHooked);
-	NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x685363, &CarBehaviorHooked);
 
 	// use SuspensionRacer instead of SuspensionSimple for racers - fixes popped tire behavior
 	NyaHookLib::Patch(0x6380CB + 1, "SuspensionRacer");

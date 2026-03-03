@@ -543,3 +543,25 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_DropCash;
+
+class Effect_CopRacerSuspension : public EffectBase_PursuitConditional {
+public:
+	Effect_CopRacerSuspension() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Real Physics For Cops";
+		fTimerLength = 240;
+		AddToIncompatiblityGroup("cop_car_suspension");
+		bIsRehideable = true;
+		bAbortOnConditionFailed = true;
+		bSaveStateToDisk = true;
+	}
+
+	void InitFunction() override {
+		pForceCopDamage = "DamageDragster";
+		pForceCopSuspension = "SuspensionRacer";
+	}
+	void DeinitFunction() override {
+		pForceCopDamage = nullptr;
+		pForceCopSuspension = nullptr;
+	}
+	bool HasTimer() override { return true; }
+} E_CopRacerSuspension;
