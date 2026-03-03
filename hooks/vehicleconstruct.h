@@ -120,6 +120,8 @@ ISimable* VehicleConstructHooked(Sim::Param params) {
 	return simable;
 }
 
+const char* pForcePlayerSuspension = nullptr;
+const char* pForcePlayerDamage = nullptr;
 const char* pForceCopSuspension = nullptr;
 const char* pForceCopDamage = nullptr;
 UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attrib::StringKey* mechanic) {
@@ -130,6 +132,14 @@ UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attr
 		}
 		if (mechanic == &BEHAVIOR_MECHANIC_AUDIO) {
 			result->mCRC = Attrib::StringHash32("SoundRacer");
+			return result;
+		}
+		if (pForcePlayerDamage && mechanic == &BEHAVIOR_MECHANIC_DAMAGE) {
+			result->mCRC = Attrib::StringHash32(pForcePlayerDamage);
+			return result;
+		}
+		if (pForcePlayerSuspension && mechanic == &BEHAVIOR_MECHANIC_SUSPENSION) {
+			result->mCRC = Attrib::StringHash32(pForcePlayerSuspension);
 			return result;
 		}
 	}

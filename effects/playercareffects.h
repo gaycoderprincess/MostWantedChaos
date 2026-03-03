@@ -187,7 +187,7 @@ public:
 class Effect_SetHeat1 : public ChaosEffect {
 public:
 	Effect_SetHeat1() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Set Heat Level to 1";
+		sName = "Set Heat Level To 1";
 	}
 
 	void InitFunction() override {
@@ -200,7 +200,7 @@ public:
 /*class Effect_SetHeat5 : public EffectBase_NotInPursuitConditional {
 public:
 	Effect_SetHeat5() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Set Heat Level to 5";
+		sName = "Set Heat Level To 5";
 	}
 
 	void InitFunction() override {
@@ -218,7 +218,7 @@ public:
 class Effect_SetHeat6 : public EffectBase_NotInPursuitConditional {
 public:
 	Effect_SetHeat6() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
-		sName = "Set Heat Level to 6";
+		sName = "Set Heat Level To 6";
 		bAbortOnConditionFailed = true;
 	}
 
@@ -1529,3 +1529,51 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override { return IsInNamedRace("16.2.1"); }
 } E_InvinciblePlayer;
+
+class Effect_PlayerSimpleSuspension : public ChaosEffect {
+public:
+	Effect_PlayerSimpleSuspension() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Simplified Physics For Player";
+		fTimerLength = 60;
+		AddToIncompatiblityGroup("player_car_suspension");
+		bAbortOnConditionFailed = true;
+	}
+
+	void InitFunction() override {
+		pForcePlayerSuspension = "SuspensionSimple";
+		ReloadCarBehaviors(VEHICLE_PLAYERS);
+	}
+	void DeinitFunction() override {
+		pForcePlayerSuspension = nullptr;
+		ReloadCarBehaviors(VEHICLE_PLAYERS);
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		auto pvehicle = (Attrib::Gen::pvehicle*)GetLocalPlayerVehicle()->GetVehicleAttributes();
+		return !strcmp(*GetAttribStringPointer(Attrib::Instance::GetAttributePointer(pvehicle, BEHAVIOR_MECHANIC_SUSPENSION.mHash32, 0)), "SuspensionRacer");
+	}
+} E_PlayerSimpleSuspension;
+
+class Effect_PlayerTrafficSuspension : public ChaosEffect {
+public:
+	Effect_PlayerTrafficSuspension() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Traffic Car Physics For Player";
+		fTimerLength = 30;
+		AddToIncompatiblityGroup("player_car_suspension");
+		bAbortOnConditionFailed = true;
+	}
+
+	void InitFunction() override {
+		pForcePlayerSuspension = "SuspensionTraffic";
+		ReloadCarBehaviors(VEHICLE_PLAYERS);
+	}
+	void DeinitFunction() override {
+		pForcePlayerSuspension = nullptr;
+		ReloadCarBehaviors(VEHICLE_PLAYERS);
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		auto pvehicle = (Attrib::Gen::pvehicle*)GetLocalPlayerVehicle()->GetVehicleAttributes();
+		return !strcmp(*GetAttribStringPointer(Attrib::Instance::GetAttributePointer(pvehicle, BEHAVIOR_MECHANIC_SUSPENSION.mHash32, 0)), "SuspensionRacer");
+	}
+} E_PlayerTrafficSuspension;

@@ -654,10 +654,14 @@ bool IsPlayerApproachingOldBridge() {
 	return (*GetLocalPlayerVehicle()->GetPosition() - NyaVec3(-2878, 220, -729)).length() < 25;
 }
 
+const char** GetAttribStringPointer(void* in) {
+	auto model = (uintptr_t)in;
+	return (const char**)(model + 0xC);
+}
+
 const char** GetPVehicleModelPointer(uint32_t pvehicleHash) {
 	auto collection = Attrib::FindCollection(Attrib::StringHash32("pvehicle"), pvehicleHash);
-	auto model = (uintptr_t)Attrib::Collection::GetData(collection, Attrib::StringHash32("MODEL"), 0);
-	return (const char**)(model + 0xC);
+	return GetAttribStringPointer(Attrib::Collection::GetData(collection, Attrib::StringHash32("MODEL"), 0));
 }
 
 void ExecuteRenderData_WithHooks();
@@ -753,6 +757,15 @@ void SendSMS(int id, bool popup, bool once) {
 FECarRecord* GivePinkSlipCar(const char* preset) {
 	NyaHelpers::CreatePinkSlipCar(preset);
 	return FEPlayerCarDB::AwardRivalCar(GetPlayerCarDB(), FEngHashString(preset));
+}
+
+void ReloadCarBehaviors(eVehicleList vehicleType) {
+	NyaHookLib::Patch<uint16_t>(0x688378, 0x9090);
+	auto& list = VEHICLE_LIST::GetList(vehicleType);
+	for (int i = 0; i < list.size(); i++) {
+		list[i]->CommitBehaviorOverrides();
+	}
+	NyaHookLib::Patch<uint16_t>(0x688378, 0x1274);
 }
 
 wchar_t gDLLDir[MAX_PATH];

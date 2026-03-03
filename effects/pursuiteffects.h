@@ -550,6 +550,7 @@ public:
 		sName = "Real Physics For Cops";
 		fTimerLength = 240;
 		AddToIncompatiblityGroup("cop_car_suspension");
+		AddToIncompatiblityGroup("cop_car_damage");
 		bIsRehideable = true;
 		bAbortOnConditionFailed = true;
 		bSaveStateToDisk = true;
@@ -558,10 +559,15 @@ public:
 	void InitFunction() override {
 		pForceCopDamage = "DamageDragster";
 		pForceCopSuspension = "SuspensionRacer";
+
+		// force reload behaviors on all cops
+		ReloadCarBehaviors(VEHICLE_AICOPS);
 	}
 	void DeinitFunction() override {
 		pForceCopDamage = nullptr;
 		pForceCopSuspension = nullptr;
+
+		ReloadCarBehaviors(VEHICLE_AICOPS);
 	}
 	bool HasTimer() override { return true; }
 } E_CopRacerSuspension;
