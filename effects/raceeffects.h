@@ -126,6 +126,7 @@ public:
 	Effect_RestartRace() : EffectBase_InAnyRaceConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Restart Event";
 		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
 		bRigProportionalChances = true;
 	}
 

@@ -1100,7 +1100,7 @@ public:
 class Effect_PlayerBrokenSteering : public ChaosEffect {
 public:
 	Effect_PlayerBrokenSteering() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Random Player Steering";
+		sName = "Randomized Player Steering";
 		fTimerLength = 30;
 	}
 

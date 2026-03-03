@@ -1188,7 +1188,7 @@ public:
 
 			obj->mMatrix.p = obj->vColPosition;
 
-			if (data->audio && NyaAudio::IsFinishedPlaying(data->audio) && dist < 10) {
+			if (data->audio && NyaAudio::IsFinishedPlaying(data->audio) && dist < 20) {
 				auto dir = (*ply->GetPosition() - obj->vColPosition);
 				dir.Normalize();
 
