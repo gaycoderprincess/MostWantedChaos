@@ -195,6 +195,11 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::CameraMoverHook::Init();
 			NyaHooks::CameraMoverHook::aFunctions.push_back(CameraHook);
 			NyaHooks::LateInitHook::Init();
+			NyaHooks::LateInitHook::aFunctions.push_back([](){
+				if (!GetModuleHandleA("vulkan-1.dll") && !GetModuleHandleA("winevulkan.dll")) {
+					MessageBoxA(nullptr, "WARNING: DXVK is not installed properly! Make sure you've placed d3d9.dll from the mod's archive into the game folder or you WILL encounter stability issues!", "nya?!~", MB_ICONERROR);
+				}
+			});
 			NyaHooks::RenderWorldHook::Init();
 			NyaHooks::RenderWorldHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PRE3D>);
 			NyaHooks::RenderWorldHook::aPostFunctions.push_back(Render3DLoop);

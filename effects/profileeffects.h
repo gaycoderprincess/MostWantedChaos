@@ -523,6 +523,7 @@ public:
 	Effect_FillInbox() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Fill SMS Mailbox";
 		nFrequency = 1; // lowest frequency possible, this is a pretty useless effect
+		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {
