@@ -1,6 +1,6 @@
 int nTimesBusted = 0;
 
-void __thiscall MessageBustedHooked(NISListenerActivity* pThis, int a2) {
+void __thiscall MessageBustedHooked(NISListenerActivity* pThis, MPerpBusted* a2) {
 	if (!INIS::mInstance) {
 		nTimesBusted++;
 		if (nTimesBusted >= 25) {
