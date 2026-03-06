@@ -1550,7 +1550,7 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
 		auto pvehicle = (Attrib::Gen::pvehicle*)GetLocalPlayerVehicle()->GetVehicleAttributes();
-		return !strcmp(*GetAttribStringPointer(Attrib::Instance::GetAttributePointer(pvehicle, BEHAVIOR_MECHANIC_SUSPENSION.mHash32, 0)), "SuspensionRacer");
+		return !strcmp(*GetAttribStringPointer(pvehicle->GetAttributePointer(BEHAVIOR_MECHANIC_SUSPENSION.mHash32, 0)), "SuspensionRacer");
 	}
 } E_PlayerSimpleSuspension;
 
@@ -1574,6 +1574,6 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
 		auto pvehicle = (Attrib::Gen::pvehicle*)GetLocalPlayerVehicle()->GetVehicleAttributes();
-		return !strcmp(*GetAttribStringPointer(Attrib::Instance::GetAttributePointer(pvehicle, BEHAVIOR_MECHANIC_SUSPENSION.mHash32, 0)), "SuspensionRacer");
+		return !strcmp(*GetAttribStringPointer(pvehicle->GetAttributePointer(BEHAVIOR_MECHANIC_SUSPENSION.mHash32, 0)), "SuspensionRacer");
 	}
 } E_PlayerTrafficSuspension;

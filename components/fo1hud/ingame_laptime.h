@@ -14,7 +14,7 @@ public:
 
 		if (!IsRaceHUDUp()) return;
 		if (!IsInRace()) return;
-		if (IsLocalPlayerStaging() || !HUD_Wrecked.aNotifs.empty() || GRaceParameters::GetNumLaps(GRaceStatus::fObj->mRaceParms) < 2) {
+		if (IsLocalPlayerStaging() || !HUD_Wrecked.aNotifs.empty() || GRaceStatus::fObj->mRaceParms->GetNumLaps() < 2) {
 			fAlpha = 0;
 			memset(lapTimes, 0, sizeof(lapTimes));
 			return;

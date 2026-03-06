@@ -4,17 +4,17 @@ void SetRaceNumLaps(int lapCount) {
 	auto race = GRaceStatus::fObj;
 	if (!race) return;
 	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return;
-	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
-	if (GRaceParameters::GetIsPursuitRace(race->mRaceParms)) return;
+	if (!race->mRaceParms->GetIsLoopingRace()) return;
+	if (race->mRaceParms->GetIsPursuitRace()) return;
 
 	if (auto index = race->mRaceParms->mIndex) {
 		index->mNumLaps = lapCount;
 	}
 
-	auto pLaps = (uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+	auto pLaps = (uint32_t*)race->mRaceParms->mRaceRecord->GetAttributePointer(Attrib::StringHash32("NumLaps"), 0);
 	if (pLaps) *pLaps = lapCount;
 	if (auto parent = race->mRaceParms->mRaceRecord->mCollection->mParent) {
-		pLaps = (uint32_t*)Attrib::Collection::GetData(parent, Attrib::StringHash32("NumLaps"), 0);
+		pLaps = (uint32_t*)parent->GetData(Attrib::StringHash32("NumLaps"), 0);
 		if (pLaps) *pLaps = lapCount;
 	}
 }
@@ -157,7 +157,7 @@ public:
 	}
 	void DeinitFunction() override {
 		if (IsInNormalRace()) {
-			GRaceStatus::EnableBarriers(GRaceStatus::fObj);
+			GRaceStatus::fObj->EnableBarriers();
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -206,7 +206,7 @@ public:
 	void TickFunctionMain(double delta) override {
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
-			if ((IsInNormalRace() && GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete >= 99) || (cFrontendDatabase::IsFinalEpicChase(FEDatabase) && IsPlayerApproachingOldBridge())) {
+			if ((IsInNormalRace() && GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete >= 99) || (FEDatabase->IsFinalEpicChase() && IsPlayerApproachingOldBridge())) {
 				//aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 				aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
@@ -216,7 +216,7 @@ public:
 	bool HideFromPlayer() override {
 		return !active;
 	}
-	bool IsAvailable() override { return IsInNormalRace() || cFrontendDatabase::IsFinalEpicChase(FEDatabase); }
+	bool IsAvailable() override { return IsInNormalRace() || FEDatabase->IsFinalEpicChase(); }
 	bool RunInMenus() override { return active; }
 } E_RestartRaceOn99;
 
@@ -481,7 +481,7 @@ public:
 	}
 	void DeinitFunction() override {
 		if (IsInNormalRace()) {
-			GRaceStatus::EnableBarriers(GRaceStatus::fObj);
+			GRaceStatus::fObj->EnableBarriers();
 		}
 	}
 	bool HasTimer() override { return true; }

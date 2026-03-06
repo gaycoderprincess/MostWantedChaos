@@ -419,8 +419,8 @@ public:
 		for (auto& name : collections) {
 			auto collection = Attrib::FindCollection(Attrib::StringHash32("rigidbodyspecs"), Attrib::StringHash32(name));
 			if (!collection) continue;
-			auto obj = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("OBJ_ELASTICITY"), 0);
-			auto wall = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("WALL_ELASTICITY"), 0);
+			auto obj = (float*)collection->GetData(Attrib::StringHash32("OBJ_ELASTICITY"), 0);
+			auto wall = (float*)collection->GetData(Attrib::StringHash32("WALL_ELASTICITY"), 0);
 			// THE NUMBERS MASON WHAT DO THEY MEAN????
 			obj[0] = 4;
 			obj[1] = 4;
@@ -436,8 +436,8 @@ public:
 		for (auto& name : collections) {
 			auto collection = Attrib::FindCollection(Attrib::StringHash32("rigidbodyspecs"), Attrib::StringHash32(name));
 			if (!collection) continue;
-			auto obj = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("OBJ_ELASTICITY"), 0);
-			auto wall = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("WALL_ELASTICITY"), 0);
+			auto obj = (float*)collection->GetData(Attrib::StringHash32("OBJ_ELASTICITY"), 0);
+			auto wall = (float*)collection->GetData(Attrib::StringHash32("WALL_ELASTICITY"), 0);
 			obj[0] = 0;
 			obj[1] = 0;
 			obj[2] = 0.05;

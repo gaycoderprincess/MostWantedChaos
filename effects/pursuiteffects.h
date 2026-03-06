@@ -210,8 +210,8 @@ public:
 
 				auto pursuit = GetLocalPlayerInterface<IVehicleAI>()->GetPursuit();
 				if (pursuit) {
-					//AICopManager::SpawnPursuitCar(TheOneCopManager, pursuit);
-					AICopManager::SpawnCopCarNow(TheOneCopManager, pursuit);
+					//TheOneCopManager->SpawnPursuitCar(pursuit);
+					TheOneCopManager->SpawnCopCarNow(pursuit);
 				}
 				return;
 			}
@@ -519,7 +519,7 @@ public:
 		if (!ai) return 1000;
 		auto instance = ai->GetAttributes();
 		if (!instance) return 1000;
-		auto rep = Attrib::Instance::GetAttributePointer(instance, Attrib::StringHash32("RepPointsForDestroying"), 0);
+		auto rep = instance->GetAttributePointer(Attrib::StringHash32("RepPointsForDestroying"), 0);
 		if (!rep) return 1000;
 		return *(int*)rep;
 	}

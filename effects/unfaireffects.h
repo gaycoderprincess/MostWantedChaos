@@ -19,6 +19,7 @@ public:
 	}
 
 	void InitFunction() override {
-		NISListenerActivity::MessageBusted(nullptr, 0);
+		auto tmp = (NISListenerActivity*)nullptr;
+		tmp->MessageBusted(0);
 	}
 } E_GetBustedInstant;

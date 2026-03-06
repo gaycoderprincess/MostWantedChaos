@@ -146,7 +146,7 @@ inline float TOKMH(float mps) { return mps * 3.6; }
 float* GetMaxHeat() {
 	auto race = GRaceStatus::fObj;
 	if (!race) return nullptr;
-	return (float*)Attrib::Instance::GetAttributePointer(&race->mRaceBin->mBinRecord, Attrib::StringHash32("MaxOpenWorldHeat"), 0);
+	return (float*)race->mRaceBin->mBinRecord.GetAttributePointer(Attrib::StringHash32("MaxOpenWorldHeat"), 0);
 }
 
 std::vector<IVehicle*> GetActiveVehicles(int driverClass = -1) {
@@ -235,30 +235,30 @@ public:
 
 bool IsInLoadingScreen() {
 	if (FadeScreen::IsFadeScreenOn()) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "Loading.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_Loading.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("Loading.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("WS_Loading.fng")) return true;
 	return false;
 }
 
 bool IsInSplashScreenOrIntros() {
 	if (TheGameFlowManager.CurrentGameFlowState < GAMEFLOW_STATE_IN_FRONTEND) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "LS_EA_hidef.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_LS_EA_hidef.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "LS_EALogo.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_LS_EALogo.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "LS_PSA.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_LS_PSA.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "MW_LS_AttractFMV.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_MW_LS_AttractFMV.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "MW_LS_Splash.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "WS_MW_LS_Splash.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("LS_EA_hidef.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("WS_LS_EA_hidef.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("LS_EALogo.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("WS_LS_EALogo.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("LS_PSA.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("WS_LS_PSA.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("MW_LS_AttractFMV.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("WS_MW_LS_AttractFMV.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("MW_LS_Splash.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("WS_MW_LS_Splash.fng")) return true;
 
 	// savegame selection
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Main.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Main_GC.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Bootup.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_Bootup_GC.fng")) return true;
-	if (cFEng::IsPackagePushed(cFEng::mInstance, "MC_List.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("MC_Main.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("MC_Main_GC.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("MC_Bootup.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("MC_Bootup_GC.fng")) return true;
+	if (cFEng::mInstance->IsPackagePushed("MC_List.fng")) return true;
 	return false;
 }
 
@@ -310,7 +310,7 @@ uint32_t GetCarFEKey(uint32_t modelHash) {
 	auto collection = Attrib::FindCollection(Attrib::StringHash32("pvehicle"), modelHash);
 	if (!collection) return modelHash;
 
-	if (auto type = (uint32_t*)Attrib::Collection::GetData(collection, Attrib::StringHash32("frontend"), 0)) {
+	if (auto type = (uint32_t*)collection->GetData(Attrib::StringHash32("frontend"), 0)) {
 		return type[1];
 	}
 	return modelHash;
@@ -392,7 +392,7 @@ IVehicle* ChangePlayerCarInWorld(uint32_t hash, FECustomizationRecord* record, b
 		if (racer && racer->mhSimable == oldHandle) {
 			racer->mhSimable = newCar->GetOwnerHandle();
 		}
-		if (GRaceStatus::fObj->mRaceParms && GRaceParameters::GetRaceType(GRaceStatus::fObj->mRaceParms) != 8) {
+		if (GRaceStatus::fObj->mRaceParms && GRaceStatus::fObj->mRaceParms->GetRaceType() != 8) {
 			EAXSound::ReStartRace(g_pEAXSound, true);
 		}
 		else {
@@ -589,7 +589,7 @@ NyaMat4x4 PrepareCameraMatrix(Camera* pCamera) {
 void ApplyCameraMatrix(Camera* pCamera, NyaMat4x4 mat) {
 	auto inv = mat.Invert();
 	pCamera->bClearVelocity = true;
-	Camera::SetCameraMatrix(pCamera, (bMatrix4*)&inv, 0);
+	pCamera->SetCameraMatrix((bMatrix4*)&inv, 0);
 }
 
 // todo this is probably bad
@@ -609,12 +609,12 @@ uint8_t* GetRaceNumLaps() {
 	auto race = GRaceStatus::fObj;
 	if (!race) return nullptr;
 	if (race->mPlayMode == GRaceStatus::kPlayMode_Roaming) return nullptr;
-	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return nullptr;
-	if (GRaceParameters::GetIsPursuitRace(race->mRaceParms)) return nullptr;
+	if (!race->mRaceParms->GetIsLoopingRace()) return nullptr;
+	if (race->mRaceParms->GetIsPursuitRace()) return nullptr;
 	if (auto index = race->mRaceParms->mIndex) {
 		return &index->mNumLaps;
 	}
-	return (uint8_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+	return (uint8_t*)race->mRaceParms->mRaceRecord->GetAttributePointer(Attrib::StringHash32("NumLaps"), 0);
 }
 
 NyaVec3 GetRelativeCarOffset(IVehicle* veh, NyaVec3 v) {
@@ -633,21 +633,21 @@ bool IsInAnyRace() {
 bool IsInNormalRace() {
 	if (!GRaceStatus::fObj) return false;
 	if (!GRaceStatus::fObj->mRaceParms) return false;
-	if (GRaceParameters::GetIsPursuitRace(GRaceStatus::fObj->mRaceParms)) return false;
+	if (GRaceStatus::fObj->mRaceParms->GetIsPursuitRace()) return false;
 	return true;
 }
 
 bool IsInPursuitRace() {
 	if (!GRaceStatus::fObj) return false;
 	if (!GRaceStatus::fObj->mRaceParms) return false;
-	if (!GRaceParameters::GetIsPursuitRace(GRaceStatus::fObj->mRaceParms)) return false;
+	if (!GRaceStatus::fObj->mRaceParms->GetIsPursuitRace()) return false;
 	return true;
 }
 
 bool IsInNamedRace(const char* eventId) {
 	if (!GRaceStatus::fObj) return false;
 	if (!GRaceStatus::fObj->mRaceParms) return false;
-	return !strcmp(GRaceParameters::GetEventID(GRaceStatus::fObj->mRaceParms), eventId);
+	return !strcmp(GRaceStatus::fObj->mRaceParms->GetEventID(), eventId);
 }
 
 bool IsPlayerApproachingOldBridge() {
@@ -661,7 +661,7 @@ const char** GetAttribStringPointer(void* in) {
 
 const char** GetPVehicleModelPointer(uint32_t pvehicleHash) {
 	auto collection = Attrib::FindCollection(Attrib::StringHash32("pvehicle"), pvehicleHash);
-	return GetAttribStringPointer(Attrib::Collection::GetData(collection, Attrib::StringHash32("MODEL"), 0));
+	return GetAttribStringPointer(collection->GetData(Attrib::StringHash32("MODEL"), 0));
 }
 
 void ExecuteRenderData_WithHooks();
@@ -750,8 +750,8 @@ bool PercentageChanceCheck(int percent) {
 void SendSMS(int id, bool popup, bool once) {
 	if (once && GetUserProfile()->TheCareerSettings.SMSMessages[id].IsInInbox()) return;
 
-	if (popup) return GManager::AddSMS(GManager::mObj, id);
-	return GManager::DispatchSMSMessage(GManager::mObj, id);
+	if (popup) return GManager::mObj->AddSMS(id);
+	return GManager::mObj->DispatchSMSMessage(id);
 }
 
 FECarRecord* GivePinkSlipCar(const char* preset) {

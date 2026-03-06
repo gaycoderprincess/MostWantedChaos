@@ -4,8 +4,8 @@ public:
 	void Process() override {
 		if (!IsRaceHUDUp()) return;
 		if (!IsInRace()) return;
-		if (GRaceParameters::GetRaceType(GRaceStatus::fObj->mRaceParms) != 4) return; // tollbooth
+		if (GRaceStatus::fObj->mRaceParms->GetRaceType() != GRace::kRaceType_Tollbooth) return;
 
-		DrawElement(1, "TIME LEFT", FormatGameTime(GRaceStatus::GetRaceTimeRemaining(GRaceStatus::fObj) * 1000));
+		DrawElement(1, "TIME LEFT", FormatGameTime(GRaceStatus::fObj->GetRaceTimeRemaining() * 1000));
 	}
 } HUD_TimeTrial;

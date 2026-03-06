@@ -558,7 +558,7 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Cops: {}", VEHICLE_LIST::GetList(VEHICLE_AICOPS).size()));
 				DrawMenuOption(std::format("Traffic: {}", VEHICLE_LIST::GetList(VEHICLE_AITRAFFIC).size()));
 				DrawMenuOption(std::format("CurrentBin: {}", FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin));
-				DrawMenuOption(std::format("IsFinalEpicChase: {}", cFrontendDatabase::IsFinalEpicChase(FEDatabase)));
+				DrawMenuOption(std::format("IsFinalEpicChase: {}", FEDatabase->IsFinalEpicChase()));
 				if (auto heat = GetMaxHeat()) {
 					DrawMenuOption(std::format("Max Heat: {:.2f}", *heat));
 				}
@@ -586,7 +586,8 @@ void ChaosModMenu() {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
 			}
 			if (DrawMenuOption("Trigger Busted")) {
-				NISListenerActivity::MessageBusted(nullptr, 0);
+				auto tmp = (NISListenerActivity*)nullptr;
+				tmp->MessageBusted(0);
 			}
 			//QuickValueEditor("SceneryScale.x", SceneryScale.x);
 			//QuickValueEditor("SceneryScale.y", SceneryScale.y);

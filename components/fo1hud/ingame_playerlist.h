@@ -40,8 +40,8 @@ public:
 		if (fPlayerListState < 0.333) fPlayerListState = 0.333;
 		if (fPlayerListState > 1) fPlayerListState = 1;
 
-		auto raceType = GRaceParameters::GetRaceType(GRaceStatus::fObj->mRaceParms);
-		bool displayScores = raceType == 5; // speedtrap
+		auto raceType = GRaceStatus::fObj->mRaceParms->GetRaceType();
+		bool displayScores = raceType == GRace::kRaceType_SpeedTrap;
 
 		tNyaStringData data;
 		data.x = std::lerp(-0.5, (displayScores ? fPosXFragDerby : fPosX) * fPlayerListState * GetAspectRatioInv(), easeInOutQuart(fPlayerListState));

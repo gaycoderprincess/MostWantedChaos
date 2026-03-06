@@ -544,7 +544,7 @@ public:
 		for (int i = 0; i < 150; i++) {
 			auto message = &GetUserProfile()->TheCareerSettings.SMSMessages[i];
 			if (!message->IsValid()) continue;
-			if (!SMSMessage::IsVoice(message)) continue;
+			if (!message->IsVoice()) continue;
 			messages.push_back(i);
 		}
 		SendSMS(messages[rand()%messages.size()], !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued(), false);

@@ -157,7 +157,7 @@ UCrc32* __thiscall CarBehaviorHooked(PVehicle* pThis, UCrc32* result, const Attr
 			return result;
 		}
 	}
-	return PVehicle::LookupBehaviorSignature(pThis, result, mechanic);
+	return pThis->LookupBehaviorSignature(result, mechanic);
 }
 
 ChloeHook Hook_VehicleConstruct([]() {

@@ -7,7 +7,7 @@ void __thiscall MessageBustedHooked(NISListenerActivity* pThis, int a2) {
 			Achievements::AwardAchievement(GetAchievement("BUSTED_MANY"));
 		}
 	}
-	return NISListenerActivity::MessageBusted(pThis, a2);
+	return pThis->MessageBusted(a2);
 }
 
 ChloeHook Hook_Busted([]() {

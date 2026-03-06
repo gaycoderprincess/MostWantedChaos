@@ -125,33 +125,33 @@ public:
 
 	void InitFunction() override {
 		backups.clear();
-		auto pClass = Attrib::Database::GetClass(Attrib::Database::sThis, Attrib::StringHash32("simsurface"));
-		auto collHash = Attrib::Class::GetFirstCollection(pClass);
+		auto pClass = Attrib::Database::sThis->GetClass(Attrib::StringHash32("simsurface"));
+		auto collHash = pClass->GetFirstCollection();
 		while (collHash) {
 			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), collHash);
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("GROUND_FRICTION"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("GROUND_FRICTION"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("GROUND_FRICTION"), *f1});
 				*f1 /= 4;
 			}
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("DRIVE_GRIP"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("DRIVE_GRIP"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("DRIVE_GRIP"), *f1});
 				*f1 /= 2;
 			}
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("LATERAL_GRIP"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("LATERAL_GRIP"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("LATERAL_GRIP"), *f1});
 				*f1 /= 2;
 			}
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("ROLLING_RESISTANCE"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("ROLLING_RESISTANCE"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("ROLLING_RESISTANCE"), *f1});
 				*f1 /= 4;
 			}
-			collHash = Attrib::Class::GetNextCollection(pClass, collHash);
+			collHash = pClass->GetNextCollection(collHash);
 		}
 	}
 	void DeinitFunction() override {
 		for (auto& backup : backups) {
 			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), backup.collection);
-			*(float*)Attrib::Collection::GetData(collection, backup.key, 0) = backup.value;
+			*(float*)collection->GetData(backup.key, 0) = backup.value;
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -174,33 +174,33 @@ public:
 
 	void InitFunction() override {
 		backups.clear();
-		auto pClass = Attrib::Database::GetClass(Attrib::Database::sThis, Attrib::StringHash32("simsurface"));
-		auto collHash = Attrib::Class::GetFirstCollection(pClass);
+		auto pClass = Attrib::Database::sThis->GetClass(Attrib::StringHash32("simsurface"));
+		auto collHash = pClass->GetFirstCollection();
 		while (collHash) {
 			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), collHash);
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("GROUND_FRICTION"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("GROUND_FRICTION"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("GROUND_FRICTION"), *f1});
 				*f1 *= 4;
 			}
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("DRIVE_GRIP"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("DRIVE_GRIP"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("DRIVE_GRIP"), *f1});
 				*f1 *= 4;
 			}
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("LATERAL_GRIP"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("LATERAL_GRIP"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("LATERAL_GRIP"), *f1});
 				*f1 *= 4;
 			}
-			if (auto f1 = (float*)Attrib::Collection::GetData(collection, Attrib::StringHash32("ROLLING_RESISTANCE"), 0)) {
+			if (auto f1 = (float*)collection->GetData(Attrib::StringHash32("ROLLING_RESISTANCE"), 0)) {
 				backups.push_back({collHash, Attrib::StringHash32("ROLLING_RESISTANCE"), *f1});
 				*f1 *= 4;
 			}
-			collHash = Attrib::Class::GetNextCollection(pClass, collHash);
+			collHash = pClass->GetNextCollection(collHash);
 		}
 	}
 	void DeinitFunction() override {
 		for (auto& backup : backups) {
 			auto collection = Attrib::FindCollection(Attrib::StringHash32("simsurface"), backup.collection);
-			*(float*)Attrib::Collection::GetData(collection, backup.key, 0) = backup.value;
+			*(float*)collection->GetData(backup.key, 0) = backup.value;
 		}
 	}
 	bool HasTimer() override { return true; }

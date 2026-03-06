@@ -2,11 +2,11 @@
 // in this case GRacerInfo is valid, mRaceParms is not
 void __thiscall TotalVehicleFixed(GRacerInfo* pThis) {
 	if (!GRaceStatus::fObj->mRaceParms) return;
-	GRacerInfo::TotalVehicle(pThis);
+	pThis->TotalVehicle();
 }
 void __thiscall BlowEngineFixed(GRacerInfo* pThis) {
 	if (!GRaceStatus::fObj->mRaceParms) return;
-	GRacerInfo::BlowEngine(pThis);
+	pThis->BlowEngine();
 }
 
 // fixes a crash when hitting objects using a player-driven AI car
@@ -23,10 +23,10 @@ void FixIndexLapCount() {
 	auto race = GRaceStatus::fObj;
 	if (!race) return;
 	if (!race->mRaceParms) return;
-	if (!GRaceParameters::GetIsLoopingRace(race->mRaceParms)) return;
-	if (GRaceParameters::GetIsPursuitRace(race->mRaceParms)) return;
+	if (!race->mRaceParms->GetIsLoopingRace()) return;
+	if (race->mRaceParms->GetIsPursuitRace()) return;
 	if (auto index = race->mRaceParms->mIndex) {
-		index->mNumLaps = *(uint32_t*)Attrib::Instance::GetAttributePointer(race->mRaceParms->mRaceRecord, Attrib::StringHash32("NumLaps"), 0);
+		index->mNumLaps = *(uint32_t*)race->mRaceParms->mRaceRecord->GetAttributePointer(Attrib::StringHash32("NumLaps"), 0);
 	}
 }
 

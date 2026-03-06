@@ -5,7 +5,7 @@ void PrologueM3Flow() {
 	if (IsInMovie()) return;
 
 	if (bPrologueM3Flow_JumpToFreeRoam) {
-		GameFlowManager::UnloadFrontend(&TheGameFlowManager);
+		TheGameFlowManager.UnloadFrontend();
 		bPrologueM3Flow_JumpToFreeRoam = false;
 	}
 }
@@ -25,7 +25,7 @@ bool __thiscall GetNoPostRaceScreenHooked(GRaceParameters* pThis) {
 	if (GetUserProfile()->TheCareerSettings.CurrentBin == 16 && FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0) {
 		return false;
 	}
-	return GRaceParameters::GetNoPostRaceScreen(pThis);
+	return pThis->GetNoPostRaceScreen();
 }
 
 bool MovieExistsHooked(const char* name) {
