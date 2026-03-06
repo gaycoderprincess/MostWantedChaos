@@ -30,7 +30,7 @@ bool __thiscall GetNoPostRaceScreenHooked(GRaceParameters* pThis) {
 
 bool MovieExistsHooked(const char* name) {
 	auto str = (std::string)name;
-	if (!str.find("storyfmv_bus12") != std::string::npos && GetUserProfile()->TheCareerSettings.CurrentBin == 16 && FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0) {
+	if (str.find("storyfmv_bus12") != std::string::npos && GetUserProfile()->TheCareerSettings.CurrentBin == 16 && FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0) {
 		return false;
 	}
 	return bFileExists(name);
