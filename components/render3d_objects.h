@@ -203,12 +203,10 @@ namespace Render3DObjects {
 	void ProcessTris(WCollider* pCollider) {
 		auto pos = pCollider->fPosition;
 
-		WCollisionTri tri = {};
-		tri.fFlags = 0;
-		tri.fSurface.fSurface = 0;
-		tri.fSurface.fFlags = 0;
-		tri.PAD = 0;
+		//auto pt = pCollider->fPosition;
+		//auto radius = pCollider->fRadius;
 
+		WCollisionTri tri = {};
 		tri.fPt2 = {pos.x - 25, 150, pos.z - 25};
 		tri.fPt1 = {pos.x - 25, 150, pos.z + 25};
 		tri.fPt0 = {pos.x + 25, 150, pos.z - 25};
