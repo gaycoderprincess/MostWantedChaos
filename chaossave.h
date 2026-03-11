@@ -37,7 +37,9 @@ bool DoChaosEffectSave() {
 
 	num = effects.size();
 	file.write((char*)&num, sizeof(num));
-	file.write((char*)&effects[0], sizeof(effects[0])*effects.size());
+	if (num > 0) {
+		file.write((char*)&effects[0], sizeof(effects[0]) * effects.size());
+	}
 	return true;
 }
 
