@@ -462,6 +462,9 @@ public:
 		if (!anyDrawn) {
 			abort = true;
 		}
+		else {
+			EffectInstance->fTimer = fTimerLength;
+		}
 	}
 	bool ShouldAbort() override { return abort; }
 	bool RunInMenus() override { return true; }
