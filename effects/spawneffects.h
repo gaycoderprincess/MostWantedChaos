@@ -149,7 +149,7 @@ public:
 	static inline float scale = 1.0;
 	static inline float colScale = 0.5;
 
-	static inline float peanutSpeed = 30;
+	static inline float peanutSpeed = 38;
 	static inline float lastPeanutDistance = 0;
 	static inline float lastPeanutDot = 0;
 
