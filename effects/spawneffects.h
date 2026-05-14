@@ -149,6 +149,9 @@ public:
 	static inline float scale = 1.0;
 	static inline float colScale = 0.5;
 
+	static inline float sfxRange = 200;
+	static inline float sfxVolume = 1;
+
 	static inline float peanutSpeed = 38;
 	static inline float lastPeanutDistance = 0;
 	static inline float lastPeanutDot = 0;
@@ -164,6 +167,7 @@ public:
 		objDir.Normalize();
 		auto dot = GetLocalPlayerCamera()->CurrentKey.Direction.Dot(objDir);
 		lastPeanutDot = dot;
+		auto& audio = *(NyaAudio::NyaSound*)&obj->CustomData;
 		if (dot > 0) {
 			auto movePos = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition);
 			lastPeanutDistance = movePos.length();
@@ -207,6 +211,27 @@ public:
 						car->mCOMObject->Find<IDamageable>()->Destroy();
 					}
 				}
+			}
+
+			if (audio) {
+				auto volume = (sfxRange - lastPeanutDistance) / sfxRange;
+				volume *= sfxVolume;
+				if (volume > 1) volume = 1;
+				if (volume < 0) volume = 0;
+				if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
+				NyaAudio::SetVolume(audio, GetSFXVolume() * volume);
+
+				if (NyaAudio::IsFinishedPlaying(audio)) {
+					NyaAudio::Play(audio);
+				}
+			}
+			else {
+				audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/StoneDrag.ogg");
+			}
+		}
+		else {
+			if (audio && !NyaAudio::IsFinishedPlaying(audio)) {
+				NyaAudio::Stop(audio);
 			}
 		}
 	}
