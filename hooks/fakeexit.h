@@ -29,6 +29,8 @@ bool ShouldBlockQuitBind() {
 }
 
 void FakeExitLoop() {
+	NyaHookLib::Patch<uint8_t>(0x5A8728, ShouldBlockQuitBind() ? 0xEB : 0x75);
+
 	if (FakeExitFlag) {
 		if (CanAltF4()) {
 			ExitTheGameFlag = FakeExitFlag;
@@ -38,7 +40,7 @@ void FakeExitLoop() {
 			//EAutoSave::Create();
 			//CwoeeHints::AddHint("Game Saved.");
 
-			CwoeeHints::AddHint("No.");
+			CwoeeHints::AddHint("No :3");
 		}
 		FakeExitFlag = 0;
 	}
