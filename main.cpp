@@ -26,7 +26,6 @@ std::vector<void(*)()> aDrawing3DLoopFunctionsOnce;
 #include "chaosvars.h"
 #include "chaospopup.h"
 #include "components/achievements.h"
-#include "components/customcamera.h"
 #include "components/render3d.h"
 #include "components/render3d_objects.h"
 #include "components/customcar.h"
@@ -54,6 +53,7 @@ namespace FlatOutHUD {
 #include "include/surface_terrains.h"
 #include "include/libsm64.h"
 #include "components/sm64.h"
+#include "components/customcamera.h"
 
 #include "chaoseffect.h"
 #include "chaosmod.h"
@@ -220,7 +220,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::RenderPropsHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PREPROPS>);
 			NyaHooks::RenderPropsHook::aPostFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_POSTPROPS>);
 
-			SkipFE = true;
+			//SkipFE = true;
 		} break;
 		default:
 			break;

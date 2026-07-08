@@ -1320,3 +1320,41 @@ public:
 	}
 	bool IsAvailable() override { return FindHidingSpot() != nullptr; }
 } E_Scientist;
+
+class Effect_Mario64 : public ChaosEffect {
+public:
+	Effect_Mario64() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Super Mario 64 Mode";
+		fTimerLength = 60;
+		AddToIncompatiblityGroup("rubberband");
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
+	}
+
+	static float __thiscall GetTopSpeedHooked(IVehicle* pThis) {
+		return 0.01;
+	}
+
+	static float __thiscall GetAccelerationHooked(IVehicle* pThis, float a2) {
+		return 0.01;
+	}
+
+	void InitFunction() override {
+		SM64::bEnabled = true;
+		NyaHookLib::Patch(0x892A64, &GetTopSpeedHooked);
+		NyaHookLib::Patch(0x892A68, &GetAccelerationHooked);
+	}
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
+		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), GetLocalPlayerVehicle());
+		CustomCamera::ProcessCam(pMoverCamera, delta);
+	}
+	void DeinitFunction() override {
+		SM64::bEnabled = false;
+		NyaHookLib::Patch(0x892A64, 0x431D60);
+		NyaHookLib::Patch(0x892A68, 0x4223E0);
+	}
+	bool IsAvailable() override { return SM64::bAvailable; }
+	bool HasTimer() override { return true; }
+} E_Mario64;

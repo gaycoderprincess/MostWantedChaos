@@ -459,6 +459,16 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Mario Debug")) {
 			ChloeMenuLib::BeginMenu();
 
+			if (DrawMenuOption("mario enable")) {
+				SM64::bEnabled = true;
+				CustomCamera::bRunCustom = true;
+			}
+
+			if (DrawMenuOption("mario disable")) {
+				SM64::bEnabled = false;
+				CustomCamera::bRunCustom = false;
+			}
+
 			DrawMenuOption(std::format("position {:.2f} {:.2f} {:.2f}",SM64::marioState.position[0],SM64::marioState.position[1],SM64::marioState.position[2]));
 			DrawMenuOption(std::format("velocity {:.2f} {:.2f} {:.2f}",SM64::marioState.velocity[0],SM64::marioState.velocity[1],SM64::marioState.velocity[2]));
 			DrawMenuOption(std::format("marioId {}",SM64::marioId));
@@ -466,7 +476,18 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("geom 0 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[0],SM64::marioGeometry.position[1],SM64::marioGeometry.position[2]));
 			DrawMenuOption(std::format("geom 1 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[3],SM64::marioGeometry.position[4],SM64::marioGeometry.position[5]));
 			DrawMenuOption(std::format("geom 2 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[6],SM64::marioGeometry.position[7],SM64::marioGeometry.position[8]));
+
+			auto bak = SM64::marioScalar;
 			QuickValueEditor("marioScalar", SM64::marioScalar);
+			if (bak != SM64::marioScalar) {
+				NyaVec3 v = {0,0,0};
+				if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+					v = *ply->GetPosition();
+					v.y -= 1;
+				}
+
+				SM64::ResetMario(v);
+			}
 
 			if (DrawMenuOption("mario teleport")) {
 				NyaVec3 v = {0,0,0};

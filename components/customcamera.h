@@ -7,6 +7,14 @@ namespace CustomCamera {
 	IVehicle* pTargetPlayerSecondPerson = nullptr;
 	IRigidBody* pTargetPlayerBodySecondPerson = nullptr;
 
+	bool IsMario() {
+		return SM64::bEnabled && pTargetPlayerVehicle == GetLocalPlayerVehicle() && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
+	}
+
+	float GetMarioScale() {
+		return 100.0 / SM64::marioScalar;
+	}
+
 	bool bSecondPersonOrbitMode = true;
 
 	const float fPanSpeedBase = 0.005;
@@ -32,6 +40,10 @@ namespace CustomCamera {
 	}
 
 	double GetMinStringDistance(IRigidBody* ply) {
+		if (IsMario()) {
+			return 2.0 * fStringMinDistance * GetMarioScale();
+		}
+
 		// this makes the heli stop moving??
 		//if (IsHeliCam()) return 1;
 
@@ -41,6 +53,10 @@ namespace CustomCamera {
 	}
 
 	double GetMaxStringDistance(IRigidBody* ply) {
+		if (IsMario()) {
+			return 2.0 * fStringMaxDistance * GetMarioScale();
+		}
+
 		// this makes the heli stop moving??
 		//if (IsHeliCam()) return 1;
 
@@ -50,12 +66,20 @@ namespace CustomCamera {
 	}
 
 	NyaVec3 GetLookatOffset(IRigidBody* ply) {
+		if (IsMario()) {
+			return {0, 1.0f * fLookatOffset * GetMarioScale(), 0};
+		}
+
 		UMath::Vector3 dim;
 		ply->GetDimension(&dim);
 		return {0, abs(dim.y) * fLookatOffset, 0};
 	}
 
 	NyaVec3 GetFollowOffset(IRigidBody* ply) {
+		if (IsMario()) {
+			return {0, 1.0f * fFollowOffset * GetMarioScale(), 0};
+		}
+
 		if (IsHeliCam()) return {0, -4, 0};
 
 		UMath::Vector3 dim;
@@ -64,6 +88,14 @@ namespace CustomCamera {
 	}
 
 	NyaVec3* GetTargetPosition(IRigidBody* ply) {
+		if (IsMario()) {
+			static NyaVec3 v;
+			v = SM64::MarioToWorld({SM64::marioState.position[0], SM64::marioState.position[1], SM64::marioState.position[2]});
+			v.y += 1 * GetMarioScale();
+			v += GetLookatOffset(ply);
+			return &v;
+		}
+
 		if (!ply) return nullptr;
 
 		static NyaVec3 vec;
@@ -73,6 +105,14 @@ namespace CustomCamera {
 	}
 
 	NyaVec3* GetFollowPosition(IRigidBody* ply) {
+		if (IsMario()) {
+			static NyaVec3 v;
+			v = SM64::MarioToWorld({SM64::marioState.position[0], SM64::marioState.position[1], SM64::marioState.position[2]});
+			v.y += 1 * GetMarioScale();
+			v += GetFollowOffset(ply);
+			return &v;
+		}
+
 		if (!ply) return nullptr;
 
 		static NyaVec3 vec;
@@ -158,6 +198,10 @@ namespace CustomCamera {
 		auto velocity = *player->GetPosition() - vLastPlayerPosition;
 		if ((vPos - *GetFollowPosition(player)).length() >= GetMaxStringDistance(player) * 0.999) {
 			velocity *= fStringVelocityMult;
+		}
+
+		if (IsMario()) {
+			velocity.y = 0.0;
 		}
 
 		vPos -= vLastPlayerPosition;

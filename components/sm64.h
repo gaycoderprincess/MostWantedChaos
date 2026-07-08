@@ -56,7 +56,9 @@ namespace SM64 {
 		return out;
 	}
 
-	template<int bufId>
+	int marioLightness = 128;
+
+	template<int bufId, bool textured>
 	void RenderMario(SM64MarioGeometryBuffers marioBuffers) {
 		int numFaces = SM64_GEO_MAX_TRIANGLES;
 		int numVertices = 3 * numFaces;
@@ -120,9 +122,16 @@ namespace SM64 {
 			//}
 
 			auto tmp = NyaDrawing::CNyaRGBA32();
-			tmp.b = srcColor[0] * 64;
-			tmp.g = srcColor[1] * 64;
-			tmp.r = srcColor[2] * 64;
+			if (textured) {
+				tmp.b = marioLightness;
+				tmp.g = marioLightness;
+				tmp.r = marioLightness;
+			}
+			else {
+				tmp.b = srcColor[0] * marioLightness;
+				tmp.g = srcColor[1] * marioLightness;
+				tmp.r = srcColor[2] * marioLightness;
+			}
 			tmp.a = 255;
 			dest->Color = *(uint32_t*)&tmp;
 
@@ -142,16 +151,18 @@ namespace SM64 {
 		tmpModel.nVertexCount = numVerticesUsed;
 		tmpModel.nFaceCount = numFacesUsed;
 
-		// todo fix rendering
-		static auto unTex = LoadTexture("CwoeeChaos/data/models/letsago.png");
-		tmpModel.pTexture = unTex;
-
-		static auto tex = LoadTexture("CwoeeChaos/data/models/white.png");
-		tmpModel.pTexture = tex;
-
 		auto mat = NyaMat4x4();
 		mat.SetIdentity();
-		tmpModel.RenderAt(WorldToRenderMatrix(mat), true);
+		if (textured) {
+			static auto marioTextured = LoadTexture("CwoeeChaos/data/models/letsago.png");
+			tmpModel.pTexture = marioTextured;
+			tmpModel.RenderAt(WorldToRenderMatrix(mat), true);
+		}
+		else {
+			static auto marioColored = LoadTexture("CwoeeChaos/data/models/white.png");
+			tmpModel.pTexture = marioColored;
+			tmpModel.RenderAt(WorldToRenderMatrix(mat), false);
+		}
 	}
 
 	std::vector<WCollisionTri> aCollisionTris;
@@ -197,6 +208,13 @@ namespace SM64 {
 			strip += strip->numTrisOrSurfaceId;
 			stripSphere++;
 		}
+	}
+
+	void ClearMarioCollision() {
+		for (auto& id : aCollisionTriMarios) {
+			sm64_surface_object_delete(id);
+		}
+		aCollisionTriMarios.clear();
 	}
 
 	void UpdateMarioCollision() {
@@ -348,89 +366,12 @@ namespace SM64 {
 		}
 
 #ifdef RENDER_NFS_COLLISIONS
-		RenderMario<1>(colBuffers);
-		RenderMario<2>(colBuffersFlip);
+		RenderMario<1, false>(colBuffers);
+		RenderMario<2, false>(colBuffersFlip);
 #endif
 	}
 
 	void InitAudio();
-
-	void OnTick() {
-		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
-			aCollisionTris.clear();
-
-			auto col = (WCollider*)ply->GetWCollider();
-			for (int i = 0; i < col->fInstanceCacheList.size(); i++) {
-				auto inst = col->fInstanceCacheList[i];
-				ProcessCollisionArticle(inst);
-			}
-
-			UpdateMarioCollision();
-
-			UMath::Vector3 marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
-			UMath::Vector3 marioVel = MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]});
-			if (marioPos.length() > 50) {
-				marioPos.y += 1;
-				ply->SetPosition(&marioPos);
-
-				UMath::Vector4 q = {0,0,0,1};
-				ply->SetOrientation(&q);
-
-				UMath::Vector3 tmp = {0,0,0};
-
-				ply->SetLinearVelocity(&marioVel);
-				ply->SetAngularVelocity(&tmp);
-
-				CarRender_DontRenderPlayer = true;
-			}
-		}
-		else {
-			CarRender_DontRenderPlayer = false;
-		}
-
-		static CNyaTimer gTimer;
-		gTimer.Process();
-
-		marioInputs.buttonA = IsPadKeyPressed(NYA_PAD_KEY_A);
-		marioInputs.buttonB = IsPadKeyPressed(NYA_PAD_KEY_B);
-		marioInputs.buttonZ = IsPadKeyPressed(NYA_PAD_KEY_X);
-
-		float cameraPos[3] = {};
-		float cameraRot = 0.0;
-
-		//cameraRot += x0_axis * dt * 2;
-		cameraPos[0] = marioState.position[0] + 1000.0f * cosf( cameraRot );
-		cameraPos[1] = marioState.position[1] + 200.0f;
-		cameraPos[2] = marioState.position[2] + 1000.0f * sinf( cameraRot );
-
-		marioInputs.camLookX = marioState.position[0] - cameraPos[0];
-		marioInputs.camLookZ = marioState.position[2] - cameraPos[2];
-		marioInputs.stickX = GetPadKeyState(NYA_PAD_KEY_LSTICK_X) / -32767.0;
-		marioInputs.stickY = GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / 32767.0;
-
-		while (gTimer.fTotalTime >= 1.f/30)
-		{
-			memcpy(lastPos, currPos, sizeof(currPos));
-			memcpy(lastGeoPos, currGeoPos, sizeof(currGeoPos));
-
-			gTimer.fTotalTime -= 1.f/30;
-			sm64_mario_tick( marioId, &marioInputs, &marioState, &marioGeometry );
-
-			memcpy(currPos, marioState.position, sizeof(currPos));
-			memcpy(currGeoPos, marioGeometry.position, sizeof(currGeoPos));
-		}
-
-		for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / (1.f/30));
-		for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
-
-		RenderMario<0>(marioGeometry);
-
-		static bool bOnce = true;
-		if (bOnce) {
-			aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
-			bOnce = false;
-		}
-	}
 
 	void LoadDummyFloor(NyaVec3 center, int width) {
 		SM64Surface surfaces[2];
@@ -469,44 +410,170 @@ namespace SM64 {
 
 		auto pos = WorldToMario(worldPos);
 
-		LoadDummyFloor(pos, 16384);
+		LoadDummyFloor(pos, 128);
 
 		marioId = sm64_mario_create(pos.x, pos.y + 300, pos.z);
+		marioState.position[0] = pos.x;
+		marioState.position[1] = pos.y;
+		marioState.position[2] = pos.z;
+	}
+
+	bool bDoReset = false;
+	bool bEnabled = false;
+	bool bAvailable = false;
+
+	void OnTick() {
+		if (!bEnabled) {
+			bDoReset = true;
+			return;
+		}
+		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) {
+			bDoReset = true;
+			return;
+		}
+		if (IsInLoadingScreen()) {
+			bDoReset = true;
+			return;
+		}
+
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			static CNyaTimer gCollisionTimer;
+			gCollisionTimer.Process();
+
+			if (gCollisionTimer.fTotalTime >= 0.25) {
+				gCollisionTimer.fTotalTime -= 0.25;
+
+				aCollisionTris.clear();
+
+				auto col = (WCollider*)ply->GetWCollider();
+				for (int i = 0; i < col->fInstanceCacheList.size(); i++) {
+					auto inst = col->fInstanceCacheList[i];
+					ProcessCollisionArticle(inst);
+				}
+
+				UpdateMarioCollision();
+			}
+
+			UMath::Vector3 marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
+			UMath::Vector3 marioVel = MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]}) / (1.0 / 30.0);
+			if (marioPos.length() > 50) {
+				marioPos.y += 1;
+				ply->SetPosition(&marioPos);
+
+				UMath::Vector4 q = {0,0,0,1};
+				//ply->SetOrientation(&q);
+
+				UMath::Vector3 tmp = {0,0,0};
+
+				ply->SetLinearVelocity(&marioVel);
+				ply->SetAngularVelocity(&tmp);
+
+				CarRender_DontRenderPlayer = true;
+				DrawLightFlares = false;
+			}
+		}
+		else {
+			CarRender_DontRenderPlayer = false;
+			DrawLightFlares = true;
+			if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+				DrawCars = false;
+			}
+
+			if (bDoReset) {
+				ClearMarioCollision();
+			}
+		}
+
+		if (bDoReset) {
+			DrawCars = true;
+
+			NyaVec3 v = {0,0,0};
+			if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+				v = *ply->GetPosition();
+				v.y -= 1;
+			}
+			ResetMario(v);
+		}
+		bDoReset = false;
+
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+			marioInputs.buttonA = 0;
+			marioInputs.buttonB = 0;
+			marioInputs.buttonZ = 0;
+		}
+		else {
+			marioInputs.buttonA = IsPadKeyPressed(NYA_PAD_KEY_A);
+			marioInputs.buttonB = IsPadKeyPressed(NYA_PAD_KEY_B);
+			marioInputs.buttonZ = IsPadKeyPressed(NYA_PAD_KEY_X) || IsPadKeyPressed(NYA_PAD_KEY_LB) || IsPadKeyPressed(NYA_PAD_KEY_RB);
+		}
+
+		float cameraPos[3] = {};
+
+		auto cameraMatReal = PrepareCameraMatrix(GetLocalPlayerCamera());
+		auto cameraPosReal = WorldToMario(RenderToWorldCoords(cameraMatReal.p));
+		cameraPos[0] = cameraPosReal[0];
+		cameraPos[1] = cameraPosReal[1];
+		cameraPos[2] = cameraPosReal[2];
+
+		//cameraPos[0] = marioState.position[0] + 1000.0f * cosf(cameraRot);
+		//cameraPos[1] = marioState.position[1] + 200.0f;
+		//cameraPos[2] = marioState.position[2] + 1000.0f * sinf(cameraRot);
+
+		marioInputs.camLookX = marioState.position[0] - cameraPos[0];
+		marioInputs.camLookZ = marioState.position[2] - cameraPos[2];
+		marioInputs.stickX = GetPadKeyState(NYA_PAD_KEY_LSTICK_X) / 32767.0;
+		marioInputs.stickY = GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / -32767.0;
+
+		if (!FEManager::mPauseRequest) {
+			static CNyaTimer gTimer;
+			gTimer.Process();
+
+			while (gTimer.fTotalTime >= 1.f/30)
+			{
+				memcpy(lastPos, currPos, sizeof(currPos));
+				memcpy(lastGeoPos, currGeoPos, sizeof(currGeoPos));
+
+				gTimer.fTotalTime -= 1.f/30;
+				sm64_mario_tick( marioId, &marioInputs, &marioState, &marioGeometry );
+
+				memcpy(currPos, marioState.position, sizeof(currPos));
+				memcpy(currGeoPos, marioGeometry.position, sizeof(currGeoPos));
+			}
+
+			for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / (1.f/30));
+			for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
+		}
+
+		RenderMario<0, false>(marioGeometry);
+		RenderMario<0, true>(marioGeometry);
+
+		static bool bOnce = true;
+		if (bOnce) {
+			aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
+			bOnce = false;
+		}
 	}
 
 	void OnAudioTick() {
-		WriteLog("OnAudioTick");
-
 		int numDesiredSamples = 3200;
 		int sampleRate = 32000;
-
-		// todo make sure this is after bass init
-		//HSAMPLE sample = BASS_SampleCreate(numDesiredSamples, sampleRate, 1, 1, BASS_SAMPLE_LOOP|BASS_SAMPLE_OVER_POS); // create sample
 
 		static CNyaTimer gTimer;
 		gTimer.Process();
 
 		auto audioStream = BASS_StreamCreate(sampleRate, 2, 0, STREAMPROC_PUSH, nullptr);
 
-		WriteLog("audioStream");
-
 		double currentTime = gTimer.fTotalTime;
 		double targetTime = 0;
 		while (true) {
 			gTimer.Process();
 
-			WriteLog("gTimer.Process()");
-
 			int16_t audioBuffer[numDesiredSamples*2]; // ??????????
 			uint32_t numSamples = sm64_audio_tick(0, numDesiredSamples, audioBuffer);
 			//BASS_SampleSetData(sample, audioBuffer); // set the sample's data
 
-			WriteLog("sm64_audio_tick()");
-
 			BASS_StreamPutData(audioStream, audioBuffer, numSamples*8);
 			BASS_ChannelPlay(audioStream, false);
-
-			WriteLog(std::format("queued {} samples", numSamples));
 
 			targetTime = currentTime + (1.0 / 30.0);
 			while (gTimer.fTotalTime < targetTime) {
@@ -549,7 +616,7 @@ namespace SM64 {
 		//audio_init();
 
 		//sm64_play_music(0, 0x05 | 0x80, 0); // from decomp/include/seq_ids.h: SEQ_LEVEL_WATER | SEQ_VARIATION
-		sm64_play_music(0, 0x03, 0);
+		//sm64_play_music(0, 0x03, 0);
 
 		marioGeometry.position = new float[9 * SM64_GEO_MAX_TRIANGLES];
 		marioGeometry.color    = new float[9 * SM64_GEO_MAX_TRIANGLES];
@@ -561,5 +628,7 @@ namespace SM64 {
 		memset(marioGeometry.color, 0, sizeof(float)*9*SM64_GEO_MAX_TRIANGLES);
 		memset(marioGeometry.normal, 0, sizeof(float)*9*SM64_GEO_MAX_TRIANGLES);
 		memset(marioGeometry.uv, 0, sizeof(float)*6*SM64_GEO_MAX_TRIANGLES);
+
+		bAvailable = true;
 	});
 }
