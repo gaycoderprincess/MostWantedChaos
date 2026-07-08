@@ -1,5 +1,5 @@
 namespace SM64 {
-#define RENDER_NFS_COLLISIONS
+//#define RENDER_NFS_COLLISIONS
 
 	uint8_t *utils_read_file_alloc( const char *path, size_t *fileLength )
 	{
@@ -584,6 +584,13 @@ namespace SM64 {
 	bool bDoReset = false;
 	bool bEnabled = false;
 	bool bAvailable = false;
+
+	void DisableMario() {
+		bEnabled = false;
+		CarRender_DontRenderPlayer = false;
+		DrawLightFlares = true;
+		DrawCars = true;
+	}
 
 	void OnTick() {
 		if (!bEnabled) {

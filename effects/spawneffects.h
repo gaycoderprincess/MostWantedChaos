@@ -1351,7 +1351,7 @@ public:
 		CustomCamera::ProcessCam(pMoverCamera, delta);
 	}
 	void DeinitFunction() override {
-		SM64::bEnabled = false;
+		SM64::DisableMario();
 		NyaHookLib::Patch(0x892A64, 0x431D60);
 		NyaHookLib::Patch(0x892A68, 0x4223E0);
 	}

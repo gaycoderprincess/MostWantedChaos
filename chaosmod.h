@@ -465,7 +465,7 @@ void ChaosModMenu() {
 			}
 
 			if (DrawMenuOption("mario disable")) {
-				SM64::bEnabled = false;
+				SM64::DisableMario();
 				CustomCamera::bRunCustom = false;
 			}
 
