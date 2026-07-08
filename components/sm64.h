@@ -677,26 +677,28 @@ namespace SM64 {
 		marioInputs.stickY = GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / -32767.0;
 
 		// basic keyboard controls
-		if (IsKeyPressed(VK_LEFT)) {
-			marioInputs.stickX = -1.0;
-		}
-		if (IsKeyPressed(VK_RIGHT)) {
-			marioInputs.stickX = 1.0;
-		}
-		if (IsKeyPressed(VK_UP)) {
-			marioInputs.stickY = -1.0;
-		}
-		if (IsKeyPressed(VK_DOWN)) {
-			marioInputs.stickY = 1.0;
-		}
-		if (IsKeyPressed(VK_SPACE)) {
-			marioInputs.buttonA = 1;
-		}
-		if (IsKeyPressed(VK_CONTROL)) {
-			marioInputs.buttonZ = 1;
-		}
-		if (IsKeyPressed(VK_LBUTTON)) {
-			marioInputs.buttonB = 1;
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
+			if (IsKeyPressed(VK_LEFT)) {
+				marioInputs.stickX = -1.0;
+			}
+			if (IsKeyPressed(VK_RIGHT)) {
+				marioInputs.stickX = 1.0;
+			}
+			if (IsKeyPressed(VK_UP)) {
+				marioInputs.stickY = -1.0;
+			}
+			if (IsKeyPressed(VK_DOWN)) {
+				marioInputs.stickY = 1.0;
+			}
+			if (IsKeyPressed(VK_SPACE)) {
+				marioInputs.buttonA = 1;
+			}
+			if (IsKeyPressed(VK_CONTROL)) {
+				marioInputs.buttonZ = 1;
+			}
+			if (IsKeyPressed(VK_LBUTTON)) {
+				marioInputs.buttonB = 1;
+			}
 		}
 
 		if (!FEManager::mPauseRequest) {
@@ -774,9 +776,6 @@ namespace SM64 {
 	ChloeHook Init([](){
 		DLLDirSetter _setdir;
 
-		aDrawing3DLoopFunctions.push_back(OnTick);
-		//aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
-
 		// init mario
 		size_t romSize;
 
@@ -812,6 +811,9 @@ namespace SM64 {
 		memset(marioGeometry.color, 0, sizeof(float)*9*SM64_GEO_MAX_TRIANGLES);
 		memset(marioGeometry.normal, 0, sizeof(float)*9*SM64_GEO_MAX_TRIANGLES);
 		memset(marioGeometry.uv, 0, sizeof(float)*6*SM64_GEO_MAX_TRIANGLES);
+
+		aDrawing3DLoopFunctions.push_back(OnTick);
+		//aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
 
 		bAvailable = true;
 	});
