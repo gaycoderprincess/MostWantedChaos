@@ -31,11 +31,6 @@ std::vector<void(*)()> aDrawing3DLoopFunctions;
 #include "components/customcar.h"
 #include "components/hints.h"
 
-// todo finish - need barrier & collision tri conversions
-#include "include/surface_terrains.h"
-#include "include/libsm64.h"
-#include "components/sm64.h"
-
 namespace FlatOutHUD {
 	#include "components/fo1hud/common.h"
 	#include "components/fo1hud/ingame.h"
@@ -54,6 +49,11 @@ namespace FlatOutHUD {
 #include "hooks/busted.h"
 #include "hooks/fakeexit.h"
 #include "hooks/prologuem3.h"
+
+#include "include/surface_terrains.h"
+#include "include/libsm64.h"
+#include "components/sm64.h"
+
 #include "chaoseffect.h"
 #include "chaosmod.h"
 #include "chaossave.h"

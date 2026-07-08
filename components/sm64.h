@@ -40,6 +40,13 @@ namespace SM64 {
 		return out;
 	}
 
+	NyaVec3 MarioToWorld(NyaVec3 v) {
+		auto out = v / marioScalar;
+		//out.x *= -1;
+		out.z *= -1;
+		return out;
+	}
+
 	NyaVec3 WorldToMario(NyaVec3 v) {
 		auto out = v * marioScalar;
 		//out.x *= -1;
@@ -47,7 +54,7 @@ namespace SM64 {
 		return out;
 	}
 
-	template<bool isCollision>
+	template<int bufId>
 	void RenderMario(SM64MarioGeometryBuffers marioBuffers) {
 		int numFaces = SM64_GEO_MAX_TRIANGLES;
 		int numVertices = 3 * numFaces;
@@ -208,25 +215,33 @@ namespace SM64 {
 		obj.transform.eulerRotation[1] = 0;
 		obj.transform.eulerRotation[2] = 0;
 
+		auto objFlip = obj;
+		objFlip.surfaces = new SM64Surface[aCollisionTris.size()];
+
 		WriteLog(std::format("obj.surfaceCount {}", obj.surfaceCount));
 
 		static SM64MarioGeometryBuffers colBuffers = {};
+		static SM64MarioGeometryBuffers colBuffersFlip = {};
 		if (!colBuffers.position) {
 			colBuffers.position = new float[9 * SM64_GEO_MAX_TRIANGLES];
-			colBuffers.normal = new float[9 * SM64_GEO_MAX_TRIANGLES];
-			colBuffers.color = new float[9 * SM64_GEO_MAX_TRIANGLES];
-			colBuffers.uv = new float[6 * SM64_GEO_MAX_TRIANGLES];
+			colBuffers.normal = colBuffersFlip.normal = new float[9 * SM64_GEO_MAX_TRIANGLES];
+			colBuffers.color = colBuffersFlip.color = new float[9 * SM64_GEO_MAX_TRIANGLES];
+			colBuffers.uv = colBuffersFlip.uv = new float[6 * SM64_GEO_MAX_TRIANGLES];
+			colBuffersFlip.position = new float[9 * SM64_GEO_MAX_TRIANGLES];
 		}
-		colBuffers.numTrianglesUsed = std::min((int)aCollisionTris.size(), (int)SM64_GEO_MAX_TRIANGLES);
+		colBuffers.numTrianglesUsed = colBuffersFlip.numTrianglesUsed = std::min((int)aCollisionTris.size(), (int)SM64_GEO_MAX_TRIANGLES);
 
 		auto colDrawPosition = &colBuffers.position[0];
 		auto colDrawNormal = &colBuffers.normal[0];
 		auto colDrawColor = &colBuffers.color[0];
 		auto colDrawUV = &colBuffers.uv[0];
 
+		auto colDrawFlipPosition = &colBuffersFlip.position[0];
+
 		for (int i = 0; i < aCollisionTris.size(); i++) {
 			auto in = &aCollisionTris[i];
 			auto out = &obj.surfaces[i];
+			auto out2 = &objFlip.surfaces[i];
 
 			out->type = SURFACE_DEFAULT;
 			out->force = 0;
@@ -246,17 +261,39 @@ namespace SM64 {
 			out->vertices[2][1] = pt0[1];
 			out->vertices[2][2] = pt0[2];
 
+			*out2 = *out;
+			out2->vertices[0][0] = pt0[0];
+			out2->vertices[0][1] = pt0[1];
+			out2->vertices[0][2] = pt0[2];
+			out2->vertices[1][0] = pt1[0];
+			out2->vertices[1][1] = pt1[1];
+			out2->vertices[1][2] = pt1[2];
+			out2->vertices[2][0] = pt2[0];
+			out2->vertices[2][1] = pt2[1];
+			out2->vertices[2][2] = pt2[2];
+
 			if (i < colBuffers.numTrianglesUsed) {
-				colDrawPosition[0] = pt2[0];
-				colDrawPosition[1] = pt2[1];
-				colDrawPosition[2] = pt2[2];
+				colDrawPosition[0] = pt0[0];
+				colDrawPosition[1] = pt0[1];
+				colDrawPosition[2] = pt0[2];
 				colDrawPosition[3] = pt1[0];
 				colDrawPosition[4] = pt1[1];
 				colDrawPosition[5] = pt1[2];
-				colDrawPosition[6] = pt0[0];
-				colDrawPosition[7] = pt0[1];
-				colDrawPosition[8] = pt0[2];
+				colDrawPosition[6] = pt2[0];
+				colDrawPosition[7] = pt2[1];
+				colDrawPosition[8] = pt2[2];
 				colDrawPosition += 9;
+
+				colDrawFlipPosition[0] = pt2[0];
+				colDrawFlipPosition[1] = pt2[1];
+				colDrawFlipPosition[2] = pt2[2];
+				colDrawFlipPosition[3] = pt1[0];
+				colDrawFlipPosition[4] = pt1[1];
+				colDrawFlipPosition[5] = pt1[2];
+				colDrawFlipPosition[6] = pt0[0];
+				colDrawFlipPosition[7] = pt0[1];
+				colDrawFlipPosition[8] = pt0[2];
+				colDrawFlipPosition += 9;
 
 				colDrawNormal[0] = 0;
 				colDrawNormal[1] = 1;
@@ -301,7 +338,13 @@ namespace SM64 {
 			aCollisionTriMarios.push_back(id);
 		}
 
-		RenderMario<true>(colBuffers);
+		auto id2 = sm64_surface_object_create(&objFlip);
+		if (id2 != -1) {
+			aCollisionTriMarios.push_back(id2);
+		}
+
+		RenderMario<1>(colBuffers);
+		RenderMario<2>(colBuffersFlip);
 	}
 
 	void OnTick() {
@@ -317,6 +360,26 @@ namespace SM64 {
 			WriteLog(std::format("aCollisionTris.size() {}", aCollisionTris.size()));
 
 			UpdateMarioCollision();
+
+			UMath::Vector3 marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
+			UMath::Vector3 marioVel = MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]});
+			if (marioPos.length() > 50) {
+				marioPos.y += 1;
+				ply->SetPosition(&marioPos);
+
+				UMath::Vector4 q = {0,0,0,1};
+				ply->SetOrientation(&q);
+
+				UMath::Vector3 tmp = {0,0,0};
+
+				ply->SetLinearVelocity(&marioVel);
+				ply->SetAngularVelocity(&tmp);
+
+				CarRender_DontRenderPlayer = true;
+			}
+		}
+		else {
+			CarRender_DontRenderPlayer = false;
 		}
 
 		static CNyaTimer gTimer;
@@ -354,7 +417,7 @@ namespace SM64 {
 		for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / (1.f/30));
 		for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
 
-		RenderMario<false>(marioGeometry);
+		RenderMario<0>(marioGeometry);
 	}
 
 	void LoadDummyFloor(NyaVec3 center, int width) {
