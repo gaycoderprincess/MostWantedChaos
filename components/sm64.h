@@ -676,6 +676,29 @@ namespace SM64 {
 		marioInputs.stickX = GetPadKeyState(NYA_PAD_KEY_LSTICK_X) / 32767.0;
 		marioInputs.stickY = GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / -32767.0;
 
+		// basic keyboard controls
+		if (IsKeyPressed(VK_LEFT)) {
+			marioInputs.stickX = -1.0;
+		}
+		if (IsKeyPressed(VK_RIGHT)) {
+			marioInputs.stickX = 1.0;
+		}
+		if (IsKeyPressed(VK_UP)) {
+			marioInputs.stickY = -1.0;
+		}
+		if (IsKeyPressed(VK_DOWN)) {
+			marioInputs.stickY = 1.0;
+		}
+		if (IsKeyPressed(VK_SPACE)) {
+			marioInputs.buttonA = 1;
+		}
+		if (IsKeyPressed(VK_CONTROL)) {
+			marioInputs.buttonZ = 1;
+		}
+		if (IsKeyPressed(VK_LBUTTON)) {
+			marioInputs.buttonB = 1;
+		}
+
 		if (!FEManager::mPauseRequest) {
 			sm64_set_sound_volume(GetSFXVolume());
 
