@@ -769,6 +769,8 @@ public:
 		auto invuln = veh->mCOMObject->Find<IRBVehicle>()->GetInvulnerability();
 		if (invuln != INVULNERABLE_NONE && invuln != INVULNERABLE_FROM_MANUAL_RESET) return false;
 		if (veh->IsStaging()) return false;
+		// don't target mario if he's dead
+		if (veh->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled && SM64::marioState.health <= 0xFF) return false;
 		// don't target racers during NISs
 		//if (veh->GetDriverClass() == DRIVER_RACER || veh->GetDriverClass() == DRIVER_HUMAN) {
 		//	if (INIS::mInstance) return false;

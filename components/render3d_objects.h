@@ -158,7 +158,7 @@ namespace Render3DObjects {
 		aBarriers.push_back(CustomBarrier(max, min)); // inverted barrier so it's always double sided
 	}
 
-	void ProcessBarriers(WCollider* pCollider) {
+	std::vector<CustomBarrier> GetFullBarrierList() {
 		auto potentialBarriers = aBarriers;
 		for (auto& obj : aObjects) {
 			if (!obj.IsActive()) continue;
@@ -177,6 +177,11 @@ namespace Render3DObjects {
 				potentialBarriers.push_back(inv);
 			}
 		}
+		return potentialBarriers;
+	}
+
+	void ProcessBarriers(WCollider* pCollider) {
+		auto potentialBarriers = GetFullBarrierList();
 
 		auto collider2d = pCollider->fPosition;
 		collider2d.y = 0;

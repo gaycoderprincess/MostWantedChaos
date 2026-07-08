@@ -548,6 +548,7 @@ namespace SM64 {
 	bool bDoReset = false;
 	bool bEnabled = false;
 	bool bAvailable = false;
+	double fTimeSinceLastAttacked = 0.0;
 
 	void DisableMario() {
 		bEnabled = false;
@@ -596,7 +597,8 @@ namespace SM64 {
 
 				// custom spawned barriers from chaos objects
 				std::vector<WCollisionBarrier> barriers;
-				for (auto& barrier : Render3DObjects::aBarriers) {
+				auto customBarriers = Render3DObjects::GetFullBarrierList();
+				for (auto& barrier : customBarriers) {
 					barriers.push_back(barrier.data);
 				}
 				ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
@@ -675,10 +677,15 @@ namespace SM64 {
 		marioInputs.stickY = GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / -32767.0;
 
 		if (!FEManager::mPauseRequest) {
+			sm64_set_sound_volume(GetSFXVolume());
+
 			static CNyaTimer gTimer;
 			gTimer.Process();
 
-			sm64_set_mario_health(marioId, 0x880);
+			fTimeSinceLastAttacked += gTimer.fDeltaTime;
+			if (fTimeSinceLastAttacked > 2.0) {
+				sm64_set_mario_health(marioId, 0x880);
+			}
 
 			while (gTimer.fTotalTime >= 1.f/30)
 			{
@@ -789,13 +796,16 @@ namespace SM64 {
 	void OnTakeDamage(int damage, NyaVec3 pos, bool heavyDamage) {
 		if (!bEnabled) return;
 
+		fTimeSinceLastAttacked = 0;
+
 		//sm64_set_mario_action_arg(SM64::marioId, ACT_BURNING_JUMP, 1);
 
 		NyaVec3 mario = SM64::WorldToMario(pos);
 		sm64_mario_take_damage(SM64::marioId, 1, heavyDamage ? 8 : 0, mario.x, mario.y, mario.z);
 
-		if (heavyDamage) {
-			sm64_set_mario_forward_velocity(SM64::marioId, 150);
-		}
+		// doesnt work
+		//if (heavyDamage) {
+		//	sm64_set_mario_forward_velocity(SM64::marioId, 150);
+		//}
 	}
 }
