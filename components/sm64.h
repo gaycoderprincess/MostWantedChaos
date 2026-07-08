@@ -589,11 +589,20 @@ namespace SM64 {
 				aCollisionTris.clear();
 				aCollisionBarriers.clear();
 
-				auto col = (WCollider*)ply->GetWCollider();
-				for (int i = 0; i < col->fInstanceCacheList.size(); i++) {
-					auto inst = col->fInstanceCacheList[i];
-					ProcessCollisionArticle(inst);
+				for (int i = 0; i < 2700; i++) {
+					auto pack = WCollisionAssets::mCollisionPackList[i];
+					if (!pack) continue;
+
+					for (int j = 0; j < pack->mInstanceNum; j++) {
+						ProcessCollisionArticle(&pack->mInstanceList[j]);
+					}
 				}
+
+				//auto col = (WCollider*)ply->GetWCollider();
+				//for (int i = 0; i < col->fInstanceCacheList.size(); i++) {
+				//	auto inst = col->fInstanceCacheList[i];
+				//	ProcessCollisionArticle(inst);
+				//}
 
 				// custom spawned barriers from chaos objects
 				std::vector<WCollisionBarrier> barriers;

@@ -1233,6 +1233,8 @@ public:
 				avel += dir * attackPowerAng;
 				rb->SetAngularVelocity(&avel);
 
+				SM64::OnTakeDamage(1, obj->vColPosition, true);
+
 				NyaAudio::Delete(&data->audio);
 
 				if (!data->launchAudio) data->launchAudio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/sci_pain4.wav");
