@@ -13,6 +13,7 @@ SET(CMAKE_CXX_STANDARD 23)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel -s -static")
 
 link_directories(${CMAKE_SOURCE_DIR}/../nya-common/lib32)
+link_directories(${CMAKE_SOURCE_DIR}/lib32)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     link_directories($ENV{VCPKG_ROOT}/installed/x86-mingw-static/lib)
@@ -73,3 +74,4 @@ set_target_properties(NFSMWChaos PROPERTIES SUFFIX "_gcp.asi")
 target_link_libraries(NFSMWChaos d3dx9)
 target_link_libraries(NFSMWChaos bass)
 target_link_libraries(NFSMWChaos ws2_32)
+#target_link_libraries(NFSMWChaos sm64)

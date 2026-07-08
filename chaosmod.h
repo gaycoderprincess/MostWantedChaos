@@ -456,6 +456,20 @@ void ChaosModMenu() {
 
 	if (DrawMenuOption("Debug")) {
 		ChloeMenuLib::BeginMenu();
+		/*if (DrawMenuOption("Mario Debug")) {
+			ChloeMenuLib::BeginMenu();
+
+			DrawMenuOption(std::format("position {:.2f} {:.2f} {:.2f}",SM64::marioState.position[0],SM64::marioState.position[1],SM64::marioState.position[2]));
+			DrawMenuOption(std::format("velocity {:.2f} {:.2f} {:.2f}",SM64::marioState.velocity[0],SM64::marioState.velocity[1],SM64::marioState.velocity[2]));
+			DrawMenuOption(std::format("marioId {}",SM64::marioId));
+			DrawMenuOption(std::format("numTrianglesUsed {}",SM64::marioGeometry.numTrianglesUsed));
+			DrawMenuOption(std::format("geom 0 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[0],SM64::marioGeometry.position[1],SM64::marioGeometry.position[2]));
+			DrawMenuOption(std::format("geom 1 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[3],SM64::marioGeometry.position[4],SM64::marioGeometry.position[5]));
+			DrawMenuOption(std::format("geom 2 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[6],SM64::marioGeometry.position[7],SM64::marioGeometry.position[8]));
+			QuickValueEditor("marioScalar", SM64::marioScalar);
+
+			ChloeMenuLib::EndMenu();
+		}*/
 		if (DrawMenuOption("Player Debug")) {
 			ChloeMenuLib::BeginMenu();
 			if (DrawMenuOption("Change C6 to Cross")) {
