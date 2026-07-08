@@ -19,6 +19,7 @@ std::vector<void(*)()> aMainLoopFunctionsOnce;
 std::vector<void(*)()> aDrawingLoopFunctions;
 std::vector<void(*)()> aDrawingLoopFunctionsOnce;
 std::vector<void(*)()> aDrawing3DLoopFunctions;
+std::vector<void(*)()> aDrawing3DLoopFunctionsOnce;
 
 #include "util.h"
 #include "d3dhook.h"
@@ -129,6 +130,11 @@ void Render3DLoop() {
 	for (auto& func : aDrawing3DLoopFunctions) {
 		func();
 	}
+
+	for (auto& func : aDrawing3DLoopFunctionsOnce) {
+		func();
+	}
+	aDrawing3DLoopFunctionsOnce.clear();
 
 	state->Apply();
 	state->Release();

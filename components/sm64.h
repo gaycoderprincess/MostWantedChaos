@@ -1,4 +1,6 @@
 namespace SM64 {
+//#define RENDER_NFS_COLLISIONS
+
 	uint8_t *utils_read_file_alloc( const char *path, size_t *fileLength )
 	{
 		FILE *f = fopen( path, "rb" );
@@ -218,8 +220,7 @@ namespace SM64 {
 		auto objFlip = obj;
 		objFlip.surfaces = new SM64Surface[aCollisionTris.size()];
 
-		WriteLog(std::format("obj.surfaceCount {}", obj.surfaceCount));
-
+#ifdef RENDER_NFS_COLLISIONS
 		static SM64MarioGeometryBuffers colBuffers = {};
 		static SM64MarioGeometryBuffers colBuffersFlip = {};
 		if (!colBuffers.position) {
@@ -237,6 +238,7 @@ namespace SM64 {
 		auto colDrawUV = &colBuffers.uv[0];
 
 		auto colDrawFlipPosition = &colBuffersFlip.position[0];
+#endif
 
 		for (int i = 0; i < aCollisionTris.size(); i++) {
 			auto in = &aCollisionTris[i];
@@ -272,6 +274,7 @@ namespace SM64 {
 			out2->vertices[2][1] = pt2[1];
 			out2->vertices[2][2] = pt2[2];
 
+#ifdef RENDER_NFS_COLLISIONS
 			if (i < colBuffers.numTrianglesUsed) {
 				colDrawPosition[0] = pt0[0];
 				colDrawPosition[1] = pt0[1];
@@ -331,6 +334,7 @@ namespace SM64 {
 				colDrawUV[1] = 0;
 				colDrawUV += 2;
 			}
+#endif
 		}
 
 		auto id = sm64_surface_object_create(&obj);
@@ -343,9 +347,13 @@ namespace SM64 {
 			aCollisionTriMarios.push_back(id2);
 		}
 
+#ifdef RENDER_NFS_COLLISIONS
 		RenderMario<1>(colBuffers);
 		RenderMario<2>(colBuffersFlip);
+#endif
 	}
+
+	void InitAudio();
 
 	void OnTick() {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
@@ -356,8 +364,6 @@ namespace SM64 {
 				auto inst = col->fInstanceCacheList[i];
 				ProcessCollisionArticle(inst);
 			}
-
-			WriteLog(std::format("aCollisionTris.size() {}", aCollisionTris.size()));
 
 			UpdateMarioCollision();
 
@@ -418,6 +424,12 @@ namespace SM64 {
 		for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
 
 		RenderMario<0>(marioGeometry);
+
+		static bool bOnce = true;
+		if (bOnce) {
+			aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
+			bOnce = false;
+		}
 	}
 
 	void LoadDummyFloor(NyaVec3 center, int width) {
@@ -462,8 +474,57 @@ namespace SM64 {
 		marioId = sm64_mario_create(pos.x, pos.y + 300, pos.z);
 	}
 
+	void OnAudioTick() {
+		WriteLog("OnAudioTick");
+
+		int numDesiredSamples = 3200;
+		int sampleRate = 32000;
+
+		// todo make sure this is after bass init
+		//HSAMPLE sample = BASS_SampleCreate(numDesiredSamples, sampleRate, 1, 1, BASS_SAMPLE_LOOP|BASS_SAMPLE_OVER_POS); // create sample
+
+		static CNyaTimer gTimer;
+		gTimer.Process();
+
+		auto audioStream = BASS_StreamCreate(sampleRate, 2, 0, STREAMPROC_PUSH, nullptr);
+
+		WriteLog("audioStream");
+
+		double currentTime = gTimer.fTotalTime;
+		double targetTime = 0;
+		while (true) {
+			gTimer.Process();
+
+			WriteLog("gTimer.Process()");
+
+			int16_t audioBuffer[numDesiredSamples*2]; // ??????????
+			uint32_t numSamples = sm64_audio_tick(0, numDesiredSamples, audioBuffer);
+			//BASS_SampleSetData(sample, audioBuffer); // set the sample's data
+
+			WriteLog("sm64_audio_tick()");
+
+			BASS_StreamPutData(audioStream, audioBuffer, numSamples*8);
+			BASS_ChannelPlay(audioStream, false);
+
+			WriteLog(std::format("queued {} samples", numSamples));
+
+			targetTime = currentTime + (1.0 / 30.0);
+			while (gTimer.fTotalTime < targetTime) {
+				Sleep(0);
+				gTimer.Process();
+			}
+			currentTime = gTimer.fTotalTime;
+		}
+	}
+
+	void InitAudio() {
+		WriteLog("InitAudio");
+		std::thread(OnAudioTick).detach();
+	}
+
 	ChloeHook Init([](){
 		aDrawing3DLoopFunctions.push_back(OnTick);
+		//aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
 
 		// init mario
 		size_t romSize;
@@ -478,7 +539,8 @@ namespace SM64 {
 		uint8_t *texture = (uint8_t*)malloc( 4 * SM64_TEXTURE_WIDTH * SM64_TEXTURE_HEIGHT );
 
 		sm64_global_terminate();
-		sm64_global_init( rom, texture );
+		sm64_global_init(rom, texture);
+		sm64_audio_init(rom);
 
 		ResetMario({0,0,0});
 
@@ -487,6 +549,7 @@ namespace SM64 {
 		//audio_init();
 
 		//sm64_play_music(0, 0x05 | 0x80, 0); // from decomp/include/seq_ids.h: SEQ_LEVEL_WATER | SEQ_VARIATION
+		sm64_play_music(0, 0x03, 0);
 
 		marioGeometry.position = new float[9 * SM64_GEO_MAX_TRIANGLES];
 		marioGeometry.color    = new float[9 * SM64_GEO_MAX_TRIANGLES];
