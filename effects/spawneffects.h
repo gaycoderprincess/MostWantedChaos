@@ -832,8 +832,8 @@ public:
 
 				data->styleRanking += attackStyleIncrease;
 
-				if (car->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled) {
-					sm64_set_mario_action_arg(SM64::marioId, ACT_BURNING_JUMP, 1);
+				if (car->GetDriverClass() == DRIVER_HUMAN) {
+					SM64::OnTakeDamage(1, obj->vColPosition, true);
 				}
 
 				if (car->GetDriverClass() == DRIVER_COP) {

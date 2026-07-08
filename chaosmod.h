@@ -456,7 +456,7 @@ void ChaosModMenu() {
 
 	if (DrawMenuOption("Debug")) {
 		ChloeMenuLib::BeginMenu();
-		if (DrawMenuOption("Mario Debug")) {
+		if (SM64::bAvailable && DrawMenuOption("Mario Debug")) {
 			ChloeMenuLib::BeginMenu();
 
 			if (DrawMenuOption("mario enable")) {

@@ -244,42 +244,6 @@ namespace SM64 {
 		}
 	}
 
-	void ProcessCollisionBarriers(WCollisionBarrierListEntry* list, int count, NyaVec3 offset) {
-		for (int i = 0; i < count; i++) {
-			auto ptMin = list[i].fB.fPts[0];
-			auto ptMax = list[i].fB.fPts[1];
-			ptMin -= offset;
-			ptMax -= offset;
-
-
-
-			// first tri
-			WCollisionTri tri;
-			tri.fPt2.x = ptMin.x;
-			tri.fPt2.y = ptMin.y;
-			tri.fPt2.z = ptMin.z;
-			tri.fPt1.x = ptMin.x;
-			tri.fPt1.y = ptMax.y;
-			tri.fPt1.z = ptMin.z;
-			tri.fPt0.x = ptMax.x;
-			tri.fPt0.y = ptMax.y;
-			tri.fPt0.z = ptMax.z;
-			aCollisionBarriers.push_back(tri);
-
-			// second tri
-			tri.fPt0.x = ptMin.x;
-			tri.fPt0.y = ptMin.y;
-			tri.fPt0.z = ptMin.z;
-			tri.fPt1.x = ptMax.x;
-			tri.fPt1.y = ptMin.y;
-			tri.fPt1.z = ptMax.z;
-			tri.fPt2.x = ptMax.x;
-			tri.fPt2.y = ptMax.y;
-			tri.fPt2.z = ptMax.z;
-			aCollisionBarriers.push_back(tri);
-		}
-	}
-
 	void ProcessCollisionArticle(WCollisionInstance* inst) {
 		if (!inst) return;
 
@@ -630,7 +594,12 @@ namespace SM64 {
 					ProcessCollisionArticle(inst);
 				}
 
-				//ProcessCollisionBarriers(&col->fBarrierList[0], col->fBarrierList.size(), {0,0,0});
+				// custom spawned barriers from chaos objects
+				std::vector<WCollisionBarrier> barriers;
+				for (auto& barrier : Render3DObjects::aBarriers) {
+					barriers.push_back(barrier.data);
+				}
+				ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
 
 				UpdateMarioCollision();
 #ifndef RENDER_NFS_COLLISIONS
@@ -773,6 +742,8 @@ namespace SM64 {
 	}
 
 	ChloeHook Init([](){
+		DLLDirSetter _setdir;
+
 		aDrawing3DLoopFunctions.push_back(OnTick);
 		//aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
 
@@ -814,4 +785,17 @@ namespace SM64 {
 
 		bAvailable = true;
 	});
+
+	void OnTakeDamage(int damage, NyaVec3 pos, bool heavyDamage) {
+		if (!bEnabled) return;
+
+		//sm64_set_mario_action_arg(SM64::marioId, ACT_BURNING_JUMP, 1);
+
+		NyaVec3 mario = SM64::WorldToMario(pos);
+		sm64_mario_take_damage(SM64::marioId, 1, heavyDamage ? 8 : 0, mario.x, mario.y, mario.z);
+
+		if (heavyDamage) {
+			sm64_set_mario_forward_velocity(SM64::marioId, 150);
+		}
+	}
 }
