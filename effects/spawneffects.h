@@ -1331,7 +1331,7 @@ class Effect_Mario64 : public ChaosEffect {
 public:
 	Effect_Mario64() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Super Mario 64 Mode";
-		fTimerLength = 60;
+		fTimerLength = 90;
 		AddToIncompatiblityGroup("rubberband");
 		bAbortOnConditionFailed = true;
 		bCanQuickTrigger = false;
