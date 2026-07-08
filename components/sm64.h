@@ -170,6 +170,9 @@ namespace SM64 {
 	std::vector<int> aCollisionTriMarios;
 
 	void ProcessCollisionBarriers(WCollisionBarrier* list, int count, NyaVec3 offset) {
+		auto marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
+		marioPos.y = 0;
+
 		for (int i = 0; i < count; i++) {
 			auto ptMin = list[i].fPts[0];
 			auto ptMax = list[i].fPts[1];
@@ -187,18 +190,56 @@ namespace SM64 {
 			tri.fPt0.x = ptMax.x;
 			tri.fPt0.y = ptMax.y;
 			tri.fPt0.z = ptMax.z;
+
+			// normal
+			auto faceNormal = (tri.fPt1 - tri.fPt0).Cross(tri.fPt2 - tri.fPt0);
+			faceNormal.y = 0;
+			faceNormal.Normalize();
+
+			auto faceCenter = (tri.fPt0 + tri.fPt1 + tri.fPt2) / 3.0;
+			faceCenter.y = 0;
+
+			auto marioNormal = (marioPos - faceCenter);
+			marioNormal.Normalize();
+
+			// flip barrier face if mario is behind it
+			bool flip = marioNormal.Dot(faceNormal) > 0.0;
+			if (flip) {
+				tri.fPt0.x = ptMin.x;
+				tri.fPt0.y = ptMin.y;
+				tri.fPt0.z = ptMin.z;
+				tri.fPt1.x = ptMin.x;
+				tri.fPt1.y = ptMax.y;
+				tri.fPt1.z = ptMin.z;
+				tri.fPt2.x = ptMax.x;
+				tri.fPt2.y = ptMax.y;
+				tri.fPt2.z = ptMax.z;
+			}
 			aCollisionBarriers.push_back(tri);
 
 			// second tri
-			tri.fPt0.x = ptMin.x;
-			tri.fPt0.y = ptMin.y;
-			tri.fPt0.z = ptMin.z;
-			tri.fPt1.x = ptMax.x;
-			tri.fPt1.y = ptMin.y;
-			tri.fPt1.z = ptMax.z;
-			tri.fPt2.x = ptMax.x;
-			tri.fPt2.y = ptMax.y;
-			tri.fPt2.z = ptMax.z;
+			if (flip) {
+				tri.fPt2.x = ptMin.x;
+				tri.fPt2.y = ptMin.y;
+				tri.fPt2.z = ptMin.z;
+				tri.fPt1.x = ptMax.x;
+				tri.fPt1.y = ptMin.y;
+				tri.fPt1.z = ptMax.z;
+				tri.fPt0.x = ptMax.x;
+				tri.fPt0.y = ptMax.y;
+				tri.fPt0.z = ptMax.z;
+			}
+			else {
+				tri.fPt0.x = ptMin.x;
+				tri.fPt0.y = ptMin.y;
+				tri.fPt0.z = ptMin.z;
+				tri.fPt1.x = ptMax.x;
+				tri.fPt1.y = ptMin.y;
+				tri.fPt1.z = ptMax.z;
+				tri.fPt2.x = ptMax.x;
+				tri.fPt2.y = ptMax.y;
+				tri.fPt2.z = ptMax.z;
+			}
 			aCollisionBarriers.push_back(tri);
 		}
 	}
@@ -209,6 +250,8 @@ namespace SM64 {
 			auto ptMax = list[i].fB.fPts[1];
 			ptMin -= offset;
 			ptMax -= offset;
+
+
 
 			// first tri
 			WCollisionTri tri;
@@ -268,7 +311,7 @@ namespace SM64 {
 
 		// filter out unused barriers
 		if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
-		//ProcessCollisionBarriers((WCollisionBarrier*)(articles_end_ptr + article->fStripsSize), article->fNumEdges, instMat.p);
+		ProcessCollisionBarriers((WCollisionBarrier*)(articles_end_ptr + article->fStripsSize), article->fNumEdges, instMat.p);
 	}
 
 	void ClearMarioCollision() {
@@ -580,7 +623,7 @@ namespace SM64 {
 					ProcessCollisionArticle(inst);
 				}
 
-				ProcessCollisionBarriers(&col->fBarrierList[0], col->fBarrierList.size(), {0,0,0});
+				//ProcessCollisionBarriers(&col->fBarrierList[0], col->fBarrierList.size(), {0,0,0});
 
 				UpdateMarioCollision();
 #ifndef RENDER_NFS_COLLISIONS
