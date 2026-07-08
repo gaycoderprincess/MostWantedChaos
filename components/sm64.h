@@ -58,8 +58,12 @@ namespace SM64 {
 
 	int marioLightness = 128;
 
+	bool bInvincibleFlash = false;
+
 	template<int bufId, bool textured>
 	void RenderMario(SM64MarioGeometryBuffers marioBuffers) {
+		if (marioState.invincTimer > 0 && bInvincibleFlash) return;
+
 		int numFaces = SM64_GEO_MAX_TRIANGLES;
 		int numVertices = 3 * numFaces;
 		
@@ -735,6 +739,13 @@ namespace SM64 {
 
 			for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / (1.f/30));
 			for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
+		}
+
+		static CNyaTimer gInvincibilityTimer;
+		gInvincibilityTimer.Process();
+		while (gInvincibilityTimer.fTotalTime > 1.0 / 30.0) {
+			gInvincibilityTimer.fTotalTime -= 1.0 / 30.0;
+			bInvincibleFlash = !bInvincibleFlash;
 		}
 
 		RenderMario<0, false>(marioGeometry);
