@@ -709,6 +709,8 @@ namespace SM64 {
 			static CNyaTimer gTimer;
 			gTimer.Process();
 
+			sm64_set_mario_health(marioId, 0x880);
+
 			while (gTimer.fTotalTime >= 1.f/30)
 			{
 				memcpy(lastPos, currPos, sizeof(currPos));
