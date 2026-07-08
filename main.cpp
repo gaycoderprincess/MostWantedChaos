@@ -32,9 +32,9 @@ std::vector<void(*)()> aDrawing3DLoopFunctions;
 #include "components/hints.h"
 
 // todo finish - need barrier & collision tri conversions
-//#include "include/surface_terrains.h"
-//#include "include/libsm64.h"
-//#include "components/sm64.h"
+#include "include/surface_terrains.h"
+#include "include/libsm64.h"
+#include "components/sm64.h"
 
 namespace FlatOutHUD {
 	#include "components/fo1hud/common.h"
@@ -214,7 +214,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::RenderPropsHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PREPROPS>);
 			NyaHooks::RenderPropsHook::aPostFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_POSTPROPS>);
 
-			//SkipFE = true;
+			SkipFE = true;
 		} break;
 		default:
 			break;

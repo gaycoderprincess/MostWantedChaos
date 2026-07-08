@@ -456,7 +456,7 @@ void ChaosModMenu() {
 
 	if (DrawMenuOption("Debug")) {
 		ChloeMenuLib::BeginMenu();
-		/*if (DrawMenuOption("Mario Debug")) {
+		if (DrawMenuOption("Mario Debug")) {
 			ChloeMenuLib::BeginMenu();
 
 			DrawMenuOption(std::format("position {:.2f} {:.2f} {:.2f}",SM64::marioState.position[0],SM64::marioState.position[1],SM64::marioState.position[2]));
@@ -468,8 +468,25 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("geom 2 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[6],SM64::marioGeometry.position[7],SM64::marioGeometry.position[8]));
 			QuickValueEditor("marioScalar", SM64::marioScalar);
 
+			if (DrawMenuOption("mario teleport")) {
+				NyaVec3 v = {0,0,0};
+				if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+					v = *ply->GetPosition();
+					v.y -= 1;
+				}
+
+				SM64::ResetMario(v);
+			}
+
+			if (!SM64::aCollisionTris.empty()) {
+				auto col = SM64::aCollisionTris[0];
+				DrawMenuOption(std::format("col 0 {:.2f} {:.2f} {:.2f}",col.fPt0[0],col.fPt0[1],col.fPt0[2]));
+				DrawMenuOption(std::format("col 1 {:.2f} {:.2f} {:.2f}",col.fPt1[0],col.fPt1[1],col.fPt1[2]));
+				DrawMenuOption(std::format("col 2 {:.2f} {:.2f} {:.2f}",col.fPt2[0],col.fPt2[1],col.fPt2[2]));
+			}
+
 			ChloeMenuLib::EndMenu();
-		}*/
+		}
 		if (DrawMenuOption("Player Debug")) {
 			ChloeMenuLib::BeginMenu();
 			if (DrawMenuOption("Change C6 to Cross")) {

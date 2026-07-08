@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.27)
+project(libsm64)
+
+SET(CMAKE_SYSTEM_NAME Windows)
+
+SET(CMAKE_C_COMPILER i686-w64-mingw32-gcc)
+SET(CMAKE_CXX_COMPILER i686-w64-mingw32-g++)
+SET(CMAKE_RC_COMPILER i686-w64-mingw32-windres)
+SET(CMAKE_RANLIB i686-w64-mingw32-ranlib)
+
+SET(CMAKE_CXX_STANDARD 23)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel -s -static")
+
+add_compile_definitions(SM64_LIB_EXPORT GBI_FLOATS VERSION_US NO_SEGMENTED_MEMORY)
+
+FILE(GLOB MyCSources1 src/*.c)
+FILE(GLOB MyCSources2 src/decomp/*.c)
+FILE(GLOB MyCSources3 src/decomp/engine/*.c)
+FILE(GLOB MyCSources4 src/decomp/include/PR/*.c)
+FILE(GLOB MyCSources5 src/decomp/game/*.c)
+FILE(GLOB MyCSources6 src/decomp/pc/*.c)
+FILE(GLOB MyCSources7 src/decomp/pc/audio/*.c)
+FILE(GLOB MyCSources8 src/decomp/mario/*.c)
+FILE(GLOB MyCSources9 src/decomp/tools/*.c)
+FILE(GLOB MyCSources10 src/decomp/audio/*.c)
+add_library(libsm64 STATIC ${MyCSources1} ${MyCSources2} ${MyCSources3} ${MyCSources4} ${MyCSources5} ${MyCSources6} ${MyCSources7} ${MyCSources8} ${MyCSources9} ${MyCSources10})
+
+target_include_directories(libsm64 PUBLIC src/decomp/include)
+
+target_compile_options(libsm64 PRIVATE "-fno-strict-aliasing")
+target_compile_options(libsm64 PRIVATE "-g")
+target_compile_options(libsm64 PRIVATE "-Wall")
+target_compile_options(libsm64 PRIVATE "-Wno-unused-function")
+target_compile_options(libsm64 PRIVATE "-fPIC")
+target_compile_options(libsm64 PRIVATE "-fvisibility=hidden")
+
+set_target_properties(libsm64 PROPERTIES PREFIX "")
