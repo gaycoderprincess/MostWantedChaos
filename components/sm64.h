@@ -660,6 +660,9 @@ namespace SM64 {
 		if (marioPos.y < -100) {
 			bDoReset = true;
 		}
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND && marioPos.length() > 50) {
+			bDoReset = true;
+		}
 
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			static CNyaTimer gCollisionTimer;
