@@ -631,6 +631,7 @@ namespace SM64 {
 				// punches & kicks throw forward
 				else if (interaction == INT_PUNCH || interaction == INT_KICK) {
 					MarioInteract_KnockFwd(rb);
+					sm64_play_sound_global(SOUND_GENERAL_BREAK_BOX);
 				}
 				// all else throws away
 				//else if (interaction) {
