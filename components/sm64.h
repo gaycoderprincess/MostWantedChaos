@@ -816,7 +816,7 @@ namespace SM64 {
 			if (IsKeyPressed(VK_CONTROL)) {
 				marioInputs.buttonZ = 1;
 			}
-			if (IsKeyPressed(VK_LBUTTON)) {
+			if (IsKeyPressed(VK_LBUTTON) || IsKeyPressed(VK_SHIFT)) {
 				marioInputs.buttonB = 1;
 			}
 		}
