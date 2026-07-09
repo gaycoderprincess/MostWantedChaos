@@ -560,6 +560,7 @@ namespace SM64 {
 		DrawLightFlares = true;
 		DrawCars = true;
 	}
+
 	NyaVec3 GetMarioWorldPos() {
 		return MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
 	}
@@ -621,13 +622,13 @@ namespace SM64 {
 						}
 					}
 				}
-					// bounce off if needed
+				// bounce off if needed
 				else if (interaction == INT_HIT_FROM_ABOVE || interaction == INT_HIT_FROM_BELOW) {
 					if (dist < fJumpAttackRange) {
 						sm64_mario_attack(marioId, pos.x, pos.y, pos.z, dim.y * marioScalar);
 					}
 				}
-					// punches & kicks throw forward
+				// punches & kicks throw forward
 				else if (interaction == INT_PUNCH || interaction == INT_KICK) {
 					MarioInteract_KnockFwd(rb);
 				}
