@@ -558,7 +558,7 @@ namespace SM64 {
 
 	void EnableMario() {
 		bEnabled = true;
-		NyaHookLib::Patch<uint8_t>(0x6B1A02, 0x74); // disable player causality check for cop flipping
+		NyaHookLib::Patch<uint16_t>(0x6B1A02, 0x9090); // disable player causality check for cop flipping
 	}
 
 	void DisableMario() {
@@ -566,7 +566,7 @@ namespace SM64 {
 		CarRender_DontRenderPlayer = false;
 		DrawLightFlares = true;
 		DrawCars = true;
-		NyaHookLib::Patch<uint8_t>(0x6B1A02, 0xEB);
+		NyaHookLib::Patch<uint16_t>(0x6B1A02, 0x0974);
 	}
 
 	NyaVec3 GetMarioWorldPos() {
