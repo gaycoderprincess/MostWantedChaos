@@ -11,10 +11,6 @@ namespace CustomCamera {
 		return SM64::bEnabled && pTargetPlayerVehicle == GetLocalPlayerVehicle() && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
 	}
 
-	float GetMarioScale() {
-		return 100.0 / SM64::marioScalar;
-	}
-
 	bool bSecondPersonOrbitMode = true;
 
 	const float fPanSpeedBase = 0.005;
@@ -41,7 +37,7 @@ namespace CustomCamera {
 
 	double GetMinStringDistance(IRigidBody* ply) {
 		if (IsMario()) {
-			return 2.0 * fStringMinDistance * GetMarioScale();
+			return 2.0 * fStringMinDistance * SM64::GetMarioScale();
 		}
 
 		// this makes the heli stop moving??
@@ -54,7 +50,7 @@ namespace CustomCamera {
 
 	double GetMaxStringDistance(IRigidBody* ply) {
 		if (IsMario()) {
-			return 2.0 * fStringMaxDistance * GetMarioScale();
+			return 2.0 * fStringMaxDistance * SM64::GetMarioScale();
 		}
 
 		// this makes the heli stop moving??
@@ -67,7 +63,7 @@ namespace CustomCamera {
 
 	NyaVec3 GetLookatOffset(IRigidBody* ply) {
 		if (IsMario()) {
-			return {0, 1.0f * fLookatOffset * GetMarioScale(), 0};
+			return {0, 1.0f * fLookatOffset * SM64::GetMarioScale(), 0};
 		}
 
 		UMath::Vector3 dim;
@@ -77,7 +73,7 @@ namespace CustomCamera {
 
 	NyaVec3 GetFollowOffset(IRigidBody* ply) {
 		if (IsMario()) {
-			return {0, 1.0f * fFollowOffset * GetMarioScale(), 0};
+			return {0, 1.0f * fFollowOffset * SM64::GetMarioScale(), 0};
 		}
 
 		if (IsHeliCam()) return {0, -4, 0};
@@ -91,7 +87,7 @@ namespace CustomCamera {
 		if (IsMario()) {
 			static NyaVec3 v;
 			v = SM64::MarioToWorld({SM64::marioState.position[0], SM64::marioState.position[1], SM64::marioState.position[2]});
-			v.y += 1 * GetMarioScale();
+			v.y += 1 * SM64::GetMarioScale();
 			v += GetLookatOffset(ply);
 			return &v;
 		}
@@ -108,7 +104,7 @@ namespace CustomCamera {
 		if (IsMario()) {
 			static NyaVec3 v;
 			v = SM64::MarioToWorld({SM64::marioState.position[0], SM64::marioState.position[1], SM64::marioState.position[2]});
-			v.y += 1 * GetMarioScale();
+			v.y += 1 * SM64::GetMarioScale();
 			v += GetFollowOffset(ply);
 			return &v;
 		}

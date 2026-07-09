@@ -7,6 +7,8 @@ bool bRNGCycles = false;
 int nSmartRNG = 0;
 bool bDisableEpilepticEffects = false;
 
+bool bManualKeybindEnabled = false;
+
 bool bDarkMode = false;
 
 float fEffectX = 0.98;

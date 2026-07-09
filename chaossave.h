@@ -307,6 +307,7 @@ bool DoChaosSettingsSave() {
 	file.write((char*)&Effect_173::bDespawnPeanuts, sizeof(Effect_173::bDespawnPeanuts));
 	file.write((char*)&bDisableEpilepticEffects, sizeof(bDisableEpilepticEffects));
 	file.write((char*)&ChaosVoting::bTiebreakerRandom, sizeof(ChaosVoting::bTiebreakerRandom));
+	file.write((char*)&bManualKeybindEnabled, sizeof(bManualKeybindEnabled));
 	return true;
 }
 
@@ -334,6 +335,7 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&Effect_173::bDespawnPeanuts, sizeof(Effect_173::bDespawnPeanuts));
 	file.read((char*)&bDisableEpilepticEffects, sizeof(bDisableEpilepticEffects));
 	file.read((char*)&ChaosVoting::bTiebreakerRandom, sizeof(ChaosVoting::bTiebreakerRandom));
+	file.read((char*)&bManualKeybindEnabled, sizeof(bManualKeybindEnabled));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();

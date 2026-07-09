@@ -358,6 +358,10 @@ void ChaosLoop() {
 				AddRunningEffect(GetRandomEffect());
 			}
 		}
+
+		if (bManualKeybindEnabled && IsKeyJustPressed(VK_OEM_PLUS)) {
+			AddRunningEffect(GetRandomEffect(true));
+		}
 	}
 	else {
 		fTimeSinceLastEffect = 0;
@@ -404,6 +408,7 @@ void ChaosModMenu() {
 			}
 		}
 		QuickValueEditor("Random Effect Option", ChaosVoting::bRandomEffectOption);
+		QuickValueEditor("Add Effects With Num+", bManualKeybindEnabled);
 		if (ChaosVoting::IsEnabled()) {
 			QuickValueEditor("Auto-Reconnect", ChaosVoting::bAutoReconnect);
 			if (DrawMenuOption("Disconnect From Channel")) {
@@ -510,6 +515,10 @@ void ChaosModMenu() {
 
 			if (DrawMenuOption("mario damage")) {
 				sm64_mario_take_damage(SM64::marioId, 1, 0, 0, 0, 0);
+			}
+
+			if (DrawMenuOption("add wing cap")) {
+				sm64_mario_interact_cap(SM64::marioId, MARIO_WING_CAP, 0, 0);
 			}
 
 			if (!SM64::aCollisionTris.empty()) {

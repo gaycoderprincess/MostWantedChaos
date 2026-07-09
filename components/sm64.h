@@ -572,6 +572,10 @@ namespace SM64 {
 		return -mat.z;
 	}
 
+	float GetMarioScale() {
+		return 100.0f / SM64::marioScalar;
+	}
+
 	void MarioInteract_KnockAway(IRigidBody* body) {
 		UMath::Vector3 marioPos = GetMarioWorldPos();
 		auto objPos = *body->GetPosition();
@@ -587,6 +591,7 @@ namespace SM64 {
 	void MarioInteract_KnockFwd(IRigidBody* body) {
 		UMath::Vector3 dir = GetMarioWorldFacing();
 		dir *= 25;
+		dir.y = 5;
 		body->SetLinearVelocity(&dir);
 	}
 
@@ -603,8 +608,8 @@ namespace SM64 {
 			UMath::Vector3 dim;
 			rb->GetDimension(&dim);
 
-			const float fAttackRange = 5.0;
-			const float fJumpAttackRange = 2.0;
+			const float fAttackRange = 5.0 * GetMarioScale();
+			const float fJumpAttackRange = 2.0 * GetMarioScale();
 
 			float dist = (*car->GetPosition() - marioPos).length();
 			if (dist < fAttackRange) {
@@ -613,12 +618,15 @@ namespace SM64 {
 
 				// ground pound is an instakill
 				if (interaction == INT_GROUND_POUND_OR_TWIRL) {
-					if (dist < fJumpAttackRange) {
+					if (dist < fJumpAttackRange && marioState.velocity[1] < -50.0f) { // only kill while moving downwards
 						if (auto dam = car->mCOMObject->Find<IEngineDamage>()) {
-							dam->Blow();
+							if (!dam->IsBlown()) dam->Blow();
 						}
 						if (auto dam = car->mCOMObject->Find<IDamageable>()) {
-							dam->Destroy();
+							if (!dam->IsDestroyed()) {
+								dam->Destroy();
+								sm64_play_sound_global(SOUND_GENERAL_BREAK_BOX);
+							}
 						}
 					}
 				}
@@ -631,7 +639,20 @@ namespace SM64 {
 				// punches & kicks throw forward
 				else if (interaction == INT_PUNCH || interaction == INT_KICK) {
 					MarioInteract_KnockFwd(rb);
-					sm64_play_sound_global(SOUND_GENERAL_BREAK_BOX);
+
+					// bounce_back_from_attack
+
+					if (marioState.action == ACT_PUNCHING) {
+						sm64_set_mario_action(marioId, ACT_MOVE_PUNCHING);
+					}
+
+					if (marioState.action & ACT_FLAG_AIR) {
+						sm64_set_mario_forward_velocity(marioId, -16.0f);
+					} else {
+						sm64_set_mario_forward_velocity(marioId, -48.0f);
+					}
+
+					sm64_play_sound_global(SOUND_ACTION_HIT_2);
 				}
 				// all else throws away
 				//else if (interaction) {
