@@ -560,6 +560,84 @@ namespace SM64 {
 		DrawLightFlares = true;
 		DrawCars = true;
 	}
+	NyaVec3 GetMarioWorldPos() {
+		return MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
+	}
+
+	NyaVec3 GetMarioWorldFacing() {
+		NyaMat4x4 mat;
+		mat.SetIdentity();
+		mat.Rotate({0,0,marioState.faceAngle});
+		return -mat.z;
+	}
+
+	void MarioInteract_KnockAway(IRigidBody* body) {
+		UMath::Vector3 marioPos = GetMarioWorldPos();
+		auto objPos = *body->GetPosition();
+
+		UMath::Vector3 dir = (objPos - marioPos);
+		dir.Normalize();
+
+		dir *= 15;
+
+		body->SetLinearVelocity(&dir);
+	}
+
+	void MarioInteract_KnockFwd(IRigidBody* body) {
+		UMath::Vector3 dir = GetMarioWorldFacing();
+		dir *= 25;
+		body->SetLinearVelocity(&dir);
+	}
+
+	void MarioObjectInteractions() {
+		UMath::Vector3 marioPos = GetMarioWorldPos();
+
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			if (car == GetLocalPlayerVehicle()) continue;
+
+			auto rb = car->GetSimable()->GetRigidBody();
+			if (!rb) continue;
+
+			UMath::Vector3 dim;
+			rb->GetDimension(&dim);
+
+			const float fAttackRange = 5.0;
+			const float fJumpAttackRange = 2.0;
+
+			float dist = (*car->GetPosition() - marioPos).length();
+			if (dist < fAttackRange) {
+				auto pos = WorldToMario(*car->GetPosition());
+				auto interaction = sm64_fake_determine_interaction(marioId, pos.x, pos.y, pos.z);
+
+				// ground pound is an instakill
+				if (interaction == INT_GROUND_POUND_OR_TWIRL) {
+					if (dist < fJumpAttackRange) {
+						if (auto dam = car->mCOMObject->Find<IEngineDamage>()) {
+							dam->Blow();
+						}
+						if (auto dam = car->mCOMObject->Find<IDamageable>()) {
+							dam->Destroy();
+						}
+					}
+				}
+					// bounce off if needed
+				else if (interaction == INT_HIT_FROM_ABOVE || interaction == INT_HIT_FROM_BELOW) {
+					if (dist < fJumpAttackRange) {
+						sm64_mario_attack(marioId, pos.x, pos.y, pos.z, dim.y * marioScalar);
+					}
+				}
+					// punches & kicks throw forward
+				else if (interaction == INT_PUNCH || interaction == INT_KICK) {
+					MarioInteract_KnockFwd(rb);
+				}
+				// all else throws away
+				//else if (interaction) {
+				//	MarioInteract_KnockAway(rb);
+				//}
+			}
+		}
+	}
 
 	void OnTick() {
 		if (!bEnabled) {
@@ -715,6 +793,8 @@ namespace SM64 {
 		}
 
 		if (!FEManager::mPauseRequest) {
+			MarioObjectInteractions();
+
 			sm64_set_sound_volume(GetSFXVolume());
 
 			static CNyaTimer gTimer;

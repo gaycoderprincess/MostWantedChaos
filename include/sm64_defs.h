@@ -379,4 +379,13 @@
 #define ACT_HOLDING_BOWSER             0x00000391 // (0x191 | ACT_FLAG_STATIONARY)
 #define ACT_RELEASING_BOWSER           0x00000392 // (0x192 | ACT_FLAG_STATIONARY)
 
+#define INT_GROUND_POUND_OR_TWIRL (1 << 0) // 0x01
+#define INT_PUNCH                 (1 << 1) // 0x02
+#define INT_KICK                  (1 << 2) // 0x04
+#define INT_TRIP                  (1 << 3) // 0x08
+#define INT_SLIDE_KICK            (1 << 4) // 0x10
+#define INT_FAST_ATTACK_OR_SHELL  (1 << 5) // 0x20
+#define INT_HIT_FROM_ABOVE        (1 << 6) // 0x40
+#define INT_HIT_FROM_BELOW        (1 << 7) // 0x80
+
 #endif // SM64_H

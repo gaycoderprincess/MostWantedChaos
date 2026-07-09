@@ -499,6 +499,15 @@ void ChaosModMenu() {
 				SM64::ResetMario(v);
 			}
 
+			auto worldFacing = SM64::GetMarioWorldFacing();
+			DrawMenuOption(std::format("facing {:.2f} {:.2f} {:.2f}",worldFacing[0],worldFacing[1],worldFacing[2]));
+
+			if (DrawMenuOption("mario teleport fwd")) {
+				auto v = SM64::GetMarioWorldPos();
+				v += SM64::GetMarioWorldFacing() * 5;
+				SM64::ResetMario(v);
+			}
+
 			if (DrawMenuOption("mario damage")) {
 				sm64_mario_take_damage(SM64::marioId, 1, 0, 0, 0, 0);
 			}
