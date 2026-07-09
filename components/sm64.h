@@ -593,6 +593,9 @@ namespace SM64 {
 		dir *= 25;
 		dir.y = 5;
 		body->SetLinearVelocity(&dir);
+
+		dir *= 0.15;
+		body->SetAngularVelocity(&dir);
 	}
 
 	void MarioObjectInteractions() {
@@ -608,7 +611,7 @@ namespace SM64 {
 			UMath::Vector3 dim;
 			rb->GetDimension(&dim);
 
-			const float fAttackRange = 5.0 * GetMarioScale();
+			const float fAttackRange = 6.0 * GetMarioScale();
 			const float fJumpAttackRange = 2.0 * GetMarioScale();
 
 			float dist = (*car->GetPosition() - marioPos).length();
