@@ -5,6 +5,7 @@ float CarRender_TruncateRotationAccuracy = 10;
 bool CarRender_Billboard = false;
 bool CarRender_DontRenderPlayer = false;
 bool CarRender_BillboardEachOther = false;
+bool CarRender_Spin = false;
 NyaMat4x4 CarRender_ForceMatrix = {};
 NyaMat4x4 CarRender_LastMatrix = {};
 
@@ -68,6 +69,19 @@ int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVe
 				*carMatrix = *carMatrix * offsetMatrix;
 			}
 		}
+	}
+	if (CarRender_Spin) {
+		float rpm = 2000.0;
+		if (auto veh = GetClosestActiveVehicle(RenderToWorldCoords(carMatrix->p))) {
+			rpm = veh->mCOMObject->Find<IEngine>()->GetRPM();
+		}
+
+		static CNyaTimer gTimer;
+		gTimer.Process();
+
+		NyaMat4x4 offsetMatrix;
+		offsetMatrix.Rotate(NyaVec3(0, gTimer.fTotalTime*rpm*0.0064, 0));
+		*carMatrix = *carMatrix * offsetMatrix;
 	}
 	if (CarRender_TruncateRotation) {
 		double lengths[3] = {

@@ -670,3 +670,20 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_Fragile;
+
+class Effect_SpinCarVisual : public ChaosEffect {
+public:
+	Effect_SpinCarVisual() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Is This What RPM Means?";
+		sFriendlyName = "Crazy Spinny Cars (Visual)";
+		fTimerLength = 60;
+	}
+
+	void InitFunction() override {
+		CarRender_Spin = true;
+	}
+	void DeinitFunction() override {
+		CarRender_Spin = false;
+	}
+	bool HasTimer() override { return true; }
+} E_SpinCarVisual;

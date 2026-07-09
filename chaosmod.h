@@ -475,7 +475,7 @@ void ChaosModMenu() {
 			ChloeMenuLib::BeginMenu();
 
 			if (DrawMenuOption("mario enable")) {
-				SM64::bEnabled = true;
+				SM64::EnableMario();
 				CustomCamera::bRunCustom = true;
 			}
 

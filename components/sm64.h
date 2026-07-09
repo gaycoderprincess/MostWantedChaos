@@ -556,11 +556,17 @@ namespace SM64 {
 	bool bAvailable = false;
 	double fTimeSinceLastAttacked = 0.0;
 
+	void EnableMario() {
+		bEnabled = true;
+		NyaHookLib::Patch<uint8_t>(0x6B1A02, 0x74); // disable player causality check for cop flipping
+	}
+
 	void DisableMario() {
 		bEnabled = false;
 		CarRender_DontRenderPlayer = false;
 		DrawLightFlares = true;
 		DrawCars = true;
+		NyaHookLib::Patch<uint8_t>(0x6B1A02, 0xEB);
 	}
 
 	NyaVec3 GetMarioWorldPos() {
@@ -602,6 +608,83 @@ namespace SM64 {
 
 		dir *= 0.15;
 		body->SetAngularVelocity(&dir);
+	}
+
+	bool IsCustomObjectKillable(const Render3DObjects::Object& obj) {
+		if (obj.sDebugName == "vergil") return true;
+		if (obj.sDebugName == "scientist") return true;
+		return false;
+	}
+
+	bool IsCustomObjectPunchKillable(const Render3DObjects::Object& obj) {
+		if (obj.sDebugName == "scientist") return true;
+		return false;
+	}
+
+	void KillCustomObject(Render3DObjects::Object& obj) {
+		if (obj.sDebugName == "vergil") { // teleport vergil, cant remove his music from here
+			obj.vColPosition = obj.mMatrix.p = {0,-100,0};
+		}
+		else {
+			obj.aModels.clear();
+		}
+	}
+
+	void MarioCustomObjectInteractions() {
+		UMath::Vector3 marioPos = GetMarioWorldPos();
+
+		for (auto& car : Render3DObjects::aObjects) {
+			if (car.fColSize <= 0.0) continue;
+
+			float dimY = car.fColSize;
+
+			const float fAttackRange = 6.0 * GetMarioScale();
+			const float fJumpAttackRange = 2.0 * GetMarioScale();
+
+			float dist = (car.vColPosition - marioPos).length();
+			if (dist < fAttackRange) {
+				auto pos = WorldToMario(car.vColPosition);
+				auto interaction = sm64_fake_determine_interaction(marioId, pos.x, pos.y, pos.z);
+
+				// ground pound is an instakill
+				if (interaction == INT_GROUND_POUND_OR_TWIRL) {
+					if (dist < fJumpAttackRange && marioState.velocity[1] < -50.0f && IsCustomObjectKillable(car)) { // only kill while moving downwards
+						KillCustomObject(car);
+						sm64_play_sound_global(SOUND_GENERAL_BREAK_BOX);
+					}
+				}
+				// bounce off if needed
+				else if (interaction == INT_HIT_FROM_ABOVE || interaction == INT_HIT_FROM_BELOW) {
+					if (dist < fJumpAttackRange) {
+						sm64_mario_attack(marioId, pos.x, pos.y, pos.z, dimY * marioScalar);
+					}
+				}
+				// punches & kicks throw forward
+				else if (interaction == INT_PUNCH || interaction == INT_KICK) {
+					if (IsCustomObjectPunchKillable(car)) {
+						KillCustomObject(car);
+					}
+
+					// bounce_back_from_attack
+
+					if (marioState.action == ACT_PUNCHING) {
+						sm64_set_mario_action(marioId, ACT_MOVE_PUNCHING);
+					}
+
+					if (marioState.action & ACT_FLAG_AIR) {
+						sm64_set_mario_forward_velocity(marioId, -16.0f);
+					} else {
+						sm64_set_mario_forward_velocity(marioId, -48.0f);
+					}
+
+					sm64_play_sound_global(SOUND_ACTION_HIT_2);
+				}
+				// all else throws away
+				//else if (interaction) {
+				//	MarioInteract_KnockAway(rb);
+				//}
+			}
+		}
 	}
 
 	void MarioObjectInteractions() {
@@ -668,6 +751,15 @@ namespace SM64 {
 				//	MarioInteract_KnockAway(rb);
 				//}
 			}
+		}
+	}
+
+	void MarioCarInheritance() {
+		auto ply = GetLocalPlayerInterface<ISpikeable>();
+		if (ply && ply->GetNumBlowouts() > 0) {
+			GetLocalPlayerInterface<IDamageable>()->ResetDamage();
+
+			sm64_set_mario_action_arg(SM64::marioId, ACT_LAVA_BOOST, 1);
 		}
 	}
 
@@ -831,6 +923,8 @@ namespace SM64 {
 
 		if (!FEManager::mPauseRequest) {
 			MarioObjectInteractions();
+			MarioCustomObjectInteractions();
+			MarioCarInheritance();
 
 			sm64_set_sound_volume(GetSFXVolume());
 
@@ -969,5 +1063,11 @@ namespace SM64 {
 		//if (heavyDamage) {
 		//	sm64_set_mario_forward_velocity(SM64::marioId, 150);
 		//}
+	}
+
+	void TakeLavaDamage() {
+		if (!bEnabled) return;
+
+		sm64_set_mario_action_arg(SM64::marioId, ACT_LAVA_BOOST, 1);
 	}
 }

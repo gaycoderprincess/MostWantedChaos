@@ -175,6 +175,23 @@ std::vector<ICollisionBody*> GetActiveObjects() {
 	return objs;
 }
 
+std::vector<IRigidBody*> GetActiveRigidBodies() {
+	std::vector<IRigidBody*> rbs;
+
+	auto cars = GetActiveVehicles();
+	auto objs = GetActiveObjects();
+	for (auto& car : cars) {
+		auto rb = car->mCOMObject->Find<IRigidBody>();
+		if (rb) rbs.push_back(rb);
+	}
+	for (auto& obj : objs) {
+		auto rb = obj->mCOMObject->Find<IRigidBody>();
+		if (rb) rbs.push_back(rb);
+	}
+
+	return rbs;
+}
+
 bool IsVehicleValidAndActive(IVehicle* vehicle) {
 	auto cars = GetActiveVehicles();
 	for (auto& car : cars) {

@@ -33,6 +33,7 @@ namespace Render3DObjects {
 		float fColSize = 1;
 		void(*pTickFunction)(Object*, double) = nullptr;
 		void* CustomData = nullptr;
+		std::string sDebugName;
 
 		NyaVec3 vLastColPosition = UMath::Vector3::kZero;
 		std::vector<CustomBarrier> Barriers = {};
@@ -78,7 +79,7 @@ namespace Render3DObjects {
 			}
 		}
 
-		Object(std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {
+		Object(const std::string& debugName, std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : sDebugName(debugName), aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {
 			RegenerateBarriers();
 		}
 

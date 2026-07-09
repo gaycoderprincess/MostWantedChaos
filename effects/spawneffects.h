@@ -104,7 +104,7 @@ public:
 		}
 
 		aTeddiesInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, colPos, colScale));
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object("teddie", models, mat, colPos, colScale));
 	}
 
 	void InitFunction() override {
@@ -242,7 +242,7 @@ public:
 		}
 
 		aPeanutsInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, PeanutMove));
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object("peanut", models, mat, mat.p, colScale, PeanutMove));
 
 		bPeanutEverSpawned = true;
 	}
@@ -317,7 +317,7 @@ public:
 		}
 
 		aObjectsInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, colPos, colScale));
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object("8down", models, mat, colPos, colScale));
 	}
 
 	void InitFunction() override {
@@ -410,6 +410,9 @@ public:
 						avel.z += 10 * right.z;
 						rb->SetAngularVelocity(&vel);
 					}
+					if (car->GetDriverClass() == DRIVER_HUMAN) {
+						SM64::TakeLavaDamage();
+					}
 					car->mCOMObject->Find<IDamageable>()->Destroy();
 					obj->aModels.clear();
 				}
@@ -425,7 +428,7 @@ public:
 		}
 
 		aBombsInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, {0,0,0}, 0, BombOnTick));
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object("bomb", models, mat, {0,0,0}, 0, BombOnTick));
 
 		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 	}
@@ -522,8 +525,10 @@ public:
 		obj->mMatrix.z *= scale;
 		obj->mMatrix.p = p;
 
-		auto cars = GetActiveVehicles();
+		auto cars = GetActiveRigidBodies();
 		for (auto& car : cars) {
+			if (!car->mCOMObject->Find<IVehicle>()) continue;
+
 			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
 			if (distFromCar < 4) {
 				data->timeLeft = 0;
@@ -558,19 +563,29 @@ public:
 			for (auto& car : cars) {
 				auto dist = (*car->GetPosition() - obj->mMatrix.p);
 				if (dist.length() < fExplosionMaxDistance) {
-					auto rb = car->mCOMObject->Find<IRigidBody>();
+					auto cb = car->mCOMObject->Find<ICollisionBody>();
 
-					auto impulse = dist * (fExplosionPower * rb->GetMass() / 1000.0 * std::min((fExplosionMaxDistance - dist.length()) * 2.0 / fExplosionMaxDistance, 1.0) / std::max(dist.length(), 0.01));
+					auto impulse = dist * (fExplosionPower * car->GetMass() / 1000.0 * std::min((fExplosionMaxDistance - dist.length()) * 2.0 / fExplosionMaxDistance, 1.0) / std::max(dist.length(), 0.01));
 
-					auto vel = *rb->GetLinearVelocity();
-					auto avel = *rb->GetAngularVelocity();
+					if (cb && cb->IsAttachedToWorld()) {
+						cb->AttachedToWorld(false, 50.0);
+					}
+
+					auto vel = *car->GetLinearVelocity();
+					auto avel = *car->GetAngularVelocity();
 					vel += impulse;
 					avel += impulse * fExplosionAngVelocityMult;
-					rb->SetLinearVelocity(&vel);
-					rb->SetAngularVelocity(&avel);
+					car->SetLinearVelocity(&vel);
+					car->SetAngularVelocity(&avel);
 
-					if (!IsCarDestroyed(car) && car->GetDriverClass() == DRIVER_COP) {
-						car->mCOMObject->Find<IDamageable>()->Destroy();
+					if (auto iveh = car->mCOMObject->Find<IVehicle>()) {
+						if (iveh->GetDriverClass() == DRIVER_HUMAN) {
+							SM64::OnTakeDamage(1, obj->vColPosition, true);
+						}
+
+						if (!IsCarDestroyed(iveh) && iveh->GetDriverClass() == DRIVER_COP) {
+							iveh->mCOMObject->Find<IDamageable>()->Destroy();
+						}
 					}
 				}
 			}
@@ -585,7 +600,7 @@ public:
 		}
 
 		int id = Render3DObjects::aObjects.size();
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, {0,0,0}, 0, BombOnTick));
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object("firework", models, mat, {0,0,0}, 0, BombOnTick));
 
 		auto data = new tFireworkData;
 		data->target = target;
@@ -979,7 +994,7 @@ public:
 
 		int id = Render3DObjects::aObjects.size();
 		aVergilsInWorld.push_back(id);
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, VergilOnTick));
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object("vergil", models, mat, mat.p, colScale, VergilOnTick));
 		Render3DObjects::aObjects[id].CustomData = new tVergilData;
 
 		bVergilEverSpawned = true;
@@ -1273,7 +1288,7 @@ public:
 
 		int id = Render3DObjects::aObjects.size();
 		aObjectsInWorld.push_back(id);
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, ScientistOnTick));
+		Render3DObjects::aObjects.push_back(Render3DObjects::Object("scientist", models, mat, mat.p, colScale, ScientistOnTick));
 		Render3DObjects::aObjects[id].CustomData = new tScientistData;
 	}
 
@@ -1339,7 +1354,7 @@ public:
 	}
 
 	void InitFunction() override {
-		SM64::bEnabled = true;
+		SM64::EnableMario();
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
