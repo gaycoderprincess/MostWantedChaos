@@ -395,3 +395,60 @@ public:
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
 } E_ObsoleteWorld;
+
+class Effect_CollisionView : public ChaosEffect {
+public:
+	Effect_CollisionView() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Debug View";
+		fTimerLength = 90;
+		AddToIncompatiblityGroup("fillmode");
+		bAbortOnConditionFailed = true;
+	}
+
+	void InitFunction() override {
+		g_VisualTreatment = false;
+		CollView::bEnabled = true;
+	}
+	void DeinitFunction() override {
+		g_VisualTreatment = true;
+		CollView::bEnabled = false;
+	}
+	bool IsAvailable() override {
+		return g_VisualTreatment;
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_CollisionView;
+
+class Effect_ObjectMagnet : public ChaosEffect {
+public:
+	Effect_ObjectMagnet() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Player Object Magnet";
+		fTimerLength = 60;
+	}
+
+	static inline float force = 5.0;
+
+	void TickFunctionMain(double delta) override {
+		auto cars = GetActiveObjects();
+		for (auto& car : cars) {
+			if (car == GetLocalPlayerInterface<ICollisionBody>()) continue;
+			auto otherCar = car->mCOMObject->Find<IRigidBody>();
+			if (!otherCar) continue;
+
+			if (car->IsAttachedToWorld()) {
+				car->AttachedToWorld(false, 50.0);
+			}
+
+			auto v = GetLocalPlayerVehicle()->GetPosition();
+			auto c = otherCar->GetPosition();
+			auto vel = *otherCar->GetLinearVelocity();
+			vel.x += (v->x - c->x) * force * delta;
+			vel.y += (v->y - c->y) * force * delta;
+			vel.z += (v->z - c->z) * force * delta;
+			otherCar->SetLinearVelocity(&vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override { return !GetActiveObjects().empty(); }
+} E_ObjectMagnet;

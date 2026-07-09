@@ -144,6 +144,8 @@ namespace Render3DObjects {
 	}
 
 	void OnTick3D() {
+		PerformanceBenchmarker _perf("Render3DObjects::OnTick3D");
+
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 
 		for (auto& obj : aObjects) {

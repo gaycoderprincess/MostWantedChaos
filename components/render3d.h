@@ -145,6 +145,45 @@ namespace Render3D {
 			effect->End();
 #endif
 		}
+
+		void RenderAt_NoEffect(NyaMat4x4 matrix, bool useAlpha = false, bool zwrite = true, bool useZ = true) const {
+			if (bInvalidated) return;
+
+			g_pd3dDevice->SetPixelShader(nullptr);
+			g_pd3dDevice->SetVertexShader(nullptr);
+
+			auto view = eViews[EVIEW_PLAYER1].PlatInfo->ViewMatrix;
+			auto proj = eViews[EVIEW_PLAYER1].PlatInfo->ProjectionMatrix;
+			g_pd3dDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)&view);
+			g_pd3dDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&proj);
+
+			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, useZ);
+			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+			g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
+			g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, useAlpha);
+			g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+			g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+
+			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+
+			g_pd3dDevice->SetTransform(D3DTS_WORLD, (D3DMATRIX*)&matrix);
+			g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
+			g_pd3dDevice->SetIndices(pIndexBuffer);
+			g_pd3dDevice->SetTexture(0, pTexture);
+			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
+		}
 	};
 	std::vector<tModel*> aAllModels;
 	std::vector<tTextureInfo> aAllTextures;

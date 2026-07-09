@@ -161,6 +161,20 @@ std::vector<IVehicle*> GetActiveVehicles(int driverClass = -1) {
 	return cars;
 }
 
+std::vector<ICollisionBody*> GetActiveObjects() {
+	auto list = COLLISIONBODY_LIST::_mTable;
+	std::vector<ICollisionBody*> objs;
+	for (int i = 0; i < list.size(); i++) {
+		auto rb = list[i];
+		if (!rb) continue;
+
+		auto simable = rb->mCOMObject->Find<ISimable>();
+		if (simable->mCOMObject->Find<IVehicle>()) continue;
+		objs.push_back(rb);
+	}
+	return objs;
+}
+
 bool IsVehicleValidAndActive(IVehicle* vehicle) {
 	auto cars = GetActiveVehicles();
 	for (auto& car : cars) {

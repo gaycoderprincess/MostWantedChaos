@@ -46,8 +46,6 @@ void ProcessChaosEffects_SetDir() {
 }
 
 void MoneyChecker() {
-	PerformanceBenchmarker _perf("MoneyChecker");
-
 	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) MONEY CHANGE";
 
@@ -82,8 +80,6 @@ void MoneyChecker() {
 }
 
 void BountyChecker() {
-	PerformanceBenchmarker _perf("BountyChecker");
-
 	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) BOUNTY CHANGE";
 
@@ -341,6 +337,8 @@ void ChaosLoop() {
 	aEffectsFromSavegameIngame.clear();
 
 	if (bTimerEnabled) {
+		PerformanceBenchmarker _perf("ChaosLoop(bTimerEnabled)");
+
 		static ChaosEffect ActiveEffect("DUMMY", true);
 		if (!ActiveEffect.sName) {
 			ActiveEffect.sName = "mod active! awruff :3";
@@ -670,6 +668,31 @@ void ChaosModMenu() {
 			ChloeMenuLib::BeginMenu();
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
+			}
+			if (DrawMenuOption("CollView")) {
+				ChloeMenuLib::BeginMenu();
+
+				if (DrawMenuOption("Toggle CollView")) {
+					CollView::bEnabled = !CollView::bEnabled;
+				}
+
+				QuickValueEditor("bWireframeGround", CollView::bWireframeGround);
+				QuickValueEditor("bWireframeBarriers", CollView::bWireframeBarriers);
+				QuickValueEditor("bWireframeCars", CollView::bWireframeCars);
+
+				QuickValueEditor("nWallColR", CollView::nWallColR);
+				QuickValueEditor("nWallColG", CollView::nWallColG);
+				QuickValueEditor("nWallColB", CollView::nWallColB);
+
+				QuickValueEditor("nGroundColR", CollView::nGroundColR);
+				QuickValueEditor("nGroundColG", CollView::nGroundColG);
+				QuickValueEditor("nGroundColB", CollView::nGroundColB);
+
+				QuickValueEditor("nCarColR", CollView::nCarColR);
+				QuickValueEditor("nCarColG", CollView::nCarColG);
+				QuickValueEditor("nCarColB", CollView::nCarColB);
+
+				ChloeMenuLib::EndMenu();
 			}
 			if (DrawMenuOption("Trigger Busted")) {
 				auto tmp = (NISListenerActivity*)nullptr;

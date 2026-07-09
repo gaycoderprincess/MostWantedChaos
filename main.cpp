@@ -55,6 +55,7 @@ namespace FlatOutHUD {
 #include "include/sm64_defs.h"
 #include "include/libsm64.h"
 #include "components/sm64.h"
+#include "components/colrender.h"
 #include "components/customcamera.h"
 
 #include "chaoseffect.h"
@@ -87,7 +88,7 @@ void OnWinRace() {
 
 void PlayerInputLoop() {
 	PerformanceBenchmarker _perf("PlayerInputLoop");
-	
+
 	ProcessChaosEffects_SetDir<ChaosEffect::HOOK_INPUT>();
 }
 
