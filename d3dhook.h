@@ -33,6 +33,8 @@ void OnD3DReset() {
 }
 
 void D3DHookPreHUD() {
+	PerformanceBenchmarker _perf("D3DHookPreHUD");
+
 	bDrawingGameUI = true;
 	D3DHookMain();
 }
@@ -40,6 +42,8 @@ void D3DHookPreHUD() {
 void ChaosLoop();
 void HookLoop() {
 	if (bDrawingGameUI) {
+		PerformanceBenchmarker _perf("HookLoop(bDrawingGameUI)");
+
 		for (auto& func : aDrawingGameUILoopFunctions) {
 			func();
 		}
@@ -49,6 +53,9 @@ void HookLoop() {
 		bDrawingGameUI = false;
 		return;
 	}
+
+	PerformanceBenchmarker _perf("HookLoop(!bDrawingGameUI)");
+
 	ChaosLoop();
 	CommonMain();
 }

@@ -768,6 +768,43 @@ void ReloadCarBehaviors(eVehicleList vehicleType) {
 	NyaHookLib::Patch<uint16_t>(0x688378, 0x1274);
 }
 
+struct PerformanceBenchmarkResult {
+	char name[64];
+	uint64_t ms;
+};
+std::vector<PerformanceBenchmarkResult> aPerformanceBenchmarkResults;
+
+class PerformanceBenchmarker {
+public:
+	char sName[64];
+	CNyaTimer nTimer;
+
+	PerformanceBenchmarker(const char* name) {
+		nTimer.Process();
+		strcpy_s(sName, 64, name);
+	}
+
+	~PerformanceBenchmarker() {
+		nTimer.Process();
+
+		uint64_t ms = nTimer.nDeltaTimeMicroseconds;
+		//WriteLog(std::format("{} took {}ms", name, ms));
+
+		for (auto& result : aPerformanceBenchmarkResults) {
+			if (!strcmp(sName, result.name)) {
+				result.ms = ms;
+				return;
+			}
+		}
+
+		PerformanceBenchmarkResult result;
+		strcpy_s(result.name, 64, sName);
+		result.ms = ms;
+		aPerformanceBenchmarkResults.push_back(result);
+	}
+};
+
+// SetCurrentDirectoryW causes performance drops so only use when needed
 wchar_t gDLLDir[MAX_PATH];
 class DLLDirSetter {
 public:
@@ -775,9 +812,11 @@ public:
 
 	DLLDirSetter() {
 		GetCurrentDirectoryW(MAX_PATH, backup);
+		if (!wcscmp(backup, gDLLDir)) return;
 		SetCurrentDirectoryW(gDLLDir);
 	}
 	~DLLDirSetter() {
+		if (!wcscmp(backup, gDLLDir)) return;
 		SetCurrentDirectoryW(backup);
 	}
 };

@@ -1,4 +1,6 @@
 void ProcessChaosEffectsMain(double fDeltaTime, bool inMenu, bool blockedByOtherMeans) {
+	PerformanceBenchmarker _perf("ProcessChaosEffectsMain");
+
 	// run effects first, then draw the chaos HUD over top
 	for (auto& effect : aRunningEffects) {
 		if (inMenu && !effect.pEffect->RunInMenus()) continue;
@@ -21,6 +23,8 @@ void ProcessChaosEffectsMain(double fDeltaTime, bool inMenu, bool blockedByOther
 
 template<ChaosEffect::eChaosHook hook>
 void ProcessChaosEffects() {
+	PerformanceBenchmarker _perf(std::format("ProcessChaosEffects<{}>", (int)hook).c_str());
+
 	static CNyaTimer gTimer;
 	gTimer.Process();
 
@@ -35,11 +39,15 @@ void ProcessChaosEffects() {
 
 template<ChaosEffect::eChaosHook hook>
 void ProcessChaosEffects_SetDir() {
+	PerformanceBenchmarker _perf(std::format("ProcessChaosEffects_SetDir<{}>", (int)hook).c_str());
+
 	DLLDirSetter _setdir;
 	ProcessChaosEffects<hook>();
 }
 
 void MoneyChecker() {
+	PerformanceBenchmarker _perf("MoneyChecker");
+
 	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) MONEY CHANGE";
 
@@ -74,6 +82,8 @@ void MoneyChecker() {
 }
 
 void BountyChecker() {
+	PerformanceBenchmarker _perf("BountyChecker");
+
 	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) BOUNTY CHANGE";
 
@@ -257,6 +267,8 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 }
 
 void ChaosLoop() {
+	PerformanceBenchmarker _perf("ChaosLoop");
+
 	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) {
 		nNumPlayerCarChangesThisRace = 0;
 	}
@@ -728,6 +740,16 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			QuickValueEditor("bFO2Minimap", FlatOutHUD::CHUD_Minimap::bFO2Minimap);
+			ChloeMenuLib::EndMenu();
+		}
+
+		if (DrawMenuOption("Performance Debug")) {
+			ChloeMenuLib::BeginMenu();
+
+			for (auto& perf : aPerformanceBenchmarkResults) {
+				DrawMenuOption(std::format("{}: {}ms", perf.name, perf.ms));
+			}
+
 			ChloeMenuLib::EndMenu();
 		}
 

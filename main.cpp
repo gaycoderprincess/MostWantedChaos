@@ -86,10 +86,14 @@ void OnWinRace() {
 }
 
 void PlayerInputLoop() {
+	PerformanceBenchmarker _perf("PlayerInputLoop");
+	
 	ProcessChaosEffects_SetDir<ChaosEffect::HOOK_INPUT>();
 }
 
 void MainLoop() {
+	PerformanceBenchmarker _perf("MainLoop");
+
 	DLLDirSetter _setdir;
 
 	for (auto& func : aMainLoopFunctions) {
@@ -103,6 +107,8 @@ void MainLoop() {
 }
 
 void CameraHook(CameraMover* pMover) {
+	PerformanceBenchmarker _perf("CameraHook");
+
 	DLLDirSetter _setdir;
 
 	if (CustomCamera::bRunCustom) {
@@ -117,6 +123,8 @@ void CameraHook(CameraMover* pMover) {
 }
 
 void Render3DLoop() {
+	PerformanceBenchmarker _perf("Render3DLoop");
+
 	DLLDirSetter _setdir;
 
 	static IDirect3DStateBlock9* state = nullptr;
@@ -145,6 +153,8 @@ void Render3DLoop() {
 }
 
 void ExecuteRenderData_WithHooks() {
+	PerformanceBenchmarker _perf("ExecuteRenderData_WithHooks");
+
 	ProcessChaosEffects<ChaosEffect::HOOK_PRE3D>();
 	ExecuteRenderData();
 	ProcessChaosEffects<ChaosEffect::HOOK_POST3D>();

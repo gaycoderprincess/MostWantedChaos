@@ -488,6 +488,8 @@ namespace SM64 {
 	}
 
 	void UpdateMarioCollision() {
+		PerformanceBenchmarker _perf("UpdateMarioCollision");
+
 		if (aCollisionTris.empty()) return; // always keep old collision if empty
 
 		for (auto& id : aCollisionTriMarios) {
@@ -670,6 +672,8 @@ namespace SM64 {
 	}
 
 	void OnTick() {
+		PerformanceBenchmarker _perf("SM64::OnTick");
+
 		if (!bEnabled) {
 			bDoReset = true;
 			return;
@@ -697,8 +701,8 @@ namespace SM64 {
 			gCollisionTimer.Process();
 
 #ifndef RENDER_NFS_COLLISIONS
-			if (gCollisionTimer.fTotalTime >= 0.25) {
-				gCollisionTimer.fTotalTime -= 0.25;
+			if ((gCollisionTimer.fTotalTime >= 0.5 && GetMarioWorldVelocity().length() > 0.0) || bDoReset) {
+				gCollisionTimer.fTotalTime -= 0.5;
 #endif
 
 				aCollisionTris.clear();
