@@ -565,6 +565,10 @@ namespace SM64 {
 		return MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
 	}
 
+	NyaVec3 GetMarioWorldVelocity() {
+		return MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]}) / (1.0 / 30.0);
+	}
+
 	NyaVec3 GetMarioWorldFacing() {
 		NyaMat4x4 mat;
 		mat.SetIdentity();
@@ -679,8 +683,8 @@ namespace SM64 {
 			return;
 		}
 
-		UMath::Vector3 marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
-		UMath::Vector3 marioVel = MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]}) / (1.0 / 30.0);
+		UMath::Vector3 marioPos = GetMarioWorldPos();
+		UMath::Vector3 marioVel = GetMarioWorldVelocity();
 		if (marioPos.y < -100) {
 			bDoReset = true;
 		}
@@ -732,8 +736,8 @@ namespace SM64 {
 				marioPos.y += 1;
 				ply->SetPosition(&marioPos);
 
-				UMath::Vector4 q = {0,0,0,1};
-				//ply->SetOrientation(&q);
+				UMath::Matrix4 lookatMatrix = NyaMat4x4::LookAt(GetMarioWorldFacing(), {0,1,0});
+				ply->SetOrientation(&lookatMatrix);
 
 				UMath::Vector3 tmp = {0,0,0};
 
