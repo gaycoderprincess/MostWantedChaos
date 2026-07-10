@@ -484,6 +484,9 @@ void ChaosModMenu() {
 				CustomCamera::bRunCustom = false;
 			}
 
+			QuickValueEditor("marioLightness", SM64::marioLightness);
+			QuickValueEditor("marioLightnessMenu", SM64::marioLightnessMenu);
+
 			DrawMenuOption(std::format("position {:.2f} {:.2f} {:.2f}",SM64::marioState.position[0],SM64::marioState.position[1],SM64::marioState.position[2]));
 			DrawMenuOption(std::format("velocity {:.2f} {:.2f} {:.2f}",SM64::marioState.velocity[0],SM64::marioState.velocity[1],SM64::marioState.velocity[2]));
 			DrawMenuOption(std::format("marioId {}",SM64::marioId));

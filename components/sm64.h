@@ -56,8 +56,8 @@ namespace SM64 {
 		return out;
 	}
 
-	int marioLightness = 100;
-	int marioLightnessMenu = 96;
+	int marioLightness = 64;
+	int marioLightnessMenu = 64;
 
 	bool bInvincibleFlash = false;
 
@@ -112,6 +112,7 @@ namespace SM64 {
 			dest->vPos[2] = tmpPos[2];
 
 			auto tmpNormal = MarioToWorld_Render({srcNormal[0], srcNormal[1], srcNormal[2]});
+			tmpNormal.Normalize();
 
 			dest->vNormals[0] = tmpNormal[0];
 			dest->vNormals[1] = tmpNormal[1];
@@ -959,26 +960,6 @@ namespace SM64 {
 
 			for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / (1.f/30));
 			for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
-
-			// calculate normals
-			/*for (int i=0; i<marioGeometry.numTrianglesUsed; i++) {
-				auto pt0 = NyaVec3(marioGeometry.position[(i*9)], marioGeometry.position[(i*9)+1], marioGeometry.position[(i*9)+2]);
-				auto pt1 = NyaVec3(marioGeometry.position[(i*9)+3], marioGeometry.position[(i*9)+4], marioGeometry.position[(i*9)+5]);
-				auto pt2 = NyaVec3(marioGeometry.position[(i*9)+6], marioGeometry.position[(i*9)+7], marioGeometry.position[(i*9)+8]);
-
-				auto faceNormal = (pt1 - pt0).Cross(pt2 - pt0);
-				faceNormal.Normalize();
-
-				marioGeometry.normal[(i*9)] = faceNormal.x;
-				marioGeometry.normal[(i*9)+1] = faceNormal.y;
-				marioGeometry.normal[(i*9)+2] = faceNormal.z;
-				marioGeometry.normal[(i*9)+3] = faceNormal.x;
-				marioGeometry.normal[(i*9)+4] = faceNormal.y;
-				marioGeometry.normal[(i*9)+5] = faceNormal.z;
-				marioGeometry.normal[(i*9)+6] = faceNormal.x;
-				marioGeometry.normal[(i*9)+7] = faceNormal.y;
-				marioGeometry.normal[(i*9)+8] = faceNormal.z;
-			}*/
 		}
 
 		static CNyaTimer gInvincibilityTimer;
