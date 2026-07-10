@@ -255,7 +255,6 @@ namespace CollView {
 
 				// normal
 				auto faceNormal = (pt1 - pt0).Cross(pt2 - pt0);
-				faceNormal.y = 0;
 				faceNormal.Normalize();
 
 				colDrawNormal[0] = faceNormal[0];
@@ -319,6 +318,14 @@ namespace CollView {
 					ProcessCollisionArticle(&pack->mInstanceList[j]);
 				}
 			}
+
+			// custom spawned barriers from chaos objects
+			std::vector<WCollisionBarrier> barriers;
+			auto customBarriers = Render3DObjects::GetFullBarrierList();
+			for (auto& barrier : customBarriers) {
+				barriers.push_back(barrier.data);
+			}
+			ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
 
 			auto tmp = NyaDrawing::CNyaRGBA32();
 			tmp.b = nObjColR;

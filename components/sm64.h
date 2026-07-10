@@ -57,6 +57,7 @@ namespace SM64 {
 	}
 
 	int marioLightness = 128;
+	int marioLightnessMenu = 96;
 
 	bool bInvincibleFlash = false;
 
@@ -93,6 +94,8 @@ namespace SM64 {
 			return;
 		}
 
+		int lightness = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND ? marioLightnessMenu : marioLightness;
+
 		int numFacesUsed = marioBuffers.numTrianglesUsed;
 		int numVerticesUsed = marioBuffers.numTrianglesUsed*3;
 		for (int i = 0; i < numVerticesUsed; i++) {
@@ -127,20 +130,26 @@ namespace SM64 {
 
 			auto tmp = NyaDrawing::CNyaRGBA32();
 			if (textured) {
-				tmp.b = marioLightness;
-				tmp.g = marioLightness;
-				tmp.r = marioLightness;
+				tmp.b = lightness;
+				tmp.g = lightness;
+				tmp.r = lightness;
 			}
 			else {
-				tmp.b = srcColor[0] * marioLightness;
-				tmp.g = srcColor[1] * marioLightness;
-				tmp.r = srcColor[2] * marioLightness;
+				tmp.b = srcColor[0] * lightness;
+				tmp.g = srcColor[1] * lightness;
+				tmp.r = srcColor[2] * lightness;
 			}
 			tmp.a = 255;
 			dest->Color = *(uint32_t*)&tmp;
 
-			dest->vUV[0] = srcUV[0];
-			dest->vUV[1] = srcUV[1];
+			if (textured && (srcUV[0] != 1 && srcUV[1] != 1)) {
+				dest->vUV[0] = srcUV[0];
+				dest->vUV[1] = srcUV[1];
+			}
+			else {
+				dest->vUV[0] = 0.5;
+				dest->vUV[1] = 0.5;
+			}
 		}
 		for (int i = 0; i < numFacesUsed*3; i++) {
 			indicesOut[i] = i;
@@ -950,6 +959,26 @@ namespace SM64 {
 
 			for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / (1.f/30));
 			for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
+
+			// calculate normals
+			/*for (int i=0; i<marioGeometry.numTrianglesUsed; i++) {
+				auto pt0 = NyaVec3(marioGeometry.position[(i*9)], marioGeometry.position[(i*9)+1], marioGeometry.position[(i*9)+2]);
+				auto pt1 = NyaVec3(marioGeometry.position[(i*9)+3], marioGeometry.position[(i*9)+4], marioGeometry.position[(i*9)+5]);
+				auto pt2 = NyaVec3(marioGeometry.position[(i*9)+6], marioGeometry.position[(i*9)+7], marioGeometry.position[(i*9)+8]);
+
+				auto faceNormal = (pt1 - pt0).Cross(pt2 - pt0);
+				faceNormal.Normalize();
+
+				marioGeometry.normal[(i*9)] = faceNormal.x;
+				marioGeometry.normal[(i*9)+1] = faceNormal.y;
+				marioGeometry.normal[(i*9)+2] = faceNormal.z;
+				marioGeometry.normal[(i*9)+3] = faceNormal.x;
+				marioGeometry.normal[(i*9)+4] = faceNormal.y;
+				marioGeometry.normal[(i*9)+5] = faceNormal.z;
+				marioGeometry.normal[(i*9)+6] = faceNormal.x;
+				marioGeometry.normal[(i*9)+7] = faceNormal.y;
+				marioGeometry.normal[(i*9)+8] = faceNormal.z;
+			}*/
 		}
 
 		static CNyaTimer gInvincibilityTimer;
