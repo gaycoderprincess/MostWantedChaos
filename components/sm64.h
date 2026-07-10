@@ -884,7 +884,7 @@ namespace SM64 {
 	}
 
 	void OnAudioTick() {
-		int numDesiredSamples = 3200;
+		int numDesiredSamples = 1100;
 		int sampleRate = 32000;
 
 		static CNyaTimer gTimer;
@@ -898,13 +898,12 @@ namespace SM64 {
 			gTimer.Process();
 
 			int16_t audioBuffer[numDesiredSamples*2]; // ??????????
-			uint32_t numSamples = sm64_audio_tick(0, numDesiredSamples, audioBuffer);
-			//BASS_SampleSetData(sample, audioBuffer); // set the sample's data
+			uint32_t numSamples = sm64_audio_tick(BASS_StreamPutData(audioStream, nullptr, 0)/8, numDesiredSamples, audioBuffer);
 
 			BASS_StreamPutData(audioStream, audioBuffer, numSamples*8);
 			BASS_ChannelPlay(audioStream, false);
 
-			targetTime = currentTime + (1.0 / 30.0);
+			targetTime = currentTime + (1.0 / 31.0); // 30.0 causes audio stutter?
 			while (gTimer.fTotalTime < targetTime) {
 				Sleep(0);
 				gTimer.Process();
