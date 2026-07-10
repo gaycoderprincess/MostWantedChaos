@@ -1,6 +1,4 @@
 namespace SM64 {
-//#define RENDER_NFS_COLLISIONS
-
 	uint8_t *utils_read_file_alloc( const char *path, size_t *fileLength )
 	{
 		FILE *f = fopen( path, "rb" );
@@ -37,6 +35,13 @@ namespace SM64 {
 	// i dont get it why is this different??????
 	NyaVec3 MarioToWorld_Render(NyaVec3 v) {
 		auto out = v / marioScalar;
+		out.y *= -1;
+		out.z *= -1;
+		return out;
+	}
+
+	NyaVec3 MarioToWorld_RenderNormal(NyaVec3 v) {
+		auto out = v;
 		out.y *= -1;
 		out.z *= -1;
 		return out;
@@ -111,8 +116,7 @@ namespace SM64 {
 			dest->vPos[1] = tmpPos[1];
 			dest->vPos[2] = tmpPos[2];
 
-			auto tmpNormal = MarioToWorld_Render({srcNormal[0], srcNormal[1], srcNormal[2]});
-			tmpNormal.Normalize();
+			auto tmpNormal = MarioToWorld_RenderNormal({srcNormal[0], srcNormal[1], srcNormal[2]});
 
 			dest->vNormals[0] = tmpNormal[0];
 			dest->vNormals[1] = tmpNormal[1];
@@ -342,7 +346,6 @@ namespace SM64 {
 		}
 	}
 
-	template<int debugRenderId>
 	void AddMarioStaticObject(std::vector<WCollisionTri>* collisions, bool doubleSided) {
 		SM64SurfaceObject obj;
 		obj.surfaces = new SM64Surface[collisions->size()];
@@ -356,26 +359,6 @@ namespace SM64 {
 
 		auto objFlip = obj;
 		objFlip.surfaces = new SM64Surface[collisions->size()];
-
-#ifdef RENDER_NFS_COLLISIONS
-		static SM64MarioGeometryBuffers colBuffers = {};
-		static SM64MarioGeometryBuffers colBuffersFlip = {};
-		if (!colBuffers.position) {
-			colBuffers.position = new float[9 * SM64_GEO_MAX_TRIANGLES];
-			colBuffers.normal = colBuffersFlip.normal = new float[9 * SM64_GEO_MAX_TRIANGLES];
-			colBuffers.color = colBuffersFlip.color = new float[9 * SM64_GEO_MAX_TRIANGLES];
-			colBuffers.uv = colBuffersFlip.uv = new float[6 * SM64_GEO_MAX_TRIANGLES];
-			colBuffersFlip.position = new float[9 * SM64_GEO_MAX_TRIANGLES];
-		}
-		colBuffers.numTrianglesUsed = colBuffersFlip.numTrianglesUsed = std::min((int)collisions->size(), (int)SM64_GEO_MAX_TRIANGLES);
-
-		auto colDrawPosition = &colBuffers.position[0];
-		auto colDrawNormal = &colBuffers.normal[0];
-		auto colDrawColor = &colBuffers.color[0];
-		auto colDrawUV = &colBuffers.uv[0];
-
-		auto colDrawFlipPosition = &colBuffersFlip.position[0];
-#endif
 
 		for (int i = 0; i < collisions->size(); i++) {
 			auto in = &(*collisions)[i];
@@ -410,68 +393,6 @@ namespace SM64 {
 			out2->vertices[2][0] = pt0[0];
 			out2->vertices[2][1] = pt0[1];
 			out2->vertices[2][2] = pt0[2];
-
-#ifdef RENDER_NFS_COLLISIONS
-			if (i < colBuffers.numTrianglesUsed) {
-				colDrawPosition[0] = pt0[0];
-				colDrawPosition[1] = pt0[1];
-				colDrawPosition[2] = pt0[2];
-				colDrawPosition[3] = pt1[0];
-				colDrawPosition[4] = pt1[1];
-				colDrawPosition[5] = pt1[2];
-				colDrawPosition[6] = pt2[0];
-				colDrawPosition[7] = pt2[1];
-				colDrawPosition[8] = pt2[2];
-				colDrawPosition += 9;
-
-				colDrawFlipPosition[0] = pt2[0];
-				colDrawFlipPosition[1] = pt2[1];
-				colDrawFlipPosition[2] = pt2[2];
-				colDrawFlipPosition[3] = pt1[0];
-				colDrawFlipPosition[4] = pt1[1];
-				colDrawFlipPosition[5] = pt1[2];
-				colDrawFlipPosition[6] = pt0[0];
-				colDrawFlipPosition[7] = pt0[1];
-				colDrawFlipPosition[8] = pt0[2];
-				colDrawFlipPosition += 9;
-
-				colDrawNormal[0] = 0;
-				colDrawNormal[1] = 1;
-				colDrawNormal[2] = 0;
-				colDrawNormal += 3;
-				colDrawNormal[0] = 0;
-				colDrawNormal[1] = 1;
-				colDrawNormal[2] = 0;
-				colDrawNormal += 3;
-				colDrawNormal[0] = 0;
-				colDrawNormal[1] = 1;
-				colDrawNormal[2] = 0;
-				colDrawNormal += 3;
-
-				colDrawColor[0] = 0;
-				colDrawColor[1] = 1;
-				colDrawColor[2] = 0;
-				colDrawColor += 3;
-				colDrawColor[0] = 0;
-				colDrawColor[1] = 1;
-				colDrawColor[2] = 0;
-				colDrawColor += 3;
-				colDrawColor[0] = 0;
-				colDrawColor[1] = 1;
-				colDrawColor[2] = 0;
-				colDrawColor += 3;
-
-				colDrawUV[0] = 0;
-				colDrawUV[1] = 0;
-				colDrawUV += 2;
-				colDrawUV[0] = 0;
-				colDrawUV[1] = 0;
-				colDrawUV += 2;
-				colDrawUV[0] = 0;
-				colDrawUV[1] = 0;
-				colDrawUV += 2;
-			}
-#endif
 		}
 
 		auto id = sm64_surface_object_create(&obj);
@@ -485,13 +406,6 @@ namespace SM64 {
 				aCollisionTriMarios.push_back(id2);
 			}
 		}
-
-#ifdef RENDER_NFS_COLLISIONS
-		RenderMario<debugRenderId, false>(colBuffers);
-		if (doubleSided) {
-			RenderMario<debugRenderId+100, false>(colBuffersFlip);
-		}
-#endif
 
 		delete[] obj.surfaces;
 		delete[] objFlip.surfaces;
@@ -510,8 +424,8 @@ namespace SM64 {
 		// fix invisible walls
 		AddDynamicDummyFloor({marioState.position[0],-500 * marioScalar,marioState.position[2]}, 16384);
 
-		AddMarioStaticObject<1>(&aCollisionTris, true);
-		AddMarioStaticObject<2>(&aCollisionBarriers, false);
+		AddMarioStaticObject(&aCollisionTris, true);
+		AddMarioStaticObject(&aCollisionBarriers, false);
 	}
 
 	void InitAudio();
@@ -802,10 +716,8 @@ namespace SM64 {
 			static CNyaTimer gCollisionTimer;
 			gCollisionTimer.Process();
 
-#ifndef RENDER_NFS_COLLISIONS
 			if ((gCollisionTimer.fTotalTime >= 0.5 && GetMarioWorldVelocity().length() > 0.0) || bDoReset) {
 				gCollisionTimer.fTotalTime -= 0.5;
-#endif
 
 				aCollisionTris.clear();
 				aCollisionBarriers.clear();
@@ -819,12 +731,6 @@ namespace SM64 {
 					}
 				}
 
-				//auto col = (WCollider*)ply->GetWCollider();
-				//for (int i = 0; i < col->fInstanceCacheList.size(); i++) {
-				//	auto inst = col->fInstanceCacheList[i];
-				//	ProcessCollisionArticle(inst);
-				//}
-
 				// custom spawned barriers from chaos objects
 				std::vector<WCollisionBarrier> barriers;
 				auto customBarriers = Render3DObjects::GetFullBarrierList();
@@ -834,9 +740,7 @@ namespace SM64 {
 				ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
 
 				UpdateMarioCollision();
-#ifndef RENDER_NFS_COLLISIONS
 			}
-#endif
 
 			if (!bDoReset && marioPos.length() > 50) {
 				marioPos.y += 1;
