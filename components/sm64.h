@@ -1042,7 +1042,7 @@ namespace SM64 {
 		uint8_t *rom = utils_read_file_alloc( "baserom.us.z64", &romSize );
 
 		if(rom == NULL) {
-			MessageBoxA(nullptr, "Failed to read ROM file \"baserom.us.z64\"", "nya?!~", MB_ICONERROR);
+			//MessageBoxA(nullptr, "Failed to read ROM file \"baserom.us.z64\"", "nya?!~", MB_ICONERROR);
 			return;
 		}
 
