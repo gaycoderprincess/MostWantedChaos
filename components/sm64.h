@@ -898,7 +898,7 @@ namespace SM64 {
 			// busy wait seems to be the only reasonable way to make this accurate
 			// 29.0 is too slow and causes crackling, 30.0 is too fast and adds delay
 			auto start = std::chrono::high_resolution_clock::now();
-			while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < (1.0 / 29.5)) {}
+			while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < (1.0 / 29.15)) {}
 		}
 	}
 
