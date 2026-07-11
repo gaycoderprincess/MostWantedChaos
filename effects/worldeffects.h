@@ -464,21 +464,23 @@ public:
 
 	void InitFunction() override {
 		g_VisualTreatment = false;
-		DrawCars = false;
+		ForceCarLOD = 4;
 		CollView::bEnabled = true;
 		CollView::bWireframeBarriers = false;
 		CollView::bWireframeGround = false;
 		CollView::bWireframeCars = false;
+		CollView::bDrawCars = false;
 		NyaHookLib::Patch(0x723FA0, 0x530008C2);
 		NyaHookLib::Patch<uint8_t>(0x7538D0, 0xC3);
 	}
 	void DeinitFunction() override {
 		g_VisualTreatment = true;
-		DrawCars = true;
+		ForceCarLOD = -1;
 		CollView::bEnabled = false;
 		CollView::bWireframeGround = true;
 		CollView::bWireframeBarriers = false;
 		CollView::bWireframeCars = true;
+		CollView::bDrawCars = true;
 		NyaHookLib::Patch(0x723FA0, 0x5314EC83);
 		NyaHookLib::Patch<uint8_t>(0x7538D0, 0x55);
 	}

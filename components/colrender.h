@@ -4,6 +4,7 @@ namespace CollView {
 	bool bWireframeGround = true;
 	bool bWireframeBarriers = false;
 	bool bWireframeCars = true;
+	bool bDrawCars = true;
 
 	int nWallColR = 0;
 	int nWallColG = 0;
@@ -405,6 +406,7 @@ namespace CollView {
 
 					auto simable = rb->mCOMObject->Find<ISimable>();
 					if (auto veh = simable->mCOMObject->Find<IVehicle>()) {
+						if (!bDrawCars) continue;
 						if (!veh->IsActive()) continue;
 						if (veh->IsLoading()) continue;
 
