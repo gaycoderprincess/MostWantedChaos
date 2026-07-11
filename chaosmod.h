@@ -664,6 +664,7 @@ void ChaosModMenu() {
 					CameraAI::SetAction(1, "CDActionDebug");
 				}
 				//DrawMenuOption(std::format("Race Context: {}", (int)GRaceStatus::fObj->mRaceContext));
+				QuickValueEditor("DrawFEng", DrawFEng);
 			}
 			else {
 				DrawMenuOption("Local player not found");
@@ -727,6 +728,19 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Busted")) {
 				auto tmp = (NISListenerActivity*)nullptr;
 				tmp->MessageBusted(0);
+			}
+			if (DrawMenuOption("Trigger Permanent Splash")) {
+				static ChaosEffect SplashEffect("DUMMY", true);
+				if (!SplashEffect.sName) {
+					static char tmp[256];
+					strcpy_s(tmp, 256, std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str());
+					SplashEffect.sName = tmp;
+					SplashEffect.fTimerLength = 99999;
+					AddRunningEffect(&SplashEffect);
+				}
+			}
+			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
+				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
 			//QuickValueEditor("SceneryScale.x", SceneryScale.x);
 			//QuickValueEditor("SceneryScale.y", SceneryScale.y);
