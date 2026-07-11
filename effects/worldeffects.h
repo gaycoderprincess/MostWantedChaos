@@ -402,6 +402,7 @@ public:
 	Effect_CollisionView() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Debug View";
 		fTimerLength = 90;
+		AddToIncompatiblityGroup("collview");
 		bAbortOnConditionFailed = true;
 	}
 
@@ -459,6 +460,7 @@ public:
 		sName = "DOS Era Graphics";
 		fTimerLength = 120;
 		AddToIncompatiblityGroup("world_invis");
+		AddToIncompatiblityGroup("collview");
 		bAbortOnConditionFailed = true;
 		sFileName = "dos";
 	}

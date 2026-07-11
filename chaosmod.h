@@ -701,6 +701,29 @@ void ChaosModMenu() {
 
 				ChloeMenuLib::EndMenu();
 			}
+			if (DrawMenuOption("Scenery Group")) {
+				ChloeMenuLib::BeginMenu();
+
+				static int id = 0;
+				QuickValueEditor("Group ID", id);
+
+				if (auto group = NyaHelpers::FindSceneryGroupById(id)) {
+					if (!SceneryGroupEnabledTable[id] && DrawMenuOption("Enable Group")) {
+						auto oldHash = group->NameHash;
+						group->NameHash = 696969;
+						EnableSceneryGroup(696969, false);
+						group->NameHash = oldHash;
+					}
+					if (SceneryGroupEnabledTable[id] && DrawMenuOption("Disable Group")) {
+						auto oldHash = group->NameHash;
+						group->NameHash = 696969;
+						DisableSceneryGroup(696969);
+						group->NameHash = oldHash;
+					}
+				}
+
+				ChloeMenuLib::EndMenu();
+			}
 			if (DrawMenuOption("Trigger Busted")) {
 				auto tmp = (NISListenerActivity*)nullptr;
 				tmp->MessageBusted(0);

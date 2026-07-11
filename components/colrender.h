@@ -187,7 +187,7 @@ namespace CollView {
 		UMath::Matrix4 instMat;
 		inst->MakeMatrix(&instMat, true);
 
-		// filter out unused barriers
+		// filter out unused stuff
 		if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
 
 		auto articles_end_ptr = (uintptr_t)(&article[1]);
