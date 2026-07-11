@@ -453,16 +453,19 @@ public:
 	bool IsAvailable() override { return !GetActiveObjects().empty(); }
 } E_ObjectMagnet;
 
-class Effect_CollisionView2 : public ChaosEffect {
+class Effect_CollisionView2 : public EffectBase_ScreenShader {
 public:
-	Effect_CollisionView2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_CollisionView2() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "DOS Era Graphics";
 		fTimerLength = 120;
 		AddToIncompatiblityGroup("world_invis");
 		bAbortOnConditionFailed = true;
+		sFileName = "dos";
 	}
 
 	void InitFunction() override {
+		EffectBase_ScreenShader::InitFunction();
+
 		g_VisualTreatment = false;
 		ForceCarLOD = 4;
 		CollView::bEnabled = true;
@@ -474,6 +477,8 @@ public:
 		NyaHookLib::Patch<uint8_t>(0x7538D0, 0xC3);
 	}
 	void DeinitFunction() override {
+		EffectBase_ScreenShader::DeinitFunction();
+
 		g_VisualTreatment = true;
 		ForceCarLOD = -1;
 		CollView::bEnabled = false;
@@ -489,4 +494,5 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool RunWhenBlocked() override { return true; }
+	bool ShouldAbort() override { return false; }
 } E_CollisionView2;
