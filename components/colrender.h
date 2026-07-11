@@ -17,6 +17,10 @@ namespace CollView {
 	int nCarColG = 255;
 	int nCarColB = 0;
 
+	int nCopCarColR = 255;
+	int nCopCarColG = 0;
+	int nCopCarColB = 0;
+
 	int nObjColR = 255;
 	int nObjColG = 0;
 	int nObjColB = 255;
@@ -24,6 +28,7 @@ namespace CollView {
 	struct CollisionGeometryBuffer {
 		float *position;
 		float *normal;
+		float *color;
 		float *uv;
 		uint16_t numTrianglesUsed;
 	};
@@ -76,6 +81,7 @@ namespace CollView {
 		for (int i = 0; i < numVerticesUsed; i++) {
 			auto src = &marioBuffers.position[i*3];
 			auto srcNormal = &marioBuffers.normal[i*3];
+			auto srcColor = &marioBuffers.color[i*3];
 			auto srcUV = &marioBuffers.uv[i*2];
 			auto dest = &verticesOut[i];
 
@@ -98,9 +104,9 @@ namespace CollView {
 				float shading = std::clamp(tmpNormal.Dot(sunDir), 0.66, 1.0);
 
 				auto tmp = NyaDrawing::CNyaRGBA32();
-				tmp.b = nWallColR * shading;
-				tmp.g = nWallColG * shading;
-				tmp.r = nWallColB * shading;
+				tmp.b = srcColor[0] * 255 * shading;
+				tmp.g = srcColor[1] * 255 * shading;
+				tmp.r = srcColor[2] * 255 * shading;
 				tmp.a = 255;
 				dest->Color = *(uint32_t*)&tmp;
 			}
@@ -180,6 +186,9 @@ namespace CollView {
 		UMath::Matrix4 instMat;
 		inst->MakeMatrix(&instMat, true);
 
+		// filter out unused barriers
+		if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
+
 		auto articles_end_ptr = (uintptr_t)(&article[1]);
 
 		auto stripSphere = (WCollisionStripSphere*)articles_end_ptr;
@@ -189,6 +198,7 @@ namespace CollView {
 			for (int j = 0; j < numToIterate; j++) {
 				WCollisionTri tri;
 				WCollisionStrip::MakeFace(strip, j, &stripSphere->fPos, &tri);
+				tri.fSurfaceRef = *(Attrib::Collection**)(articles_end_ptr + (4 * tri.fSurface.fSurface) + article->fStripsSize + article->fEdgesSize);
 
 				tri.fPt0 -= instMat.p;
 				tri.fPt1 -= instMat.p;
@@ -200,8 +210,6 @@ namespace CollView {
 			stripSphere++;
 		}
 
-		// filter out unused barriers
-		if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
 		ProcessCollisionBarriers((WCollisionBarrier*)(articles_end_ptr + article->fStripsSize), article->fNumEdges, instMat.p);
 	}
 
@@ -212,6 +220,7 @@ namespace CollView {
 		if (!colBuffers.position) {
 			colBuffers.position = new float[9 * COLLVIEW_MAX_TRIANGLES];
 			colBuffers.normal = colBuffersFlip.normal = new float[9 * COLLVIEW_MAX_TRIANGLES];
+			colBuffers.color = colBuffersFlip.color = new float[9 * COLLVIEW_MAX_TRIANGLES];
 			colBuffers.uv = colBuffersFlip.uv = new float[6 * COLLVIEW_MAX_TRIANGLES];
 			colBuffersFlip.position = new float[9 * COLLVIEW_MAX_TRIANGLES];
 		}
@@ -219,6 +228,7 @@ namespace CollView {
 
 		auto colDrawPosition = &colBuffers.position[0];
 		auto colDrawNormal = &colBuffers.normal[0];
+		auto colDrawColor = &colBuffers.color[0];
 		auto colDrawUV = &colBuffers.uv[0];
 
 		auto colDrawFlipPosition = &colBuffersFlip.position[0];
@@ -269,6 +279,37 @@ namespace CollView {
 				colDrawNormal[1] = faceNormal[1];
 				colDrawNormal[2] = faceNormal[2];
 				colDrawNormal += 3;
+
+				if (in->fSurfaceRef) {
+					auto color = (float*)in->fSurfaceRef->GetData(0x740D3125, 0);
+
+					colDrawColor[0] = color[0];
+					colDrawColor[1] = color[1];
+					colDrawColor[2] = color[2];
+					colDrawColor += 3;
+					colDrawColor[0] = color[0];
+					colDrawColor[1] = color[1];
+					colDrawColor[2] = color[2];
+					colDrawColor += 3;
+					colDrawColor[0] = color[0];
+					colDrawColor[1] = color[1];
+					colDrawColor[2] = color[2];
+					colDrawColor += 3;
+				}
+				else {
+					colDrawColor[0] = nWallColR / 255.0;
+					colDrawColor[1] = nWallColG / 255.0;
+					colDrawColor[2] = nWallColB / 255.0;
+					colDrawColor += 3;
+					colDrawColor[0] = nWallColR / 255.0;
+					colDrawColor[1] = nWallColG / 255.0;
+					colDrawColor[2] = nWallColB / 255.0;
+					colDrawColor += 3;
+					colDrawColor[0] = nWallColR / 255.0;
+					colDrawColor[1] = nWallColG / 255.0;
+					colDrawColor[2] = nWallColB / 255.0;
+					colDrawColor += 3;
+				}
 
 				colDrawUV[0] = 0;
 				colDrawUV[1] = 0;
@@ -344,7 +385,15 @@ namespace CollView {
 			static auto mdlCar = Render3D::CreateModels("cube.fbx");
 			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 
-			if (!mdl.empty() && !mdlCar.empty()) {
+			tmp.b = nCopCarColR;
+			tmp.g = nCopCarColG;
+			tmp.r = nCopCarColB;
+			tmp.a = 255;
+			Render3D::nVertexColorValue = *(uint32_t*)&tmp;
+			static auto mdlCopCar = Render3D::CreateModels("cube.fbx");
+			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+
+			if (!mdl.empty() && !mdlCar.empty() && !mdlCopCar.empty()) {
 				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, bWireframeCars ? D3DFILL_WIREFRAME : D3DFILL_SOLID);
 
 				auto list = COLLISIONBODY_LIST::_mTable;
@@ -359,7 +408,7 @@ namespace CollView {
 						if (!veh->IsActive()) continue;
 						if (veh->IsLoading()) continue;
 
-						renderModel = mdlCar[0];
+						renderModel = veh->GetDriverClass() == DRIVER_COP ? mdlCopCar[0] : mdlCar[0];
 					}
 
 					UMath::Vector3 dim;

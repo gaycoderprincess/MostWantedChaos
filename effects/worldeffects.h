@@ -16,6 +16,7 @@ public:
 	Effect_InvisibleWorld() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Invisible World";
 		fTimerLength = 30;
+		AddToIncompatiblityGroup("world_invis");
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -401,7 +402,6 @@ public:
 	Effect_CollisionView() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Debug View";
 		fTimerLength = 90;
-		AddToIncompatiblityGroup("fillmode");
 		bAbortOnConditionFailed = true;
 	}
 
@@ -452,3 +452,39 @@ public:
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override { return !GetActiveObjects().empty(); }
 } E_ObjectMagnet;
+
+class Effect_CollisionView2 : public ChaosEffect {
+public:
+	Effect_CollisionView2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "DOS Era Graphics";
+		fTimerLength = 120;
+		AddToIncompatiblityGroup("world_invis");
+		bAbortOnConditionFailed = true;
+	}
+
+	void InitFunction() override {
+		g_VisualTreatment = false;
+		DrawCars = false;
+		CollView::bEnabled = true;
+		CollView::bWireframeBarriers = false;
+		CollView::bWireframeGround = false;
+		CollView::bWireframeCars = false;
+		NyaHookLib::Patch(0x723FA0, 0x530008C2);
+		NyaHookLib::Patch<uint8_t>(0x7538D0, 0xC3);
+	}
+	void DeinitFunction() override {
+		g_VisualTreatment = true;
+		DrawCars = true;
+		CollView::bEnabled = false;
+		CollView::bWireframeGround = true;
+		CollView::bWireframeBarriers = false;
+		CollView::bWireframeCars = true;
+		NyaHookLib::Patch(0x723FA0, 0x5314EC83);
+		NyaHookLib::Patch<uint8_t>(0x7538D0, 0x55);
+	}
+	bool IsAvailable() override {
+		return g_VisualTreatment;
+	}
+	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+} E_CollisionView2;
