@@ -887,28 +887,18 @@ namespace SM64 {
 		int numDesiredSamples = 1100;
 		int sampleRate = 32000;
 
-		static CNyaTimer gTimer;
-		gTimer.Process();
-
 		auto audioStream = BASS_StreamCreate(sampleRate, 2, 0, STREAMPROC_PUSH, nullptr);
 
-		double currentTime = gTimer.fTotalTime;
-		double targetTime = 0;
 		while (true) {
-			gTimer.Process();
-
 			int16_t audioBuffer[numDesiredSamples*2]; // ??????????
-			uint32_t numSamples = sm64_audio_tick(BASS_StreamPutData(audioStream, nullptr, 0)/8, numDesiredSamples, audioBuffer);
-
-			BASS_StreamPutData(audioStream, audioBuffer, numSamples*8);
+			uint32_t numSamples = sm64_audio_tick(0, numDesiredSamples, audioBuffer);
+			BASS_StreamPutData(audioStream, audioBuffer, numSamples * 8);
 			BASS_ChannelPlay(audioStream, false);
 
-			targetTime = currentTime + (1.0 / 31.0); // 30.0 causes audio stutter?
-			while (gTimer.fTotalTime < targetTime) {
-				Sleep(0);
-				gTimer.Process();
-			}
-			currentTime = gTimer.fTotalTime;
+			// busy wait seems to be the only reasonable way to make this accurate
+			// 29.0 is too slow and causes crackling, 30.0 is too fast and adds delay
+			auto start = std::chrono::high_resolution_clock::now();
+			while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < (1.0 / 29.5)) {}
 		}
 	}
 
