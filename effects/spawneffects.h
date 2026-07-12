@@ -1368,3 +1368,28 @@ public:
 	bool IsAvailable() override { return SM64::bAvailable; }
 	bool HasTimer() override { return true; }
 } E_Mario64;
+
+class Effect_Ball : public ChaosEffect {
+public:
+	Effect_Ball() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Ballin";
+		fTimerLength = 90;
+		bCanQuickTrigger = false;
+	}
+
+	void InitFunction() override {
+		CustomPhysics::bEnabled = true;
+		CarRender_DontRenderPlayer = true;
+	}
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_CAMERA) return;
+
+		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), GetLocalPlayerVehicle());
+		CustomCamera::ProcessCam(pMoverCamera, delta);
+	}
+	void DeinitFunction() override {
+		CustomPhysics::bEnabled = false;
+		CarRender_DontRenderPlayer = false;
+	}
+	bool HasTimer() override { return true; }
+} E_Ball;

@@ -30,7 +30,6 @@ namespace CollView {
 		float *position;
 		float *normal;
 		float *color;
-		float *uv;
 		uint16_t numTrianglesUsed;
 	};
 
@@ -83,7 +82,6 @@ namespace CollView {
 			auto src = &marioBuffers.position[i*3];
 			auto srcNormal = &marioBuffers.normal[i*3];
 			auto srcColor = &marioBuffers.color[i*3];
-			auto srcUV = &marioBuffers.uv[i*2];
 			auto dest = &verticesOut[i];
 
 			auto tmpPos = WorldToRender({src[0], src[1], src[2]});
@@ -120,8 +118,8 @@ namespace CollView {
 				dest->Color = *(uint32_t*)&tmp;
 			}
 
-			dest->vUV[0] = srcUV[0];
-			dest->vUV[1] = srcUV[1];
+			dest->vUV[0] = 0.0;
+			dest->vUV[1] = 0.0;
 		}
 		for (int i = 0; i < numFacesUsed*3; i++) {
 			indicesOut[i] = i;
@@ -222,7 +220,6 @@ namespace CollView {
 			colBuffers.position = new float[9 * COLLVIEW_MAX_TRIANGLES];
 			colBuffers.normal = colBuffersFlip.normal = new float[9 * COLLVIEW_MAX_TRIANGLES];
 			colBuffers.color = colBuffersFlip.color = new float[9 * COLLVIEW_MAX_TRIANGLES];
-			colBuffers.uv = colBuffersFlip.uv = new float[6 * COLLVIEW_MAX_TRIANGLES];
 			colBuffersFlip.position = new float[9 * COLLVIEW_MAX_TRIANGLES];
 		}
 		colBuffers.numTrianglesUsed = colBuffersFlip.numTrianglesUsed = std::min((int)collisions->size(), (int)COLLVIEW_MAX_TRIANGLES);
@@ -230,7 +227,6 @@ namespace CollView {
 		auto colDrawPosition = &colBuffers.position[0];
 		auto colDrawNormal = &colBuffers.normal[0];
 		auto colDrawColor = &colBuffers.color[0];
-		auto colDrawUV = &colBuffers.uv[0];
 
 		auto colDrawFlipPosition = &colBuffersFlip.position[0];
 
@@ -311,16 +307,6 @@ namespace CollView {
 					colDrawColor[2] = nWallColB / 255.0;
 					colDrawColor += 3;
 				}
-
-				colDrawUV[0] = 0;
-				colDrawUV[1] = 0;
-				colDrawUV += 2;
-				colDrawUV[0] = 0;
-				colDrawUV[1] = 0;
-				colDrawUV += 2;
-				colDrawUV[0] = 0;
-				colDrawUV[1] = 0;
-				colDrawUV += 2;
 			}
 		}
 

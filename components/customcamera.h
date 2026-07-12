@@ -11,6 +11,10 @@ namespace CustomCamera {
 		return SM64::bEnabled && pTargetPlayerVehicle == GetLocalPlayerVehicle() && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
 	}
 
+	bool IsBallin() {
+		return CustomPhysics::bEnabled;
+	}
+
 	bool bSecondPersonOrbitMode = true;
 
 	const float fPanSpeedBase = 0.005;
@@ -65,6 +69,9 @@ namespace CustomCamera {
 		if (IsMario()) {
 			return {0, 1.0f * fLookatOffset * SM64::GetMarioScale(), 0};
 		}
+		if (IsBallin()) {
+			return {0, 1.0f * fLookatOffset, 0};
+		}
 
 		UMath::Vector3 dim;
 		ply->GetDimension(&dim);
@@ -74,6 +81,9 @@ namespace CustomCamera {
 	NyaVec3 GetFollowOffset(IRigidBody* ply) {
 		if (IsMario()) {
 			return {0, 1.0f * fFollowOffset * SM64::GetMarioScale(), 0};
+		}
+		if (IsBallin()) {
+			return {0, 1.0f * fLookatOffset, 0};
 		}
 
 		if (IsHeliCam()) return {0, -4, 0};
@@ -91,6 +101,15 @@ namespace CustomCamera {
 			v += GetLookatOffset(ply);
 			return &v;
 		}
+		if (IsBallin()) {
+			static NyaVec3 v;
+			auto tmp = b3Body_GetPosition(CustomPhysics::PlayerBodyTemp);
+			v.x = tmp.x;
+			v.y = tmp.y;
+			v.z = tmp.z;
+			v += GetLookatOffset(ply);
+			return &v;
+		}
 
 		if (!ply) return nullptr;
 
@@ -105,6 +124,15 @@ namespace CustomCamera {
 			static NyaVec3 v;
 			v = SM64::GetMarioWorldPos();
 			v.y += 1 * SM64::GetMarioScale();
+			v += GetFollowOffset(ply);
+			return &v;
+		}
+		if (IsBallin()) {
+			static NyaVec3 v;
+			auto tmp = b3Body_GetPosition(CustomPhysics::PlayerBodyTemp);
+			v.x = tmp.x;
+			v.y = tmp.y;
+			v.z = tmp.z;
 			v += GetFollowOffset(ply);
 			return &v;
 		}

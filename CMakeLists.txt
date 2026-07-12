@@ -25,7 +25,7 @@ else()
     endif()
 endif()
 
-add_compile_definitions(IMGUI_USER_CONFIG="../../nya_imconfig.h" CWOEECHAOS_VERSION="3.30" NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
+add_compile_definitions(BOX3D_DOUBLE_PRECISION IMGUI_USER_CONFIG="../../nya_imconfig.h" CWOEECHAOS_VERSION="3.30" NYA_BACKEND_DX9 NYA_AUDIO_BASS NYA_FONTNAME="MenuStyles/MenuStyleBubbly/FranxurterTotallyMedium-gxwjp.ttf" NYA_FONTSIZE=32.0)
 add_library(NFSMWChaos SHARED
         ../nya-common/3rdparty/imgui/imgui.cpp
         ../nya-common/3rdparty/imgui/backends/imgui_impl_dx9.cpp
@@ -75,3 +75,4 @@ target_link_libraries(NFSMWChaos d3dx9)
 target_link_libraries(NFSMWChaos bass)
 target_link_libraries(NFSMWChaos ws2_32)
 target_link_libraries(NFSMWChaos sm64)
+target_link_libraries(NFSMWChaos box3d)

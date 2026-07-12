@@ -547,6 +547,58 @@ void ChaosModMenu() {
 
 			ChloeMenuLib::EndMenu();
 		}
+		if (DrawMenuOption("Box3D Debug")) {
+			ChloeMenuLib::BeginMenu();
+
+			auto bodyId = CustomPhysics::PlayerBodyTemp;
+			auto pos = b3Body_GetPosition(bodyId);
+			auto quat = b3Body_GetRotation(bodyId);
+			auto vel = b3Body_GetLinearVelocity(bodyId);
+			auto avel = b3Body_GetAngularVelocity(bodyId);
+
+			if (DrawMenuOption("push x")) {
+				vel.x += 20;
+				b3Body_SetLinearVelocity(bodyId, vel);
+			}
+
+			if (DrawMenuOption("push y")) {
+				vel.y += 20;
+				b3Body_SetLinearVelocity(bodyId, vel);
+			}
+
+			if (DrawMenuOption("push z")) {
+				vel.y += 20;
+				b3Body_SetLinearVelocity(bodyId, vel);
+			}
+
+			if (DrawMenuOption("push -x")) {
+				vel.x -= 20;
+				b3Body_SetLinearVelocity(bodyId, vel);
+			}
+
+			if (DrawMenuOption("push -y")) {
+				vel.y -= 20;
+				b3Body_SetLinearVelocity(bodyId, vel);
+			}
+
+			if (DrawMenuOption("push -z")) {
+				vel.y -= 20;
+				b3Body_SetLinearVelocity(bodyId, vel);
+			}
+
+			DrawMenuOption(std::format("position {:.2f} {:.2f} {:.2f}", pos.x, pos.y, pos.z));
+			DrawMenuOption(std::format("velocity {:.2f} {:.2f} {:.2f}", vel.x, vel.y, vel.z));
+
+			QuickValueEditor("fMoveSpeed", CustomPhysics::fMoveSpeed);
+			QuickValueEditor("fMaxMoveSpeed", CustomPhysics::fMaxMoveSpeed);
+			QuickValueEditor("DrawCars", DrawCars);
+			QuickValueEditor("CustomCamera::fLookatOffset", CustomCamera::fLookatOffset);
+			QuickValueEditor("CustomCamera::fFollowOffset", CustomCamera::fFollowOffset);
+			QuickValueEditor("CustomCamera::fStringMinDistance", CustomCamera::fStringMinDistance);
+			QuickValueEditor("CustomCamera::fStringMaxDistance", CustomCamera::fStringMaxDistance);
+
+			ChloeMenuLib::EndMenu();
+		}
 		if (DrawMenuOption("Player Debug")) {
 			ChloeMenuLib::BeginMenu();
 			if (DrawMenuOption("Change C6 to Cross")) {
