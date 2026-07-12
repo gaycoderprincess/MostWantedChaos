@@ -32,6 +32,12 @@ namespace CustomPhysics {
 	};
 	CustomArticle aCollisionArticles[2700];
 
+	struct CustomObjectInstance {
+		b3BodyId nB3Body;
+		b3ShapeId nB3Shape;
+	};
+	std::vector<CustomObjectInstance> aB3Objects;
+
 	void ProcessCollisionBarriers(CustomArticleInstance* article, WCollisionBarrier* list, int count, NyaVec3 offset) {
 		for (int i = 0; i < count; i++) {
 			auto ptMin = list[i].fPts[0];
@@ -290,6 +296,64 @@ namespace CustomPhysics {
 	float fMaxMoveSpeed = 50.0;
 	float fBallSize = 2.5;
 
+	void CollectWorldObjects() {
+		for (auto& obj : aB3Objects) {
+			b3DestroyBody(obj.nB3Body);
+		}
+		aB3Objects.clear();
+
+		auto objs = GetActiveRigidBodies();
+		for (auto& rb : objs) {
+			if (rb == GetLocalPlayerInterface<IRigidBody>()) continue;
+
+			auto objInst = CustomObjectInstance();
+
+			UMath::Vector3 dim;
+			rb->GetDimension(&dim);
+
+			auto q = *rb->GetOrientation();
+			auto p = *rb->GetPosition();
+
+			UMath::Matrix4 m;
+			rb->GetMatrix4(&m);
+
+			b3Matrix3 m3;
+			m3.cx.x = m.x.x;
+			m3.cx.y = m.x.y;
+			m3.cx.z = m.x.z;
+			m3.cy.x = m.y.x;
+			m3.cy.y = m.y.y;
+			m3.cy.z = m.y.z;
+			m3.cz.x = m.z.x;
+			m3.cz.y = m.z.y;
+			m3.cz.z = m.z.z;
+
+			b3BodyDef def = b3DefaultBodyDef();
+			def.type = b3_dynamicBody;
+			def.position = {p.x,p.y,p.z};
+			def.rotation = b3MakeQuatFromMatrix(&m3);
+			objInst.nB3Body = b3CreateBody(m_worldId, &def);
+
+			b3ShapeDef shapeDef = b3DefaultShapeDef();
+			auto hull = b3MakeBoxHull(dim.x, dim.y, dim.z);
+			b3HullData hullData;
+			objInst.nB3Shape = b3CreateHullShape(objInst.nB3Body, &shapeDef, &hull.base);
+
+			auto vel = *rb->GetLinearVelocity();
+			auto avel = *rb->GetAngularVelocity();
+			auto mass = rb->GetMass();
+			b3Body_SetLinearVelocity(objInst.nB3Body, {vel.x,vel.y,vel.z});
+			b3Body_SetAngularVelocity(objInst.nB3Body, {avel.x,avel.y,avel.z});
+			b3MassData massData;
+			massData.mass = mass;
+			massData.inertia = {mass*dim.x,mass*dim.y,mass*dim.z};
+			massData.center = {0,0,0};
+			b3Body_SetMassData(objInst.nB3Body, massData);
+
+			aB3Objects.push_back(objInst);
+		}
+	}
+
 	bool bDrawThisFrame = false;
 	void OnWorldTick() {
 		if (!bEnabled) {
@@ -343,6 +407,8 @@ namespace CustomPhysics {
 			}
 		}
 
+		CollectWorldObjects();
+
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			if (bDoReset) {
 				auto pos = *ply->GetPosition();
@@ -363,17 +429,10 @@ namespace CustomPhysics {
 				ply->SetPosition(&v);
 				v = {vel.x, vel.y, vel.z};
 				ply->SetLinearVelocity(&v);
-
-				if (v.length() > 0.01) {
-					UMath::Matrix4 lookatMatrix = NyaMat4x4::LookAt(v, {0, 1, 0});
-					ply->SetOrientation(&lookatMatrix);
-				}
-
 				v = {avel.x, avel.y, avel.z};
 				ply->SetAngularVelocity(&v);
-
-				//UMath::Vector4 q = {quat.v.x, quat.v.y, quat.v.z, quat.s};
-				//ply->SetOrientation(&q);
+				UMath::Vector4 q = {quat.v.x, quat.v.y, quat.v.z, quat.s};
+				ply->SetOrientation(&q);
 			}
 
 			auto mat = PrepareCameraMatrix(GetLocalPlayerCamera());
@@ -430,7 +489,7 @@ namespace CustomPhysics {
 			b3ContactData contactData;
 			b3Body_GetContactData(PlayerBodyTemp, &contactData, 1);
 			if (b3Contact_IsValid(contactData.contactId) && (IsKeyJustPressed(VK_SPACE) || IsPadKeyJustPressed(NYA_PAD_KEY_A))) {
-				y += 25;
+				y += 15;
 			}
 			vel.y = y;
 
@@ -455,6 +514,7 @@ namespace CustomPhysics {
 		}
 
 		if (!bDrawThisFrame) return;
+		bDrawThisFrame = false;
 
 		/*for (int i = 0; i < 2700; i++) {
 			auto mesh = aCollisionArticles[i].pB3Mesh;
