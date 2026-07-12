@@ -592,8 +592,8 @@ void ChaosModMenu() {
 			QuickValueEditor("fMoveSpeed", CustomPhysics::fMoveSpeed);
 			QuickValueEditor("fMaxMoveSpeed", CustomPhysics::fMaxMoveSpeed);
 			QuickValueEditor("DrawCars", DrawCars);
-			QuickValueEditor("CustomCamera::fLookatOffset", CustomCamera::fLookatOffset);
-			QuickValueEditor("CustomCamera::fFollowOffset", CustomCamera::fFollowOffset);
+			QuickValueEditor("fLookatOffsetBall", CustomCamera::fLookatOffsetBall);
+			QuickValueEditor("fFollowOffsetBall", CustomCamera::fFollowOffsetBall);
 			QuickValueEditor("CustomCamera::fStringMinDistance", CustomCamera::fStringMinDistance);
 			QuickValueEditor("CustomCamera::fStringMaxDistance", CustomCamera::fStringMaxDistance);
 

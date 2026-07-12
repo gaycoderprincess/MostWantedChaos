@@ -17,18 +17,22 @@ namespace CustomPhysics {
 		return meshData;
 	}
 
-	struct CustomArticle {
+	struct CustomArticleInstance {
+		int nSceneryGroupId;
 		std::vector<WCollisionTri> aTriStrips;
 		std::vector<WCollisionTri> aBarriers;
 		b3MeshData* pB3Mesh;
 		b3BodyId nB3Body;
 		b3ShapeId nB3Shape;
+		bool bB3MeshEnabled;
+	};
+
+	struct CustomArticle {
+		std::vector<CustomArticleInstance> aInstances;
 	};
 	CustomArticle aCollisionArticles[2700];
 
-	void ProcessCollisionBarriers(int articleId, WCollisionBarrier* list, int count, NyaVec3 offset) {
-		WriteLog(std::format("Adding {} barriers for article {}", count, articleId));
-
+	void ProcessCollisionBarriers(CustomArticleInstance* article, WCollisionBarrier* list, int count, NyaVec3 offset) {
 		for (int i = 0; i < count; i++) {
 			auto ptMin = list[i].fPts[0];
 			auto ptMax = list[i].fPts[1];
@@ -47,7 +51,7 @@ namespace CustomPhysics {
 			tri.fPt0.y = ptMax.y;
 			tri.fPt0.z = ptMax.z;
 
-			aCollisionArticles[articleId].aBarriers.push_back(tri);
+			article->aBarriers.push_back(tri);
 
 			// second tri
 			tri.fPt2.x = ptMin.x;
@@ -59,7 +63,7 @@ namespace CustomPhysics {
 			tri.fPt0.x = ptMax.x;
 			tri.fPt0.y = ptMax.y;
 			tri.fPt0.z = ptMax.z;
-			aCollisionArticles[articleId].aBarriers.push_back(tri);
+			article->aBarriers.push_back(tri);
 
 			// first tri
 			tri.fPt0.x = ptMin.x;
@@ -72,7 +76,7 @@ namespace CustomPhysics {
 			tri.fPt2.y = ptMax.y;
 			tri.fPt2.z = ptMax.z;
 
-			aCollisionArticles[articleId].aBarriers.push_back(tri);
+			article->aBarriers.push_back(tri);
 
 			// second tri
 			tri.fPt0.x = ptMin.x;
@@ -84,7 +88,7 @@ namespace CustomPhysics {
 			tri.fPt2.x = ptMax.x;
 			tri.fPt2.y = ptMax.y;
 			tri.fPt2.z = ptMax.z;
-			aCollisionArticles[articleId].aBarriers.push_back(tri);
+			article->aBarriers.push_back(tri);
 		}
 	}
 
@@ -98,9 +102,14 @@ namespace CustomPhysics {
 		inst->MakeMatrix(&instMat, true);
 
 		// filter out unused stuff
-		if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
+		//if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
 
 		auto articles_end_ptr = (uintptr_t)(&article[1]);
+
+		aCollisionArticles[articleId].aInstances.push_back({});
+		auto articleInst = &aCollisionArticles[articleId].aInstances[aCollisionArticles[articleId].aInstances.size()-1];
+
+		articleInst->nSceneryGroupId = inst->fGroupNumber;
 
 		auto stripSphere = (WCollisionStripSphere*)articles_end_ptr;
 		auto strip = (WCollisionStrip*)(&stripSphere[article->fNumStrips]);
@@ -115,24 +124,22 @@ namespace CustomPhysics {
 				tri.fPt1 -= instMat.p;
 				tri.fPt2 -= instMat.p;
 
-				aCollisionArticles[articleId].aTriStrips.push_back(tri);
+				articleInst->aTriStrips.push_back(tri);
 
 				auto flip = tri;
 				flip.fPt0 = tri.fPt2;
 				flip.fPt1 = tri.fPt1;
 				flip.fPt2 = tri.fPt0;
-				aCollisionArticles[articleId].aTriStrips.push_back(flip);
+				articleInst->aTriStrips.push_back(flip);
 			}
 			strip += strip->numTrisOrSurfaceId;
 			stripSphere++;
 		}
 
-		ProcessCollisionBarriers(articleId, (WCollisionBarrier*)(articles_end_ptr + article->fStripsSize), article->fNumEdges, instMat.p);
+		ProcessCollisionBarriers(articleInst, (WCollisionBarrier*)(articles_end_ptr + article->fStripsSize), article->fNumEdges, instMat.p);
 	}
 
-	void ConvertCollisionArticle(int articleId) {
-		auto& article = aCollisionArticles[articleId];
-
+	void ConvertCollisionArticle(CustomArticleInstance& article) {
 		if (article.pB3Mesh) {
 			b3DestroyMesh(article.pB3Mesh);
 		}
@@ -176,6 +183,8 @@ namespace CustomPhysics {
 			//shapeDef.materialCount = 7;
 			article.nB3Shape = b3CreateMeshShape(article.nB3Body, &shapeDef, article.pB3Mesh, b3Vec3_one);
 			WriteLog(std::format("article.nB3Shape {}", article.nB3Shape.index1));
+
+			article.bB3MeshEnabled = true;
 		}
 	}
 
@@ -277,8 +286,9 @@ namespace CustomPhysics {
 	bool bEnabled = false;
 	bool bDoReset = false;
 
-	float fMoveSpeed = 5.0;
+	float fMoveSpeed = 15.0;
 	float fMaxMoveSpeed = 50.0;
+	float fBallSize = 2.5;
 
 	bool bDrawThisFrame = false;
 	void OnWorldTick() {
@@ -302,19 +312,35 @@ namespace CustomPhysics {
 			auto pack = WCollisionAssets::mCollisionPackList[i];
 			if (!pack) continue;
 
-			if (!aCollisionArticles[i].aTriStrips.empty()) continue;
-			if (!aCollisionArticles[i].aBarriers.empty()) continue;
-
-			WriteLog(std::format("Processing article {}", i));
+			if (!aCollisionArticles[i].aInstances.empty()) continue;
 
 			for (int j = 0; j < pack->mInstanceNum; j++) {
-				WriteLog(std::format("Processing instance {}", j));
 				ProcessCollisionArticle(i, &pack->mInstanceList[j]);
 			}
 
-			WriteLog(std::format("Converting article {}", i));
+			for (auto& inst : aCollisionArticles[i].aInstances) {
+				ConvertCollisionArticle(inst);
+			}
+		}
 
-			ConvertCollisionArticle(i);
+		for (int i = 0; i < 2700; i++) {
+			auto pack = WCollisionAssets::mCollisionPackList[i];
+			if (!pack) continue;
+
+			for (auto& inst : aCollisionArticles[i].aInstances) {
+				int id = &inst - &aCollisionArticles[i].aInstances[0];
+
+				auto enabled = !inst.nSceneryGroupId || SceneryGroupEnabledTable[inst.nSceneryGroupId];
+				if (enabled != inst.bB3MeshEnabled) {
+					if (enabled) {
+						b3Body_Enable(inst.nB3Body);
+					}
+					else {
+						b3Body_Disable(inst.nB3Body);
+					}
+					inst.bB3MeshEnabled = enabled;
+				}
+			}
 		}
 
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
@@ -337,10 +363,17 @@ namespace CustomPhysics {
 				ply->SetPosition(&v);
 				v = {vel.x, vel.y, vel.z};
 				ply->SetLinearVelocity(&v);
+
+				if (v.length() > 0.01) {
+					UMath::Matrix4 lookatMatrix = NyaMat4x4::LookAt(v, {0, 1, 0});
+					ply->SetOrientation(&lookatMatrix);
+				}
+
 				v = {avel.x, avel.y, avel.z};
 				ply->SetAngularVelocity(&v);
-				UMath::Vector4 q = {quat.v.x, quat.v.y, quat.v.z, quat.s};
-				ply->SetOrientation(&q);
+
+				//UMath::Vector4 q = {quat.v.x, quat.v.y, quat.v.z, quat.s};
+				//ply->SetOrientation(&q);
 			}
 
 			auto mat = PrepareCameraMatrix(GetLocalPlayerCamera());
@@ -350,32 +383,57 @@ namespace CustomPhysics {
 			side.y = 0;
 			fwd.Normalize();
 			side.Normalize();
-			auto input = GetLocalPlayerInterface<IInput>()->GetControls();
-			float gas = input->fGas;
-			float brake = input->fBrake;
-			if (GetLocalPlayerInterface<ITransmission>()->GetGear() == G_REVERSE) {
-				gas = input->fBrake;
-				brake = input->fGas;
+
+			auto stick = NyaVec3(GetPadKeyState(NYA_PAD_KEY_LSTICK_X) / 32767.0,GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / -32767.0,0);
+			if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
+				if (IsKeyPressed(VK_LEFT)) {
+					stick.x = -1.0;
+				}
+				if (IsKeyPressed(VK_RIGHT)) {
+					stick.x = 1.0;
+				}
+				if (IsKeyPressed(VK_UP)) {
+					stick.y = -1.0;
+				}
+				if (IsKeyPressed(VK_DOWN)) {
+					stick.y = 1.0;
+				}
 			}
-			auto len = b3Length(vel);
-			vel.x += fwd.x * gas * fMoveSpeed * gTimer.fDeltaTime;
-			vel.y += fwd.y * gas * fMoveSpeed * gTimer.fDeltaTime;
-			vel.z += fwd.z * gas * fMoveSpeed * gTimer.fDeltaTime;
-			vel.x -= fwd.x * brake * fMoveSpeed * gTimer.fDeltaTime;
-			vel.y -= fwd.y * brake * fMoveSpeed * gTimer.fDeltaTime;
-			vel.z -= fwd.z * brake * fMoveSpeed * gTimer.fDeltaTime;
-			vel.x += side.x * input->fSteering * fMoveSpeed * gTimer.fDeltaTime;
-			vel.y += side.y * input->fSteering * fMoveSpeed * gTimer.fDeltaTime;
-			vel.z += side.z * input->fSteering * fMoveSpeed * gTimer.fDeltaTime;
+
+			if (stick.length() > 1.0) {
+				stick.Normalize();
+			}
+
+			float y = vel.y;
+			vel.y = 0;
+
+			auto oldLen = b3Length(vel);
+			vel.x += fwd.x * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
+			vel.z += fwd.z * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
+			vel.x += side.x * stick.x * fMoveSpeed * gTimer.fDeltaTime;
+			vel.z += side.z * stick.x * fMoveSpeed * gTimer.fDeltaTime;
 			auto newLen = b3Length(vel);
 			if (newLen > fMaxMoveSpeed) {
 				vel.x /= newLen;
-				vel.y /= newLen;
 				vel.z /= newLen;
-				vel.x *= len;
-				vel.y *= len;
-				vel.z *= len;
+				vel.x *= oldLen;
+				vel.z *= oldLen;
 			}
+			// double force when braking
+			else if (newLen < oldLen) {
+				vel.x += fwd.x * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
+				vel.z += fwd.z * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
+				vel.x += side.x * stick.x * fMoveSpeed * gTimer.fDeltaTime;
+				vel.z += side.z * stick.x * fMoveSpeed * gTimer.fDeltaTime;
+			}
+
+			b3ContactData contactData;
+			b3Body_GetContactData(PlayerBodyTemp, &contactData, 1);
+			if (b3Contact_IsValid(contactData.contactId) && (IsKeyJustPressed(VK_SPACE) || IsPadKeyJustPressed(NYA_PAD_KEY_A))) {
+				y += 25;
+			}
+			vel.y = y;
+
 			b3Body_SetLinearVelocity(PlayerBodyTemp, vel);
 		}
 
@@ -424,9 +482,9 @@ namespace CustomPhysics {
 			UMath::Matrix4 mat = *rb->GetMatrix4();
 			mat.p = *rb->GetPosition();
 
-			mat.x *= 2.0;
-			mat.y *= 2.0;
-			mat.z *= 2.0;
+			mat.x *= fBallSize;
+			mat.y *= fBallSize;
+			mat.z *= fBallSize;
 
 			mdl[0]->RenderAt(WorldToRenderMatrix(mat));
 		}
@@ -444,13 +502,14 @@ namespace CustomPhysics {
 		b3BodyDef def = b3DefaultBodyDef();
 		def.type = b3_dynamicBody;
 		def.position = {0,0,0};
+		def.enableSleep = false;
 		PlayerBodyTemp = b3CreateBody(m_worldId, &def);
 		WriteLog(std::format("PlayerBodyTemp {}", PlayerBodyTemp.index1));
 
 		b3ShapeDef shapeDef = b3DefaultShapeDef();
 		b3Sphere sphere;
 		sphere.center = {0,0,0};
-		sphere.radius = 2.0;
+		sphere.radius = fBallSize;
 		auto shape = b3CreateSphereShape(PlayerBodyTemp, &shapeDef, &sphere);
 		WriteLog(std::format("PlayerBodyShape {}", shape.index1));
 	});

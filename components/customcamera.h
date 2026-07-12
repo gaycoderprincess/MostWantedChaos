@@ -24,6 +24,8 @@ namespace CustomCamera {
 	NyaVec3 vPosChange = {0, 0, 0};
 	float fLookatOffset = 0.7;
 	float fFollowOffset = 1.7;
+	float fLookatOffsetBall = 1.0;
+	float fFollowOffsetBall = 1.5;
 	NyaVec3 vLastPlayerPosition = {0, 0, 0};
 	float fMouseRotateSpeed = 1;
 	float fStringMinDistance = 3;
@@ -67,10 +69,10 @@ namespace CustomCamera {
 
 	NyaVec3 GetLookatOffset(IRigidBody* ply) {
 		if (IsMario()) {
-			return {0, 1.0f * fLookatOffset * SM64::GetMarioScale(), 0};
+			return {0, fLookatOffset * SM64::GetMarioScale(), 0};
 		}
 		if (IsBallin()) {
-			return {0, 1.0f * fLookatOffset, 0};
+			return {0, CustomPhysics::fBallSize * fLookatOffsetBall, 0};
 		}
 
 		UMath::Vector3 dim;
@@ -80,10 +82,10 @@ namespace CustomCamera {
 
 	NyaVec3 GetFollowOffset(IRigidBody* ply) {
 		if (IsMario()) {
-			return {0, 1.0f * fFollowOffset * SM64::GetMarioScale(), 0};
+			return {0, fFollowOffset * SM64::GetMarioScale(), 0};
 		}
 		if (IsBallin()) {
-			return {0, 1.0f * fLookatOffset, 0};
+			return {0, CustomPhysics::fBallSize * fFollowOffsetBall, 0};
 		}
 
 		if (IsHeliCam()) return {0, -4, 0};

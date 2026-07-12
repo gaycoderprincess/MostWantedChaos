@@ -1350,6 +1350,7 @@ public:
 		sName = "Super Mario 64 Mode";
 		fTimerLength = 90;
 		bAbortOnConditionFailed = true;
+		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
 	}
 
@@ -1374,6 +1375,7 @@ public:
 	Effect_Ball() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Ballin";
 		fTimerLength = 90;
+		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
 	}
 
