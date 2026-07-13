@@ -10,8 +10,10 @@ namespace CustomPhysicsObjects {
 		b3BodyId nB3Body;
 		bool bRenderFlat = false;
 		bool bRemoveOnSafehouse = false;
-		bool bRemoveOnOutOfBounds = true;
+		bool bRemoveOnOutOfBounds = false;
 		bool bRemoveOnOutOfRange = false;
+
+		NyaVec3 vSpawnPosition = {0,0,0};
 		int nLastCollided = 0;
 		NyaAudio::NyaSound pCollisionSound = 0;
 
@@ -37,10 +39,17 @@ namespace CustomPhysicsObjects {
 		void SetAngularVelocity(const UMath::Vector3* v) {
 			b3Body_SetAngularVelocity(nB3Body, {v->x,v->y,v->z});
 		}
+
+		void Respawn() {
+			b3Body_SetTransform(nB3Body, {vSpawnPosition.x,vSpawnPosition.y,vSpawnPosition.z}, b3Quat_identity);
+			b3Body_SetLinearVelocity(nB3Body, b3Vec3_zero);
+			b3Body_SetAngularVelocity(nB3Body, b3Vec3_zero);
+		}
 	};
 	std::vector<CustomPhysicsObject> aPhysicsObjects;
 
 	void CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
+		data.vSpawnPosition = position;
 		if (collider == BOX) {
 			b3BodyDef def = b3DefaultBodyDef();
 			def.type = b3_dynamicBody;
@@ -84,12 +93,15 @@ namespace CustomPhysicsObjects {
 
 	bool PurgeOutOfWorld() {
 		for (auto& obj : aPhysicsObjects) {
-			if (!obj.bRemoveOnOutOfBounds) continue;
-
 			if (obj.GetPosition().y < -100) {
-				b3DestroyBody(obj.nB3Body);
-				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
-				return true;
+				if (obj.bRemoveOnOutOfBounds) {
+					b3DestroyBody(obj.nB3Body);
+					aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
+					return true;
+				}
+				else {
+					obj.Respawn();
+				}
 			}
 		}
 		return false;
@@ -99,10 +111,10 @@ namespace CustomPhysicsObjects {
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
 		for (auto& obj : aPhysicsObjects) {
-			if (!obj.bRemoveOnOutOfBounds) continue;
+			if (!obj.bRemoveOnOutOfRange) continue;
 
 			auto dist = (plyPos - obj.GetPosition());
-			if (dist.length() > 500) {
+			if (dist.length() > 1000) {
 				b3DestroyBody(obj.nB3Body);
 				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
 				return true;

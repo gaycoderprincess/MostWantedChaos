@@ -39,6 +39,19 @@ public:
 		}
 	};
 
+	// make less picked effects more frequent
+	int GetWeightedFrequency() {
+		double avg = 0.0;
+		for (auto& effect : aEffects) {
+			avg += effect->nTotalTimesActivated;
+		}
+		avg /= (double)aEffects.size();
+
+		if (nTotalTimesActivated < (avg / 4.0)) return nFrequency * 3;
+		if (nTotalTimesActivated < (avg / 2.0)) return nFrequency * 2;
+		return nFrequency;
+	}
+
 	const char* GetFriendlyName() const {
 		if (sFriendlyName) return sFriendlyName;
 		return sName;
@@ -368,7 +381,7 @@ ChaosEffect* GetRandomEffect(bool quickTrigger = false) {
 		if (!CanEffectBeRandomlyPicked(effect)) continue;
 		if (quickTrigger && !effect->bCanQuickTrigger) continue;
 
-		for (int i = 0; i < effect->nFrequency; i++) {
+		for (int i = 0; i < effect->GetWeightedFrequency(); i++) {
 			availableEffects.push_back(effect);
 		}
 	}

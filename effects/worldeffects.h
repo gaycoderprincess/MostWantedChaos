@@ -449,9 +449,21 @@ public:
 			vel.z += (v->z - c->z) * force * delta;
 			otherCar->SetLinearVelocity(&vel);
 		}
+
+		auto& objs = CustomPhysicsObjects::aPhysicsObjects;
+		for (auto& car : objs) {
+			auto otherCar = &car;
+			auto v = GetLocalPlayerVehicle()->GetPosition();
+			auto c = otherCar->GetPosition();
+			auto vel = otherCar->GetLinearVelocity();
+			vel.x += (v->x - c.x) * force * delta;
+			vel.y += (v->y - c.y) * force * delta;
+			vel.z += (v->z - c.z) * force * delta;
+			otherCar->SetLinearVelocity(&vel);
+		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsAvailable() override { return !GetActiveObjects().empty(); }
+	bool IsAvailable() override { return !GetActiveObjects().empty() || !CustomPhysicsObjects::aPhysicsObjects.empty(); }
 } E_ObjectMagnet;
 
 class Effect_CollisionView2 : public EffectBase_ScreenShader {

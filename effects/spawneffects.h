@@ -1408,7 +1408,7 @@ public:
 	Effect_Mario64() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Super Mario 64 Mode";
 		sFriendlyName = "Turn Into Mario 64";
-		fTimerLength = 90;
+		fTimerLength = 120;
 		bAbortOnConditionFailed = true;
 		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
@@ -1420,6 +1420,8 @@ public:
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
+
+		if (IsInNormalRace()) EffectInstance->fTimer -= delta; // have the time left if in a race
 
 		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), GetLocalPlayerVehicle());
 		CustomCamera::ProcessCam(pMoverCamera, delta);
@@ -1436,10 +1438,11 @@ public:
 	Effect_Ball() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Super Rockport Ball";
 		sFriendlyName = "Turn Into Giant Beach Ball";
-		fTimerLength = 90;
+		fTimerLength = 120;
 		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
 		bRigProportionalChances = true;
+		nFrequency *= 3;
 	}
 
 	void InitFunction() override {
@@ -1478,7 +1481,7 @@ public:
 class Effect_SpawnBalls : public ChaosEffect {
 public:
 	Effect_SpawnBalls() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Spawn Beach Balls";
+		sName = "Spawn 1000 Beach Balls";
 	}
 
 	void InitFunction() override {
@@ -1499,6 +1502,7 @@ public:
 				objData.aModels = mdl;
 				objData.vModelSize = {1,1,1};
 				objData.bRemoveOnSafehouse = true;
+				objData.bRemoveOnOutOfBounds = true;
 				objData.bRemoveOnOutOfRange = true;
 				objData.pCollisionSound = sound;
 				CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
@@ -1506,3 +1510,36 @@ public:
 		}
 	}
 } E_SpawnBalls;
+
+class Effect_SpawnBall : public ChaosEffect {
+public:
+	Effect_SpawnBall() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Beach Balls";
+	}
+
+	void InitFunction() override {
+		static auto mdl = Render3D::CreateModels("beachball.fbx");
+
+		auto ply = *GetLocalPlayerInterface<IRigidBody>()->GetPosition();
+		auto vel = *GetLocalPlayerInterface<IRigidBody>()->GetLinearVelocity();
+
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		for (int x = -5; x < 5; x += 3) {
+			for (int y = -5; y < 5; y += 3) {
+				NyaVec3 pos = ply;
+				pos.x += x;
+				pos.y += 2;
+				pos.z += y;
+
+				CustomPhysicsObjects::CustomPhysicsObject objData;
+				objData.aModels = mdl;
+				objData.vModelSize = {1,1,1};
+				objData.bRemoveOnSafehouse = false;
+				objData.bRemoveOnOutOfBounds = false;
+				objData.bRemoveOnOutOfRange = false;
+				objData.pCollisionSound = sound;
+				CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+			}
+		}
+	}
+} E_SpawnBall;

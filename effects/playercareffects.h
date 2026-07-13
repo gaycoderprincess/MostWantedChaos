@@ -276,6 +276,29 @@ public:
 	}
 } E_BlowEngine;
 
+class Effect_BlowEngineFake : public ChaosEffect {
+public:
+	Effect_BlowEngineFake() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Fake Blow Player's Engine";
+		fTimerLength = 4;
+		MakeIncompatibleWithFilterGroup("player_godmode");
+		bCanQuickTrigger = false;
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
+			ply->Sabotage(3);
+		}
+	}
+	void TickFunctionMain(double delta) override {
+		if (EffectInstance->fTimer < 3.0) {
+			if (auto ply = GetLocalPlayerInterface<IEngineDamage>()) {
+				ply->Repair();
+			}
+		}
+	}
+} E_BlowEngineFake;
+
 class Effect_AutoDrive : public ChaosEffect {
 public:
 	Effect_AutoDrive() : ChaosEffect(EFFECT_CATEGORY_TEMP) {

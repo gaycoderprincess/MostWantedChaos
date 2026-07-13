@@ -13,13 +13,13 @@ namespace CustomCamera {
 
 	double fMarioDelayFactor = 0.0;
 	bool IsMarioDelayed() {
-		return (SM64::marioState.action & ACT_FLAG_AIR) != 0;
+		return SM64::marioState.action == ACT_DIVE || SM64::marioState.action == ACT_FORWARD_ROLLOUT || SM64::marioState.action == ACT_DIVE_SLIDE;
 	}
 
 	UMath::Vector3 GetMarioDelayVector() {
 		auto v = SM64::GetMarioWorldVelocity();
 		v.y = 0;
-		return v * (1.0 / 30.0);
+		return v * (1.0 / 15.0);
 	}
 
 	bool IsBallin() {

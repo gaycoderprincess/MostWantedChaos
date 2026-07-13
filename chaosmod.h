@@ -369,7 +369,7 @@ void ChaosLoop() {
 			}
 		}
 
-		if (bManualKeybindEnabled && IsKeyJustPressed(VK_OEM_PLUS)) {
+		if (bManualKeybindEnabled && IsKeyJustPressed(VK_ADD)) {
 			AddRunningEffect(GetRandomEffect(true));
 		}
 	}
