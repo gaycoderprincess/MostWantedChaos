@@ -4,6 +4,7 @@ namespace CustomPhysicsBall {
 	bool bDoReset = false;
 
 	float fMoveSpeed = 15.0;
+	float fBrakeSpeed = 2.0;
 	float fMaxMoveSpeed = 50.0;
 	float fBallSize = 2.5;
 
@@ -142,23 +143,31 @@ namespace CustomPhysicsBall {
 			vel.y = 0;
 
 			auto oldLen = b3Length(vel);
-			vel.x += fwd.x * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
-			vel.z += fwd.z * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
-			vel.x += side.x * stick.x * fMoveSpeed * gTimer.fDeltaTime;
-			vel.z += side.z * stick.x * fMoveSpeed * gTimer.fDeltaTime;
+
+			b3Vec3 velAdd = {0,0,0};
+
+			velAdd.x += fwd.x * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
+			velAdd.z += fwd.z * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
+			velAdd.x += side.x * stick.x * fMoveSpeed * gTimer.fDeltaTime;
+			velAdd.z += side.z * stick.x * fMoveSpeed * gTimer.fDeltaTime;
+
+			if (b3Length(velAdd) > 0.0) {
+				auto velNorm = b3Normalize(vel);
+				auto velAddNorm = b3Normalize(velAdd);
+
+				// double force when braking
+				auto dot = 1.0 - ((b3Dot(velNorm, velAddNorm) + 1.0) / 2.0);
+				velAdd *= (1.0 + (dot * fBrakeSpeed));
+			}
+
+			vel += velAdd;
+
 			auto newLen = b3Length(vel);
 			if (newLen > fMaxMoveSpeed) {
 				vel.x /= newLen;
 				vel.z /= newLen;
 				vel.x *= oldLen;
 				vel.z *= oldLen;
-			}
-			// double force when braking
-			else if (newLen < oldLen) {
-				vel.x += fwd.x * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
-				vel.z += fwd.z * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
-				vel.x += side.x * stick.x * fMoveSpeed * gTimer.fDeltaTime;
-				vel.z += side.z * stick.x * fMoveSpeed * gTimer.fDeltaTime;
 			}
 
 			b3ContactData contactData;
