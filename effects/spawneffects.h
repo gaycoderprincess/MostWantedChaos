@@ -1467,7 +1467,6 @@ class Effect_SpawnBalls : public ChaosEffect {
 public:
 	Effect_SpawnBalls() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Beach Balls";
-		bCanQuickTrigger = false;
 	}
 
 	void InitFunction() override {

@@ -12,7 +12,7 @@ namespace CustomPhysicsObjects {
 		bool bRemoveOnSafehouse = false;
 		bool bRemoveOnOutOfBounds = true;
 		bool bRemoveOnOutOfRange = false;
-		bool bLastCollided = false;
+		int nLastCollided = 0;
 		NyaAudio::NyaSound pCollisionSound = 0;
 	};
 	std::vector<CustomPhysicsObject> aPhysicsObjects;
@@ -101,23 +101,30 @@ namespace CustomPhysicsObjects {
 		while (PurgeOutOfWorld()) {}
 		while (PurgeByRange()) {}
 
+		b3ContactData contactData[8];
+
 		for (auto& obj : aPhysicsObjects) {
+			if (!obj.pCollisionSound) continue;
+
 			auto pos = b3Body_GetPosition(obj.nB3Body);
 
-			b3ContactData contactData;
-			b3Body_GetContactData(obj.nB3Body, &contactData, 1);
-			auto collided = b3Contact_IsValid(contactData.contactId);
-			if (obj.pCollisionSound && collided && !obj.bLastCollided) {
+			int num = b3Body_GetContactData(obj.nB3Body, contactData, 8);
+			//if (num > obj.nLastCollided) { // this results in too many false positives
+			if (num && !obj.nLastCollided) {
+				obj.nLastCollided = num;
+
 				auto dist = (*GetLocalPlayerVehicle()->GetPosition() - NyaVec3(pos.x,pos.y,pos.z));
 				auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
 				volume *= fObjectSFXVolume;
 				if (volume > 1) volume = 1;
-				if (volume < 0) volume = 0;
-				if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
+				if (volume < 0) {
+					volume = 0;
+					break;
+				}
 				NyaAudio::SetVolume(obj.pCollisionSound, GetSFXVolume() * volume);
 				NyaAudio::Play(obj.pCollisionSound);
 			}
-			obj.bLastCollided = collided;
+			obj.nLastCollided = num;
 		}
 	}
 
