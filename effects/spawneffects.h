@@ -1407,6 +1407,7 @@ class Effect_Mario64 : public ChaosEffect {
 public:
 	Effect_Mario64() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Super Mario 64 Mode";
+		sFriendlyName = "Turn Into Mario 64";
 		fTimerLength = 90;
 		bAbortOnConditionFailed = true;
 		AddToIncompatiblityGroup("control_mode");

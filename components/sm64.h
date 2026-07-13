@@ -933,14 +933,22 @@ namespace SM64 {
 			bInvincibleFlash = !bInvincibleFlash;
 		}
 
-		RenderMario<0, false>(marioGeometry);
-		RenderMario<0, true>(marioGeometry);
-
 		static bool bOnce = true;
 		if (bOnce) {
 			aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
 			bOnce = false;
 		}
+	}
+
+	void OnTick3D() {
+		PerformanceBenchmarker _perf("SM64::OnTick3D");
+
+		if (!bEnabled) return;
+		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) return;
+		if (IsInLoadingScreen() || IsInMovie()) return;
+
+		RenderMario<0, false>(marioGeometry);
+		RenderMario<0, true>(marioGeometry);
 	}
 
 	void OnAudioTick() {
@@ -1006,7 +1014,8 @@ namespace SM64 {
 		memset(marioGeometry.normal, 0, sizeof(float)*9*SM64_GEO_MAX_TRIANGLES);
 		memset(marioGeometry.uv, 0, sizeof(float)*6*SM64_GEO_MAX_TRIANGLES);
 
-		aDrawing3DLoopFunctions.push_back(OnTick);
+		aDrawing3DLoopFunctions.push_back(OnTick3D);
+		aDrawingLoopFunctions.push_back(OnTick);
 		//aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
 
 		bAvailable = true;

@@ -134,12 +134,12 @@ namespace CustomPhysicsObjects {
 
 				auto dist = (*GetLocalPlayerVehicle()->GetPosition() - obj.GetPosition());
 				auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
-				volume *= fObjectSFXVolume;
 				if (volume > 1) volume = 1;
 				if (volume < 0) {
 					volume = 0;
 					break;
 				}
+				volume *= fObjectSFXVolume;
 				NyaAudio::SetVolume(obj.pCollisionSound, GetSFXVolume() * volume);
 				NyaAudio::Play(obj.pCollisionSound);
 			}

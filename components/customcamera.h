@@ -11,6 +11,10 @@ namespace CustomCamera {
 		return SM64::bEnabled && pTargetPlayerVehicle == GetLocalPlayerVehicle() && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
 	}
 
+	bool IsMarioDelayed() {
+		return (SM64::marioState.action & ACT_FLAG_AIR) != 0;
+	}
+
 	bool IsBallin() {
 		return CustomPhysicsBall::bEnabled;
 	}
@@ -101,6 +105,11 @@ namespace CustomCamera {
 			v = SM64::GetMarioWorldPos();
 			v.y += 1 * SM64::GetMarioScale();
 			v += GetLookatOffset(ply);
+			//if (IsMarioDelayed()) {
+			//	auto vel = SM64::GetMarioWorldVelocity();
+			//	vel.y = 0;
+			//	v -= vel * (1.0/30.0);
+			//}
 			return &v;
 		}
 		if (IsBallin()) {
@@ -127,6 +136,11 @@ namespace CustomCamera {
 			v = SM64::GetMarioWorldPos();
 			v.y += 1 * SM64::GetMarioScale();
 			v += GetFollowOffset(ply);
+			//if (IsMarioDelayed()) {
+			//	auto vel = SM64::GetMarioWorldVelocity();
+			//	vel.y = 0;
+			//	v -= vel * (1.0/30.0);
+			//}
 			return &v;
 		}
 		if (IsBallin()) {
