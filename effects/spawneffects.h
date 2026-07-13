@@ -1433,7 +1433,7 @@ public:
 class Effect_Ball : public ChaosEffect {
 public:
 	Effect_Ball() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Ballin";
+		sName = "Super Rockport Ball";
 		sFriendlyName = "Turn Into Giant Beach Ball";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("control_mode");
@@ -1458,6 +1458,17 @@ public:
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			UMath::Vector3 v = {0,0,0};
 			ply->SetAngularVelocity(&v);
+
+			UMath::Vector3 fwd;
+			ply->GetForwardVector(&fwd);
+
+			UMath::Vector3 vel = *ply->GetLinearVelocity();
+
+			// use teleportplayer to make sure we don't get reset back to where the ball spawned
+			v = *ply->GetPosition();
+			TeleportPlayer(v, fwd);
+
+			ply->SetLinearVelocity(&vel);
 		}
 	}
 	bool HasTimer() override { return true; }

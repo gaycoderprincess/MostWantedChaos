@@ -55,11 +55,11 @@ namespace FlatOutHUD {
 #include "include/sm64_defs.h"
 #include "include/libsm64.h"
 #include "box3d/box3d.h"
-#include "components/sm64.h"
 #include "components/colrender.h"
 #include "components/customphysics.h"
 #include "components/customphysics_ball.h"
 #include "components/customphysics_objects.h"
+#include "components/sm64.h"
 #include "components/customcamera.h"
 
 #include "chaoseffect.h"

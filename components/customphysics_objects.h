@@ -14,6 +14,29 @@ namespace CustomPhysicsObjects {
 		bool bRemoveOnOutOfRange = false;
 		int nLastCollided = 0;
 		NyaAudio::NyaSound pCollisionSound = 0;
+
+		UMath::Vector3 GetPosition() {
+			auto v = b3Body_GetPosition(nB3Body);
+			return {v.x,v.y,v.z};
+		}
+
+		UMath::Vector3 GetLinearVelocity() {
+			auto v = b3Body_GetLinearVelocity(nB3Body);
+			return {v.x,v.y,v.z};
+		}
+
+		UMath::Vector3 GetAngularVelocity() {
+			auto v = b3Body_GetAngularVelocity(nB3Body);
+			return {v.x,v.y,v.z};
+		}
+
+		void SetLinearVelocity(const UMath::Vector3* v) {
+			b3Body_SetLinearVelocity(nB3Body, {v->x,v->y,v->z});
+		}
+
+		void SetAngularVelocity(const UMath::Vector3* v) {
+			b3Body_SetAngularVelocity(nB3Body, {v->x,v->y,v->z});
+		}
 	};
 	std::vector<CustomPhysicsObject> aPhysicsObjects;
 
@@ -63,8 +86,7 @@ namespace CustomPhysicsObjects {
 		for (auto& obj : aPhysicsObjects) {
 			if (!obj.bRemoveOnOutOfBounds) continue;
 
-			auto v = b3Body_GetPosition(obj.nB3Body);
-			if (v.y < -100) {
+			if (obj.GetPosition().y < -100) {
 				b3DestroyBody(obj.nB3Body);
 				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
 				return true;
@@ -79,8 +101,7 @@ namespace CustomPhysicsObjects {
 		for (auto& obj : aPhysicsObjects) {
 			if (!obj.bRemoveOnOutOfBounds) continue;
 
-			auto v = b3Body_GetPosition(obj.nB3Body);
-			auto dist = (plyPos - NyaVec3(v.x,v.y,v.z));
+			auto dist = (plyPos - obj.GetPosition());
 			if (dist.length() > 500) {
 				b3DestroyBody(obj.nB3Body);
 				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
@@ -91,7 +112,7 @@ namespace CustomPhysicsObjects {
 	}
 
 	float fObjectSFXRange = 100;
-	float fObjectSFXVolume = 1.0;
+	float fObjectSFXVolume = 0.66;
 
 	void OnTick() {
 		if (!GetLocalPlayerVehicle()) return;
@@ -106,14 +127,12 @@ namespace CustomPhysicsObjects {
 		for (auto& obj : aPhysicsObjects) {
 			if (!obj.pCollisionSound) continue;
 
-			auto pos = b3Body_GetPosition(obj.nB3Body);
-
 			int num = b3Body_GetContactData(obj.nB3Body, contactData, 8);
 			//if (num > obj.nLastCollided) { // this results in too many false positives
 			if (num && !obj.nLastCollided) {
 				obj.nLastCollided = num;
 
-				auto dist = (*GetLocalPlayerVehicle()->GetPosition() - NyaVec3(pos.x,pos.y,pos.z));
+				auto dist = (*GetLocalPlayerVehicle()->GetPosition() - obj.GetPosition());
 				auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
 				volume *= fObjectSFXVolume;
 				if (volume > 1) volume = 1;
@@ -138,8 +157,8 @@ namespace CustomPhysicsObjects {
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
 		for (auto& obj : aPhysicsObjects) {
-			auto pos = b3Body_GetPosition(obj.nB3Body);
-			auto dist = (plyPos - NyaVec3(pos.x,pos.y,pos.z));
+			auto pos = obj.GetPosition();
+			auto dist = (plyPos - pos);
 			if (dist.length() > 250) continue; // don't render far away objects
 
 			UMath::Matrix4 mat;

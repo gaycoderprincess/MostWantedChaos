@@ -524,7 +524,8 @@ namespace SM64 {
 		body->SetLinearVelocity(&dir);
 	}
 
-	void MarioInteract_KnockFwd(IRigidBody* body) {
+	template<typename T>
+	void MarioInteract_KnockFwd(T* body) {
 		UMath::Vector3 dir = GetMarioWorldFacing();
 		dir *= 25;
 		dir.y = 5;
@@ -588,6 +589,57 @@ namespace SM64 {
 					if (IsCustomObjectPunchKillable(car)) {
 						KillCustomObject(car);
 					}
+
+					// bounce_back_from_attack
+
+					if (marioState.action == ACT_PUNCHING) {
+						sm64_set_mario_action(marioId, ACT_MOVE_PUNCHING);
+					}
+
+					if (marioState.action & ACT_FLAG_AIR) {
+						sm64_set_mario_forward_velocity(marioId, -16.0f);
+					} else {
+						sm64_set_mario_forward_velocity(marioId, -48.0f);
+					}
+
+					sm64_play_sound_global(SOUND_ACTION_HIT_2);
+				}
+				// all else throws away
+				//else if (interaction) {
+				//	MarioInteract_KnockAway(rb);
+				//}
+			}
+		}
+	}
+
+	void MarioCustomPhysicsObjectInteractions() {
+		UMath::Vector3 marioPos = GetMarioWorldPos();
+
+		auto objs = CustomPhysicsObjects::aPhysicsObjects;
+		for (auto& rb : objs) {
+			auto dim = rb.vModelSize;
+
+			const float fAttackRange = 6.0 * GetMarioScale();
+			const float fJumpAttackRange = 2.0 * GetMarioScale();
+
+			float dist = (rb.GetPosition() - marioPos).length();
+			if (dist < fAttackRange) {
+				auto pos = WorldToMario(rb.GetPosition());
+				auto interaction = sm64_fake_determine_interaction(marioId, pos.x, pos.y, pos.z);
+
+				// ground pound is an instakill
+				if (interaction == INT_GROUND_POUND_OR_TWIRL) {
+					// todo
+				}
+				// bounce off if needed
+				else if (interaction == INT_HIT_FROM_ABOVE || interaction == INT_HIT_FROM_BELOW) {
+					if (dist < fJumpAttackRange) {
+						sm64_mario_attack(marioId, pos.x, pos.y, pos.z, dim.y * marioScalar);
+					}
+				}
+				// punches & kicks throw forward
+				else if (interaction == INT_PUNCH || interaction == INT_KICK) {
+					MarioInteract_KnockFwd(&rb);
 
 					// bounce_back_from_attack
 
@@ -845,6 +897,7 @@ namespace SM64 {
 		if (!FEManager::mPauseRequest) {
 			MarioObjectInteractions();
 			MarioCustomObjectInteractions();
+			MarioCustomPhysicsObjectInteractions();
 			MarioCarInheritance();
 
 			sm64_set_sound_volume(GetSFXVolume());

@@ -64,20 +64,18 @@ namespace CustomPhysicsBall {
 		static CNyaTimer gTimer;
 		gTimer.Process();
 
-		static bool bLastBallOnGround = false;
+		b3ContactData contactData[8];
+		int numCollisions = b3Body_GetContactData(BallBody, contactData, 8);
 
-		b3ContactData contactData;
-		b3Body_GetContactData(BallBody, &contactData, 1);
-		bool ballOnGround = b3Contact_IsValid(contactData.contactId);
-
-		if (ballOnGround && !bLastBallOnGround) {
+		static int nLastBallCollisions = 0;
+		if (numCollisions > nLastBallCollisions) {
 			static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
 			if (sound) {
-				NyaAudio::SetVolume(sound, GetSFXVolume());
+				NyaAudio::SetVolume(sound, GetSFXVolume()*0.66);
 				NyaAudio::Play(sound);
 			}
 		}
-		bLastBallOnGround = ballOnGround;
+		nLastBallCollisions = numCollisions;
 
 		// ball controls and player car teleport
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
@@ -183,7 +181,7 @@ namespace CustomPhysicsBall {
 			}
 
 			// jump button if on ground
-			if (ballOnGround && (IsKeyJustPressed(VK_SPACE) || IsPadKeyJustPressed(NYA_PAD_KEY_A))) {
+			if (numCollisions && (IsKeyJustPressed(VK_SPACE) || IsPadKeyJustPressed(NYA_PAD_KEY_A))) {
 				y += 10;
 			}
 			vel.y = y;
