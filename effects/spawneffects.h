@@ -493,7 +493,7 @@ public:
 	};
 
 	static void FireworkAttack_Box3D(NyaVec3 colPosition, b3BodyId bodyId, float power, float angMult, float maxDist) {
-		float objectMass = 500.0; // temp
+		float objectMass = 250.0; // temp
 
 		auto bodyPos = b3Body_GetPosition(bodyId);
 
@@ -584,10 +584,10 @@ public:
 			float fExplosionMaxDistance = 10;
 
 			if (CustomPhysicsBall::bEnabled) {
-				FireworkAttack_Box3D(obj->vColPosition, CustomPhysicsBall::BallBody, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
+				FireworkAttack_Box3D(obj->mMatrix.p, CustomPhysicsBall::BallBody, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
 			}
 			for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
-				FireworkAttack_Box3D(obj->vColPosition, phys.nB3Body, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
+				FireworkAttack_Box3D(obj->mMatrix.p, phys.nB3Body, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
 			}
 
 			for (auto& car : cars) {
@@ -1411,6 +1411,7 @@ public:
 		bAbortOnConditionFailed = true;
 		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
+		bRigProportionalChances = true;
 	}
 
 	void InitFunction() override {
@@ -1433,9 +1434,11 @@ class Effect_Ball : public ChaosEffect {
 public:
 	Effect_Ball() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Ballin";
+		sFriendlyName = "Turn Into Giant Beach Ball";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
+		bRigProportionalChances = true;
 	}
 
 	void InitFunction() override {
