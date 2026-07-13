@@ -1380,8 +1380,8 @@ public:
 	}
 
 	void InitFunction() override {
-		CustomPhysics::bEnabled = true;
-		CarRender_DontRenderPlayer = true;
+		NoResetCount++;
+		CustomPhysicsBall::EnableBall();
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
@@ -1390,8 +1390,8 @@ public:
 		CustomCamera::ProcessCam(pMoverCamera, delta);
 	}
 	void DeinitFunction() override {
-		CustomPhysics::bEnabled = false;
-		CarRender_DontRenderPlayer = false;
+		NoResetCount--;
+		CustomPhysicsBall::DisableBall();
 	}
 	bool HasTimer() override { return true; }
 } E_Ball;

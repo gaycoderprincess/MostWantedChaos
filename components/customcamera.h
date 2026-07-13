@@ -12,7 +12,7 @@ namespace CustomCamera {
 	}
 
 	bool IsBallin() {
-		return CustomPhysics::bEnabled;
+		return CustomPhysicsBall::bEnabled;
 	}
 
 	bool bSecondPersonOrbitMode = true;
@@ -72,7 +72,7 @@ namespace CustomCamera {
 			return {0, fLookatOffset * SM64::GetMarioScale(), 0};
 		}
 		if (IsBallin()) {
-			return {0, CustomPhysics::fBallSize * fLookatOffsetBall, 0};
+			return {0, CustomPhysicsBall::fBallSize * fLookatOffsetBall, 0};
 		}
 
 		UMath::Vector3 dim;
@@ -85,7 +85,7 @@ namespace CustomCamera {
 			return {0, fFollowOffset * SM64::GetMarioScale(), 0};
 		}
 		if (IsBallin()) {
-			return {0, CustomPhysics::fBallSize * fFollowOffsetBall, 0};
+			return {0, CustomPhysicsBall::fBallSize * fFollowOffsetBall, 0};
 		}
 
 		if (IsHeliCam()) return {0, -4, 0};
@@ -105,7 +105,7 @@ namespace CustomCamera {
 		}
 		if (IsBallin()) {
 			static NyaVec3 v;
-			auto tmp = b3Body_GetPosition(CustomPhysics::PlayerBodyTemp);
+			auto tmp = b3Body_GetPosition(CustomPhysicsBall::BallBody);
 			v.x = tmp.x;
 			v.y = tmp.y;
 			v.z = tmp.z;
@@ -131,7 +131,7 @@ namespace CustomCamera {
 		}
 		if (IsBallin()) {
 			static NyaVec3 v;
-			auto tmp = b3Body_GetPosition(CustomPhysics::PlayerBodyTemp);
+			auto tmp = b3Body_GetPosition(CustomPhysicsBall::BallBody);
 			v.x = tmp.x;
 			v.y = tmp.y;
 			v.z = tmp.z;

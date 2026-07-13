@@ -550,7 +550,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Box3D Debug")) {
 			ChloeMenuLib::BeginMenu();
 
-			auto bodyId = CustomPhysics::PlayerBodyTemp;
+			auto bodyId = CustomPhysicsBall::BallBody;
 			auto pos = b3Body_GetPosition(bodyId);
 			auto quat = b3Body_GetRotation(bodyId);
 			auto vel = b3Body_GetLinearVelocity(bodyId);
@@ -589,8 +589,8 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("position {:.2f} {:.2f} {:.2f}", pos.x, pos.y, pos.z));
 			DrawMenuOption(std::format("velocity {:.2f} {:.2f} {:.2f}", vel.x, vel.y, vel.z));
 
-			QuickValueEditor("fMoveSpeed", CustomPhysics::fMoveSpeed);
-			QuickValueEditor("fMaxMoveSpeed", CustomPhysics::fMaxMoveSpeed);
+			QuickValueEditor("fMoveSpeed", CustomPhysicsBall::fMoveSpeed);
+			QuickValueEditor("fMaxMoveSpeed", CustomPhysicsBall::fMaxMoveSpeed);
 			QuickValueEditor("DrawCars", DrawCars);
 			QuickValueEditor("fLookatOffsetBall", CustomCamera::fLookatOffsetBall);
 			QuickValueEditor("fFollowOffsetBall", CustomCamera::fFollowOffsetBall);

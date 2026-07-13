@@ -58,6 +58,7 @@ namespace FlatOutHUD {
 #include "components/sm64.h"
 #include "components/colrender.h"
 #include "components/customphysics.h"
+#include "components/customphysics_ball.h"
 #include "components/customcamera.h"
 
 #include "chaoseffect.h"
