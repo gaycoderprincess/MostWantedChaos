@@ -1392,6 +1392,11 @@ public:
 	void DeinitFunction() override {
 		NoResetCount--;
 		CustomPhysicsBall::DisableBall();
+
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			UMath::Vector3 v = {0,0,0};
+			ply->SetAngularVelocity(&v);
+		}
 	}
 	bool HasTimer() override { return true; }
 } E_Ball;

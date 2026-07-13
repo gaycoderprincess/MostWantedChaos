@@ -72,12 +72,14 @@ namespace CustomPhysicsBall {
 		// ball controls and player car teleport
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			if (bDoReset) {
+				auto vel = *ply->GetLinearVelocity();
+				auto avel = *ply->GetAngularVelocity();
 				auto pos = *ply->GetPosition();
 				pos.y += 5;
 				auto q = *ply->GetOrientation();
 				b3Body_SetTransform(BallBody, {pos.x, pos.y, pos.z}, {q.x, q.y, q.z, q.w});
-				b3Body_SetLinearVelocity(BallBody, {0,0,0});
-				b3Body_SetAngularVelocity(BallBody, {0,0,0});
+				b3Body_SetLinearVelocity(BallBody, {vel.x,vel.y,vel.z});
+				b3Body_SetAngularVelocity(BallBody, {avel.x,avel.y,avel.z});
 				bDoReset = false;
 			}
 
