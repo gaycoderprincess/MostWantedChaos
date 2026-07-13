@@ -9,7 +9,7 @@ namespace CustomPhysicsObjects {
 		NyaVec3 vModelSize = {1,1,1};
 		b3BodyId nB3Body;
 		bool bRenderFlat = false;
-		bool bRemoveOnSafehouse = true;
+		bool bRemoveOnSafehouse = false;
 		bool bRemoveOnOutOfBounds = true;
 		bool bRemoveOnOutOfRange = false;
 		bool bLastCollided = false;
@@ -81,7 +81,7 @@ namespace CustomPhysicsObjects {
 
 			auto v = b3Body_GetPosition(obj.nB3Body);
 			auto dist = (plyPos - NyaVec3(v.x,v.y,v.z));
-			if (dist.length() > 400) {
+			if (dist.length() > 500) {
 				b3DestroyBody(obj.nB3Body);
 				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
 				return true;

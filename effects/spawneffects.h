@@ -492,6 +492,29 @@ public:
 		float timeLeft;
 	};
 
+	static void FireworkAttack_Box3D(NyaVec3 colPosition, b3BodyId bodyId, float power, float angMult, float maxDist) {
+		float objectMass = 500.0; // temp
+
+		auto bodyPos = b3Body_GetPosition(bodyId);
+
+		auto pos = NyaVec3(bodyPos.x,bodyPos.y,bodyPos.z);
+		auto dist = (pos - colPosition);
+		if (dist.length() < maxDist) {
+			auto impulse = dist * (power * objectMass / 1000.0 * std::min((maxDist - dist.length()) * 2.0 / maxDist, 1.0) / std::max(dist.length(), 0.01));
+
+			auto vel = b3Body_GetLinearVelocity(bodyId);
+			auto avel = b3Body_GetAngularVelocity(bodyId);
+			vel.x += impulse.x;
+			vel.y += impulse.y;
+			vel.z += impulse.z;
+			avel.x += impulse.x * angMult;
+			avel.y += impulse.y * angMult;
+			avel.z += impulse.z * angMult;
+			b3Body_SetLinearVelocity(bodyId, vel);
+			b3Body_SetAngularVelocity(bodyId, avel);
+		}
+	}
+
 	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
 		if (IsChaosBlocked()) return;
 
@@ -559,6 +582,13 @@ public:
 			float fExplosionPower = 15;
 			float fExplosionAngVelocityMult = 0.25;
 			float fExplosionMaxDistance = 10;
+
+			if (CustomPhysicsBall::bEnabled) {
+				FireworkAttack_Box3D(obj->vColPosition, CustomPhysicsBall::BallBody, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
+			}
+			for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
+				FireworkAttack_Box3D(obj->vColPosition, phys.nB3Body, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
+			}
 
 			for (auto& car : cars) {
 				auto dist = (*car->GetPosition() - obj->mMatrix.p);
@@ -823,11 +853,40 @@ public:
 		if (data->styleRanking > NUM_STYLES) data->styleRanking = NUM_STYLES; // cap at top of SSS
 	}
 
+	static void VergilAttack_Box3D(NyaVec3 colPosition, b3BodyId bodyId, float range, float extraUp) {
+		auto bodyPos = b3Body_GetPosition(bodyId);
+
+		auto pos = NyaVec3(bodyPos.x,bodyPos.y,bodyPos.z);
+		auto dist = (pos - colPosition).length();
+		if (dist < range) {
+			auto dir = (pos - colPosition);
+			dir.Normalize();
+
+			auto vel = b3Body_GetLinearVelocity(bodyId);
+			vel.x += dir.x * attackPower;
+			vel.y += dir.y * attackPower + extraUp;
+			vel.z += dir.z * attackPower;
+			b3Body_SetLinearVelocity(bodyId, vel);
+
+			auto avel = b3Body_GetAngularVelocity(bodyId);
+			avel.x += dir.x * attackPowerAng;
+			avel.y += dir.y * attackPowerAng;
+			avel.z += dir.z * attackPowerAng;
+			b3Body_SetAngularVelocity(bodyId, avel);
+		}
+	}
+
 	static void VergilGenericAttack(Render3DObjects::Object* obj, float range, float extraUp) {
 		auto data = (tVergilData*)obj->CustomData;
 
 		auto cars = GetActiveVehicles();
-		for (auto& car: cars) {
+		if (CustomPhysicsBall::bEnabled) {
+			VergilAttack_Box3D(obj->vColPosition, CustomPhysicsBall::BallBody, range, extraUp);
+		}
+		for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
+			VergilAttack_Box3D(obj->vColPosition, phys.nB3Body, range, extraUp);
+		}
+		for (auto& car : cars) {
 			if (!CanCarBeTargeted(car)) continue;
 
 			auto pos = *car->GetPosition();
@@ -1425,6 +1484,7 @@ public:
 				CustomPhysicsObjects::CustomPhysicsObject objData;
 				objData.aModels = mdl;
 				objData.vModelSize = {1,1,1};
+				objData.bRemoveOnSafehouse = true;
 				objData.bRemoveOnOutOfRange = true;
 				objData.pCollisionSound = sound;
 				CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
