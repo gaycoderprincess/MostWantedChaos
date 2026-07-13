@@ -9,7 +9,9 @@ namespace CustomPhysicsObjects {
 		NyaVec3 vModelSize = {1,1,1};
 		b3BodyId nB3Body;
 		bool bRenderFlat = false;
-		bool bRemoveOnWorldExit = false;
+		bool bRemoveOnSafehouse = true;
+		bool bRemoveOnOutOfBounds = true;
+		bool bRemoveOnOutOfRange = false;
 		bool bLastCollided = false;
 		NyaAudio::NyaSound pCollisionSound = 0;
 	};
@@ -48,7 +50,8 @@ namespace CustomPhysicsObjects {
 
 	bool PurgeRemovables() {
 		for (auto& obj : aPhysicsObjects) {
-			if (obj.bRemoveOnWorldExit) {
+			if (obj.bRemoveOnSafehouse) {
+				b3DestroyBody(obj.nB3Body);
 				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
 				return true;
 			}
@@ -58,10 +61,28 @@ namespace CustomPhysicsObjects {
 
 	bool PurgeOutOfWorld() {
 		for (auto& obj : aPhysicsObjects) {
-			if (!obj.bRemoveOnWorldExit) continue;
+			if (!obj.bRemoveOnOutOfBounds) continue;
 
 			auto v = b3Body_GetPosition(obj.nB3Body);
 			if (v.y < -100) {
+				b3DestroyBody(obj.nB3Body);
+				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool PurgeByRange() {
+		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
+
+		for (auto& obj : aPhysicsObjects) {
+			if (!obj.bRemoveOnOutOfBounds) continue;
+
+			auto v = b3Body_GetPosition(obj.nB3Body);
+			auto dist = (plyPos - NyaVec3(v.x,v.y,v.z));
+			if (dist.length() > 400) {
+				b3DestroyBody(obj.nB3Body);
 				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
 				return true;
 			}
@@ -78,6 +99,7 @@ namespace CustomPhysicsObjects {
 		if (!aPhysicsObjects.empty()) CustomPhysics::bEnabled = true;
 
 		while (PurgeOutOfWorld()) {}
+		while (PurgeByRange()) {}
 
 		for (auto& obj : aPhysicsObjects) {
 			auto pos = b3Body_GetPosition(obj.nB3Body);
@@ -106,10 +128,15 @@ namespace CustomPhysicsObjects {
 		}
 		if (IsInLoadingScreen() || IsInMovie()) return;
 
+		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
+
 		for (auto& obj : aPhysicsObjects) {
+			auto pos = b3Body_GetPosition(obj.nB3Body);
+			auto dist = (plyPos - NyaVec3(pos.x,pos.y,pos.z));
+			if (dist.length() > 250) continue; // don't render far away objects
+
 			UMath::Matrix4 mat;
 			auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(obj.nB3Body));
-			auto pos = b3Body_GetPosition(obj.nB3Body);
 
 			mat.x.x = m.cx.x;
 			mat.x.y = m.cx.y;

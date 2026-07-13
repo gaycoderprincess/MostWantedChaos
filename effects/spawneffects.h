@@ -1425,7 +1425,7 @@ public:
 				CustomPhysicsObjects::CustomPhysicsObject objData;
 				objData.aModels = mdl;
 				objData.vModelSize = {1,1,1};
-				objData.bRemoveOnWorldExit = true;
+				objData.bRemoveOnOutOfRange = true;
 				objData.pCollisionSound = sound;
 				CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
 			}
