@@ -23,7 +23,6 @@ namespace CustomPhysics {
 		std::vector<WCollisionTri> aBarriers;
 		b3MeshData* pB3Mesh;
 		b3BodyId nB3Body;
-		b3ShapeId nB3Shape;
 		bool bB3MeshEnabled;
 	};
 
@@ -34,7 +33,6 @@ namespace CustomPhysics {
 
 	struct CustomObjectInstance {
 		b3BodyId nB3Body;
-		b3ShapeId nB3Shape;
 	};
 	std::vector<CustomObjectInstance> aB3Objects;
 
@@ -172,23 +170,18 @@ namespace CustomPhysics {
 			vertices.push_back({tri.fPt2.x, tri.fPt2.y, tri.fPt2.z});
 		}
 
-		WriteLog(std::format("Processing {} verts ({} tri, {} barrier)", vertices.size(), article.aTriStrips.size()*3, article.aBarriers.size()*3));
-
 		if (!vertices.empty()) {
 			article.pB3Mesh = CreateMesh(&vertices[0], vertices.size(), &indices[0], indices.size());
-			WriteLog(std::format("article.pB3Mesh {:X}", (uintptr_t)article.pB3Mesh));
 
 			b3BodyDef def = b3DefaultBodyDef();
 			def.type = b3_staticBody;
 			def.position = {0,0,0};
 			article.nB3Body = b3CreateBody(m_worldId, &def);
-			WriteLog(std::format("article.nB3Body {}", article.nB3Body.index1));
 
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
 			//shapeDef.materials = materials;
 			//shapeDef.materialCount = 7;
-			article.nB3Shape = b3CreateMeshShape(article.nB3Body, &shapeDef, article.pB3Mesh, b3Vec3_one);
-			WriteLog(std::format("article.nB3Shape {}", article.nB3Shape.index1));
+			auto nB3Shape = b3CreateMeshShape(article.nB3Body, &shapeDef, article.pB3Mesh, b3Vec3_one);
 
 			article.bB3MeshEnabled = true;
 		}
@@ -288,8 +281,8 @@ namespace CustomPhysics {
 	}
 
 	bool bCollectLocalPlayerCar = true;
-	float fWorldObjectMassScale = 1.0;
-	float fWorldObjectMassMinimum = 15.0;
+	float fWorldObjectMassScale = 100.0;
+	float fWorldObjectMassMinimum = 400.0;
 	void CollectWorldObjects() {
 		for (auto& obj : aB3Objects) {
 			b3DestroyBody(obj.nB3Body);
@@ -332,7 +325,7 @@ namespace CustomPhysics {
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
 			auto hull = b3MakeBoxHull(dim.x, dim.y, dim.z);
 			b3HullData hullData;
-			objInst.nB3Shape = b3CreateHullShape(objInst.nB3Body, &shapeDef, &hull.base);
+			auto nB3Shape = b3CreateHullShape(objInst.nB3Body, &shapeDef, &hull.base);
 
 			auto vel = *rb->GetLinearVelocity();
 			auto avel = *rb->GetAngularVelocity();
@@ -426,7 +419,6 @@ namespace CustomPhysics {
 
 		b3WorldDef worldDef = b3DefaultWorldDef();
 		worldDef.workerCount = 8;
-		worldDef.enableSleep = false;
 		m_worldId = b3CreateWorld(&worldDef);
 	});
 }

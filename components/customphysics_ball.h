@@ -14,8 +14,6 @@ namespace CustomPhysicsBall {
 		bEnabled = true;
 		CustomPhysics::bEnabled = true;
 		CustomPhysics::bCollectLocalPlayerCar = false;
-		CustomPhysics::fWorldObjectMassScale = 100.0;
-		CustomPhysics::fWorldObjectMassMinimum = 400.0;
 		CarRender_DontRenderPlayer = true;
 	}
 
@@ -23,8 +21,6 @@ namespace CustomPhysicsBall {
 		bEnabled = false;
 		CustomPhysics::bEnabled = false;
 		CustomPhysics::bCollectLocalPlayerCar = true;
-		CustomPhysics::fWorldObjectMassScale = 1.0;
-		CustomPhysics::fWorldObjectMassMinimum = 15.0;
 		CarRender_DontRenderPlayer = false;
 	}
 
@@ -36,7 +32,6 @@ namespace CustomPhysicsBall {
 			def.position = {0,0,0};
 			def.enableSleep = false;
 			BallBody = b3CreateBody(CustomPhysics::m_worldId, &def);
-			WriteLog(std::format("BallBody {}", BallBody.index1));
 
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
 			b3Sphere sphere;
@@ -68,6 +63,21 @@ namespace CustomPhysicsBall {
 		
 		static CNyaTimer gTimer;
 		gTimer.Process();
+
+		static bool bLastBallOnGround = false;
+
+		b3ContactData contactData;
+		b3Body_GetContactData(BallBody, &contactData, 1);
+		bool ballOnGround = b3Contact_IsValid(contactData.contactId);
+
+		if (ballOnGround && !bLastBallOnGround) {
+			static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+			if (sound) {
+				NyaAudio::SetVolume(sound, GetSFXVolume());
+				NyaAudio::Play(sound);
+			}
+		}
+		bLastBallOnGround = ballOnGround;
 
 		// ball controls and player car teleport
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
@@ -172,9 +182,8 @@ namespace CustomPhysicsBall {
 				vel.z *= oldLen;
 			}
 
-			b3ContactData contactData;
-			b3Body_GetContactData(BallBody, &contactData, 1);
-			if (b3Contact_IsValid(contactData.contactId) && (IsKeyJustPressed(VK_SPACE) || IsPadKeyJustPressed(NYA_PAD_KEY_A))) {
+			// jump button if on ground
+			if (ballOnGround && (IsKeyJustPressed(VK_SPACE) || IsPadKeyJustPressed(NYA_PAD_KEY_A))) {
 				y += 10;
 			}
 			vel.y = y;
@@ -199,8 +208,6 @@ namespace CustomPhysicsBall {
 
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
 		if (!mdl.empty()) {
-			WriteLog("DFGHDFGHL:DFGHKLFDGHLKGF");
-
 			auto rb = GetLocalPlayerInterface<ICollisionBody>();
 
 			UMath::Matrix4 mat = *rb->GetMatrix4();

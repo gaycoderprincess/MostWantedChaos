@@ -1400,3 +1400,35 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_Ball;
+
+class Effect_SpawnBalls : public ChaosEffect {
+public:
+	Effect_SpawnBalls() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Beach Balls";
+		bCanQuickTrigger = false;
+	}
+
+	void InitFunction() override {
+		static auto mdl = Render3D::CreateModels("beachball.fbx");
+
+		auto ply = *GetLocalPlayerInterface<IRigidBody>()->GetPosition();
+		auto vel = *GetLocalPlayerInterface<IRigidBody>()->GetLinearVelocity();
+
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		for (int x = -50; x < 50; x += 3) {
+			for (int y = -50; y < 50; y += 3) {
+				NyaVec3 pos = ply;
+				pos.x += x;
+				pos.y += 2;
+				pos.z += y;
+
+				CustomPhysicsObjects::CustomPhysicsObject objData;
+				objData.aModels = mdl;
+				objData.vModelSize = {1,1,1};
+				objData.bRemoveOnWorldExit = true;
+				objData.pCollisionSound = sound;
+				CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+			}
+		}
+	}
+} E_SpawnBalls;

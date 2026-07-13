@@ -1,0 +1,146 @@
+namespace CustomPhysicsObjects {
+	enum eColliderType {
+		SPHERE,
+		BOX
+	};
+
+	struct CustomPhysicsObject {
+		std::vector<Render3D::tModel*> aModels;
+		NyaVec3 vModelSize = {1,1,1};
+		b3BodyId nB3Body;
+		bool bRenderFlat = false;
+		bool bRemoveOnWorldExit = false;
+		bool bLastCollided = false;
+		NyaAudio::NyaSound pCollisionSound = 0;
+	};
+	std::vector<CustomPhysicsObject> aPhysicsObjects;
+
+	void CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
+		if (collider == BOX) {
+			b3BodyDef def = b3DefaultBodyDef();
+			def.type = b3_dynamicBody;
+			def.position = {0,0,0};
+			data.nB3Body = b3CreateBody(CustomPhysics::m_worldId, &def);
+
+			b3ShapeDef shapeDef = b3DefaultShapeDef();
+			auto hull = b3MakeBoxHull(data.vModelSize.x, data.vModelSize.y, data.vModelSize.z);
+			b3HullData hullData;
+			b3CreateHullShape(data.nB3Body, &shapeDef, &hull.base);
+		}
+		else if (collider == SPHERE) {
+			b3BodyDef def = b3DefaultBodyDef();
+			def.type = b3_dynamicBody;
+			def.position = {0,0,0};
+			data.nB3Body = b3CreateBody(CustomPhysics::m_worldId, &def);
+
+			b3ShapeDef shapeDef = b3DefaultShapeDef();
+			b3Sphere sphere;
+			sphere.center = {0,0,0};
+			sphere.radius = data.vModelSize.x;
+			b3CreateSphereShape(data.nB3Body, &shapeDef, &sphere);
+		}
+
+		b3Body_SetTransform(data.nB3Body, {position.x,position.y,position.z}, b3Quat_identity);
+		b3Body_SetLinearVelocity(data.nB3Body, {velocity.x,velocity.y,velocity.z});
+
+		aPhysicsObjects.push_back(data);
+	}
+
+	bool PurgeRemovables() {
+		for (auto& obj : aPhysicsObjects) {
+			if (obj.bRemoveOnWorldExit) {
+				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool PurgeOutOfWorld() {
+		for (auto& obj : aPhysicsObjects) {
+			if (!obj.bRemoveOnWorldExit) continue;
+
+			auto v = b3Body_GetPosition(obj.nB3Body);
+			if (v.y < -100) {
+				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	float fObjectSFXRange = 100;
+	float fObjectSFXVolume = 1.0;
+
+	void OnTick() {
+		if (!GetLocalPlayerVehicle()) return;
+
+		if (!aPhysicsObjects.empty()) CustomPhysics::bEnabled = true;
+
+		while (PurgeOutOfWorld()) {}
+
+		for (auto& obj : aPhysicsObjects) {
+			auto pos = b3Body_GetPosition(obj.nB3Body);
+
+			b3ContactData contactData;
+			b3Body_GetContactData(obj.nB3Body, &contactData, 1);
+			auto collided = b3Contact_IsValid(contactData.contactId);
+			if (obj.pCollisionSound && collided && !obj.bLastCollided) {
+				auto dist = (*GetLocalPlayerVehicle()->GetPosition() - NyaVec3(pos.x,pos.y,pos.z));
+				auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
+				volume *= fObjectSFXVolume;
+				if (volume > 1) volume = 1;
+				if (volume < 0) volume = 0;
+				if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
+				NyaAudio::SetVolume(obj.pCollisionSound, GetSFXVolume() * volume);
+				NyaAudio::Play(obj.pCollisionSound);
+			}
+			obj.bLastCollided = collided;
+		}
+	}
+
+	void OnTick3D() {
+		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) {
+			while (PurgeRemovables()) {}
+			return;
+		}
+		if (IsInLoadingScreen() || IsInMovie()) return;
+
+		for (auto& obj : aPhysicsObjects) {
+			UMath::Matrix4 mat;
+			auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(obj.nB3Body));
+			auto pos = b3Body_GetPosition(obj.nB3Body);
+
+			mat.x.x = m.cx.x;
+			mat.x.y = m.cx.y;
+			mat.x.z = m.cx.z;
+			mat.y.x = m.cy.x;
+			mat.y.y = m.cy.y;
+			mat.y.z = m.cy.z;
+			mat.z.x = m.cz.x;
+			mat.z.y = m.cz.y;
+			mat.z.z = m.cz.z;
+			mat.p.x = pos.x;
+			mat.p.y = pos.y;
+			mat.p.z = pos.z;
+
+			mat.x *= obj.vModelSize.x;
+			mat.y *= obj.vModelSize.y;
+			mat.z *= obj.vModelSize.z;
+
+			for (auto& mdl : obj.aModels) {
+				if (obj.bRenderFlat) {
+					mdl->RenderAt_NoEffect(WorldToRenderMatrix(mat));
+				}
+				else {
+					mdl->RenderAt(WorldToRenderMatrix(mat));
+				}
+			}
+		}
+	}
+
+	ChloeHook Init([]{
+		aDrawing3DLoopFunctions.push_back(OnTick3D);
+		aMainLoopFunctions.push_back(OnTick);
+	});
+}
