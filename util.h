@@ -200,6 +200,14 @@ bool IsVehicleValidAndActive(IVehicle* vehicle) {
 	return false;
 }
 
+bool IsRigidBodyValidAndActive(IRigidBody* rb) {
+	auto objs = GetActiveRigidBodies();
+	for (auto& obj : objs) {
+		if (obj == rb) return true;
+	}
+	return false;
+}
+
 IVehicle* GetClosestActiveVehicle(IVehicle* toVehicle) {
 	auto sourcePos = *toVehicle->GetPosition();
 	UMath::Vector3 sourceFwd;

@@ -184,6 +184,17 @@ public:
 	}
 };
 
+class EffectBase_NotInRaceConditional : public ChaosEffect {
+public:
+	EffectBase_NotInRaceConditional(const char* category) : ChaosEffect(category) {
+		sName = "(EFFECT BASE) Not In Race Conditional";
+	}
+
+	bool IsAvailable() override {
+		return !IsInNormalRace();
+	}
+};
+
 class EffectBase_InAnyRaceConditional : public ChaosEffect {
 public:
 	EffectBase_InAnyRaceConditional(const char* category) : ChaosEffect(category) {

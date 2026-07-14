@@ -442,4 +442,5 @@ bool RunningEffectsCleanup() {
 #include "effects/effect_disableall.h"
 #include "effects/effect_tiktok.h"
 #include "effects/effect_dance.h"
+#include "effects/effect_mousedrag.h"
 #include "effects/unfaireffects.h"

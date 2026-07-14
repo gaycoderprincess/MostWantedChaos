@@ -818,6 +818,11 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			QuickValueEditor("MouseDrag::crosshairSize", Effect_MouseDrag::crosshairSize);
+			QuickValueEditor("MouseDrag::selectRange", Effect_MouseDrag::selectRange);
+			QuickValueEditor("MouseDrag::dragSpeed", Effect_MouseDrag::dragSpeed);
+			QuickValueEditor("MouseDrag::throwSpeed", Effect_MouseDrag::throwSpeed);
+			QuickValueEditor("MouseDrag::maxDistance", Effect_MouseDrag::maxDistance);
 			//QuickValueEditor("SceneryScale.x", SceneryScale.x);
 			//QuickValueEditor("SceneryScale.y", SceneryScale.y);
 			//QuickValueEditor("SceneryScale.z", SceneryScale.z);
