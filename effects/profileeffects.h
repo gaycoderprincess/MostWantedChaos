@@ -470,6 +470,11 @@ public:
 			}
 			customization->Handle = oldId;
 		}
+
+		if (GetUserProfile()->TheOptionsSettings.TheGameplaySettings.AutoSaveOn) {
+			EAutoSave::Create();
+			CwoeeHints::AddHint("Game Saved.");
+		}
 	}
 	// only activate in career mode if your car model is different from your active career car
 	bool IsAvailable() override {

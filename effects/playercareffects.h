@@ -424,6 +424,7 @@ public:
 		sName = "Handling +10";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("handling_tune");
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -449,6 +450,7 @@ public:
 		sName = "Handling -10";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("handling_tune");
+		bCanQuickTrigger = false;
 	}
 
 	void TickFunctionMain(double delta) override {
