@@ -127,6 +127,8 @@ namespace CustomPhysicsObjects {
 	float fObjectSFXVolume = 0.66;
 
 	void OnTick() {
+		PerformanceBenchmarker _perf("CustomPhysicsObjects::OnTick");
+
 		if (!GetLocalPlayerVehicle()) return;
 
 		if (!aPhysicsObjects.empty()) CustomPhysics::bEnabled = true;
@@ -160,6 +162,8 @@ namespace CustomPhysicsObjects {
 	}
 
 	void OnTick3D() {
+		PerformanceBenchmarker _perf("CustomPhysicsObjects::OnTick3D");
+
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) {
 			while (PurgeRemovables()) {}
 			return;

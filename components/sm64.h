@@ -188,6 +188,8 @@ namespace SM64 {
 	std::vector<int> aCollisionTriMarios;
 
 	void ProcessCollisionBarriers(WCollisionBarrier* list, int count, NyaVec3 offset) {
+		if (*(uint8_t*)0x6BB796 == 0xEB) return; // disable wall collision chaos effect
+
 		auto marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
 		marioPos.y = 0;
 

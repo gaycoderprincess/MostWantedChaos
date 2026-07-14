@@ -262,6 +262,28 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 	return nullptr;
 }
 
+void DrawPerformanceWarnings() {
+	if (GetEffectRunning(&E_Lag)) return;
+
+	float y = 0.9;
+	for (auto& perf : aPerformanceBenchmarkResults) {
+		if (!perf.once) continue;
+
+		if (perf.ms >= 20000) { // 20 milliseconds
+			tNyaStringData data;
+			data.x = 0.1 * GetAspectRatioInv();
+			data.y = y;
+			data.size = 0.03;
+			data.SetColor(255,0,0,255);
+			DrawString(data, std::format("PERFORMANCE WARNING: {} took {}ms", perf.name, (perf.ms / 1000)));
+
+			y -= data.size;
+		}
+
+		perf.once = false;
+	}
+}
+
 void ChaosLoop() {
 	PerformanceBenchmarker _perf("ChaosLoop");
 
@@ -278,6 +300,7 @@ void ChaosLoop() {
 
 	MoneyChecker();
 	BountyChecker();
+	DrawPerformanceWarnings();
 
 	for (auto& func : aDrawingLoopFunctions) {
 		func();

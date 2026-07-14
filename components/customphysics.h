@@ -299,7 +299,6 @@ namespace CustomPhysics {
 			UMath::Vector3 dim;
 			rb->GetDimension(&dim);
 
-			auto q = *rb->GetOrientation();
 			auto p = *rb->GetPosition();
 
 			UMath::Matrix4 m;
@@ -324,8 +323,7 @@ namespace CustomPhysics {
 
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
 			auto hull = b3MakeBoxHull(dim.x, dim.y, dim.z);
-			b3HullData hullData;
-			auto nB3Shape = b3CreateHullShape(objInst.nB3Body, &shapeDef, &hull.base);
+			b3CreateHullShape(objInst.nB3Body, &shapeDef, &hull.base);
 
 			auto vel = *rb->GetLinearVelocity();
 			auto avel = *rb->GetAngularVelocity();
@@ -344,6 +342,8 @@ namespace CustomPhysics {
 
 	bool bEnabled = false;
 	void OnWorldTick() {
+		PerformanceBenchmarker _perf("CustomPhysics::OnWorldTick");
+
 		if (!bEnabled) return;
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 		if (IsInLoadingScreen() || IsInMovie()) return;

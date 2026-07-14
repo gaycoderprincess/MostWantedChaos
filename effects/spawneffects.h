@@ -1418,10 +1418,11 @@ public:
 	void InitFunction() override {
 		SM64::EnableMario();
 	}
+	void TickFunctionMain(double delta) override {
+		if (IsInNormalRace()) EffectInstance->fTimer -= delta; // halve the time left if in a race
+	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
-
-		if (IsInNormalRace()) EffectInstance->fTimer -= delta; // have the time left if in a race
 
 		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), GetLocalPlayerVehicle());
 		CustomCamera::ProcessCam(pMoverCamera, delta);

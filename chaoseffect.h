@@ -47,7 +47,9 @@ public:
 		}
 		avg /= (double)aEffects.size();
 
-		if (nTotalTimesActivated < (avg / 4.0)) return nFrequency * 3;
+		if (avg < 1.0) return nFrequency;
+
+		//if (nTotalTimesActivated < (avg / 4.0)) return nFrequency * 3;
 		if (nTotalTimesActivated < (avg / 2.0)) return nFrequency * 2;
 		return nFrequency;
 	}

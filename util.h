@@ -802,6 +802,7 @@ void ReloadCarBehaviors(eVehicleList vehicleType) {
 struct PerformanceBenchmarkResult {
 	char name[64];
 	uint64_t ms;
+	bool once = true;
 };
 std::vector<PerformanceBenchmarkResult> aPerformanceBenchmarkResults;
 
@@ -824,6 +825,7 @@ public:
 		for (auto& result : aPerformanceBenchmarkResults) {
 			if (!strcmp(sName, result.name)) {
 				result.ms = ms;
+				result.once = true;
 				return;
 			}
 		}
@@ -831,6 +833,7 @@ public:
 		PerformanceBenchmarkResult result;
 		strcpy_s(result.name, 64, sName);
 		result.ms = ms;
+		result.once = true;
 		aPerformanceBenchmarkResults.push_back(result);
 	}
 };
