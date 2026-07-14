@@ -1492,6 +1492,20 @@ public:
 		bCanMultiTrigger = true;
 	}
 
+	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		static auto mdl = Render3D::CreateModels("beachball.fbx");
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = mdl;
+		objData.vModelSize = {1,1,1};
+		objData.bRemoveOnSafehouse = true;
+		objData.bRemoveOnOutOfBounds = true;
+		objData.bRemoveOnOutOfRange = true;
+		objData.pCollisionSound = sound;
+		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+	}
+
 	void InitFunction() override {
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
 
@@ -1505,15 +1519,7 @@ public:
 				pos.x += x;
 				pos.y += 2;
 				pos.z += y;
-
-				CustomPhysicsObjects::CustomPhysicsObject objData;
-				objData.aModels = mdl;
-				objData.vModelSize = {1,1,1};
-				objData.bRemoveOnSafehouse = true;
-				objData.bRemoveOnOutOfBounds = true;
-				objData.bRemoveOnOutOfRange = true;
-				objData.pCollisionSound = sound;
-				CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+				SpawnObject(pos, vel);
 			}
 		}
 	}
@@ -1526,30 +1532,34 @@ public:
 		bCanMultiTrigger = true;
 	}
 
-	void InitFunction() override {
+	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
 
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = mdl;
+		objData.vModelSize = {1,1,1};
+		objData.bRemoveOnSafehouse = false;
+		objData.bRemoveOnOutOfBounds = false;
+		objData.bRemoveOnOutOfRange = false;
+		objData.pCollisionSound = sound;
+		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+	}
+
+	void InitFunction() override {
 		auto ply = *GetLocalPlayerInterface<IRigidBody>()->GetPosition();
 		auto vel = *GetLocalPlayerInterface<IRigidBody>()->GetLinearVelocity();
 
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
 		for (int x = -5; x < 5; x += 3) {
 			for (int y = -5; y < 5; y += 3) {
 				NyaVec3 pos = ply;
 				pos.x += x;
 				pos.y += 2;
 				pos.z += y;
-
-				CustomPhysicsObjects::CustomPhysicsObject objData;
-				objData.aModels = mdl;
-				objData.vModelSize = {1,1,1};
-				objData.bRemoveOnSafehouse = false;
-				objData.bRemoveOnOutOfBounds = false;
-				objData.bRemoveOnOutOfRange = false;
-				objData.pCollisionSound = sound;
-				CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+				SpawnObject(pos, vel);
 			}
 		}
+		DoChaosSave();
 	}
 } E_SpawnBall;
 

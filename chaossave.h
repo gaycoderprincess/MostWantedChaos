@@ -280,6 +280,40 @@ void DoChaosScientistLoad() {
 	}
 }
 
+bool DoChaosBallsSave() {
+	std::vector<UMath::Vector3> save;
+	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
+		if (obj->bRemoveOnOutOfBounds) continue;
+		if (obj->bRemoveOnOutOfRange) continue;
+		if (obj->bRemoveOnSafehouse) continue;
+		save.push_back({obj->vSpawnPosition});
+	}
+
+	std::ofstream file("CwoeeChaos/save/balls.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return false;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+	return true;
+}
+
+void DoChaosBallsLoad() {
+	std::ifstream file("CwoeeChaos/save/balls.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		UMath::Vector3 save;
+		file.read((char*)&save, sizeof(save));
+		Effect_SpawnBall::SpawnObject(save, {0,0,0});
+	}
+}
+
 bool DoChaosSettingsSave() {
 	// using the non-mutex version here as this is called inside TriggerHighestVotedEffect
 	// also defining this here so the game can't crash while accessing the irc client and corrupt the savefile
@@ -352,6 +386,7 @@ void DoChaosSave() {
 	if (!DoChaos8DownSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosBombSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosVergilSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosBallsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosScientistSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 }
@@ -364,5 +399,6 @@ void DoChaosLoad() {
 	DoChaosBombLoad();
 	DoChaosVergilLoad();
 	DoChaosScientistLoad();
+	DoChaosBallsLoad();
 	DoChaosSettingsLoad();
 }

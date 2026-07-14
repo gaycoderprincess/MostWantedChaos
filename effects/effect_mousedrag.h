@@ -82,8 +82,8 @@ public:
 		selectedBody = CwoeeSharedRigidBody();
 		NyaHookLib::Patch<uint16_t>(0x6B1A02, 0x9090); // disable player causality check for cop flipping
 
-		CwoeeHints::AddHint("Drag stuff around using the mouse!");
-		CwoeeHints::AddHint("Reset your car to move the camera");
+		CwoeeHints::AddHint("Drag stuff around using the mouse!", 15);
+		CwoeeHints::AddHint("Reset your car to move the camera", 15);
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;

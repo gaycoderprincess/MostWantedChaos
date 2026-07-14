@@ -556,7 +556,7 @@ class Effect_LaggyLookingCars : public ChaosEffect {
 public:
 	Effect_LaggyLookingCars() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Snap To Grid";
-		sFriendlyName = "Shaky Cars";
+		sFriendlyName = "Shaky Cars (Visual)";
 		fTimerLength = 60;
 	}
 
