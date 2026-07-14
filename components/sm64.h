@@ -810,17 +810,20 @@ namespace SM64 {
 
 		auto distFromClosest = (GetMarioWorldPos() - *closest->GetPosition());
 		auto distFromPlayer = (GetMarioWorldPos() - *ply->GetPosition());
-		bool attacked = false;
-		if (distFromClosest.length() < 4.5) {
+		bool ableToAttack = false;
+		if (distFromClosest.length() < 5.5) {
 			distFromClosest.Normalize();
-			if (distFromClosest.Dot(GetMarioWorldFacing()) < -0.33) {
-				marioInputs.buttonB = bFrame;
-				attacked = true;
+			if (!closest->mCOMObject->Find<ICollisionBody>()->IsSleeping() && distFromClosest.Dot(GetMarioWorldFacing()) < -0.33) {
+				if (marioState.forwardVelocity < 29.0 && marioState.action != ACT_DIVE && marioState.action != ACT_DIVE_SLIDE && marioState.action != ACT_FORWARD_ROLLOUT) {
+					marioInputs.buttonB = bFrame;
+				}
+				ableToAttack = true;
 			}
 		}
-		if (!attacked || distFromPlayer.length() > 5.0) {
-			//marioInputs.stickY = 1.0;
-
+		if ((distFromPlayer.length() > 11.0 && marioState.forwardVelocity >= 29.0) || marioState.action == ACT_DIVE_SLIDE) {
+			marioInputs.buttonB = bFrame;
+		}
+		if (!ableToAttack || distFromPlayer.length() > 6.0) {
 			distFromPlayer.y = 0.0;
 			distFromPlayer.Normalize();
 			marioInputs.stickX = distFromPlayer.x;
@@ -908,7 +911,7 @@ namespace SM64 {
 			return;
 		}
 		if (IsInLoadingScreen() || IsInMovie()) {
-			bDoReset = true;
+			if (!bEnemyEnabled) bDoReset = true;
 			return;
 		}
 
@@ -985,16 +988,12 @@ namespace SM64 {
 			DrawCars = true;
 
 			NyaVec3 v = {0,0,0};
-			if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
-				v = *ply->GetPosition();
-
-				if (bEnemyEnabled) {
-					UMath::Vector3 fwd;
-					ply->GetForwardVector(&fwd);
-
-					v += fwd * 3;
-				}
-				else {
+			if (bEnemyEnabled) {
+				v = vEnemySpawnPosition;
+			}
+			else {
+				if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+					v = *ply->GetPosition();
 					v.y -= 1;
 				}
 			}
@@ -1008,7 +1007,16 @@ namespace SM64 {
 			MarioCustomPhysicsObjectInteractions();
 			MarioCarInheritance();
 
-			sm64_set_sound_volume(GetSFXVolume());
+			if (bEnemyEnabled) {
+				auto dist = (*GetLocalPlayerVehicle()->GetPosition() - GetMarioWorldPos());
+				auto volume = (200.0 - dist.length()) / 200.0;
+				if (volume > 1) volume = 1;
+				if (volume < 0) volume = 0;
+				sm64_set_sound_volume(GetSFXVolume()*volume);
+			}
+			else {
+				sm64_set_sound_volume(GetSFXVolume());
+			}
 
 			static CNyaTimer gTimer;
 			gTimer.Process();

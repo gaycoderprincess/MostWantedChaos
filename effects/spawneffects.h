@@ -1562,6 +1562,21 @@ public:
 
 	void InitFunction() override {
 		SM64::bEnemyEnabled = true;
+
+		NyaVec3 v = {0,0,0};
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			v = *ply->GetPosition();
+			v.y -= 0.75;
+
+			UMath::Vector3 fwd;
+			ply->GetForwardVector(&fwd);
+
+			v += fwd * 3;
+
+			ply->SetLinearVelocity(&UMath::Vector3::kZero);
+			ply->SetAngularVelocity(&UMath::Vector3::kZero);
+		}
+		SM64::vEnemySpawnPosition = v;
 	}
 	bool IsAvailable() override { return SM64::bAvailable; }
 } E_Mario64Enemy;

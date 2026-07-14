@@ -516,6 +516,7 @@ void ChaosModMenu() {
 
 			DrawMenuOption(std::format("position {:.2f} {:.2f} {:.2f}",SM64::marioState.position[0],SM64::marioState.position[1],SM64::marioState.position[2]));
 			DrawMenuOption(std::format("velocity {:.2f} {:.2f} {:.2f}",SM64::marioState.velocity[0],SM64::marioState.velocity[1],SM64::marioState.velocity[2]));
+			DrawMenuOption(std::format("forwardVelocity {}",SM64::marioState.forwardVelocity));
 			DrawMenuOption(std::format("marioId {}",SM64::marioId));
 			DrawMenuOption(std::format("numTrianglesUsed {}",SM64::marioGeometry.numTrianglesUsed));
 			DrawMenuOption(std::format("geom 0 {:.2f} {:.2f} {:.2f}",SM64::marioGeometry.position[0],SM64::marioGeometry.position[1],SM64::marioGeometry.position[2]));
