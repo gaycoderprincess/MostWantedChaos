@@ -283,9 +283,7 @@ void DoChaosScientistLoad() {
 bool DoChaosBallsSave() {
 	std::vector<UMath::Vector3> save;
 	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
-		if (obj->bRemoveOnOutOfBounds) continue;
-		if (obj->bRemoveOnOutOfRange) continue;
-		if (obj->bRemoveOnSafehouse) continue;
+		if (obj->sDebugName != "beachball_save") continue;
 		save.push_back({obj->vSpawnPosition});
 	}
 

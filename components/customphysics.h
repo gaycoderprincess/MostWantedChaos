@@ -33,6 +33,8 @@ namespace CustomPhysics {
 
 	struct CustomObjectInstance {
 		b3BodyId nB3Body;
+		IRigidBody* pGameBody;
+		bool bReturnChangesToGame = false;
 	};
 	std::vector<CustomObjectInstance> aB3Objects;
 
@@ -285,6 +287,44 @@ namespace CustomPhysics {
 	float fWorldObjectMassMinimum = 400.0;
 	void CollectWorldObjects() {
 		for (auto& obj : aB3Objects) {
+			if (obj.pGameBody && obj.bReturnChangesToGame) {
+				auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(obj.nB3Body));
+
+				UMath::Matrix4 mat;
+				mat.x.x = m.cx.x;
+				mat.x.y = m.cx.y;
+				mat.x.z = m.cx.z;
+				mat.y.x = m.cy.x;
+				mat.y.y = m.cy.y;
+				mat.y.z = m.cy.z;
+				mat.z.x = m.cz.x;
+				mat.z.y = m.cz.y;
+				mat.z.z = m.cz.z;
+				obj.pGameBody->SetOrientation(&mat);
+
+				auto p = b3Body_GetPosition(obj.nB3Body);
+				auto v = b3Body_GetLinearVelocity(obj.nB3Body);
+				auto av = b3Body_GetAngularVelocity(obj.nB3Body);
+
+				UMath::Vector3 pos;
+				pos.x = p.x;
+				pos.y = p.y;
+				pos.z = p.z;
+				obj.pGameBody->SetPosition(&pos);
+
+				UMath::Vector3 vel;
+				vel.x = v.x;
+				vel.y = v.y;
+				vel.z = v.z;
+				obj.pGameBody->SetLinearVelocity(&vel);
+
+				UMath::Vector3 avel;
+				avel.x = av.x;
+				avel.y = av.y;
+				avel.z = av.z;
+				obj.pGameBody->SetAngularVelocity(&avel);
+			}
+
 			b3DestroyBody(obj.nB3Body);
 		}
 		aB3Objects.clear();
@@ -336,6 +376,7 @@ namespace CustomPhysics {
 			massData.center = {0,0,0};
 			b3Body_SetMassData(objInst.nB3Body, massData);
 
+			objInst.pGameBody = rb;
 			aB3Objects.push_back(objInst);
 		}
 	}

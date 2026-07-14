@@ -886,6 +886,12 @@ public:
 		for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
 			VergilAttack_Box3D(obj->vColPosition, phys->nB3Body, range, extraUp);
 		}
+		if (SM64::bEnemyEnabled) {
+			auto dist = (SM64::GetMarioWorldPos() - obj->vColPosition).length();
+			if (dist < range) {
+				SM64::OnTakeDamage(1, obj->vColPosition, true);
+			}
+		}
 		for (auto& car : cars) {
 			if (!CanCarBeTargeted(car)) continue;
 
@@ -1502,6 +1508,7 @@ public:
 		objData.bRemoveOnSafehouse = true;
 		objData.bRemoveOnOutOfBounds = true;
 		objData.bRemoveOnOutOfRange = true;
+		objData.sDebugName = "beachball";
 		objData.pCollisionSound = sound;
 		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
 	}
@@ -1542,6 +1549,7 @@ public:
 		objData.bRemoveOnSafehouse = false;
 		objData.bRemoveOnOutOfBounds = false;
 		objData.bRemoveOnOutOfRange = false;
+		objData.sDebugName = "beachball_save";
 		objData.pCollisionSound = sound;
 		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
 	}

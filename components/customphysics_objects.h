@@ -12,6 +12,7 @@ namespace CustomPhysicsObjects {
 		bool bRemoveOnSafehouse = false;
 		bool bRemoveOnOutOfBounds = false;
 		bool bRemoveOnOutOfRange = false;
+		std::string sDebugName;
 
 		NyaVec3 vSpawnPosition = {0,0,0};
 		int nLastCollided = 0;
