@@ -766,6 +766,7 @@ namespace SM64 {
 		Render3DObjects::aSM64Barriers.clear();
 
 		float size = 1.0;
+		float sizeY = 1.5;
 		auto pos = GetMarioWorldPos();
 
 		auto v1 = NyaVec3(-1, 0, -1);
@@ -788,8 +789,8 @@ namespace SM64 {
 		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v4), NyaVec3(v1)));
 
 		for (auto& barrier : Render3DObjects::aSM64Barriers) {
-			barrier.data.fPts[0].y = pos.y - (size * 0.5);
-			barrier.data.fPts[1].y = pos.y + (size * 0.5);
+			barrier.data.fPts[0].y = pos.y;
+			barrier.data.fPts[1].y = pos.y + sizeY;
 		}
 	}
 
