@@ -841,6 +841,11 @@ namespace SM64 {
 			distFromPlayer.Normalize();
 			marioInputs.stickX = distFromPlayer.x;
 			marioInputs.stickY = -distFromPlayer.z;
+
+			// allow some time to turn around if needed
+			if (distFromPlayer.Dot(GetMarioWorldFacing()) > -0.95 && marioState.action != ACT_DIVE_SLIDE) {
+				marioInputs.buttonB = 0;
+			}
 		}
 		bFrame = !bFrame;
 	}
@@ -930,8 +935,17 @@ namespace SM64 {
 
 		UMath::Vector3 marioPos = GetMarioWorldPos();
 		UMath::Vector3 marioVel = GetMarioWorldVelocity();
-		if (marioPos.y < -100) {
+		if (marioPos.y < -20) {
 			bDoReset = true;
+		}
+		if (bEnemyEnabled) {
+			auto spawn2d = vEnemySpawnPosition;
+			auto pos2d = marioPos;
+			spawn2d.y = 0;
+			pos2d.y = 0;
+			if ((spawn2d - pos2d).length() < 2.0 && (marioPos.y < (vEnemySpawnPosition.y - 10))) {
+				bDoReset = true;
+			}
 		}
 		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND && marioPos.length() > 50) {
 			bDoReset = true;

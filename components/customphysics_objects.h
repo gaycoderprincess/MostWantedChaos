@@ -105,7 +105,7 @@ namespace CustomPhysicsObjects {
 
 	bool PurgeOutOfWorld() {
 		for (auto& obj : aPhysicsObjects) {
-			if (obj->GetPosition().y < -100) {
+			if (obj->GetPosition().y < -20) {
 				if (obj->bRemoveOnOutOfBounds) {
 					DeletePhysicsObject(obj);
 					return true;

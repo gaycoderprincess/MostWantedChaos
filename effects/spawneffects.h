@@ -1562,6 +1562,7 @@ public:
 
 	void InitFunction() override {
 		SM64::bEnemyEnabled = true;
+		SM64::bDoReset = true;
 
 		NyaVec3 v = {0,0,0};
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
@@ -1571,7 +1572,7 @@ public:
 			UMath::Vector3 fwd;
 			ply->GetForwardVector(&fwd);
 
-			v += fwd * 3;
+			v += fwd * 5;
 
 			ply->SetLinearVelocity(&UMath::Vector3::kZero);
 			ply->SetAngularVelocity(&UMath::Vector3::kZero);
