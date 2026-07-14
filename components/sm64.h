@@ -486,7 +486,10 @@ namespace SM64 {
 
 	void EnableMario() {
 		bEnabled = true;
-		bEnemyEnabled = false;
+		if (bEnemyEnabled) {
+			bDoReset = true;
+			bEnemyEnabled = false;
+		}
 		NyaHookLib::Patch<uint16_t>(0x6B1A02, 0x9090); // disable player causality check for cop flipping
 	}
 
@@ -710,7 +713,7 @@ namespace SM64 {
 
 						// jumping on weak cops kills them
 						auto name = car->GetVehicleName();
-						if (!strcmp(name, "copmidsize") || !strcmp(name, "copghost")) {
+						if (bEnemyEnabled || (!strcmp(name, "copmidsize") || !strcmp(name, "copghost"))) {
 							if (auto dam = car->mCOMObject->Find<IEngineDamage>()) {
 								if (!dam->IsBlown()) dam->Blow();
 							}
@@ -812,17 +815,26 @@ namespace SM64 {
 		auto distFromPlayer = (GetMarioWorldPos() - *ply->GetPosition());
 		bool ableToAttack = false;
 		if (distFromClosest.length() < 5.5) {
-			distFromClosest.Normalize();
-			if (!closest->mCOMObject->Find<ICollisionBody>()->IsSleeping() && distFromClosest.Dot(GetMarioWorldFacing()) < -0.33) {
-				if (marioState.forwardVelocity < 29.0 && marioState.action != ACT_DIVE && marioState.action != ACT_DIVE_SLIDE && marioState.action != ACT_FORWARD_ROLLOUT) {
-					marioInputs.buttonB = bFrame;
+			//// ground pound
+			//if ((marioState.action & ACT_FLAG_AIR) && distFromClosest.length() < 1.5 && distFromClosest.y > 0.0) {
+			//	marioInputs.buttonZ = bFrame;
+			//}
+			// attack closest
+			//else {
+				distFromClosest.Normalize();
+				if (!closest->mCOMObject->Find<ICollisionBody>()->IsSleeping() && distFromClosest.Dot(GetMarioWorldFacing()) < -0.33) {
+					if (marioState.forwardVelocity < 29.0 && marioState.action != ACT_DIVE && marioState.action != ACT_DIVE_SLIDE && marioState.action != ACT_FORWARD_ROLLOUT) {
+						marioInputs.buttonB = bFrame;
+					}
+					ableToAttack = true;
 				}
-				ableToAttack = true;
-			}
+			//}
 		}
+		// dive slide loop for faster movement
 		if ((distFromPlayer.length() > 11.0 && marioState.forwardVelocity >= 29.0) || marioState.action == ACT_DIVE_SLIDE) {
 			marioInputs.buttonB = bFrame;
 		}
+		// move towards player
 		if (!ableToAttack || distFromPlayer.length() > 6.0) {
 			distFromPlayer.y = 0.0;
 			distFromPlayer.Normalize();
