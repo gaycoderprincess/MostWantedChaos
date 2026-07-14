@@ -1421,7 +1421,11 @@ public:
 		SM64::EnableMario();
 	}
 	void TickFunctionMain(double delta) override {
-		if (IsInNormalRace()) EffectInstance->fTimer -= delta; // halve the time left if in a race
+		if (EffectInstance->fTimer <= 5.0) return;
+
+		if (IsInNormalRace()) {
+			EffectInstance->fTimer -= delta; // halve the time left if in a race
+		}
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
