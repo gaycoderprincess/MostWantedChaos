@@ -22,6 +22,7 @@ namespace Render3DObjects {
 		}
 	};
 	std::vector<CustomBarrier> aBarriers;
+	std::vector<CustomBarrier> aSM64Barriers;
 
 	float CollisionStrength = 10;
 
@@ -161,8 +162,13 @@ namespace Render3DObjects {
 		aBarriers.push_back(CustomBarrier(max, min)); // inverted barrier so it's always double sided
 	}
 
-	std::vector<CustomBarrier> GetFullBarrierList() {
+	std::vector<CustomBarrier> GetFullBarrierList(bool includeMarios = true) {
 		auto potentialBarriers = aBarriers;
+		if (includeMarios) {
+			for (auto& barrier : aSM64Barriers) {
+				potentialBarriers.push_back(barrier);
+			}
+		}
 		for (auto& obj : aObjects) {
 			if (!obj.IsActive()) continue;
 			if (obj.fColSize <= 0) continue;

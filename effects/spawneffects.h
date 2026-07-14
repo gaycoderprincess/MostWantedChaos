@@ -1411,8 +1411,10 @@ public:
 		fTimerLength = 120;
 		bAbortOnConditionFailed = true;
 		AddToIncompatiblityGroup("control_mode");
+		AddToIncompatiblityGroup("sm64");
 		bCanQuickTrigger = false;
 		bRigProportionalChances = true;
+		nFrequency *= 2;
 	}
 
 	void InitFunction() override {
@@ -1546,3 +1548,20 @@ public:
 		}
 	}
 } E_SpawnBall;
+
+class Effect_Mario64Enemy : public ChaosEffect {
+public:
+	Effect_Mario64Enemy() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Griefer Mario";
+		bAbortOnConditionFailed = true;
+		AddToIncompatiblityGroup("sm64");
+		//bCanQuickTrigger = false;
+		bRigProportionalChances = true;
+		nFrequency *= 2;
+	}
+
+	void InitFunction() override {
+		SM64::bEnemyEnabled = true;
+	}
+	bool IsAvailable() override { return SM64::bAvailable; }
+} E_Mario64Enemy;

@@ -479,11 +479,14 @@ namespace SM64 {
 
 	bool bDoReset = false;
 	bool bEnabled = false;
+	bool bEnemyEnabled = false;
+	NyaVec3 vEnemySpawnPosition = {0,0,0};
 	bool bAvailable = false;
 	double fTimeSinceLastAttacked = 0.0;
 
 	void EnableMario() {
 		bEnabled = true;
+		bEnemyEnabled = false;
 		NyaHookLib::Patch<uint16_t>(0x6B1A02, 0x9090); // disable player causality check for cop flipping
 	}
 
@@ -670,7 +673,7 @@ namespace SM64 {
 
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
-			if (car == GetLocalPlayerVehicle()) continue;
+			if (!bEnemyEnabled && car == GetLocalPlayerVehicle()) continue;
 
 			auto rb = car->GetSimable()->GetRigidBody();
 			if (!rb) continue;
@@ -755,14 +758,152 @@ namespace SM64 {
 		}
 	}
 
+	void CreateMarioBarriers() {
+		Render3DObjects::aSM64Barriers.clear();
+
+		float size = 1.0;
+		auto pos = GetMarioWorldPos();
+
+		auto v1 = NyaVec3(-1, 0, -1);
+		auto v2 = NyaVec3(-1, 0, 1);
+		auto v3 = NyaVec3(1, 0, 1);
+		auto v4 = NyaVec3(1, 0, -1);
+		v1.x = pos.x + (size * 0.5 * v1.x);
+		v1.z = pos.z + (size * 0.5 * v1.z);
+		v2.x = pos.x + (size * 0.5 * v2.x);
+		v2.z = pos.z + (size * 0.5 * v2.z);
+		v3.x = pos.x + (size * 0.5 * v3.x);
+		v3.z = pos.z + (size * 0.5 * v3.z);
+		v4.x = pos.x + (size * 0.5 * v4.x);
+		v4.z = pos.z + (size * 0.5 * v4.z);
+
+		Render3DObjects::aSM64Barriers.clear();
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v1), NyaVec3(v2)));
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v2), NyaVec3(v3)));
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v3), NyaVec3(v4)));
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v4), NyaVec3(v1)));
+
+		for (auto& barrier : Render3DObjects::aSM64Barriers) {
+			barrier.data.fPts[0].y = pos.y - (size * 0.5);
+			barrier.data.fPts[1].y = pos.y + (size * 0.5);
+		}
+	}
+
+	void DoEnemyMarioControls() {
+		marioInputs.camLookX = 0.0;
+		marioInputs.camLookZ = 1.0;
+
+		static bool bFrame = false;
+
+		marioInputs.buttonA = 0;
+		marioInputs.buttonB = 0;
+		marioInputs.buttonZ = 0;
+
+		marioInputs.stickX = 0;
+		marioInputs.stickY = 0;
+
+		auto ply = GetLocalPlayerVehicle();
+		if (!ply) return;
+
+		auto closest = GetClosestActiveVehicle(GetMarioWorldPos());
+		if (!closest) return;
+
+		auto distFromClosest = (GetMarioWorldPos() - *closest->GetPosition());
+		auto distFromPlayer = (GetMarioWorldPos() - *ply->GetPosition());
+		bool attacked = false;
+		if (distFromClosest.length() < 4.5) {
+			distFromClosest.Normalize();
+			if (distFromClosest.Dot(GetMarioWorldFacing()) < -0.33) {
+				marioInputs.buttonB = bFrame;
+				attacked = true;
+			}
+		}
+		if (!attacked || distFromPlayer.length() > 5.0) {
+			//marioInputs.stickY = 1.0;
+
+			distFromPlayer.y = 0.0;
+			distFromPlayer.Normalize();
+			marioInputs.stickX = distFromPlayer.x;
+			marioInputs.stickY = -distFromPlayer.z;
+		}
+		bFrame = !bFrame;
+	}
+
+	void DoPlayerMarioControls() {
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+			marioInputs.buttonA = 0;
+			marioInputs.buttonB = 0;
+			marioInputs.buttonZ = 0;
+		}
+		else {
+			marioInputs.buttonA = IsPadKeyPressed(NYA_PAD_KEY_A);
+			marioInputs.buttonB = IsPadKeyPressed(NYA_PAD_KEY_B);
+			marioInputs.buttonZ = IsPadKeyPressed(NYA_PAD_KEY_X) || IsPadKeyPressed(NYA_PAD_KEY_LB) || IsPadKeyPressed(NYA_PAD_KEY_RB);
+		}
+
+		float cameraPos[3] = {};
+
+		auto cameraMatReal = PrepareCameraMatrix(GetLocalPlayerCamera());
+		auto cameraPosReal = WorldToMario(RenderToWorldCoords(cameraMatReal.p));
+		cameraPos[0] = cameraPosReal[0];
+		cameraPos[1] = cameraPosReal[1];
+		cameraPos[2] = cameraPosReal[2];
+
+		//cameraPos[0] = marioState.position[0] + 1000.0f * cosf(cameraRot);
+		//cameraPos[1] = marioState.position[1] + 200.0f;
+		//cameraPos[2] = marioState.position[2] + 1000.0f * sinf(cameraRot);
+
+		marioInputs.camLookX = marioState.position[0] - cameraPos[0];
+		marioInputs.camLookZ = marioState.position[2] - cameraPos[2];
+
+		marioInputs.stickX = GetPadKeyState(NYA_PAD_KEY_LSTICK_X) / 32767.0;
+		marioInputs.stickY = GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / -32767.0;
+
+		// basic keyboard controls
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
+			if (IsKeyPressed(VK_LEFT)) {
+				marioInputs.stickX = -1.0;
+			}
+			if (IsKeyPressed(VK_RIGHT)) {
+				marioInputs.stickX = 1.0;
+			}
+			if (IsKeyPressed(VK_UP)) {
+				marioInputs.stickY = -1.0;
+			}
+			if (IsKeyPressed(VK_DOWN)) {
+				marioInputs.stickY = 1.0;
+			}
+			if (IsKeyPressed(VK_SPACE)) {
+				marioInputs.buttonA = 1;
+			}
+			if (IsKeyPressed(VK_CONTROL)) {
+				marioInputs.buttonZ = 1;
+			}
+			if (IsKeyPressed(VK_LBUTTON) || IsKeyPressed(VK_SHIFT)) {
+				marioInputs.buttonB = 1;
+			}
+		}
+
+		auto stick = NyaVec3(marioInputs.stickX, marioInputs.stickY, 0);
+		if (stick.length() > 1.0) {
+			stick.Normalize();
+			marioInputs.stickX = stick.x;
+			marioInputs.stickY = stick.y;
+		}
+	}
+
 	void OnTick() {
 		PerformanceBenchmarker _perf("SM64::OnTick");
 
-		if (!bEnabled) {
+		if (!bEnabled && !bEnemyEnabled) {
 			bDoReset = true;
 			return;
 		}
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) {
+			bDoReset = true;
+			return;
+		}
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND && bEnemyEnabled) {
 			bDoReset = true;
 			return;
 		}
@@ -801,7 +942,7 @@ namespace SM64 {
 
 				// custom spawned barriers from chaos objects
 				std::vector<WCollisionBarrier> barriers;
-				auto customBarriers = Render3DObjects::GetFullBarrierList();
+				auto customBarriers = Render3DObjects::GetFullBarrierList(false);
 				for (auto& barrier : customBarriers) {
 					barriers.push_back(barrier.data);
 				}
@@ -810,7 +951,7 @@ namespace SM64 {
 				UpdateMarioCollision();
 			}
 
-			if (!bDoReset && marioPos.length() > 50) {
+			if (!bDoReset && marioPos.length() > 50 && !bEnemyEnabled) {
 				marioPos.y += 1;
 				ply->SetPosition(&marioPos);
 
@@ -827,10 +968,12 @@ namespace SM64 {
 			}
 		}
 		else {
-			CarRender_DontRenderPlayer = false;
-			DrawLightFlares = true;
-			if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
-				DrawCars = false;
+			if (!bEnemyEnabled) {
+				CarRender_DontRenderPlayer = false;
+				DrawLightFlares = true;
+				if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
+					DrawCars = false;
+				}
 			}
 
 			if (bDoReset) {
@@ -844,71 +987,20 @@ namespace SM64 {
 			NyaVec3 v = {0,0,0};
 			if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 				v = *ply->GetPosition();
-				v.y -= 1;
+
+				if (bEnemyEnabled) {
+					UMath::Vector3 fwd;
+					ply->GetForwardVector(&fwd);
+
+					v += fwd * 3;
+				}
+				else {
+					v.y -= 1;
+				}
 			}
 			ResetMario(v);
 		}
 		bDoReset = false;
-
-		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
-			marioInputs.buttonA = 0;
-			marioInputs.buttonB = 0;
-			marioInputs.buttonZ = 0;
-		}
-		else {
-			marioInputs.buttonA = IsPadKeyPressed(NYA_PAD_KEY_A);
-			marioInputs.buttonB = IsPadKeyPressed(NYA_PAD_KEY_B);
-			marioInputs.buttonZ = IsPadKeyPressed(NYA_PAD_KEY_X) || IsPadKeyPressed(NYA_PAD_KEY_LB) || IsPadKeyPressed(NYA_PAD_KEY_RB);
-		}
-
-		float cameraPos[3] = {};
-
-		auto cameraMatReal = PrepareCameraMatrix(GetLocalPlayerCamera());
-		auto cameraPosReal = WorldToMario(RenderToWorldCoords(cameraMatReal.p));
-		cameraPos[0] = cameraPosReal[0];
-		cameraPos[1] = cameraPosReal[1];
-		cameraPos[2] = cameraPosReal[2];
-
-		//cameraPos[0] = marioState.position[0] + 1000.0f * cosf(cameraRot);
-		//cameraPos[1] = marioState.position[1] + 200.0f;
-		//cameraPos[2] = marioState.position[2] + 1000.0f * sinf(cameraRot);
-
-		marioInputs.camLookX = marioState.position[0] - cameraPos[0];
-		marioInputs.camLookZ = marioState.position[2] - cameraPos[2];
-		marioInputs.stickX = GetPadKeyState(NYA_PAD_KEY_LSTICK_X) / 32767.0;
-		marioInputs.stickY = GetPadKeyState(NYA_PAD_KEY_LSTICK_Y) / -32767.0;
-
-		// basic keyboard controls
-		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
-			if (IsKeyPressed(VK_LEFT)) {
-				marioInputs.stickX = -1.0;
-			}
-			if (IsKeyPressed(VK_RIGHT)) {
-				marioInputs.stickX = 1.0;
-			}
-			if (IsKeyPressed(VK_UP)) {
-				marioInputs.stickY = -1.0;
-			}
-			if (IsKeyPressed(VK_DOWN)) {
-				marioInputs.stickY = 1.0;
-			}
-			if (IsKeyPressed(VK_SPACE)) {
-				marioInputs.buttonA = 1;
-			}
-			if (IsKeyPressed(VK_CONTROL)) {
-				marioInputs.buttonZ = 1;
-			}
-			if (IsKeyPressed(VK_LBUTTON) || IsKeyPressed(VK_SHIFT)) {
-				marioInputs.buttonB = 1;
-			}
-		}
-
-		auto stick = NyaVec3(marioInputs.stickX, marioInputs.stickY, 0);
-		if (stick.length() > 1.0) {
-			stick.Normalize();
-			marioInputs.stickX = stick.x;
-			marioInputs.stickY = stick.y;
-		}
 
 		if (!FEManager::mPauseRequest) {
 			MarioObjectInteractions();
@@ -926,8 +1018,15 @@ namespace SM64 {
 				sm64_set_mario_health(marioId, 0x880);
 			}
 
-			while (gTimer.fTotalTime >= 1.f/30)
-			{
+			while (gTimer.fTotalTime >= 1.0 / 30.0) {
+				if (bEnemyEnabled) {
+					DoEnemyMarioControls();
+					CreateMarioBarriers();
+				}
+				else {
+					DoPlayerMarioControls();
+				}
+
 				memcpy(lastPos, currPos, sizeof(currPos));
 				memcpy(lastGeoPos, currGeoPos, sizeof(currGeoPos));
 
@@ -959,8 +1058,9 @@ namespace SM64 {
 	void OnTick3D() {
 		PerformanceBenchmarker _perf("SM64::OnTick3D");
 
-		if (!bEnabled) return;
+		if (!bEnabled && !bEnemyEnabled) return;
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING && TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_IN_FRONTEND) return;
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND && bEnemyEnabled) return;
 		if (IsInLoadingScreen() || IsInMovie()) return;
 
 		RenderMario<0, false>(marioGeometry);
