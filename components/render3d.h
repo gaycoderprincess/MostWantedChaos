@@ -17,6 +17,8 @@ namespace Render3D {
 		IDirect3DTexture9* pTexture;
 	};
 
+	bool bForceNoEffect = false;
+
 	struct tModel {
 		IDirect3DIndexBuffer9* pIndexBuffer = nullptr;
 		IDirect3DVertexBuffer9* pVertexBuffer = nullptr;
@@ -28,6 +30,10 @@ namespace Render3D {
 
 		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD, bool zwrite = true) const {
 			if (bInvalidated) return;
+
+			if (bForceNoEffect) {
+				return RenderAt_NoEffect(matrix, useAlpha, zwrite);
+			}
 
 #ifdef RENDER3D_NOEFFECT
 			g_pd3dDevice->SetPixelShader(nullptr);

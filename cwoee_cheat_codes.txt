@@ -1,0 +1,227 @@
+43Letterboxed
+43Stretched
+AcidTrip
+Add100KBounty
+Add100KCostToState
+Add3Laps
+AddALap
+AddAStrikeToActiveCareerCar
+AddExtraVotingOption
+Aerodynamics100
+AllCarsAreBlahaj (BecomeFish)
+AllTrafficIsTRAFPIZZA
+AllTrafficIsTrucks
+AntiMillionaire
+AutoDrive
+Black&WhiteScreenOverlay (Black&White)
+BlahajRoofRacks (FriendsOfBlahaj)
+BlowOneOpponentsEngine
+BlueScreenOverlay (DaBaDee)
+BlurTheScreen (WheresMyGlasses)
+BottomUpCamera
+BouncyCars
+BouncyMod
+BouncySuspension
+BreakTirePhysics
+CarsFloatAway
+CarsSnakeBehindPlayer (Snake)
+CarsStareAtEachOther (Staredown)
+CarsStareAtYou
+CarsWreckWhenFlipped
+ChallengeSeriesCamera
+ChangeCarToDodgeNeon (SeriouslyWeakDude)
+ChangeCarToFlatOutPepperVisual (Pep)
+ChangeCarToGTAGreenwoodVisual (BucketAssCar)
+ChangeCarToMorganaVisual (NotACat)
+ChaosModCredits
+CinematicCamera
+Cocksbot
+ConstantPausing
+CopJengaTower
+CopsDriveTrafficCars (TrulyUndercover)
+CopsDriveTrucks
+CopsDropCash
+CrazySpinnyCarsVisual (IsThisWhatRPMMeans)
+CruiseControl
+DOSEraGraphics
+DebugView
+DecreaseHeatLevel
+DestroyRandomCar
+DisableAutosave
+DisableBuildings
+DisableCarToCarCollision
+DisableCopSpawning
+DisableCops
+DisableGameHUD (DisableHUD)
+DisableHidingSpots
+DisableInstantBustOnReset
+DisableOpponentsNitro
+DisablePausing
+DisablePlayerInput
+DisablePlayerNitro
+DisablePlayerPhysics
+DisablePlayerSteering (BrokenSteeringWheel)
+DisableRaceBarriers
+DisableResetting
+DisableRubberbanding
+DisableSpeedbreaker
+DisableTraffic
+DisableVisualTreatment
+DisableWallCollision
+DisableWorldCollision
+DiscoScreenOverlay (DiscoTime)
+DragHUD
+DrunkScreenOverlay (DrunkMode)
+EnableGameMomentCamera
+FakeCrash
+FalseStarts
+FixPlayersTires
+Flashbang
+FlatOutStyleHUD
+FlippyCars
+ForceAutomaticTransmission
+ForceManualTransmission
+ForcePlayerToGear1
+ForcePlayerToReverseGear
+ForcePlayerToTopGear (TopGear)
+ForcedRearView
+ForcefieldOnRandomCar
+ForzaRewind
+FreezeCamera
+Give5000 (FIVEGRAND)
+GiveOtherCarsFireworkRockets
+GranTurismoCamera
+GrippyWorld
+HalvePlayerSteering (HalfBrokenSteeringWheel)
+HalvePlayerThrottle (HalfBrokenThrottle)
+Handling10
+Handling10
+HelicopterCamera
+HeyHotshotSoundEffect (HeyHotshot)
+HighContrast
+Inception
+IncreaseHeatLevel
+InfiniteCopMass
+InfinitePlayerMass (Juggernaut)
+InfinitePlayerNitro
+InfiniteSpeedbreaker
+InfiniteTrafficMass
+InvertedColors
+InvincibleCops
+InvinciblePlayerEngine
+InvinciblePlayerTires
+InvisibleCars
+InvisibleWorld
+LagForAllCars (HostedbyCloudflare)
+LagForAllOtherCars
+LaggyPlayer (ConnectionProblem)
+LaunchOpponentsBackwards
+LaunchOpponentsSideways
+LaunchOpponentsUp
+LaunchPlayerBackwards
+LaunchPlayerDown
+LaunchPlayerForward
+LaunchPlayerSideways
+LaunchPlayerUp
+LeakingFuelTank
+LobotomizedTraffic
+LockOpponentsInPlace
+LockPlayerInPlace
+LockPlayerRotation
+LowContrast
+LowQualityMovement
+MagnetOnRandomCar
+MajorityVoting
+Millionaire
+MirrorTheScreen (British)
+MonsterTruckSuspension
+NeverBusted
+NewOpponentsAreGolfs
+NewOpponentsAreM3GTRs
+NewOpponentsCopyYourCar
+NewOpponentsStealYourCars
+NitroBoosting
+NothingHappens
+OccasionalBackstreetBoys
+OpponentsRubberband (FUCKINGRUBBERBAND)
+PittableOpponents
+PixelateTheScreen
+PlacePlayerOntoClosestCar (PiggybackRide)
+PlayerCarForcefield
+PlayerCarMagnet
+PlayerObjectMagnet
+PortraitMode
+PunctureOnePlayerTire
+PunctureOpponentsTires
+PuncturePlayersTires
+PursuitBreakerSoundEffect
+RacerAIForTraffic
+RainbowWorld (RainbowRoad)
+RandomText
+RandomizedChaosTimer (ChaosForYourChaos)
+RandomizedPlayerSteering
+RealFrameDrops
+RealPhysicsForCops
+RealTimeSpeedbreaker
+RealisticFuelPrices
+RealisticOpponentPerformance
+RefuelPlayerCar
+RemoveALap
+RemoveAllWheels
+ReplaceEveryTextureWithOBSOLETE (OBSOLETE)
+ResetPlayer
+RespawnPropsAndPursuitBreakers
+ReverseText
+RuthlessCopSpawns (EVERYONE)
+RuthlessCrossSpawns (ItsCross)
+SaturateTheScreen
+SecondPersonView
+SetHeatLevelTo1
+SetHeatLevelTo6
+ShakyCars (SnapToGrid)
+ShoutoutstoJJ902
+ShuffledLetters
+SimplifiedPhysicsForPlayer
+SkipCurrentSong
+Skyfall
+SlipperyWorld
+Spawn1000BeachBalls
+SpawnBeachBalls
+SpawnGrieferVergil
+SpawnGrieferVergilsAtOldBridge (SpawnGrieferVergilsSomewhere)
+SpawnPlayerAsRandomCopCar
+SpawnPlayerAsRandomTrafficCar
+SpawnPlayerAsStockPunto
+SpawnSCP173Somewhere
+SpawnScientistInAHidingSpot
+SpawnTeddieFromPersona4 (pee)
+SpawnVendingMachine (8Down)
+SpinPlayerOut
+SpinPlayerRapidly
+SpinningOpponents
+SpinningPlayer (SpainbuttheAissilent)
+SpinningTraffic
+SteerToChangeHeatLevel (HeatedSteering)
+StopPlayerCar
+StrongNitro
+SubtractBounty100K1Mil (Subtract100KBounty)
+SwapPlacesWithRandomOpponent
+TeleportAllCarsToPlayer
+TikTokMode
+TopDownCamera
+TrafficCarPhysicsForPlayer
+TransRights
+TriggerPolicePursuit
+TumblingCars
+TunnelVision
+UninstallCounterStrikeSource
+UpsideDownScreen (MeanwhileInAustralia)
+WeakNitro
+WheelCamera
+WhysThisDealer
+WideCars
+WidescreenBorders
+WireframeMode
+WireframeWorld
+ZeroOpponentMass
+ZeroPlayerMass

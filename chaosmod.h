@@ -262,14 +262,20 @@ ChaosEffect* GetSmartRNGEffect(bool redo = false) {
 	return nullptr;
 }
 
-void DrawPerformanceWarnings() {
+void DrawPerformanceWarnings(double delta) {
 	if (GetEffectRunning(&E_Lag)) return;
+
+	static double fTimeRender3DBorked = 0;
 
 	float y = 0.9;
 	for (auto& perf : aPerformanceBenchmarkResults) {
 		if (!perf.once) continue;
 
 		if (perf.ms >= 20000) { // 20 milliseconds
+			if (!strcmp(perf.name, "Render3DObjects::OnTick3D")) {
+				fTimeRender3DBorked += delta;
+			}
+
 			tNyaStringData data;
 			data.x = 0.1 * GetAspectRatioInv();
 			data.y = y;
@@ -281,6 +287,11 @@ void DrawPerformanceWarnings() {
 		}
 
 		perf.once = false;
+	}
+
+	// if 3d object takes too long, force them to not use effect
+	if (fTimeRender3DBorked > 2.0) {
+		Render3D::bForceNoEffect = true;
 	}
 }
 
@@ -300,7 +311,6 @@ void ChaosLoop() {
 
 	MoneyChecker();
 	BountyChecker();
-	DrawPerformanceWarnings();
 
 	for (auto& func : aDrawingLoopFunctions) {
 		func();
@@ -313,6 +323,7 @@ void ChaosLoop() {
 
 	static CNyaTimer gTimer;
 	gTimer.Process();
+	DrawPerformanceWarnings(gTimer.fDeltaTime);
 
 	if (ChaosVoting::IsEnabled()) {
 		ChaosVoting::pAllOfTheAbove = &E_VotingAll; // this is such a hack lol woof meow
