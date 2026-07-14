@@ -1483,6 +1483,7 @@ class Effect_SpawnBalls : public ChaosEffect {
 public:
 	Effect_SpawnBalls() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn 1000 Beach Balls";
+		bCanMultiTrigger = true;
 	}
 
 	void InitFunction() override {
@@ -1516,6 +1517,7 @@ class Effect_SpawnBall : public ChaosEffect {
 public:
 	Effect_SpawnBall() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Beach Balls";
+		bCanMultiTrigger = true;
 	}
 
 	void InitFunction() override {

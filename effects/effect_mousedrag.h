@@ -16,7 +16,7 @@ public:
 	static inline float selectRange = 0.2;
 	static inline float dragSpeed = 100.0;
 	static inline float throwSpeed = 50.0;
-	static inline float maxDistance = 300.0;
+	static inline float maxDistance = 200.0;
 	static inline IRigidBody* selectedBody = nullptr;
 
 	static NyaVec3 GetScreenPosition(NyaVec3 world) {

@@ -428,7 +428,7 @@ public:
 		fTimerLength = 60;
 	}
 
-	static inline float force = 5.0;
+	static inline float force = 10.0;
 
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveObjects();
