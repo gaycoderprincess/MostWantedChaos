@@ -624,7 +624,8 @@ namespace SM64 {
 		UMath::Vector3 marioPos = GetMarioWorldPos();
 
 		auto objs = CustomPhysicsObjects::aPhysicsObjects;
-		for (auto& rb : objs) {
+		for (auto& pObj : objs) {
+			auto rb = *pObj;
 			auto dim = rb.vModelSize;
 
 			const float fAttackRange = 6.0 * GetMarioScale();

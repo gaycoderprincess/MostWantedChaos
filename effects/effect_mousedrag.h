@@ -17,7 +17,7 @@ public:
 	static inline float dragSpeed = 100.0;
 	static inline float throwSpeed = 50.0;
 	static inline float maxDistance = 200.0;
-	static inline IRigidBody* selectedBody = nullptr;
+	static inline auto selectedBody = CwoeeSharedRigidBody();
 
 	static NyaVec3 GetScreenPosition(NyaVec3 world) {
 		bVector3 screenPos;
@@ -29,14 +29,14 @@ public:
 		return screenPos;
 	}
 
-	static void DrawCrosshair(IRigidBody* target, bool isDragging) {
-		auto screenPos = GetScreenPosition(*target->GetPosition());
+	static void DrawCrosshair(CwoeeSharedRigidBody target, bool isDragging) {
+		auto screenPos = GetScreenPosition(target.GetPosition());
 
 		static auto texture = LoadTexture("CwoeeChaos/data/textures/firework_crosshair.png");
 		DrawRectangle(screenPos.x - crosshairSize * GetAspectRatioInv(), screenPos.x + crosshairSize * GetAspectRatioInv(), screenPos.y - crosshairSize, screenPos.y + crosshairSize, isDragging ? NyaDrawing::CNyaRGBA32(0,255,0,255) : NyaDrawing::CNyaRGBA32(255,0,0,255), 0, texture);
 	}
 
-	static IRigidBody* GetClosestCarToCursor() {
+	static CwoeeSharedRigidBody GetClosestCarToCursor() {
 		POINT point;
 		GetCursorPos(&point);
 
@@ -53,12 +53,12 @@ public:
 		auto camPos = RenderToWorldCoords(cam.p);
 		auto fwd = RenderToWorldCoords(cam.z);
 
-		IRigidBody* closest = nullptr;
+		CwoeeSharedRigidBody closest = CwoeeSharedRigidBody();
 		float closestDist = 9999.0;
 
-		auto objs = GetActiveRigidBodies();
+		auto objs = GetActiveSharedRigidBodies();
 		for (auto& obj : objs) {
-			auto pos = *obj->GetPosition();
+			auto pos = obj.GetPosition();
 			auto dirFromCam = (pos - camPos);
 			if (dirFromCam.length() > maxDistance) continue;
 			dirFromCam.Normalize();
@@ -79,7 +79,7 @@ public:
 
 	void InitFunction() override {
 		mCameraMatrix = PrepareCameraMatrix(GetLocalPlayerCamera());
-		selectedBody = nullptr;
+		selectedBody = CwoeeSharedRigidBody();
 		NyaHookLib::Patch<uint16_t>(0x6B1A02, 0x9090); // disable player causality check for cop flipping
 
 		CwoeeHints::AddHint("Drag stuff around using the mouse!");
@@ -108,32 +108,40 @@ public:
 			}
 		}
 
-		if (auto car = GetClosestCarToCursor()) {
-			auto pos = *car->GetPosition();
+		auto closestCar = GetClosestCarToCursor();
+		if (closestCar.IsValid()) {
+			auto pos = closestCar.GetPosition();
 			auto screenPos = GetScreenPosition(pos);
 			screenPos.x *= nResX;
 			screenPos.y *= nResY;
 			screenPos.z = 0.0;
 
 			if ((cursorPos - screenPos).length() < nResY * selectRange) {
-				if (IsKeyJustPressed(VK_LBUTTON)) selectedBody = car;
+				if (IsKeyJustPressed(VK_LBUTTON)) selectedBody = closestCar;
 
-				if (!selectedBody) {
-					DrawCrosshair(car, true);
+				if (!selectedBody.IsValid()) {
+					DrawCrosshair(closestCar, true);
 				}
 			}
 		}
 
-		if (!IsRigidBodyValidAndActive(selectedBody)) {
-			selectedBody = nullptr;
+		if (!selectedBody.IsValid()) {
+			selectedBody = CwoeeSharedRigidBody();
 		}
 
-		if (IsKeyPressed(VK_LBUTTON) && selectedBody) {
+		if (IsKeyPressed(VK_LBUTTON) && selectedBody.IsValid()) {
 			auto cam = PrepareCameraMatrix(GetLocalPlayerCamera());
 			auto camPos = RenderToWorldCoords(cam.p);
 			auto fwd = RenderToWorldCoords(cam.z);
 			auto side = RenderToWorldCoords(cam.x);
 			auto up = RenderToWorldCoords(cam.y);
+
+			if (selectedBody.pGameObject) {
+				auto cb = selectedBody.pGameObject->mCOMObject->Find<ICollisionBody>();
+				if (cb && cb->IsAttachedToWorld()) {
+					cb->AttachedToWorld(false, 50.0);
+				}
+			}
 
 			DrawCrosshair(selectedBody, false);
 
@@ -141,23 +149,23 @@ public:
 			cursorMove.x /= nResX;
 			cursorMove.y /= nResY;
 
-			auto distFromCamera = (camPos - *selectedBody->GetPosition()).length();
+			auto distFromCamera = (camPos - selectedBody.GetPosition()).length();
 
-			auto vel = *selectedBody->GetLinearVelocity();
+			auto vel = selectedBody.GetLinearVelocity();
 			vel = cursorMove.x * side * dragSpeed * distFromCamera;
 			vel += cursorMove.y * up * dragSpeed * distFromCamera;
 
 			if (IsKeyPressed(VK_RBUTTON)) {
 				vel += fwd * throwSpeed;
-				selectedBody->SetLinearVelocity(&vel);
-				selectedBody = nullptr;
+				selectedBody.SetLinearVelocity(vel);
+				selectedBody = CwoeeSharedRigidBody();
 			}
 			else {
-				selectedBody->SetLinearVelocity(&vel);
+				selectedBody.SetLinearVelocity(vel);
 			}
 		}
-		else if (selectedBody) {
-			selectedBody = nullptr;
+		else if (selectedBody.IsValid()) {
+			selectedBody = CwoeeSharedRigidBody();
 		}
 
 		lastCursorPos = cursorPos;

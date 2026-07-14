@@ -46,7 +46,7 @@ namespace CustomPhysicsObjects {
 			b3Body_SetAngularVelocity(nB3Body, b3Vec3_zero);
 		}
 	};
-	std::vector<CustomPhysicsObject> aPhysicsObjects;
+	std::vector<CustomPhysicsObject*> aPhysicsObjects;
 
 	void CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
 		data.vSpawnPosition = position;
@@ -77,14 +77,26 @@ namespace CustomPhysicsObjects {
 		b3Body_SetTransform(data.nB3Body, {position.x,position.y,position.z}, b3Quat_identity);
 		b3Body_SetLinearVelocity(data.nB3Body, {velocity.x,velocity.y,velocity.z});
 
-		aPhysicsObjects.push_back(data);
+		auto obj = new CustomPhysicsObject;
+		*obj = data;
+		aPhysicsObjects.push_back(obj);
+	}
+
+	void DeletePhysicsObject(CustomPhysicsObject* obj) {
+		for (auto& search : aPhysicsObjects) {
+			if (search == obj) {
+				b3DestroyBody(search->nB3Body);
+				delete search;
+				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&search - &aPhysicsObjects[0]));
+				return;
+			}
+		}
 	}
 
 	bool PurgeRemovables() {
 		for (auto& obj : aPhysicsObjects) {
-			if (obj.bRemoveOnSafehouse) {
-				b3DestroyBody(obj.nB3Body);
-				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
+			if (obj->bRemoveOnSafehouse) {
+				DeletePhysicsObject(obj);
 				return true;
 			}
 		}
@@ -93,14 +105,13 @@ namespace CustomPhysicsObjects {
 
 	bool PurgeOutOfWorld() {
 		for (auto& obj : aPhysicsObjects) {
-			if (obj.GetPosition().y < -100) {
-				if (obj.bRemoveOnOutOfBounds) {
-					b3DestroyBody(obj.nB3Body);
-					aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
+			if (obj->GetPosition().y < -100) {
+				if (obj->bRemoveOnOutOfBounds) {
+					DeletePhysicsObject(obj);
 					return true;
 				}
 				else {
-					obj.Respawn();
+					obj->Respawn();
 				}
 			}
 		}
@@ -111,12 +122,11 @@ namespace CustomPhysicsObjects {
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
 		for (auto& obj : aPhysicsObjects) {
-			if (!obj.bRemoveOnOutOfRange) continue;
+			if (!obj->bRemoveOnOutOfRange) continue;
 
-			auto dist = (plyPos - obj.GetPosition());
+			auto dist = (plyPos - obj->GetPosition());
 			if (dist.length() > 1000) {
-				b3DestroyBody(obj.nB3Body);
-				aPhysicsObjects.erase(aPhysicsObjects.begin() + (&obj - &aPhysicsObjects[0]));
+				DeletePhysicsObject(obj);
 				return true;
 			}
 		}
@@ -138,7 +148,8 @@ namespace CustomPhysicsObjects {
 
 		b3ContactData contactData[8];
 
-		for (auto& obj : aPhysicsObjects) {
+		for (auto& pObj : aPhysicsObjects) {
+			auto obj = *pObj;
 			if (!obj.pCollisionSound) continue;
 
 			int num = b3Body_GetContactData(obj.nB3Body, contactData, 8);
@@ -172,7 +183,8 @@ namespace CustomPhysicsObjects {
 
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
-		for (auto& obj : aPhysicsObjects) {
+		for (auto& pObj : aPhysicsObjects) {
+			auto obj = *pObj;
 			auto pos = obj.GetPosition();
 			auto dist = (plyPos - pos);
 			if (dist.length() > 250) continue; // don't render far away objects
@@ -212,4 +224,73 @@ namespace CustomPhysicsObjects {
 		aDrawing3DLoopFunctions.push_back(OnTick3D);
 		aMainLoopFunctions.push_back(OnTick);
 	});
+}
+
+class CwoeeSharedRigidBody {
+public:
+	IRigidBody* pGameObject;
+	CustomPhysicsObjects::CustomPhysicsObject* pCustomObject;
+
+	CwoeeSharedRigidBody() {
+		pGameObject = nullptr;
+		pCustomObject = nullptr;
+	}
+	CwoeeSharedRigidBody(IRigidBody* obj) : pGameObject(obj) {}
+	CwoeeSharedRigidBody(CustomPhysicsObjects::CustomPhysicsObject* obj) : pCustomObject(obj) {}
+
+	bool IsValid() {
+		if (pGameObject && IsRigidBodyValidAndActive(pGameObject)) return true;
+		if (pCustomObject) {
+			for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
+				if (obj == pCustomObject) return true;
+			}
+		}
+		return false;
+	}
+
+	void InvalidError() {
+		MessageBoxA(0, std::format("Attempted to index invalid rigidbody {:X} {:X}", (uintptr_t)pGameObject, (uintptr_t)pCustomObject).c_str(), "nya?!~", MB_ICONERROR);
+		exit(0);
+	}
+
+	UMath::Vector3 GetPosition() {
+		if (pGameObject) return *pGameObject->GetPosition();
+		if (pCustomObject) return pCustomObject->GetPosition();
+		InvalidError();
+	}
+
+	UMath::Vector3 GetLinearVelocity() {
+		if (pGameObject) return *pGameObject->GetLinearVelocity();
+		if (pCustomObject) return pCustomObject->GetLinearVelocity();
+		InvalidError();
+	}
+
+	UMath::Vector3 GetAngularVelocity() {
+		if (pGameObject) return *pGameObject->GetAngularVelocity();
+		if (pCustomObject) return pCustomObject->GetAngularVelocity();
+		InvalidError();
+	}
+
+	void SetLinearVelocity(UMath::Vector3 v) {
+		if (pGameObject) pGameObject->SetLinearVelocity(&v);
+		if (pCustomObject) pCustomObject->SetLinearVelocity(&v);
+	}
+
+	void SetAngularVelocity(UMath::Vector3 v) {
+		if (pGameObject) pGameObject->SetAngularVelocity(&v);
+		if (pCustomObject) pCustomObject->SetAngularVelocity(&v);
+	}
+};
+
+std::vector<CwoeeSharedRigidBody> GetActiveSharedRigidBodies() {
+	std::vector<CwoeeSharedRigidBody> out;
+	auto game = GetActiveRigidBodies();
+	for (auto& rb : game) {
+		out.push_back(rb);
+	}
+	auto cwoee = CustomPhysicsObjects::aPhysicsObjects;
+	for (auto& rb : cwoee) {
+		out.push_back(rb);
+	}
+	return out;
 }

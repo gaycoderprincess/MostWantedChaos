@@ -587,7 +587,7 @@ public:
 				FireworkAttack_Box3D(obj->mMatrix.p, CustomPhysicsBall::BallBody, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
 			}
 			for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
-				FireworkAttack_Box3D(obj->mMatrix.p, phys.nB3Body, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
+				FireworkAttack_Box3D(obj->mMatrix.p, phys->nB3Body, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
 			}
 
 			for (auto& car : cars) {
@@ -884,7 +884,7 @@ public:
 			VergilAttack_Box3D(obj->vColPosition, CustomPhysicsBall::BallBody, range, extraUp);
 		}
 		for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
-			VergilAttack_Box3D(obj->vColPosition, phys.nB3Body, range, extraUp);
+			VergilAttack_Box3D(obj->vColPosition, phys->nB3Body, range, extraUp);
 		}
 		for (auto& car : cars) {
 			if (!CanCarBeTargeted(car)) continue;
@@ -1555,7 +1555,7 @@ public:
 		sName = "Spawn Griefer Mario";
 		bAbortOnConditionFailed = true;
 		AddToIncompatiblityGroup("sm64");
-		//bCanQuickTrigger = false;
+		bCanQuickTrigger = false;
 		bRigProportionalChances = true;
 		nFrequency *= 2;
 	}

@@ -451,8 +451,7 @@ public:
 		}
 
 		auto& objs = CustomPhysicsObjects::aPhysicsObjects;
-		for (auto& car : objs) {
-			auto otherCar = &car;
+		for (auto& otherCar : objs) {
 			auto v = GetLocalPlayerVehicle()->GetPosition();
 			auto c = otherCar->GetPosition();
 			auto vel = otherCar->GetLinearVelocity();
