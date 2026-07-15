@@ -287,9 +287,9 @@ public:
 		if (pGameObject) pGameObject->SetLinearVelocity(&v);
 		if (pCustomObject) pCustomObject->SetLinearVelocity(&v);
 		if (pCustomStaticObject) {
-			pCustomStaticObject->mMatrix.p += v / RealTimeElapsedFrame;
+			pCustomStaticObject->mMatrix.p += v * RealTimeElapsedFrame;
 			if (pCustomStaticObject->fColSize > 0.0) {
-				pCustomStaticObject->vColPosition += v / RealTimeElapsedFrame;
+				pCustomStaticObject->vColPosition += v * RealTimeElapsedFrame;
 			}
 		}
 	}
