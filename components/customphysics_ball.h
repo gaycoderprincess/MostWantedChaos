@@ -77,6 +77,21 @@ namespace CustomPhysicsBall {
 		}
 		nLastBallCollisions = numCollisions;
 
+		// destroy cars that touch it
+		for (int i = 0; i < numCollisions && i < 8; i++) {
+			auto body1 = b3Shape_GetBody(contactData[i].shapeIdA);
+			auto body2 = b3Shape_GetBody(contactData[i].shapeIdB);
+
+			auto veh = CustomPhysics::GetVehicleForB3Body(body1);
+			if (!veh) veh = CustomPhysics::GetVehicleForB3Body(body2);
+
+			if (!veh) continue;
+			if (veh == GetLocalPlayerVehicle()) continue;
+			if (veh->GetDriverClass() != DRIVER_COP) continue;
+			if (IsCarDestroyed(veh)) continue;
+			DestroyCar(veh);
+		}
+
 		// ball controls and player car teleport
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			if (bDoReset) {

@@ -58,7 +58,6 @@ endif()
 if(MSVC OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_include_directories(NFSMWChaos PUBLIC $ENV{DXSDK_DIR}Include)
     target_link_directories(NFSMWChaos PUBLIC $ENV{DXSDK_DIR}Lib/x86)
-    target_compile_options(NFSMWChaos PRIVATE "-Wno-narrowing")
     target_compile_options(NFSMWChaos PRIVATE
             $<$<CONFIG:Debug>:/MTd>
             $<$<CONFIG:Release>:/MT>
@@ -67,6 +66,8 @@ if(MSVC OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 target_link_options(NFSMWChaos PRIVATE "-Wl,--exclude-all-symbols")
+target_compile_options(NFSMWChaos PRIVATE "-Wno-narrowing")
+target_compile_options(NFSMWChaos PRIVATE "-Wno-invalid-offsetof")
 
 set_target_properties(NFSMWChaos PROPERTIES PREFIX "")
 set_target_properties(NFSMWChaos PROPERTIES SUFFIX "_gcp.asi")

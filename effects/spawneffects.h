@@ -208,7 +208,7 @@ public:
 							NyaAudio::Play(soundAlt);
 						}
 
-						car->mCOMObject->Find<IDamageable>()->Destroy();
+						DestroyCar(car);
 					}
 				}
 			}
@@ -413,7 +413,7 @@ public:
 					if (car->GetDriverClass() == DRIVER_HUMAN) {
 						SM64::TakeLavaDamage();
 					}
-					car->mCOMObject->Find<IDamageable>()->Destroy();
+					DestroyCar(car);
 					obj->aModels.clear();
 				}
 			}
@@ -614,7 +614,7 @@ public:
 						}
 
 						if (!IsCarDestroyed(iveh) && iveh->GetDriverClass() == DRIVER_COP) {
-							iveh->mCOMObject->Find<IDamageable>()->Destroy();
+							DestroyCar(iveh);
 						}
 					}
 				}
@@ -919,7 +919,7 @@ public:
 				}
 
 				if (car->GetDriverClass() == DRIVER_COP) {
-					car->mCOMObject->Find<IDamageable>()->Destroy();
+					DestroyCar(car);
 				}
 			}
 		}

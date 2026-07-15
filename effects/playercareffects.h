@@ -1432,7 +1432,7 @@ public:
 
 			fLeewayTimer += delta;
 			if (fLeewayTimer > 0.5) {
-				GetLocalPlayerInterface<IDamageable>()->Destroy();
+				DestroyCar(GetLocalPlayerVehicle());
 			}
 		}
 		else {

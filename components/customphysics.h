@@ -38,6 +38,15 @@ namespace CustomPhysics {
 	};
 	std::vector<CustomObjectInstance> aB3Objects;
 
+	IVehicle* GetVehicleForB3Body(b3BodyId body) {
+		for (auto& obj : aB3Objects) {
+			if (B3_ID_EQUALS(obj.nB3Body, body)) {
+				return obj.pGameBody->mCOMObject->Find<IVehicle>();
+			}
+		}
+		return nullptr;
+	}
+
 	void ProcessCollisionBarriers(CustomArticleInstance* article, WCollisionBarrier* list, int count, NyaVec3 offset) {
 		for (int i = 0; i < count; i++) {
 			auto ptMin = list[i].fPts[0];
@@ -412,8 +421,6 @@ namespace CustomPhysics {
 			if (!pack) continue;
 
 			for (auto& inst : aCollisionArticles[i].aInstances) {
-				int id = &inst - &aCollisionArticles[i].aInstances[0];
-
 				auto enabled = !inst.nSceneryGroupId || SceneryGroupEnabledTable[inst.nSceneryGroupId];
 				if (enabled != inst.bB3MeshEnabled) {
 					if (enabled) {

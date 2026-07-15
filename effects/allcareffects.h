@@ -10,12 +10,10 @@ public:
 		auto cars = GetActiveVehicles();
 		int i = rand() % cars.size();
 		auto racer = cars[i];
-		auto damage = racer->mCOMObject->Find<IDamageable>();
-		if (!damage) return;
 		if (racer == GetLocalPlayerVehicle()) {
 			Achievements::AwardAchievement(GetAchievement("DESTROY_RANDOM_PLAYER"));
 		}
-		damage->Destroy();
+		DestroyCar(racer);
 	}
 } E_DestroyRandomCar;
 
@@ -197,13 +195,12 @@ public:
 		for (int i = 0; i < list.size(); i++) {
 			auto racer = list[i];
 			auto rb = racer->mCOMObject->Find<IRigidBody>();
-			auto damage = racer->mCOMObject->Find<IDamageable>();
-			if (!rb || !damage) continue;
+			if (!rb) continue;
 			if (IsCarDestroyed(racer)) continue;
 			UMath::Vector3 up;
 			rb->GetUpVector(&up);
 			if (up.y < 0) {
-				damage->Destroy();
+				DestroyCar(racer);
 			}
 		}
 	}
@@ -664,7 +661,7 @@ public:
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			if (car->mCOMObject->Find<ICollisionBody>()->HasHadCollision()) {
-				car->mCOMObject->Find<IDamageable>()->Destroy();
+				DestroyCar(car);
 			}
 		}
 	}

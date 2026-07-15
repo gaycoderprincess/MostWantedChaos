@@ -590,6 +590,17 @@ bool IsCarDestroyed(IVehicle* car, bool tirePopsCount = false) {
 	return car->IsDestroyed();
 }
 
+void DestroyCar(IVehicle* car) {
+	if (auto dam = car->mCOMObject->Find<IEngineDamage>()) {
+		if (!dam->IsBlown()) dam->Blow();
+	}
+	if (auto dam = car->mCOMObject->Find<IDamageable>()) {
+		if (!dam->IsDestroyed()) {
+			dam->Destroy();
+		}
+	}
+}
+
 bool IsChaosBlocked() {
 	if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return true;
 	if (IsInLoadingScreen() || IsInNIS() || IsInMovie()) return true;
