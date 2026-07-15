@@ -1051,6 +1051,7 @@ namespace SM64 {
 				}
 				else {
 					DoPlayerMarioControls();
+					Render3DObjects::aSM64Barriers.clear();
 				}
 
 				memcpy(lastPos, currPos, sizeof(currPos));
