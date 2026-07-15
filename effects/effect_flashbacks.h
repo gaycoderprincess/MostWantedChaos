@@ -55,6 +55,8 @@ public:
 		if (timer > fCaptureInterval) {
 			timer -= fCaptureInterval;
 			if (rewindTarget > 0) {
+				ICopMgr::mInstance->SetAllBustedTimersToZero();
+
 				ApplyAllCars(lastStates.size() - 1);
 				if (rewindTarget >= lastStates.size()) {
 					rewindTarget = -1;

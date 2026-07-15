@@ -104,7 +104,7 @@ public:
 		}
 
 		aTeddiesInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object("teddie", models, mat, colPos, colScale));
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("teddie", models, mat, colPos, colScale));
 	}
 
 	void InitFunction() override {
@@ -242,7 +242,7 @@ public:
 		}
 
 		aPeanutsInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object("peanut", models, mat, mat.p, colScale, PeanutMove));
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("peanut", models, mat, mat.p, colScale, PeanutMove));
 
 		bPeanutEverSpawned = true;
 	}
@@ -317,7 +317,7 @@ public:
 		}
 
 		aObjectsInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object("8down", models, mat, colPos, colScale));
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("8down", models, mat, colPos, colScale));
 	}
 
 	void InitFunction() override {
@@ -428,7 +428,7 @@ public:
 		}
 
 		aBombsInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object("bomb", models, mat, {0,0,0}, 0, BombOnTick));
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("bomb", models, mat, {0,0,0}, 0, BombOnTick));
 
 		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 	}
@@ -630,7 +630,7 @@ public:
 		}
 
 		int id = Render3DObjects::aObjects.size();
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object("firework", models, mat, {0,0,0}, 0, BombOnTick));
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("firework", models, mat, {0,0,0}, 0, BombOnTick));
 
 		auto data = new tFireworkData;
 		data->target = target;
@@ -642,7 +642,7 @@ public:
 		//}
 		data->speed = moveSpeed + GetLocalPlayerVehicle()->GetSpeed();
 		data->timeLeft = 2;
-		Render3DObjects::aObjects[id].CustomData = data;
+		Render3DObjects::aObjects[id]->CustomData = data;
 	}
 
 	static void LaunchRocketFromPlayer(IRigidBody* veh, IVehicle* target) {
@@ -1059,8 +1059,8 @@ public:
 
 		int id = Render3DObjects::aObjects.size();
 		aVergilsInWorld.push_back(id);
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object("vergil", models, mat, mat.p, colScale, VergilOnTick));
-		Render3DObjects::aObjects[id].CustomData = new tVergilData;
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("vergil", models, mat, mat.p, colScale, VergilOnTick));
+		Render3DObjects::aObjects[id]->CustomData = new tVergilData;
 
 		bVergilEverSpawned = true;
 	}
@@ -1085,7 +1085,7 @@ public:
 
 			// despawn all other vergils
 			for (auto& id : aVergilsInWorld) {
-				auto obj = &Render3DObjects::aObjects[id];
+				auto obj = Render3DObjects::aObjects[id];
 				if (!CanVergilBeDeleted(obj)) continue;
 				if (!obj->IsActive()) continue;
 
@@ -1225,8 +1225,8 @@ public:
 
 		int id = Render3DObjects::aObjects.size();
 		aFranklinsInWorld.push_back(id);
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object(models, mat, mat.p, colScale, FranklinOnTick));
-		Render3DObjects::aObjects[id].CustomData = new tFranklinData;
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object(models, mat, mat.p, colScale, FranklinOnTick));
+		Render3DObjects::aObjects[id]->CustomData = new tFranklinData;
 	}
 
 	void InitFunction() override {
@@ -1353,8 +1353,8 @@ public:
 
 		int id = Render3DObjects::aObjects.size();
 		aObjectsInWorld.push_back(id);
-		Render3DObjects::aObjects.push_back(Render3DObjects::Object("scientist", models, mat, mat.p, colScale, ScientistOnTick));
-		Render3DObjects::aObjects[id].CustomData = new tScientistData;
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("scientist", models, mat, mat.p, colScale, ScientistOnTick));
+		Render3DObjects::aObjects[id]->CustomData = new tScientistData;
 	}
 
 	static inline NyaVec3 aHidingSpots[] = {
@@ -1366,7 +1366,8 @@ public:
 
 	static bool IsHidingSpotOccupied(NyaVec3 pos) {
 		for (auto& id : aObjectsInWorld) {
-			auto obj = Render3DObjects::aObjects[id];
+			auto obj = *Render3DObjects::aObjects[id];
+			if (obj.sDebugName != "scientist") continue;
 			if ((pos - obj.vColPosition).length() < 15) return true;
 		}
 		return false;

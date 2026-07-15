@@ -566,7 +566,8 @@ namespace SM64 {
 	void MarioCustomObjectInteractions() {
 		UMath::Vector3 marioPos = GetMarioWorldPos();
 
-		for (auto& car : Render3DObjects::aObjects) {
+		for (auto& obj : Render3DObjects::aObjects) {
+			auto car = *obj;
 			if (car.fColSize <= 0.0) continue;
 
 			float dimY = car.fColSize;

@@ -77,7 +77,7 @@ void DoChaosEffectLoad() {
 bool DoChaos173Save() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_173::aPeanutsInWorld) {
-		auto model = &Render3DObjects::aObjects[peanut];
+		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix});
 	}
@@ -114,7 +114,7 @@ void DoChaos173Load() {
 bool DoChaosTeddieSave() {
 	std::vector<tObjectSaveWithCol> save;
 	for (auto& peanut : Effect_Teddie::aTeddiesInWorld) {
-		auto model = &Render3DObjects::aObjects[peanut];
+		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix, model->vColPosition});
 	}
@@ -147,7 +147,7 @@ void DoChaosTeddieLoad() {
 bool DoChaos8DownSave() {
 	std::vector<tObjectSaveWithCol> save;
 	for (auto& peanut : Effect_8Down::aObjectsInWorld) {
-		auto model = &Render3DObjects::aObjects[peanut];
+		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix, model->vColPosition});
 	}
@@ -180,7 +180,7 @@ void DoChaos8DownLoad() {
 bool DoChaosBombSave() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_ReVoltBomb::aBombsInWorld) {
-		auto model = &Render3DObjects::aObjects[peanut];
+		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix});
 	}
@@ -213,7 +213,7 @@ void DoChaosBombLoad() {
 bool DoChaosVergilSave() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_Vergil::aVergilsInWorld) {
-		auto model = &Render3DObjects::aObjects[peanut];
+		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix});
 	}
@@ -250,7 +250,7 @@ void DoChaosVergilLoad() {
 bool DoChaosScientistSave() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_Scientist::aObjectsInWorld) {
-		auto model = &Render3DObjects::aObjects[peanut];
+		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
 		save.push_back({model->mMatrix});
 	}

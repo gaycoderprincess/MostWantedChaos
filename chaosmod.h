@@ -428,6 +428,7 @@ void ChaosModMenu() {
 	if (tmp != fEffectCycleTimer) {
 		if (fEffectCycleTimer < tmp) fTimeSinceLastEffect = 0;
 		if (fEffectCycleTimer < 5) fEffectCycleTimer = 5;
+		if (fEffectCycleTimer > 60) fEffectCycleTimer = 60;
 	}
 
 	if (DrawMenuOption("UI")) {

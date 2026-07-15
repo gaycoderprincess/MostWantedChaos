@@ -231,19 +231,27 @@ class CwoeeSharedRigidBody {
 public:
 	IRigidBody* pGameObject;
 	CustomPhysicsObjects::CustomPhysicsObject* pCustomObject;
+	Render3DObjects::Object* pCustomStaticObject;
 
 	CwoeeSharedRigidBody() {
 		pGameObject = nullptr;
 		pCustomObject = nullptr;
+		pCustomStaticObject = nullptr;
 	}
 	CwoeeSharedRigidBody(IRigidBody* obj) : pGameObject(obj) {}
 	CwoeeSharedRigidBody(CustomPhysicsObjects::CustomPhysicsObject* obj) : pCustomObject(obj) {}
+	CwoeeSharedRigidBody(Render3DObjects::Object* obj) : pCustomStaticObject(obj) {}
 
 	bool IsValid() {
 		if (pGameObject && IsRigidBodyValidAndActive(pGameObject)) return true;
 		if (pCustomObject) {
 			for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
 				if (obj == pCustomObject) return true;
+			}
+		}
+		if (pCustomStaticObject) {
+			for (auto& obj : Render3DObjects::aObjects) {
+				if (obj == pCustomStaticObject) return true;
 			}
 		}
 		return false;
@@ -257,24 +265,33 @@ public:
 	UMath::Vector3 GetPosition() {
 		if (pGameObject) return *pGameObject->GetPosition();
 		if (pCustomObject) return pCustomObject->GetPosition();
+		if (pCustomStaticObject) return pCustomStaticObject->mMatrix.p;
 		InvalidError();
 	}
 
 	UMath::Vector3 GetLinearVelocity() {
 		if (pGameObject) return *pGameObject->GetLinearVelocity();
 		if (pCustomObject) return pCustomObject->GetLinearVelocity();
+		if (pCustomStaticObject) return {0,0,0};
 		InvalidError();
 	}
 
 	UMath::Vector3 GetAngularVelocity() {
 		if (pGameObject) return *pGameObject->GetAngularVelocity();
 		if (pCustomObject) return pCustomObject->GetAngularVelocity();
+		if (pCustomStaticObject) return {0,0,0};
 		InvalidError();
 	}
 
 	void SetLinearVelocity(UMath::Vector3 v) {
 		if (pGameObject) pGameObject->SetLinearVelocity(&v);
 		if (pCustomObject) pCustomObject->SetLinearVelocity(&v);
+		if (pCustomStaticObject) {
+			pCustomStaticObject->mMatrix.p += v / RealTimeElapsedFrame;
+			if (pCustomStaticObject->fColSize > 0.0) {
+				pCustomStaticObject->vColPosition += v / RealTimeElapsedFrame;
+			}
+		}
 	}
 
 	void SetAngularVelocity(UMath::Vector3 v) {
@@ -292,6 +309,12 @@ std::vector<CwoeeSharedRigidBody> GetActiveSharedRigidBodies() {
 	auto cwoee = CustomPhysicsObjects::aPhysicsObjects;
 	for (auto& rb : cwoee) {
 		out.push_back(rb);
+	}
+	auto render3d = Render3DObjects::aObjects;
+	for (auto& obj : render3d) {
+		if (obj->sDebugName == "bomb") continue;
+		if (obj->sDebugName == "firework") continue;
+		out.push_back(obj);
 	}
 	return out;
 }

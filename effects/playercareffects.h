@@ -1037,6 +1037,8 @@ public:
 
 		player.Apply(targetCar);
 		target.Apply(playerCar);
+
+		TeleportPlayer(target.pos, target.vel);
 	}
 } E_SwapPlayerWithOpponent;
 

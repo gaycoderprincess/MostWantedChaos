@@ -124,7 +124,7 @@ namespace Render3DObjects {
 			return aModels.empty();
 		}
 	};
-	std::vector<Object> aObjects;
+	std::vector<Object*> aObjects;
 
 	void OnTick() {
 		static CNyaTimer gTimer;
@@ -134,13 +134,13 @@ namespace Render3DObjects {
 
 		auto cars = GetActiveVehicles();
 		for (auto& obj : aObjects) {
-			if (!obj.IsActive()) continue;
-			obj.RegenerateBarriers();
+			if (!obj->IsActive()) continue;
+			obj->RegenerateBarriers();
 			//for (auto& car: cars) {
-			//	obj.CheckCollision(car->mCOMObject->Find<IRigidBody>(), gTimer.fDeltaTime);
+			//	obj->CheckCollision(car->mCOMObject->Find<IRigidBody>(), gTimer.fDeltaTime);
 			//}
-			if (obj.pTickFunction) {
-				obj.pTickFunction(&obj, gTimer.fDeltaTime);
+			if (obj->pTickFunction) {
+				obj->pTickFunction(obj, gTimer.fDeltaTime);
 			}
 		}
 	}
@@ -151,8 +151,8 @@ namespace Render3DObjects {
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 
 		for (auto& obj : aObjects) {
-			for (auto& model : obj.aModels) {
-				model->RenderAt(WorldToRenderMatrix(obj.mMatrix));
+			for (auto& model : obj->aModels) {
+				model->RenderAt(WorldToRenderMatrix(obj->mMatrix));
 			}
 		}
 	}
@@ -170,10 +170,10 @@ namespace Render3DObjects {
 			}
 		}
 		for (auto& obj : aObjects) {
-			if (!obj.IsActive()) continue;
-			if (obj.fColSize <= 0) continue;
+			if (!obj->IsActive()) continue;
+			if (obj->fColSize <= 0) continue;
 
-			for (auto& barrier : obj.Barriers) {
+			for (auto& barrier : obj->Barriers) {
 				potentialBarriers.push_back(barrier);
 
 				auto inv = barrier;
