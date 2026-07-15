@@ -304,6 +304,8 @@ void ChaosLoop() {
 
 	static bool bOnce = true;
 	if (bOnce) {
+		NyaAudio::Init(GameWindow);
+
 		DoChaosLoad();
 		g_VisualTreatment = true;
 		bOnce = false;
