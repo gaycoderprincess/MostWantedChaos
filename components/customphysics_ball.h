@@ -60,10 +60,10 @@ namespace CustomPhysicsBall {
 			bDoReset = true;
 			return;
 		}
+
 		auto pos = b3Body_GetPosition(BallBody);
 		if (pos.y < -20) {
 			bDoReset = true;
-			return;
 		}
 		
 		static CNyaTimer gTimer;
