@@ -80,7 +80,10 @@ namespace CustomPhysicsObjects {
 			auto dist = (*GetLocalPlayerVehicle()->GetPosition() - GetPosition());
 			auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
 			if (volume > 1) volume = 1;
-			if (volume < 0) volume = 0;
+			if (volume <= 0) {
+				volume = 0;
+				return;
+			}
 			volume *= fObjectSFXVolume;
 			NyaAudio::SetVolume(pCollisionSound, GetSFXVolume() * volume);
 			NyaAudio::SkipTo(pCollisionSound, 0, false);
@@ -375,7 +378,7 @@ public:
 	}
 };
 
-std::vector<CwoeeSharedRigidBody> GetActiveSharedRigidBodies() {
+std::vector<CwoeeSharedRigidBody> GetActiveSharedRigidBodies(bool includeStaticObjects = false) {
 	std::vector<CwoeeSharedRigidBody> out;
 	auto game = GetActiveRigidBodies();
 	for (auto& rb : game) {
@@ -385,11 +388,13 @@ std::vector<CwoeeSharedRigidBody> GetActiveSharedRigidBodies() {
 	for (auto& rb : cwoee) {
 		out.push_back(rb);
 	}
-	auto render3d = Render3DObjects::aObjects;
-	for (auto& obj : render3d) {
-		if (obj->sDebugName == "bomb") continue;
-		if (obj->sDebugName == "firework") continue;
-		out.push_back(obj);
+	if (includeStaticObjects) {
+		auto render3d = Render3DObjects::aObjects;
+		for (auto& obj : render3d) {
+			if (obj->sDebugName == "bomb") continue;
+			if (obj->sDebugName == "firework") continue;
+			out.push_back(obj);
+		}
 	}
 	return out;
 }

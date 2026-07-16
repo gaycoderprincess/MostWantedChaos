@@ -55,7 +55,7 @@ public:
 		CwoeeSharedRigidBody closest = CwoeeSharedRigidBody();
 		float closestDist = 9999.0;
 
-		auto objs = GetActiveSharedRigidBodies();
+		auto objs = GetActiveSharedRigidBodies(true);
 		for (auto& obj : objs) {
 			auto pos = obj.GetPosition();
 			auto dirFromCam = (pos - camPos);
