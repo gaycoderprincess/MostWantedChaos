@@ -571,6 +571,16 @@ struct CwoeeCarMiscState {
 void TeleportPlayer(UMath::Vector3 pos, UMath::Vector3 fwd) {
 	Sim::SetStream(&pos, true);
 	GetLocalPlayerVehicle()->SetVehicleOnGround(&pos, &fwd);
+
+	for (auto& func : aPlayerTeleportFunctions) {
+		func();
+	}
+}
+
+void OnPlayerTeleported() {
+	for (auto& func : aPlayerTeleportFunctions) {
+		func();
+	}
 }
 
 bool IsCarDestroyed(IVehicle* car, bool tirePopsCount = false) {
@@ -598,6 +608,9 @@ void DestroyCar(IVehicle* car) {
 		if (!dam->IsDestroyed()) {
 			dam->Destroy();
 		}
+	}
+	for (auto& func : aPlayerDestroyFunctions) {
+		func();
 	}
 }
 

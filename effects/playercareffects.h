@@ -10,6 +10,12 @@ public:
 		if (auto ply = GetLocalPlayerVehicle()) {
 			ply->SetSpeed(0);
 		}
+		if (SM64::bEnabled) {
+			SM64::SetMarioForwardVelocity(TOMPS(0));
+		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::SetLinearVelocity({0,0,0});
+		}
 	}
 } E_StopCar;
 
@@ -23,6 +29,12 @@ public:
 		if (auto ply = GetLocalPlayerVehicle()) {
 			ply->SetSpeed(TOMPS(400));
 		}
+		if (SM64::bEnabled) {
+			SM64::SetMarioForwardVelocity(TOMPS(400));
+		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::SetForwardVelocity(TOMPS(400));
+		}
 	}
 } E_LaunchCarFwd;
 
@@ -35,6 +47,12 @@ public:
 	void InitFunction() override {
 		if (auto ply = GetLocalPlayerVehicle()) {
 			ply->SetSpeed(TOMPS(-200));
+		}
+		if (SM64::bEnabled) {
+			SM64::SetMarioForwardVelocity(TOMPS(-200));
+		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::SetForwardVelocity(TOMPS(-200));
 		}
 	}
 } E_LaunchCarBwd;
@@ -54,6 +72,9 @@ public:
 			side.z *= TOMPS(200);
 			ply->SetLinearVelocity(&side);
 		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::SetSidewaysVelocity(TOMPS(200));
+		}
 	}
 } E_LaunchCarSide;
 
@@ -68,6 +89,16 @@ public:
 			UMath::Vector3 vel = *ply->GetLinearVelocity();
 			vel.y = TOMPS(200);
 			ply->SetLinearVelocity(&vel);
+		}
+		if (SM64::bEnabled) {
+			UMath::Vector3 vel = SM64::GetMarioWorldVelocity();
+			vel.y = TOMPS(200);
+			SM64::SetMarioWorldVelocity(vel);
+		}
+		if (CustomPhysicsBall::bEnabled) {
+			UMath::Vector3 vel = CustomPhysicsBall::GetLinearVelocity();
+			vel.y = TOMPS(200);
+			CustomPhysicsBall::SetLinearVelocity(vel);
 		}
 	}
 } E_LaunchCarUp;
@@ -86,6 +117,7 @@ public:
 			UMath::Vector3 vel = *ply->GetLinearVelocity();
 			vel.y = -TOMPS(200);
 			ply->SetLinearVelocity(&vel);
+			OnPlayerTeleported();
 		}
 	}
 } E_LaunchCarDown;
@@ -1069,6 +1101,9 @@ public:
 			playerRB->SetLinearVelocity(&playerVel);
 			playerRB->SetAngularVelocity(&playerAVel);
 		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::SetAngularVelocity({0,0,0});
+		}
 	}
 	void DeinitFunction() override {
 		NoResetCount--;
@@ -1119,6 +1154,9 @@ public:
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			auto controls = ply->GetControls();
 			controls->fSteering = 0;
+		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::fSideMoveSpeed = 0.0;
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -1172,6 +1210,9 @@ public:
 			if (controls->fSteering < -0.5) controls->fSteering = -0.5;
 			if (controls->fSteering > 0.5) controls->fSteering = 0.5;
 		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::fSideMoveSpeed = 0.5;
+		}
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerHalfSteering;
@@ -1190,6 +1231,9 @@ public:
 		if (auto ply = GetLocalPlayerInterface<IInput>()) {
 			auto controls = ply->GetControls();
 			if (controls->fGas > 0.5) controls->fGas = 0.5;
+		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::fFwdMoveSpeed = 0.5;
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -1215,6 +1259,7 @@ public:
 		if (timer > 1) {
 			if (PercentageChanceCheck(25)) {
 				lastState.Apply(GetLocalPlayerVehicle());
+				OnPlayerTeleported();
 			}
 			else if (PercentageChanceCheck(50)) {
 				lastState.Capture(GetLocalPlayerVehicle());
@@ -1267,6 +1312,10 @@ public:
 			if (!engine) continue;
 			if (!engine->IsNOSEngaged()) continue;
 			car->SetSpeed(TOMPS(300));
+
+			if (car == GetLocalPlayerVehicle() && CustomPhysicsBall::bEnabled) {
+				CustomPhysicsBall::SetForwardVelocity(TOMPS(300));
+			}
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -1287,6 +1336,9 @@ public:
 			ply->SetWheelAngularVelocity(2, 50.0);
 			ply->SetWheelAngularVelocity(3, 50.0);
 		}
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::SetForwardVelocity(TOMPS(60));
+		}
 	}
 	bool HasTimer() override { return true; }
 } E_CruiseControl;
@@ -1305,6 +1357,7 @@ public:
 			pos.y += 2500;
 			ply->SetPosition(&pos);
 			ply->SetLinearVelocity(&UMath::Vector3::kZero);
+			OnPlayerTeleported();
 		}
 	}
 	void TickFunctionMain(double delta) override {

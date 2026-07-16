@@ -20,6 +20,8 @@ std::vector<void(*)()> aDrawingLoopFunctions;
 std::vector<void(*)()> aDrawingLoopFunctionsOnce;
 std::vector<void(*)()> aDrawing3DLoopFunctions;
 std::vector<void(*)()> aDrawing3DLoopFunctionsOnce;
+std::vector<void(*)()> aPlayerTeleportFunctions;
+std::vector<void(*)()> aPlayerDestroyFunctions;
 
 #include "util.h"
 #include "d3dhook.h"

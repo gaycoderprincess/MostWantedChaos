@@ -258,7 +258,7 @@ public:
 	}
 
 	void InvalidError() {
-		MessageBoxA(0, std::format("Attempted to index invalid rigidbody {:X} {:X}", (uintptr_t)pGameObject, (uintptr_t)pCustomObject).c_str(), "nya?!~", MB_ICONERROR);
+		MessageBoxA(0, std::format("Attempted to index invalid rigidbody {:X} {:X} {:X}", (uintptr_t)pGameObject, (uintptr_t)pCustomObject, (uintptr_t)pCustomStaticObject).c_str(), "nya?!~", MB_ICONERROR);
 		exit(0);
 	}
 

@@ -61,6 +61,14 @@ namespace SM64 {
 		return out;
 	}
 
+	float WorldToMarioFloat(float v) {
+		return v * marioScalar;
+	}
+
+	float MarioToWorldFloat(float v) {
+		return v / marioScalar;
+	}
+
 	int marioLightness = 255;
 	int marioLightnessMenu = 255;
 
@@ -509,6 +517,20 @@ namespace SM64 {
 		return MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]}) / (1.0 / 30.0);
 	}
 
+	void SetMarioWorldVelocity(NyaVec3 v) {
+		v *= (1.0 / 30.0);
+		v = WorldToMario(v);
+		sm64_set_mario_velocity(marioId, v.x, v.y, v.z);
+	}
+
+	float GetMarioForwardVelocity() {
+		return MarioToWorldFloat(marioState.forwardVelocity / (1.0 / 30.0));
+	}
+
+	void SetMarioForwardVelocity(float f) {
+		sm64_set_mario_forward_velocity(marioId, WorldToMarioFloat(f * (1.0 / 30.0)));
+	}
+
 	NyaVec3 GetMarioWorldFacing() {
 		NyaMat4x4 mat;
 		mat.SetIdentity();
@@ -905,6 +927,15 @@ namespace SM64 {
 		}
 	}
 
+	void OnTeleport() {
+		bDoReset = true;
+	}
+
+	void OnDestroy() {
+		if (!bEnabled) return;
+		sm64_set_mario_health(marioId, 0);
+	}
+
 	void OnTick() {
 		PerformanceBenchmarker _perf("SM64::OnTick");
 
@@ -1161,6 +1192,8 @@ namespace SM64 {
 		aDrawing3DLoopFunctions.push_back(OnTick3D);
 		aDrawingLoopFunctions.push_back(OnTick);
 		//aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
+		aPlayerTeleportFunctions.push_back(OnTeleport);
+		aPlayerDestroyFunctions.push_back(OnDestroy);
 
 		bAvailable = true;
 	});

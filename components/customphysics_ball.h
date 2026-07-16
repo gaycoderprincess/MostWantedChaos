@@ -8,6 +8,9 @@ namespace CustomPhysicsBall {
 	float fMaxMoveSpeed = 50.0;
 	float fBallSize = 2.5;
 
+	float fFwdMoveSpeed = 1.0;
+	float fSideMoveSpeed = 1.0;
+
 	b3BodyId BallBody;
 
 	void EnableBall() {
@@ -22,6 +25,43 @@ namespace CustomPhysicsBall {
 		CustomPhysics::bEnabled = false;
 		CustomPhysics::bCollectLocalPlayerCar = true;
 		CarRender_DontRenderPlayer = false;
+	}
+
+	void SetForwardVelocity(float v) {
+		auto mat = PrepareCameraMatrix(GetLocalPlayerCamera());
+		auto fwd = RenderToWorldCoords(mat.z);
+		fwd.y = 0;
+		fwd.Normalize();
+
+		NyaVec3 velAdd = fwd * v;
+		b3Body_SetLinearVelocity(BallBody, {velAdd.x,velAdd.y,velAdd.z});
+	}
+
+	void SetSidewaysVelocity(float v) {
+		auto mat = PrepareCameraMatrix(GetLocalPlayerCamera());
+		auto side = RenderToWorldCoords(mat.x);
+		side.y = 0;
+		side.Normalize();
+
+		NyaVec3 velAdd = side * v;
+		b3Body_SetLinearVelocity(BallBody, {velAdd.x,velAdd.y,velAdd.z});
+	}
+
+	void SetLinearVelocity(NyaVec3 v) {
+		b3Body_SetLinearVelocity(BallBody, {v.x,v.y,v.z});
+	}
+
+	void SetAngularVelocity(NyaVec3 v) {
+		b3Body_SetAngularVelocity(BallBody, {v.x,v.y,v.z});
+	}
+
+	NyaVec3 GetLinearVelocity() {
+		auto vel = b3Body_GetLinearVelocity(BallBody);
+		return {vel.x,vel.y,vel.z};
+	}
+
+	void OnTeleport() {
+		bDoReset = true;
 	}
 
 	void OnTick() {
@@ -168,6 +208,12 @@ namespace CustomPhysicsBall {
 				stick.Normalize();
 			}
 
+			if (IsCarDestroyed(GetLocalPlayerVehicle())) {
+				stick = {0,0,0};
+			}
+			stick.x *= fSideMoveSpeed;
+			stick.y *= fFwdMoveSpeed;
+
 			float y = vel.y;
 			vel.y = 0;
 
@@ -207,6 +253,9 @@ namespace CustomPhysicsBall {
 
 			b3Body_SetLinearVelocity(BallBody, vel);
 		}
+
+		fFwdMoveSpeed = 1.0;
+		fSideMoveSpeed = 1.0;
 	}
 
 	void OnTick3D() {
@@ -246,5 +295,6 @@ namespace CustomPhysicsBall {
 	ChloeHook Init([]{
 		aDrawing3DLoopFunctions.push_back(OnTick3D);
 		aMainLoopFunctions.push_back(OnTick);
+		aPlayerTeleportFunctions.push_back(OnTeleport);
 	});
 }

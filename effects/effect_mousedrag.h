@@ -151,10 +151,7 @@ public:
 
 			auto distFromCamera = (camPos - selectedBody.GetPosition()).length();
 
-			auto vel = selectedBody.GetLinearVelocity();
-			vel = cursorMove.x * side * dragSpeed * distFromCamera;
-			vel += cursorMove.y * up * dragSpeed * distFromCamera;
-
+			NyaVec3 vel = (cursorMove.x * side * dragSpeed * distFromCamera) + (cursorMove.y * up * dragSpeed * distFromCamera);
 			if (IsKeyPressed(VK_RBUTTON)) {
 				vel += fwd * throwSpeed;
 				selectedBody.SetLinearVelocity(vel);
