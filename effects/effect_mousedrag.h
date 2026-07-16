@@ -6,8 +6,7 @@ public:
 		bAbortOnConditionFailed = true;
 		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
-		bRigProportionalChances = true; // todo remove
-		nFrequency *= 3; // todo remove
+		nFrequency *= 2;
 	}
 
 	static inline NyaMat4x4 mCameraMatrix;

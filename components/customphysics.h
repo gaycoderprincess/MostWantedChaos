@@ -38,12 +38,17 @@ namespace CustomPhysics {
 	};
 	std::vector<CustomObjectInstance> aB3Objects;
 
-	IVehicle* GetVehicleForB3Body(b3BodyId body) {
+	IRigidBody* GetGameBodyForB3Body(b3BodyId body) {
 		for (auto& obj : aB3Objects) {
 			if (B3_ID_EQUALS(obj.nB3Body, body)) {
-				return obj.pGameBody->mCOMObject->Find<IVehicle>();
+				return obj.pGameBody;
 			}
 		}
+		return nullptr;
+	}
+
+	IVehicle* GetVehicleForB3Body(b3BodyId body) {
+		if (auto game = GetGameBodyForB3Body(body)) return game->mCOMObject->Find<IVehicle>();
 		return nullptr;
 	}
 

@@ -312,6 +312,38 @@ void DoChaosBallsLoad() {
 	}
 }
 
+bool DoChaosABCSave() {
+	std::vector<UMath::Vector3> save;
+	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
+		if (obj->sDebugName != "abcblock_save") continue;
+		save.push_back({obj->vSpawnPosition});
+	}
+
+	std::ofstream file("CwoeeChaos/save/abc.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return false;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+	return true;
+}
+
+void DoChaosABCLoad() {
+	std::ifstream file("CwoeeChaos/save/abc.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		UMath::Vector3 save;
+		file.read((char*)&save, sizeof(save));
+		Effect_SpawnBlock::SpawnObject(save, {0,0,0});
+	}
+}
+
 bool DoChaosSettingsSave() {
 	// using the non-mutex version here as this is called inside TriggerHighestVotedEffect
 	// also defining this here so the game can't crash while accessing the irc client and corrupt the savefile
@@ -385,6 +417,7 @@ void DoChaosSave() {
 	if (!DoChaosBombSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosVergilSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosBallsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosABCSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosScientistSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 }
@@ -398,5 +431,6 @@ void DoChaosLoad() {
 	DoChaosVergilLoad();
 	DoChaosScientistLoad();
 	DoChaosBallsLoad();
+	DoChaosABCLoad();
 	DoChaosSettingsLoad();
 }

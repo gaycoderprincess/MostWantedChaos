@@ -243,6 +243,7 @@ public:
 			car.state.Apply(car.vehicle);
 			car.miscState.Apply(car.vehicle, false);
 		}
+		OnPlayerTeleported();
 	}
 
 	void InitFunction() override {

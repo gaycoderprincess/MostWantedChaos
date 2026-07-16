@@ -4,6 +4,10 @@ namespace CustomPhysicsObjects {
 		BOX
 	};
 
+	const int NUM_CONTACTS_CHECK = 8;
+	float fObjectSFXRange = 100;
+	float fObjectSFXVolume = 0.66;
+
 	struct CustomPhysicsObject {
 		std::vector<Render3D::tModel*> aModels;
 		NyaVec3 vModelSize = {1,1,1};
@@ -12,11 +16,36 @@ namespace CustomPhysicsObjects {
 		bool bRemoveOnSafehouse = false;
 		bool bRemoveOnOutOfBounds = false;
 		bool bRemoveOnOutOfRange = false;
+		bool bUseExpensiveCollisionCheck = false;
 		std::string sDebugName;
 
 		NyaVec3 vSpawnPosition = {0,0,0};
-		int nLastCollided = 0;
 		NyaAudio::NyaSound pCollisionSound = 0;
+
+		struct CollidedObject {
+			IRigidBody* body;
+			double time;
+		};
+		double fTimeSinceCollidedWorld = 0.0;
+		std::vector<CollidedObject> aLastCollidedGameObject;
+		int nLazyLastCollided = 0;
+
+		void AddCollision(IRigidBody* body) {
+			for (auto& obj : aLastCollidedGameObject) {
+				if (obj.body == body) {
+					obj.time = 0.0;
+					return;
+				}
+			}
+			aLastCollidedGameObject.push_back({body,0.0});
+		}
+
+		bool HasHadCollision(IRigidBody* body) {
+			for (auto& obj : aLastCollidedGameObject) {
+				if (obj.body == body) return obj.time < 1.0;
+			}
+			return false;
+		}
 
 		UMath::Vector3 GetPosition() {
 			auto v = b3Body_GetPosition(nB3Body);
@@ -45,6 +74,63 @@ namespace CustomPhysicsObjects {
 			b3Body_SetTransform(nB3Body, {vSpawnPosition.x,vSpawnPosition.y,vSpawnPosition.z}, b3Quat_identity);
 			b3Body_SetLinearVelocity(nB3Body, b3Vec3_zero);
 			b3Body_SetAngularVelocity(nB3Body, b3Vec3_zero);
+		}
+
+		void PlayCollisionSound() {
+			auto dist = (*GetLocalPlayerVehicle()->GetPosition() - GetPosition());
+			auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
+			if (volume > 1) volume = 1;
+			if (volume < 0) volume = 0;
+			volume *= fObjectSFXVolume;
+			NyaAudio::SetVolume(pCollisionSound, GetSFXVolume() * volume);
+			NyaAudio::SkipTo(pCollisionSound, 0, false);
+			NyaAudio::Play(pCollisionSound);
+		}
+
+		void ProcessLazyCollisionSound() {
+			if (!pCollisionSound) return;
+
+			b3ContactData contactData[NUM_CONTACTS_CHECK];
+			int num = b3Body_GetContactData(nB3Body, contactData, NUM_CONTACTS_CHECK);
+			//if (num > nLazyLastCollided) { // this results in too many false positives
+			if (num && !nLazyLastCollided) {
+				PlayCollisionSound();
+			}
+			nLazyLastCollided = num;
+		}
+
+		void ProcessExpensiveCollisionSound(double delta) {
+			b3ContactData contactData[NUM_CONTACTS_CHECK];
+			int num = b3Body_GetContactData(nB3Body, contactData, NUM_CONTACTS_CHECK);
+			bool collidedWorld = false;
+			bool collidedNewObject = false;
+			for (int i = 0; i < num; i++) {
+				auto game = CustomPhysics::GetGameBodyForB3Body(b3Shape_GetBody(contactData->shapeIdA));
+				if (!game) game = CustomPhysics::GetGameBodyForB3Body(b3Shape_GetBody(contactData->shapeIdB));
+
+				if (game) {
+					if (!HasHadCollision(game)) {
+						collidedNewObject = true;
+					}
+					AddCollision(game);
+				}
+				else {
+					collidedWorld = true;
+				}
+			}
+			if ((collidedWorld && fTimeSinceCollidedWorld > 0.25) || collidedNewObject) {
+				PlayCollisionSound();
+			}
+
+			if (collidedWorld) {
+				fTimeSinceCollidedWorld = 0.0;
+			}
+			else {
+				fTimeSinceCollidedWorld += delta;
+			}
+			for (auto& collided : aLastCollidedGameObject) {
+				collided.time += delta;
+			}
 		}
 	};
 	std::vector<CustomPhysicsObject*> aPhysicsObjects;
@@ -134,11 +220,11 @@ namespace CustomPhysicsObjects {
 		return false;
 	}
 
-	float fObjectSFXRange = 100;
-	float fObjectSFXVolume = 0.66;
-
 	void OnTick() {
 		PerformanceBenchmarker _perf("CustomPhysicsObjects::OnTick");
+
+		static CNyaTimer gTimer;
+		gTimer.Process();
 
 		if (!GetLocalPlayerVehicle()) return;
 
@@ -150,26 +236,15 @@ namespace CustomPhysicsObjects {
 		b3ContactData contactData[8];
 
 		for (auto& pObj : aPhysicsObjects) {
-			auto obj = *pObj;
+			auto& obj = *pObj;
 			if (!obj.pCollisionSound) continue;
 
-			int num = b3Body_GetContactData(obj.nB3Body, contactData, 8);
-			//if (num > obj.nLastCollided) { // this results in too many false positives
-			if (num && !obj.nLastCollided) {
-				obj.nLastCollided = num;
-
-				auto dist = (*GetLocalPlayerVehicle()->GetPosition() - obj.GetPosition());
-				auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
-				if (volume > 1) volume = 1;
-				if (volume < 0) {
-					volume = 0;
-					break;
-				}
-				volume *= fObjectSFXVolume;
-				NyaAudio::SetVolume(obj.pCollisionSound, GetSFXVolume() * volume);
-				NyaAudio::Play(obj.pCollisionSound);
+			if (obj.bUseExpensiveCollisionCheck) {
+				obj.ProcessExpensiveCollisionSound(gTimer.fDeltaTime);
 			}
-			obj.nLastCollided = num;
+			else {
+				obj.ProcessLazyCollisionSound();
+			}
 		}
 	}
 

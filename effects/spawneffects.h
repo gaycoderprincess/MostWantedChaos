@@ -1542,7 +1542,6 @@ public:
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
 		objData.aModels = mdl;
@@ -1550,8 +1549,9 @@ public:
 		objData.bRemoveOnSafehouse = false;
 		objData.bRemoveOnOutOfBounds = false;
 		objData.bRemoveOnOutOfRange = false;
+		objData.bUseExpensiveCollisionCheck = true;
 		objData.sDebugName = "beachball_save";
-		objData.pCollisionSound = sound;
+		objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
 	}
 
@@ -1604,3 +1604,81 @@ public:
 	}
 	bool IsAvailable() override { return SM64::bAvailable; }
 } E_Mario64Enemy;
+
+class Effect_SpawnBlocks : public ChaosEffect {
+public:
+	Effect_SpawnBlocks() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Learn The ABCs";
+		sFriendlyName = "Spawn 1000 ABC Blocks";
+		bCanMultiTrigger = true;
+	}
+
+	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		static auto mdl = Render3D::CreateModels("abcblock.fbx");
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/toybrick.wav");
+
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = mdl;
+		objData.vModelSize = {1,1,1};
+		objData.bRemoveOnSafehouse = true;
+		objData.bRemoveOnOutOfBounds = true;
+		objData.bRemoveOnOutOfRange = true;
+		objData.sDebugName = "abcblock";
+		objData.pCollisionSound = sound;
+		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::BOX, pos, vel);
+	}
+
+	void InitFunction() override {
+		auto ply = *GetLocalPlayerInterface<IRigidBody>()->GetPosition();
+		auto vel = *GetLocalPlayerInterface<IRigidBody>()->GetLinearVelocity();
+
+		for (int x = -50; x < 50; x += 3) {
+			for (int y = -50; y < 50; y += 3) {
+				NyaVec3 pos = ply;
+				pos.x += x;
+				pos.y += 2;
+				pos.z += y;
+				SpawnObject(pos, vel);
+			}
+		}
+	}
+} E_SpawnBlocks;
+
+class Effect_SpawnBlock : public ChaosEffect {
+public:
+	Effect_SpawnBlock() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Learn The ABCs";
+		sFriendlyName = "Spawn ABC Blocks";
+		bCanQuickTrigger = false;
+	}
+
+	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		static auto mdl = Render3D::CreateModels("abcblock.fbx");
+
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = mdl;
+		objData.vModelSize = {1,1,1};
+		objData.bRemoveOnSafehouse = false;
+		objData.bRemoveOnOutOfBounds = false;
+		objData.bRemoveOnOutOfRange = false;
+		objData.bUseExpensiveCollisionCheck = true;
+		objData.sDebugName = "abcblock_save";
+		objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/toybrick.wav");
+		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::BOX, pos, vel);
+	}
+
+	void InitFunction() override {
+		auto ply = *GetLocalPlayerInterface<IRigidBody>()->GetPosition();
+		auto vel = *GetLocalPlayerInterface<IRigidBody>()->GetLinearVelocity();
+
+		for (int x = -5; x < 5; x += 3) {
+			for (int y = -5; y < 5; y += 3) {
+				NyaVec3 pos = ply;
+				pos.x += x;
+				pos.y += 2;
+				pos.z += y;
+				SpawnObject(pos, vel);
+			}
+		}
+	}
+} E_SpawnBlock;
