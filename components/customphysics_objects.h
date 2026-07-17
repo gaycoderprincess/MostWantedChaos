@@ -263,7 +263,7 @@ namespace CustomPhysicsObjects {
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
 		for (auto& pObj : aPhysicsObjects) {
-			auto obj = *pObj;
+			auto& obj = *pObj;
 			auto pos = obj.GetPosition();
 			auto dist = (plyPos - pos);
 			if (dist.length() > 250) continue; // don't render far away objects

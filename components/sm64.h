@@ -589,7 +589,7 @@ namespace SM64 {
 		UMath::Vector3 marioPos = GetMarioWorldPos();
 
 		for (auto& obj : Render3DObjects::aObjects) {
-			auto car = *obj;
+			auto& car = *obj;
 			if (car.fColSize <= 0.0) continue;
 
 			float dimY = car.fColSize;
@@ -648,7 +648,7 @@ namespace SM64 {
 
 		auto objs = CustomPhysicsObjects::aPhysicsObjects;
 		for (auto& pObj : objs) {
-			auto rb = *pObj;
+			auto& rb = *pObj;
 			auto dim = rb.vModelSize;
 
 			const float fAttackRange = 6.0 * GetMarioScale();
