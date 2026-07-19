@@ -33,16 +33,16 @@ std::vector<void(*)()> aPlayerDestroyFunctions;
 #include "components/customcar.h"
 #include "components/hints.h"
 
-namespace FlatOutHUD {
-	#include "components/fo1hud/common.h"
-	#include "components/fo1hud/ingame.h"
-}
 #include "hooks/fixes.h"
 #include "hooks/noreset.h"
 #include "hooks/gamespeed.h"
 #include "hooks/geartype.h"
 #include "hooks/vehicleconstruct.h"
 #include "hooks/text.h"
+namespace FlatOutHUD {
+	#include "components/fo1hud/common.h"
+	#include "components/fo1hud/ingame.h"
+}
 #include "hooks/shaders.h"
 #include "hooks/carrender.h"
 #include "hooks/eventwin.h"

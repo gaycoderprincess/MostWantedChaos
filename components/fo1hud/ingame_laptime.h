@@ -47,10 +47,10 @@ public:
 		NyaDrawing::CNyaRGBA32 rgb = {255,255,255,255};
 		rgb.a = fAlpha * 255;
 		if (bCentered) {
-			DrawElementCenter(0.5, "LAP TIME", FormatGameTime(lapTime), rgb);
+			DrawElementCenter(0.5, TextHook::GetStringWithAllModifiers("LAP TIME"), FormatGameTime(lapTime), rgb);
 		}
 		else {
-			DrawElementCenter(0.5, "LAP TIME", "", rgb);
+			DrawElementCenter(0.5, TextHook::GetStringWithAllModifiers("LAP TIME"), "", rgb);
 			if (lapTime >= 60 * 1000 && lapTime <= 120 * 1000) {
 				DrawElementCustomX(JUSTIFY_CENTER, nNonCenterX_1, 0.5, "", FormatGameTime(lapTime), rgb);
 			}

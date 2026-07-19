@@ -6,6 +6,6 @@ public:
 		if (!IsInRace()) return;
 		if (GRaceStatus::fObj->mRaceParms->GetRaceType() != GRace::kRaceType_Tollbooth) return;
 
-		DrawElement(1, "TIME LEFT", FormatGameTime(GRaceStatus::fObj->GetRaceTimeRemaining() * 1000));
+		DrawElement(1, TextHook::GetStringWithAllModifiers("TIME LEFT"), FormatGameTime(GRaceStatus::fObj->GetRaceTimeRemaining() * 1000));
 	}
 } HUD_TimeTrial;

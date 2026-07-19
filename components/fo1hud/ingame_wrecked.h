@@ -21,28 +21,28 @@ public:
 
 	void AddWreckedNotif(GRacerInfo* pPlayer) {
 		if (pPlayer->mIndex == 0) {
-			AddNotif("YOU ARE WRECKED!", "", true);
+			AddNotif(TextHook::GetStringWithAllModifiers("YOU ARE WRECKED!"), "", true);
 		}
 		else {
-			AddNotif(pPlayer->mName, "IS WRECKED", true);
+			AddNotif(pPlayer->mName, TextHook::GetStringWithAllModifiers("IS WRECKED"), true);
 		}
 	}
 
 	void AddKONotif(GRacerInfo* pPlayer) {
 		if (pPlayer->mIndex == 0) {
-			AddNotif("YOU ARE KNOCKED OUT!", "", true);
+			AddNotif(TextHook::GetStringWithAllModifiers("YOU ARE KNOCKED OUT!"), "", true);
 		}
 		else {
-			AddNotif(pPlayer->mName, "IS KNOCKED OUT", true);
+			AddNotif(pPlayer->mName, TextHook::GetStringWithAllModifiers("IS KNOCKED OUT"), true);
 		}
 	}
 
 	void AddTimeoutNotif(GRacerInfo* pPlayer) {
 		if (pPlayer->mIndex == 0) {
-			AddNotif("OUT OF TIME!", "", true);
+			AddNotif(TextHook::GetStringWithAllModifiers("OUT OF TIME!"), "", true);
 		}
 		else {
-			AddNotif(pPlayer->mName, "RAN OUT OF TIME", true);
+			AddNotif(pPlayer->mName, TextHook::GetStringWithAllModifiers("RAN OUT OF TIME"), true);
 		}
 	}
 

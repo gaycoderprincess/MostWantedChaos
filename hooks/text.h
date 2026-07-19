@@ -197,12 +197,7 @@ namespace TextHook {
 		return text;
 	}
 
-	const char* __fastcall SearchForStringHooked(void* a1, uint32_t a2) {
-		auto str = SearchForString(a1, a2);
-		if (!str) return nullptr;
-		if (bRandomText && CanStringBeRandomized(str)) {
-			str = SearchForString(a1, GetRandomizedText(a2));
-		}
+	const char* GetStringWithAllModifiers(const char* str) {
 		if (pReplaceText) str = pReplaceText;
 		if (pInterspersedText) {
 			for (int i = 0; i < nInterspersedTextRuns; i++) {
@@ -216,6 +211,15 @@ namespace TextHook {
 			str = GetShuffledText(str);
 		}
 		return str;
+	}
+
+	const char* __fastcall SearchForStringHooked(void* a1, uint32_t a2) {
+		auto str = SearchForString(a1, a2);
+		if (!str) return nullptr;
+		if (bRandomText && CanStringBeRandomized(str)) {
+			str = SearchForString(a1, GetRandomizedText(a2));
+		}
+		return GetStringWithAllModifiers(str);
 	}
 
 	ChloeHook Hook_Text([]() {

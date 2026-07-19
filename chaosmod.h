@@ -508,6 +508,8 @@ void ChaosModMenu() {
 
 	if (DrawMenuOption("Debug")) {
 		ChloeMenuLib::BeginMenu();
+		//QuickValueEditor("fWeaponSprite_FixedToFloat", DOOM::fWeaponSprite_FixedToFloat);
+		//QuickValueEditor("fWeaponSprite_Y", DOOM::fWeaponSprite_Y);
 		if (SM64::bAvailable && DrawMenuOption("Mario Debug")) {
 			ChloeMenuLib::BeginMenu();
 
