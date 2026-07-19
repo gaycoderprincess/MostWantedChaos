@@ -1362,6 +1362,7 @@ public:
 			{-2258, 155.5, 699}, // wotr pork
 			{-2179.5, 151.8, 1140.2}, // gas station car wash
 			{-3139, 188.9, -180}, // stadium
+			{-130, 5.03, 4627}, // coast near final pursuit under fish market
 	};
 
 	static bool IsHidingSpotOccupied(NyaVec3 pos) {
