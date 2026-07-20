@@ -700,6 +700,41 @@ void ChaosModMenu() {
 					DrawMenuOption(std::format("Up: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
 					rb->GetDimension(&fwd);
 					DrawMenuOption(std::format("Dimension: {:.2f} {:.2f} {:.2f}", fwd.x, fwd.y, fwd.z));
+					if (auto collider = (WCollider*)rb->GetWCollider()) {
+						if (!collider->fInstanceCacheList.empty()) {
+							auto inst = collider->fInstanceCacheList[0];
+							DrawMenuOption(std::format("inst {:X}", (uintptr_t)inst));
+							DrawMenuOption(std::format("fMatRow0Width: {:.2f} {:.2f} {:.2f} {:.2f}", inst->fInvMatRow0Width.x, inst->fInvMatRow0Width.y, inst->fInvMatRow0Width.z, inst->fInvMatRow0Width.w));
+							DrawMenuOption(std::format("fIterStamp: {}", inst->fIterStamp));
+							DrawMenuOption(std::format("fFlags: {}", inst->fFlags));
+							DrawMenuOption(std::format("fHeight: {}", inst->fHeight));
+							DrawMenuOption(std::format("fGroupNumber: {}", inst->fGroupNumber));
+							DrawMenuOption(std::format("fRenderInstanceInd: {}", inst->fRenderInstanceInd));
+							DrawMenuOption(std::format("fCollisionArticle: {:X}", (uintptr_t)inst->fCollisionArticle));
+							DrawMenuOption(std::format("fMatRow2Length: {:.2f} {:.2f} {:.2f} {:.2f}", inst->fInvMatRow2Length.x, inst->fInvMatRow2Length.y, inst->fInvMatRow2Length.z, inst->fInvMatRow2Length.w));
+							DrawMenuOption(std::format("fPosRadius: {:.2f} {:.2f} {:.2f} {:.2f}", inst->fInvPosRadius.x, inst->fInvPosRadius.y, inst->fInvPosRadius.z, inst->fInvPosRadius.w));
+
+							if (auto article = inst->fCollisionArticle) {
+								DrawMenuOption(std::format("fNumStrips: {}", article->fNumStrips));
+								DrawMenuOption(std::format("fNumEdges: {}", article->fNumEdges));
+								DrawMenuOption(std::format("fNumSurfaces: {}", article->fNumSurfaces));
+								DrawMenuOption(std::format("fStripsSize: {}", article->fStripsSize));
+								DrawMenuOption(std::format("fEdgesSize: {}", article->fEdgesSize));
+								DrawMenuOption(std::format("fSurfacesSize: {}", article->fSurfacesSize));
+								DrawMenuOption(std::format("fResolvedFlag: {}", article->fResolvedFlag));
+								DrawMenuOption(std::format("fIntermediatObjInd: {}", article->fIntermediatObjInd));
+								DrawMenuOption(std::format("fFlags: {}", article->fFlags));
+							}
+
+							// fInvMatRow0Width 1.0 0.0 0.0 33.14
+							// fInvMatRow2Length 0.0 0.0 1.0 44.8
+							// fInvPosRadius 2499.75 -448.0 -1757.5
+							// fHeight 576 - actual height from top to bottom / 2 ? or amount to move by? no that'd be 57.6
+							// fFlags 0
+							// fGroupNumber 0
+							// player pos -2508 148 1762
+						}
+					}
 				}
 				auto cam = GetLocalPlayerCamera();
 				auto camMatrix = *(NyaMat4x4*)&cam->CurrentKey.Matrix;

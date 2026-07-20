@@ -257,10 +257,182 @@ namespace Render3DObjects {
 		}
 	}
 
+	void ProcessTrisNew(WCollider* pCollider) {
+		auto pos = pCollider->fPosition;
+
+		//auto pt = pCollider->fPosition;
+		//auto radius = pCollider->fRadius;
+
+		float width = 25.0;
+		float length = 25.0;
+
+		WCollisionTri tri = {};
+		tri.fPt2 = {pos.x - (width/2.0), 150, pos.z - (length/2.0)};
+		tri.fPt1 = {pos.x - (width/2.0), 150, pos.z + (length/2.0)};
+		tri.fPt0 = {pos.x + (width/2.0), 150, pos.z - (length/2.0)};
+		//tri.fPt0 = {-3500,150,-3500};
+		//tri.fPt1 = {-3500,150,3500};
+		//tri.fPt2 = {3500,150,-3500};
+		tri.fSurface.fSurface = 0;
+		tri.fSurfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("unknown"));
+
+		auto tri3 = tri;
+		tri3.fPt2 = {pos.x + (width/2.0), 150, pos.z + (length/2.0)};
+
+		//if (pCollider->fInstanceCacheList.empty())
+		{
+			NyaVec3 tmp = {width,length,0};
+
+			static auto inst = new WCollisionInstance;
+			inst->fInvMatRow0Width.x = 1.0;
+			inst->fInvMatRow0Width.y = 0.0;
+			inst->fInvMatRow0Width.z = 0.0;
+			inst->fInvMatRow0Width.w = width;
+			inst->fInvMatRow2Length.x = 0.0;
+			inst->fInvMatRow2Length.y = 0.0;
+			inst->fInvMatRow2Length.z = 1.0;
+			inst->fInvMatRow2Length.w = length;
+			inst->fInvPosRadius.x = -pos.x;
+			inst->fInvPosRadius.y = -pos.y;
+			inst->fInvPosRadius.z = -pos.z;
+			inst->fInvPosRadius.w = tmp.length();
+			inst->fIterStamp = 0;
+			inst->fFlags = 0;
+			inst->fHeight = 100.0; // temp value
+			inst->fGroupNumber = 0;
+			inst->fRenderInstanceInd = 0; // todo?
+
+			size_t numStrips = 2;
+			size_t stripSphere_begin = sizeof(WCollisionArticle);
+			size_t strips_begin = stripSphere_begin+(sizeof(WCollisionStripSphere)*numStrips);
+			size_t surfaces_begin = strips_begin+(sizeof(WCollisionStrip)*numStrips);
+
+			size_t dataSize = sizeof(WCollisionArticle)+4+((sizeof(WCollisionStripSphere)+sizeof(WCollisionStrip))*numStrips);
+			static auto data = new uint8_t[dataSize];
+			memset(data,0,dataSize);
+
+			auto article = (WCollisionArticle*)data;
+			article->fNumStrips = numStrips;
+			article->fStripsSize = (sizeof(WCollisionStripSphere)+sizeof(WCollisionStrip))*numStrips;
+			article->fNumEdges = 0;
+			article->fEdgesSize = 0;
+			article->fResolvedFlag = 1;
+			article->fNumSurfaces = 1;
+			article->fSurfacesSize = 4;
+			article->fIntermediatObjInd = 0; // ??
+			article->fFlags = 0;
+
+			auto stripSphere = (WCollisionStripSphere*)(data+stripSphere_begin);
+
+			auto stripList = (WCollisionStrip*)(data+strips_begin);
+
+			float stripMult = 128.0; // 0.0078125
+			float stripSphereMult = 16.0; // 0.0625
+
+			std::vector<WCollisionTri> tris;
+			tris.push_back(tri);
+			tris.push_back(tri3);
+			for (int i = 0; i < tris.size(); i++) {
+				// todo is this correct?
+				tris[i].fPt0.x += inst->fInvPosRadius.x;
+				tris[i].fPt0.y += inst->fInvPosRadius.y;
+				tris[i].fPt0.z += inst->fInvPosRadius.z;
+				tris[i].fPt1.x += inst->fInvPosRadius.x;
+				tris[i].fPt1.y += inst->fInvPosRadius.y;
+				tris[i].fPt1.z += inst->fInvPosRadius.z;
+				tris[i].fPt2.x += inst->fInvPosRadius.x;
+				tris[i].fPt2.y += inst->fInvPosRadius.y;
+				tris[i].fPt2.z += inst->fInvPosRadius.z;
+
+				tris[i].fPt0 *= stripMult;
+				tris[i].fPt1 *= stripMult;
+				tris[i].fPt2 *= stripMult;
+
+				stripSphere->fPos = {0,0,0}; // ?? this is still relative right?
+				stripSphere->fOffset = ((uintptr_t)stripList)-((uintptr_t)data)-sizeof(WCollisionArticle); // offset to strip from start of strip data?
+				stripSphere->fRadius = stripSphereMult * inst->fInvPosRadius.w;
+				stripSphere++;
+
+				// one tri per strip, very inefficient but alas i am stupid
+				stripList->numTrisOrSurfaceId = 3;
+				stripList->pt[0] = tris[i].fPt0.x;
+				stripList->pt[1] = tris[i].fPt0.y;
+				stripList->pt[2] = tris[i].fPt0.z;
+				stripList++;
+				stripList->numTrisOrSurfaceId = 0;
+				stripList->pt[0] = tris[i].fPt1.x;
+				stripList->pt[1] = tris[i].fPt1.y;
+				stripList->pt[2] = tris[i].fPt1.z;
+				stripList++;
+				stripList->numTrisOrSurfaceId = 0;
+				stripList->pt[0] = tris[i].fPt2.x;
+				stripList->pt[1] = tris[i].fPt2.y;
+				stripList->pt[2] = tris[i].fPt2.z;
+				stripList++;
+			}
+
+			/*auto triList = (WCollisionTri*)(data+sizeof(WCollisionArticle));
+
+			for (int i = 0; i < tris.size(); i++) {
+				triList[i] = tris[i];
+			}*/
+
+			auto surfaceList = (Attrib::Collection**)(data+surfaces_begin);
+			surfaceList[0] = tri.fSurfaceRef;
+
+			inst->fCollisionArticle = article;
+
+			// fInvMatRow0Width 1.0 0.0 0.0 33.14
+			// fInvMatRow2Length 0.0 0.0 1.0 44.8
+			// fInvPosRadius 2499.75 -448.0 -1757.5
+			// fHeight 576 - actual height from top to bottom / 2 ? or amount to move by? no that'd be 57.6
+			// fFlags 0
+			// fGroupNumber 0
+			// player pos -2508 148 1762
+
+			bool alreadyAdded = false;
+			for (int i = 0; i < pCollider->fInstanceCacheList.size(); i++) {
+				if (pCollider->fInstanceCacheList[i] == inst) {
+					alreadyAdded = true;
+				}
+			}
+			if (!alreadyAdded) {
+				pCollider->fInstanceCacheList.push_back(inst);
+			}
+		}
+
+		/*if (pCollider->fTriList.empty()) {
+			auto tmp = (WCollisionTriBlock*)gFastMem.Alloc(sizeof(WCollisionTriBlock), nullptr);
+			memset(tmp, 0, sizeof(WCollisionTriBlock));
+			//tmp->clear();
+			tmp->push_back(tri);
+			tmp->push_back(tri3);
+			pCollider->fTriList.push_back(tmp);
+		}
+		else {
+			for (int i = 0; i < pCollider->fTriList.size(); i++) {
+				auto tmp = pCollider->fTriList[i];
+				//tmp->clear();
+				tmp->push_back(tri);
+				tmp->push_back(tri3);
+
+				std::sort(tmp->mpBegin, tmp->mpEnd, [](const WCollisionTri& a, const WCollisionTri& b) { return AvgTriY(&a) > AvgTriY(&b); });
+				if (tmp->mpBegin[0].fPt0.y == 150.0f) {
+					tmp->clear();
+					tmp->push_back(tri);
+					tmp->push_back(tri3);
+				}
+			}
+		}*/
+	}
+
 	void __thiscall ProcessCollider(WCollider* pCollider, uint32_t updateMask) {
 		pCollider->PrepareRegion(updateMask);
 
 		if ((updateMask & 4) != 0) ProcessBarriers(pCollider);
+		//if ((updateMask & 12) != 0) {
+		//	ProcessTrisNew(pCollider);
+		//}
 		//if ((updateMask & 12) != 0) ProcessTris(pCollider); // doesn't work consistently
 	}
 
