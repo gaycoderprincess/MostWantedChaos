@@ -257,6 +257,14 @@ namespace Render3DObjects {
 		}
 	}
 
+	std::vector<WCollisionInstance*> aCustomCollisionInstances;
+	void RegisterCustomCollisionInstance(WCollisionInstance* inst) {
+		for (auto& stored : aCustomCollisionInstances) {
+			if (stored == inst) return;
+		}
+		aCustomCollisionInstances.push_back(inst);
+	}
+
 	float fHoverPlatform = -999.0;
 	void ProcessTrisNew(WCollider* pCollider) {
 		if (pCollider->fInstanceCacheList.empty()) return;
@@ -311,6 +319,7 @@ namespace Render3DObjects {
 			inst->fHeight = 0.0; // temp value
 			inst->fGroupNumber = 0;
 			inst->fRenderInstanceInd = 0; // todo?
+			RegisterCustomCollisionInstance(inst);
 
 			size_t numStrips = 4;
 			size_t numTris = numStrips*3;
@@ -356,10 +365,6 @@ namespace Render3DObjects {
 				tris[i].fPt2.x += inst->fInvPosRadius.x;
 				tris[i].fPt2.y += inst->fInvPosRadius.y;
 				tris[i].fPt2.z += inst->fInvPosRadius.z;
-
-				//WriteLog(std::format("tris[{}].fPt0 {:.2f} {:.2f} {:.2f}", i, tris[i].fPt0.x, tris[i].fPt0.y, tris[i].fPt0.z));
-				//WriteLog(std::format("tris[{}].fPt1 {:.2f} {:.2f} {:.2f}", i, tris[i].fPt1.x, tris[i].fPt1.y, tris[i].fPt1.z));
-				//WriteLog(std::format("tris[{}].fPt2 {:.2f} {:.2f} {:.2f}", i, tris[i].fPt2.x, tris[i].fPt2.y, tris[i].fPt2.z));
 
 				tris[i].fPt0 *= stripMult;
 				tris[i].fPt1 *= stripMult;
@@ -428,12 +433,43 @@ namespace Render3DObjects {
 
 			// manually do GetTriList if required, as inserting stuff into the instance list doesn't work otherwise
 			// (they're called right after one another)
-			if ((updateMask & 12) != 0 && (updateMask & 8) != 0) {
+			if ((updateMask & 8) != 0) {
 				WCollisionMgr::GetTriList(&pCollider->fInstanceCacheList, &pCollider->fPosition, pCollider->fRadius, &pCollider->fTriList);
 				//pCollider->PrepareRegion(8);
 			}
 		}
 		//if ((updateMask & 12) != 0) ProcessTris(pCollider); // doesn't work consistently
+	}
+
+	// check through all collision instances to see if the reference is valid
+	bool IsCollisionInstanceValid(WCollisionInstance* inst) {
+		for (auto& custom : aCustomCollisionInstances) {
+			if (inst == custom) return true;
+		}
+		for (int i = 0; i < 2700; i++) {
+			auto pack = WCollisionAssets::mCollisionPackList[i];
+			if (!pack) continue;
+
+			for (int j = 0; j < pack->mInstanceNum; j++) {
+				if (&pack->mInstanceList[j] == inst) return true;
+			}
+		}
+		return false;
+	}
+
+	bool IsInstanceListValid(WCollisionInstanceCacheList &instList) {
+		for (int i = 0; i < instList.size(); i++) {
+			if (!IsCollisionInstanceValid(instList[i])) return false;
+		}
+		return true;
+	}
+
+	bool __thiscall FindClosestFaceCheck(WWorldPos* pThis, WCollisionInstanceCacheList *instList, UMath::Vector3 *ptRaw, bool quitIfOnSameFace) {
+		if (!IsInstanceListValid(*instList)) {
+			AddLogPopup("WCollisionInstanceCacheList invalid");
+			instList = nullptr;
+		}
+		return WWorldPos::FindClosestFace(pThis, instList, ptRaw, quitIfOnSameFace);
 	}
 
 	ChloeHook Init([](){
@@ -450,6 +486,7 @@ namespace Render3DObjects {
 
 		// WWorldPos::Update use different FindClosestFace that uses the collision instance cache
 		NyaHookLib::Patch<uint8_t>(0x789CDD + 2, 0x3C);
-		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x789CE3, 0x786750);
+		//NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x789CE3, 0x786750);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x789CE3, &FindClosestFaceCheck);
 	});
 }

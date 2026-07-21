@@ -267,7 +267,6 @@ void DrawPerformanceWarnings(double delta) {
 
 	static double fTimeRender3DBorked = 0;
 
-	float y = 0.9;
 	for (auto& perf : aPerformanceBenchmarkResults) {
 		if (!perf.once) continue;
 
@@ -275,15 +274,7 @@ void DrawPerformanceWarnings(double delta) {
 			if (!strcmp(perf.name, "Render3DObjects::OnTick3D")) {
 				fTimeRender3DBorked += delta;
 			}
-
-			tNyaStringData data;
-			data.x = 0.1 * GetAspectRatioInv();
-			data.y = y;
-			data.size = 0.03;
-			data.SetColor(255,0,0,255);
-			DrawString(data, std::format("PERFORMANCE WARNING: {} took {}ms", perf.name, (perf.ms / 1000)));
-
-			y -= data.size;
+			AddLogPopup(std::format("PERFORMANCE WARNING: {} took {}ms", perf.name, (perf.ms / 1000)));
 		}
 
 		perf.once = false;
@@ -326,6 +317,7 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 	DrawPerformanceWarnings(gTimer.fDeltaTime);
+	DrawLogPopups();
 
 	if (ChaosVoting::IsEnabled()) {
 		ChaosVoting::pAllOfTheAbove = &E_VotingAll; // this is such a hack lol woof meow

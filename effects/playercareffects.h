@@ -1657,3 +1657,21 @@ public:
 		return !strcmp(*GetAttribStringPointer(pvehicle->GetAttributePointer(BEHAVIOR_MECHANIC_SUSPENSION.mHash32, 0)), "SuspensionRacer");
 	}
 } E_PlayerTrafficSuspension;
+
+class Effect_PlayerHoverPlatform : public ChaosEffect {
+public:
+	Effect_PlayerHoverPlatform() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Player Hover Car";
+		fTimerLength = 90;
+	}
+
+	void TickFunctionMain(double delta) override {
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			Render3DObjects::fHoverPlatform = std::max(ply->GetPosition()->y - 2.0f, Render3DObjects::fHoverPlatform);
+		}
+	}
+	void DeinitFunction() override {
+		Render3DObjects::fHoverPlatform = -999.0;
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerHoverPlatform;

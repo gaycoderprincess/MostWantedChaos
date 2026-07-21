@@ -831,6 +831,26 @@ void ReloadCarBehaviors(eVehicleList vehicleType) {
 	NyaHookLib::Patch<uint16_t>(0x688378, 0x1274);
 }
 
+std::vector<std::string> aLogPopups;
+void AddLogPopup(const std::string& str) {
+	aLogPopups.push_back(str);
+}
+
+void DrawLogPopups() {
+	float y = 0.9;
+	for (auto& popup : aLogPopups) {
+		tNyaStringData data;
+		data.x = 0.1 * GetAspectRatioInv();
+		data.y = y;
+		data.size = 0.03;
+		data.SetColor(255,0,0,255);
+		DrawString(data, popup);
+
+		y -= data.size;
+	}
+	aLogPopups.clear();
+}
+
 struct PerformanceBenchmarkResult {
 	char name[64];
 	uint64_t ms;
