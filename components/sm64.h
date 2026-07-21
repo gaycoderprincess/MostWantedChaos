@@ -804,6 +804,10 @@ namespace SM64 {
 		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v2), NyaVec3(v3)));
 		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v3), NyaVec3(v4)));
 		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v4), NyaVec3(v1)));
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v2), NyaVec3(v1)));
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v3), NyaVec3(v2)));
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v4), NyaVec3(v3)));
+		Render3DObjects::aSM64Barriers.push_back(Render3DObjects::CustomBarrier(NyaVec3(v1), NyaVec3(v4)));
 
 		for (auto& barrier : Render3DObjects::aSM64Barriers) {
 			barrier.data.fPts[0].y = pos.y;

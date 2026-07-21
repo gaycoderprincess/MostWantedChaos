@@ -21,7 +21,6 @@ namespace Render3DObjects {
 			midpoint = (max2d + min2d) * 0.5;
 		}
 	};
-	std::vector<CustomBarrier> aBarriers;
 	std::vector<CustomBarrier> aSM64Barriers;
 
 	std::vector<WCollisionInstance*> aCustomCollisionInstances;
@@ -385,6 +384,10 @@ namespace Render3DObjects {
 			Barriers.push_back(CustomBarrier(NyaVec3(v2), NyaVec3(v3)));
 			Barriers.push_back(CustomBarrier(NyaVec3(v3), NyaVec3(v4)));
 			Barriers.push_back(CustomBarrier(NyaVec3(v4), NyaVec3(v1)));
+			Barriers.push_back(CustomBarrier(NyaVec3(v2), NyaVec3(v1)));
+			Barriers.push_back(CustomBarrier(NyaVec3(v3), NyaVec3(v2)));
+			Barriers.push_back(CustomBarrier(NyaVec3(v4), NyaVec3(v3)));
+			Barriers.push_back(CustomBarrier(NyaVec3(v1), NyaVec3(v4)));
 
 			for (auto& barrier : Barriers) {
 				barrier.data.fPts[0].y = vColPosition.y - (fColSize * 0.5);
@@ -434,13 +437,8 @@ namespace Render3DObjects {
 		}
 	}
 
-	void AddBarrier(NyaVec3 min, NyaVec3 max) {
-		aBarriers.push_back(CustomBarrier(min, max));
-		aBarriers.push_back(CustomBarrier(max, min)); // inverted barrier so it's always double sided
-	}
-
 	std::vector<CustomBarrier> GetFullBarrierList(bool includeMarios = true, bool includeTriBarriers = true) {
-		auto potentialBarriers = aBarriers;
+		std::vector<CustomBarrier> potentialBarriers;
 		if (includeMarios) {
 			for (auto& barrier : aSM64Barriers) {
 				potentialBarriers.push_back(barrier);
