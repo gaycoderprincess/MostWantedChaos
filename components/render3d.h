@@ -28,6 +28,10 @@ namespace Render3D {
 		uint32_t nFaceCount;
 		bool bInvalidated = false;
 
+		// for collision checks
+		std::vector<NyaVec3> aVertices;
+		std::vector<int> aIndices;
+
 		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD, bool zwrite = true) const {
 			if (bInvalidated) return;
 
@@ -196,6 +200,15 @@ namespace Render3D {
 
 	tModel* CreateOneModel(int numVertices, int numFaces, const NyaVec3* vertices, const NyaVec3* normals, const NyaVec3* tangents, const NyaVec3* bitangents, const NyaVec3* uvs, const NyaDrawing::CNyaRGBA32* colors, const uint32_t* indices, const std::string& material) {
 		auto model = new tModel;
+
+		model->aVertices.reserve(numVertices);
+		model->aIndices.reserve(numFaces*3);
+		for (int i = 0; i < numVertices; i++) {
+			model->aVertices.push_back(vertices[i]);
+		}
+		for (int i = 0; i < numFaces*3; i++) {
+			model->aIndices.push_back(indices[i]);
+		}
 
 		size_t vertexTotalSize = numVertices * sizeof(CwoeeVertexData);
 		size_t indexTotalSize = numFaces * 3 * 4;

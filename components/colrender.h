@@ -370,7 +370,7 @@ namespace CollView {
 				WCollider colliderTemp = {};
 				colliderTemp.fPosition = *ply->GetPosition();
 				colliderTemp.fInstanceCacheList.clear();
-				Render3DObjects::ProcessTrisNew(&colliderTemp);
+				Render3DObjects::ProcessWColliderTris(&colliderTemp);
 				if (!colliderTemp.fInstanceCacheList.empty()) {
 					ProcessCollisionArticle(colliderTemp.fInstanceCacheList[0]);
 				}

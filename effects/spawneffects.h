@@ -316,8 +316,10 @@ public:
 			models = Render3D::CreateModels("8down.fbx");
 		}
 
-		aObjectsInWorld.push_back(Render3DObjects::aObjects.size());
+		int id = Render3DObjects::aObjects.size();
+		aObjectsInWorld.push_back(id);
 		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("8down", models, mat, colPos, colScale));
+		//Render3DObjects::aObjects[id]->bTriCollidable = true;
 	}
 
 	void InitFunction() override {
@@ -1683,3 +1685,56 @@ public:
 		}
 	}
 } E_SpawnBlock;
+
+class Effect_SpawnRamp : public ChaosEffect {
+public:
+	Effect_SpawnRamp() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Ramp";
+	}
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = -90;
+	static inline float rZ = 0;
+	static inline float offX = 0;
+	static inline float offY = -0.8;
+	static inline float offZ = 4;
+	static inline float scale = 5.0;
+
+	static inline std::vector<int> aRampsInWorld;
+
+	static void SpawnRamp(UMath::Matrix4 mat, NyaVec3 colPos) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("ramp.fbx");
+		}
+
+		int id = Render3DObjects::aObjects.size();
+		aRampsInWorld.push_back(id);
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("ramp", models, mat, mat.p));
+		Render3DObjects::aObjects[id]->bTriCollidable = true;
+	}
+
+	void InitFunction() override {
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+			auto colPos = mat.p;
+			colPos += mat.x * offX;
+			colPos += mat.z * offZ;
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+			mat.x *= scale;
+			mat.y *= scale;
+			mat.z *= scale;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+			SpawnRamp(mat, colPos);
+			DoChaosSave();
+		}
+	}
+} E_SpawnRamp;

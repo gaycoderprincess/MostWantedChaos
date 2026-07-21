@@ -1001,6 +1001,11 @@ namespace SM64 {
 				}
 				ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
 
+				auto customTris = Render3DObjects::GetFullTriList();
+				for (auto& inst : customTris) {
+					ProcessCollisionArticle(inst);
+				}
+
 				UpdateMarioCollision();
 			}
 

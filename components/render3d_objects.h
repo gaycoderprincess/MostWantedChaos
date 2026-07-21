@@ -24,7 +24,158 @@ namespace Render3DObjects {
 	std::vector<CustomBarrier> aBarriers;
 	std::vector<CustomBarrier> aSM64Barriers;
 
-	float CollisionStrength = 10;
+	std::vector<WCollisionInstance*> aCustomCollisionInstances;
+	void RegisterCustomCollisionInstance(WCollisionInstance* inst) {
+		for (auto& stored : aCustomCollisionInstances) {
+			if (stored == inst) return;
+		}
+		aCustomCollisionInstances.push_back(inst);
+	}
+
+	void ModifyCustomCollisionInstance(WCollisionInstance* inst, const std::vector<WCollisionTri>& tris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
+		float width = 0.0;
+		float length = 0.0;
+		float height = 0.0;
+
+		for (auto& tri : tris) {
+			width = std::max(std::abs(tri.fPt0.x-centerPos.x), width);
+			width = std::max(std::abs(tri.fPt1.x-centerPos.x), width);
+			width = std::max(std::abs(tri.fPt2.x-centerPos.x), width);
+			height = std::max(std::abs(tri.fPt0.y-centerPos.y), height);
+			height = std::max(std::abs(tri.fPt1.y-centerPos.y), height);
+			height = std::max(std::abs(tri.fPt2.y-centerPos.y), height);
+			length = std::max(std::abs(tri.fPt0.z-centerPos.z), length);
+			length = std::max(std::abs(tri.fPt1.z-centerPos.z), length);
+			length = std::max(std::abs(tri.fPt2.z-centerPos.z), length);
+		}
+
+		NyaVec3 tmp = {width,length,0};
+
+		inst->fInvMatRow0Width.x = 1.0;
+		inst->fInvMatRow0Width.y = 0.0;
+		inst->fInvMatRow0Width.z = 0.0;
+		inst->fInvMatRow0Width.w = width;
+		inst->fInvMatRow2Length.x = 0.0;
+		inst->fInvMatRow2Length.y = 0.0;
+		inst->fInvMatRow2Length.z = 1.0;
+		inst->fInvMatRow2Length.w = length;
+		inst->fInvPosRadius.x = -centerPos.x;
+		inst->fInvPosRadius.y = -centerPos.y;
+		inst->fInvPosRadius.z = -centerPos.z;
+		inst->fInvPosRadius.w = tmp.length();
+		inst->fHeight = height;
+
+		auto article = inst->fCollisionArticle;
+		auto data = (uint8_t*)inst->fCollisionArticle;
+
+		if (tris.size() != article->fNumStrips) {
+			MessageBoxA(nullptr, std::format("Attempted to modify collision instance with {} tris to have {} tris", article->fNumStrips, tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+			exit(0);
+		}
+
+		auto numStrips = article->fNumStrips;
+		auto numVerts = numStrips*3;
+
+		size_t stripSphere_begin = sizeof(WCollisionArticle);
+		size_t strips_begin = stripSphere_begin+(sizeof(WCollisionStripSphere)*numStrips);
+		size_t surfaces_begin = strips_begin+(sizeof(WCollisionStrip)*numVerts);
+
+		auto stripSphere = (WCollisionStripSphere*)(data+stripSphere_begin);
+
+		auto stripList = (WCollisionStrip*)(data+strips_begin);
+
+		float stripMult = 128.0; // 0.0078125
+		float stripSphereMult = 16.0; // 0.0625
+
+		for (int i = 0; i < tris.size(); i++) {
+			auto tri = tris[i];
+			tri.fPt0.x += inst->fInvPosRadius.x;
+			tri.fPt0.y += inst->fInvPosRadius.y;
+			tri.fPt0.z += inst->fInvPosRadius.z;
+			tri.fPt1.x += inst->fInvPosRadius.x;
+			tri.fPt1.y += inst->fInvPosRadius.y;
+			tri.fPt1.z += inst->fInvPosRadius.z;
+			tri.fPt2.x += inst->fInvPosRadius.x;
+			tri.fPt2.y += inst->fInvPosRadius.y;
+			tri.fPt2.z += inst->fInvPosRadius.z;
+
+			tri.fPt0 *= stripMult;
+			tri.fPt1 *= stripMult;
+			tri.fPt2 *= stripMult;
+
+			stripSphere->fPos = {0,0,0}; // ?? this is still relative right?
+			stripSphere->fOffset = ((uintptr_t)stripList)-((uintptr_t)data)-sizeof(WCollisionArticle); // offset to strip from start of strip data?
+			stripSphere->fRadius = stripSphereMult * inst->fInvPosRadius.w;
+			stripSphere++;
+
+			// one tri per strip, very inefficient but alas i am stupid
+			stripList->numTrisOrSurfaceId = 3;
+			stripList->pt[0] = tri.fPt0.x;
+			stripList->pt[1] = tri.fPt0.y;
+			stripList->pt[2] = tri.fPt0.z;
+			stripList++;
+			stripList->numTrisOrSurfaceId = 0;
+			stripList->pt[0] = tri.fPt1.x;
+			stripList->pt[1] = tri.fPt1.y;
+			stripList->pt[2] = tri.fPt1.z;
+			stripList++;
+			stripList->numTrisOrSurfaceId = 0;
+			stripList->pt[0] = tri.fPt2.x;
+			stripList->pt[1] = tri.fPt2.y;
+			stripList->pt[2] = tri.fPt2.z;
+			stripList++;
+		}
+
+		if (surfaceRef) {
+			auto surfaceList = (Attrib::Collection**)(data + surfaces_begin);
+			surfaceList[0] = surfaceRef;
+		}
+
+		// fInvMatRow0Width 1.0 0.0 0.0 33.14
+		// fInvMatRow2Length 0.0 0.0 1.0 44.8
+		// fInvPosRadius 2499.75 -448.0 -1757.5
+		// fHeight 576 - actual height from top to bottom / 2 ? or amount to move by? no that'd be 57.6
+		// fFlags 0
+		// fGroupNumber 0
+		// player pos -2508 148 1762
+	}
+
+	WCollisionInstance* CreateCustomCollisionInstance(const std::vector<WCollisionTri>& tris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
+		if (!surfaceRef) {
+			surfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("unknown"));
+		}
+
+		auto inst = new WCollisionInstance;
+		inst->fIterStamp = 0;
+		inst->fFlags = 0;
+		inst->fHeight = 0.0;
+		inst->fGroupNumber = 0;
+		inst->fRenderInstanceInd = 0; // todo?
+		RegisterCustomCollisionInstance(inst);
+
+		size_t numStrips = tris.size();
+		size_t numVerts = numStrips*3;
+
+		size_t dataSize = sizeof(WCollisionArticle)+4+(sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numVerts);
+		auto data = new uint8_t[dataSize];
+		memset(data,0,dataSize);
+
+		auto article = (WCollisionArticle*)data;
+		article->fNumStrips = numStrips;
+		article->fStripsSize = (sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numVerts);
+		article->fNumEdges = 0;
+		article->fEdgesSize = 0;
+		article->fResolvedFlag = 0;
+		article->fNumSurfaces = 1;
+		article->fSurfacesSize = 4;
+		article->fIntermediatObjInd = 0; // ??
+		article->fFlags = 0;
+		inst->fCollisionArticle = article;
+
+		ModifyCustomCollisionInstance(inst, tris, centerPos, surfaceRef);
+
+		return inst;
+	}
 
 	class Object {
 	public:
@@ -34,15 +185,168 @@ namespace Render3DObjects {
 		float fColSize = 1;
 		void(*pTickFunction)(Object*, double) = nullptr;
 		void* CustomData = nullptr;
+		bool bTriCollidable = false;
 		std::string sDebugName;
 
-		NyaVec3 vLastColPosition = UMath::Vector3::kZero;
+		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
+		NyaVec3 vLastTriPosition = UMath::Vector3::kZero;
 		std::vector<CustomBarrier> Barriers = {};
+		WCollisionInstance* CollisionInstance = nullptr;
+		WCollisionInstance* CollisionInstanceIgnored = nullptr;
+
+		// skip tris that are flipped or sideways, these will become barriers
+		bool ShouldTriBeBarrier(const WCollisionTri& tri) {
+			auto faceNormal = (tri.fPt1 - tri.fPt0).Cross(tri.fPt2 - tri.fPt0);
+			faceNormal.Normalize();
+			return std::abs(faceNormal.y) <= 0.05;
+		}
+
+		bool ShouldTriBeIgnored(const WCollisionTri& tri) {
+			auto faceNormal = (tri.fPt1 - tri.fPt0).Cross(tri.fPt2 - tri.fPt0);
+			faceNormal.Normalize();
+			return faceNormal.y <= 0.05;
+		}
+
+		NyaMat4x4 GetCollisionMatrix() {
+			auto out = mMatrix;
+			out.y *= -1;
+			return out;
+		}
+
+		void RegenerateTris() {
+			if (!bTriCollidable) return;
+
+			auto currPos = vColPosition;
+			if (currPos.x == vLastTriPosition.x && currPos.y == vLastTriPosition.y && currPos.z == vLastTriPosition.z) return;
+			vLastTriPosition = currPos;
+
+			std::vector<WCollisionTri> tris;
+			std::vector<WCollisionTri> trisIgnored;
+			for (auto& model : aModels) {
+				for (int i = 0; i < model->aIndices.size()/3; i++) {
+					WCollisionTri tri = {};
+					tri.fPt2 = GetCollisionMatrix() * model->aVertices[model->aIndices[i*3]];
+					tri.fPt1 = GetCollisionMatrix() * model->aVertices[model->aIndices[(i*3)+1]];
+					tri.fPt0 = GetCollisionMatrix() * model->aVertices[model->aIndices[(i*3)+2]];
+					tri.fSurface.fSurface = 0;
+					if (ShouldTriBeIgnored(tri)) {
+						trisIgnored.push_back(tri);
+
+						// backfacing
+						auto tri2 = tri;
+						tri2.fPt2 = tri.fPt0;
+						tri2.fPt1 = tri.fPt1;
+						tri2.fPt0 = tri.fPt2;
+						trisIgnored.push_back(tri2);
+					}
+					else {
+						tris.push_back(tri);
+
+						// backfacing
+						auto tri2 = tri;
+						tri2.fPt2 = tri.fPt0;
+						tri2.fPt1 = tri.fPt1;
+						tri2.fPt0 = tri.fPt2;
+						tris.push_back(tri2);
+					}
+				}
+			}
+
+			if (!tris.empty()) {
+				if (!CollisionInstance) {
+					auto surface = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("asphalt_no_leaves"));
+					CollisionInstance = CreateCustomCollisionInstance(tris, currPos, surface);
+				}
+				ModifyCustomCollisionInstance(CollisionInstance, tris, currPos);
+			}
+			if (!trisIgnored.empty()) {
+				if (!CollisionInstanceIgnored) {
+					CollisionInstanceIgnored = CreateCustomCollisionInstance(tris, currPos);
+				}
+				ModifyCustomCollisionInstance(CollisionInstanceIgnored, tris, currPos);
+			}
+		}
+
+		void RegenerateTriBarriers() {
+			if (!bTriCollidable) return;
+			if (vColPosition.x == vLastBarrierPosition.x && vColPosition.y == vLastBarrierPosition.y && vColPosition.z == vLastBarrierPosition.z) return;
+			vLastBarrierPosition = vColPosition;
+
+			Barriers.clear();
+
+			std::vector<WCollisionTri> tris;
+			for (auto& model : aModels) {
+				for (int i = 0; i < model->aIndices.size()/3; i++) {
+					WCollisionTri tri = {};
+					tri.fPt2 = GetCollisionMatrix() * model->aVertices[model->aIndices[i*3]];
+					tri.fPt1 = GetCollisionMatrix() * model->aVertices[model->aIndices[(i*3)+1]];
+					tri.fPt0 = GetCollisionMatrix() * model->aVertices[model->aIndices[(i*3)+2]];
+					tri.fSurface.fSurface = 0;
+					if (!ShouldTriBeBarrier(tri)) continue;
+					tris.push_back(tri);
+
+					// bit of leeway so i.e. ramps don't get messed up
+					float yMin = std::min(std::min(tri.fPt0.y, tri.fPt1.y), tri.fPt2.y) - 0.25;
+					float yMax = std::max(std::max(tri.fPt0.y, tri.fPt1.y), tri.fPt2.y) - 0.25;
+
+					auto dist01 = tri.fPt0 - tri.fPt1;
+					auto dist02 = tri.fPt0 - tri.fPt2;
+					auto dist12 = tri.fPt1 - tri.fPt2;
+					dist01.y = 0;
+					dist02.y = 0;
+					dist12.y = 0;
+					auto length01 = dist01.length();
+					auto length02 = dist02.length();
+					auto length12 = dist12.length();
+					if (length01 > length02) {
+						// length01 longest
+						if (length01 > length12) {
+							Barriers.push_back(CustomBarrier(tri.fPt0, tri.fPt1));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+							Barriers.push_back(CustomBarrier(tri.fPt1, tri.fPt0));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+						}
+						// length12 longest
+						else {
+							Barriers.push_back(CustomBarrier(tri.fPt1, tri.fPt2));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+							Barriers.push_back(CustomBarrier(tri.fPt2, tri.fPt1));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+						}
+					}
+					else {
+						// length02 longest
+						if (length02 > length12) {
+							Barriers.push_back(CustomBarrier(tri.fPt0, tri.fPt2));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+							Barriers.push_back(CustomBarrier(tri.fPt2, tri.fPt0));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+						}
+						// length12 longest
+						else {
+							Barriers.push_back(CustomBarrier(tri.fPt1, tri.fPt2));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+							Barriers.push_back(CustomBarrier(tri.fPt2, tri.fPt1));
+							Barriers[Barriers.size()-1].data.fPts[0].y = yMin;
+							Barriers[Barriers.size()-1].data.fPts[1].y = yMax;
+						}
+					}
+				}
+			}
+		}
 
 		void RegenerateBarriers() {
+			if (bTriCollidable) return;
 			if (fColSize <= 0) return;
-			if (vColPosition.x == vLastColPosition.x && vColPosition.y == vLastColPosition.y && vColPosition.z == vLastColPosition.z) return;
-			vLastColPosition = vColPosition;
+			if (vColPosition.x == vLastBarrierPosition.x && vColPosition.y == vLastBarrierPosition.y && vColPosition.z == vLastBarrierPosition.z) return;
+			vLastBarrierPosition = vColPosition;
 
 			// points:
 			// -1 -1
@@ -80,41 +384,7 @@ namespace Render3DObjects {
 			}
 		}
 
-		Object(const std::string& debugName, std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : sDebugName(debugName), aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {
-			RegenerateBarriers();
-		}
-
-		void CheckCollision(IRigidBody* other, double delta) {
-			return; // not needed anymore with the new barrier system
-
-			if (fColSize <= 0) return;
-
-			UMath::Vector3 dim;
-			other->GetDimension(&dim);
-			UMath::Vector3 fwd;
-			other->GetForwardVector(&fwd);
-			fwd.y = 0;
-			fwd.Normalize();
-			auto otherPos = *other->GetPosition();
-			auto velocity = *other->GetLinearVelocity();
-
-			auto colSize1 = fColSize + dim.x;
-			auto colSize2 = fColSize + dim.z;
-			auto dir = (otherPos - vColPosition);
-			auto dirNorm = dir;
-			dirNorm.Normalize();
-			auto dirNormXZ = dirNorm;
-			dirNormXZ.y = 0;
-			dirNormXZ.Normalize();
-
-			auto colSize = std::lerp(colSize1, colSize2, abs(dirNormXZ.Dot(fwd)));
-			if ((otherPos - vColPosition).length() < colSize) {
-				velocity += dir * CollisionStrength * delta * velocity.length();
-				other->SetLinearVelocity(&velocity);
-				auto newPos = vColPosition + (dirNorm * colSize);
-				other->SetPosition((UMath::Vector3*)&newPos);
-			}
-		}
+		Object(const std::string& debugName, std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : sDebugName(debugName), aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {}
 
 		bool IsActive() {
 			return !aModels.empty() && !aModels[0]->bInvalidated;
@@ -132,13 +402,11 @@ namespace Render3DObjects {
 
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 
-		auto cars = GetActiveVehicles();
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
 			obj->RegenerateBarriers();
-			//for (auto& car: cars) {
-			//	obj->CheckCollision(car->mCOMObject->Find<IRigidBody>(), gTimer.fDeltaTime);
-			//}
+			obj->RegenerateTris();
+			obj->RegenerateTriBarriers();
 			if (obj->pTickFunction) {
 				obj->pTickFunction(obj, gTimer.fDeltaTime);
 			}
@@ -171,7 +439,6 @@ namespace Render3DObjects {
 		}
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
-			if (obj->fColSize <= 0) continue;
 
 			for (auto& barrier : obj->Barriers) {
 				potentialBarriers.push_back(barrier);
@@ -187,6 +454,20 @@ namespace Render3DObjects {
 			}
 		}
 		return potentialBarriers;
+	}
+
+	std::vector<WCollisionInstance*> GetFullTriList(bool includeIgnored = false) {
+		std::vector<WCollisionInstance*> potentialInsts;
+		for (auto& obj : aObjects) {
+			if (!obj->IsActive()) continue;
+			if (obj->CollisionInstance) {
+				potentialInsts.push_back(obj->CollisionInstance);
+			}
+			if (includeIgnored && obj->CollisionInstanceIgnored) {
+				potentialInsts.push_back(obj->CollisionInstanceIgnored);
+			}
+		}
+		return potentialInsts;
 	}
 
 	void ProcessBarriers(WCollider* pCollider) {
@@ -209,64 +490,9 @@ namespace Render3DObjects {
 		}
 	}
 
-	float AvgTriY(const WCollisionTri* tri) {
-		float f = tri->fPt0.y + tri->fPt1.y + tri->fPt2.y;
-		return f / 3.0;
-	}
-
-	void ProcessTris(WCollider* pCollider) {
-		auto pos = pCollider->fPosition;
-
-		//auto pt = pCollider->fPosition;
-		//auto radius = pCollider->fRadius;
-
-		WCollisionTri tri = {};
-		tri.fPt2 = {pos.x - 25, 150, pos.z - 25};
-		tri.fPt1 = {pos.x - 25, 150, pos.z + 25};
-		tri.fPt0 = {pos.x + 25, 150, pos.z - 25};
-		//tri.fPt0 = {-3500,150,-3500};
-		//tri.fPt1 = {-3500,150,3500};
-		//tri.fPt2 = {3500,150,-3500};
-		tri.fSurfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("asphalt_no_leaves"));
-
-		auto tri3 = tri;
-		tri3.fPt2 = {pos.x + 25, 150, pos.z + 25};
-
-		if (pCollider->fTriList.empty()) {
-			auto tmp = (WCollisionTriBlock*)gFastMem.Alloc(sizeof(WCollisionTriBlock), nullptr);
-			memset(tmp, 0, sizeof(WCollisionTriBlock));
-			//tmp->clear();
-			tmp->push_back(tri);
-			tmp->push_back(tri3);
-			pCollider->fTriList.push_back(tmp);
-		}
-		else {
-			for (int i = 0; i < pCollider->fTriList.size(); i++) {
-				auto tmp = pCollider->fTriList[i];
-				//tmp->clear();
-				tmp->push_back(tri);
-				tmp->push_back(tri3);
-
-				std::sort(tmp->mpBegin, tmp->mpEnd, [](const WCollisionTri& a, const WCollisionTri& b) { return AvgTriY(&a) > AvgTriY(&b); });
-				if (tmp->mpBegin[0].fPt0.y == 150.0f) {
-					tmp->clear();
-					tmp->push_back(tri);
-					tmp->push_back(tri3);
-				}
-			}
-		}
-	}
-
-	std::vector<WCollisionInstance*> aCustomCollisionInstances;
-	void RegisterCustomCollisionInstance(WCollisionInstance* inst) {
-		for (auto& stored : aCustomCollisionInstances) {
-			if (stored == inst) return;
-		}
-		aCustomCollisionInstances.push_back(inst);
-	}
-
 	float fHoverPlatform = -999.0;
-	void ProcessTrisNew(WCollider* pCollider) {
+	WCollisionInstance* pHoverPlatform = nullptr;
+	void ProcessHoverPlatform(WCollider* pCollider) {
 		if (pCollider->fInstanceCacheList.empty()) return;
 
 		auto pos = pCollider->fPosition;
@@ -282,8 +508,6 @@ namespace Render3DObjects {
 		tri.fPt2 = {pos.x - (width/2.0), fHoverPlatform, pos.z - (length/2.0)};
 		tri.fPt1 = {pos.x - (width/2.0), fHoverPlatform, pos.z + (length/2.0)};
 		tri.fPt0 = {pos.x + (width/2.0), fHoverPlatform, pos.z - (length/2.0)};
-		tri.fSurface.fSurface = 0;
-		tri.fSurfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("unknown"));
 
 		auto tri3 = tri;
 		tri3.fPt2 = {pos.x + (width/2.0), fHoverPlatform, pos.z + (length/2.0)};
@@ -297,124 +521,52 @@ namespace Render3DObjects {
 		tri3Rev.fPt1 = tri3.fPt1;
 		tri3Rev.fPt2 = tri3.fPt0;
 
-		//if (pCollider->fInstanceCacheList.empty())
-		{
-			NyaVec3 tmp = {width,length,0};
+		std::vector<WCollisionTri> tris;
+		tris.push_back(tri);
+		tris.push_back(tri3);
+		tris.push_back(triRev);
+		tris.push_back(tri3Rev);
 
-			static auto inst = new WCollisionInstance;
-			inst->fInvMatRow0Width.x = 1.0;
-			inst->fInvMatRow0Width.y = 0.0;
-			inst->fInvMatRow0Width.z = 0.0;
-			inst->fInvMatRow0Width.w = width;
-			inst->fInvMatRow2Length.x = 0.0;
-			inst->fInvMatRow2Length.y = 0.0;
-			inst->fInvMatRow2Length.z = 1.0;
-			inst->fInvMatRow2Length.w = length;
-			inst->fInvPosRadius.x = -pos.x;
-			inst->fInvPosRadius.y = -pos.y;
-			inst->fInvPosRadius.z = -pos.z;
-			inst->fInvPosRadius.w = tmp.length();
-			inst->fIterStamp = 0;
-			inst->fFlags = 0;
-			inst->fHeight = 0.0; // temp value
-			inst->fGroupNumber = 0;
-			inst->fRenderInstanceInd = 0; // todo?
-			RegisterCustomCollisionInstance(inst);
+		static auto inst = CreateCustomCollisionInstance(tris, pos);
+		ModifyCustomCollisionInstance(inst, tris, pos);
+		pHoverPlatform = inst;
+	}
 
-			size_t numStrips = 4;
-			size_t numTris = numStrips*3;
-			size_t stripSphere_begin = sizeof(WCollisionArticle);
-			size_t strips_begin = stripSphere_begin+(sizeof(WCollisionStripSphere)*numStrips);
-			size_t surfaces_begin = strips_begin+(sizeof(WCollisionStrip)*numTris);
-
-			size_t dataSize = sizeof(WCollisionArticle)+4+(sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numTris);
-			static auto data = new uint8_t[dataSize];
-			memset(data,0,dataSize);
-
-			auto article = (WCollisionArticle*)data;
-			article->fNumStrips = numStrips;
-			article->fStripsSize = (sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numTris);
-			article->fNumEdges = 0;
-			article->fEdgesSize = 0;
-			article->fResolvedFlag = 0;
-			article->fNumSurfaces = 1;
-			article->fSurfacesSize = 4;
-			article->fIntermediatObjInd = 0; // ??
-			article->fFlags = 0;
-
-			auto stripSphere = (WCollisionStripSphere*)(data+stripSphere_begin);
-
-			auto stripList = (WCollisionStrip*)(data+strips_begin);
-
-			float stripMult = 128.0; // 0.0078125
-			float stripSphereMult = 16.0; // 0.0625
-
-			std::vector<WCollisionTri> tris;
-			tris.push_back(tri);
-			tris.push_back(tri3);
-			tris.push_back(triRev);
-			tris.push_back(tri3Rev);
-			for (int i = 0; i < tris.size(); i++) {
-				// todo is this correct?
-				tris[i].fPt0.x += inst->fInvPosRadius.x;
-				tris[i].fPt0.y += inst->fInvPosRadius.y;
-				tris[i].fPt0.z += inst->fInvPosRadius.z;
-				tris[i].fPt1.x += inst->fInvPosRadius.x;
-				tris[i].fPt1.y += inst->fInvPosRadius.y;
-				tris[i].fPt1.z += inst->fInvPosRadius.z;
-				tris[i].fPt2.x += inst->fInvPosRadius.x;
-				tris[i].fPt2.y += inst->fInvPosRadius.y;
-				tris[i].fPt2.z += inst->fInvPosRadius.z;
-
-				tris[i].fPt0 *= stripMult;
-				tris[i].fPt1 *= stripMult;
-				tris[i].fPt2 *= stripMult;
-
-				stripSphere->fPos = {0,0,0}; // ?? this is still relative right?
-				stripSphere->fOffset = ((uintptr_t)stripList)-((uintptr_t)data)-sizeof(WCollisionArticle); // offset to strip from start of strip data?
-				stripSphere->fRadius = stripSphereMult * inst->fInvPosRadius.w;
-				stripSphere++;
-
-				// one tri per strip, very inefficient but alas i am stupid
-				stripList->numTrisOrSurfaceId = 3;
-				stripList->pt[0] = tris[i].fPt0.x;
-				stripList->pt[1] = tris[i].fPt0.y;
-				stripList->pt[2] = tris[i].fPt0.z;
-				stripList++;
-				stripList->numTrisOrSurfaceId = 0;
-				stripList->pt[0] = tris[i].fPt1.x;
-				stripList->pt[1] = tris[i].fPt1.y;
-				stripList->pt[2] = tris[i].fPt1.z;
-				stripList++;
-				stripList->numTrisOrSurfaceId = 0;
-				stripList->pt[0] = tris[i].fPt2.x;
-				stripList->pt[1] = tris[i].fPt2.y;
-				stripList->pt[2] = tris[i].fPt2.z;
-				stripList++;
+	void AddToWCollider(WCollider* pCollider, WCollisionInstance* inst) {
+		bool alreadyAdded = false;
+		for (int i = 0; i < pCollider->fInstanceCacheList.size(); i++) {
+			if (pCollider->fInstanceCacheList[i] == inst) {
+				alreadyAdded = true;
 			}
+		}
+		if (!alreadyAdded) {
+			pCollider->fInstanceCacheList.push_back(inst);
+		}
+	}
 
-			auto surfaceList = (Attrib::Collection**)(data+surfaces_begin);
-			surfaceList[0] = tri.fSurfaceRef;
+	void ProcessWColliderTris(WCollider* pCollider) {
+		if (fHoverPlatform > -100.0) {
+			ProcessHoverPlatform(pCollider);
+			AddToWCollider(pCollider, pHoverPlatform);
+		}
 
-			inst->fCollisionArticle = article;
+		auto pos = pCollider->fPosition;
+		for (auto& obj : aObjects) {
+			if (!obj->IsActive()) continue;
+			if (!obj->bTriCollidable) continue;
 
-			// fInvMatRow0Width 1.0 0.0 0.0 33.14
-			// fInvMatRow2Length 0.0 0.0 1.0 44.8
-			// fInvPosRadius 2499.75 -448.0 -1757.5
-			// fHeight 576 - actual height from top to bottom / 2 ? or amount to move by? no that'd be 57.6
-			// fFlags 0
-			// fGroupNumber 0
-			// player pos -2508 148 1762
+			auto inst = obj->CollisionInstance;
+			if (!inst) continue;
 
-			bool alreadyAdded = false;
-			for (int i = 0; i < pCollider->fInstanceCacheList.size(); i++) {
-				if (pCollider->fInstanceCacheList[i] == inst) {
-					alreadyAdded = true;
-				}
-			}
-			if (!alreadyAdded) {
-				pCollider->fInstanceCacheList.push_back(inst);
-			}
+			auto objPos = inst->fInvPosRadius;
+			objPos.x *= -1;
+			objPos.y *= -1;
+			objPos.z *= -1;
+
+			auto dist = (objPos - pos).length();
+			if (dist > inst->fInvPosRadius.w) continue;
+
+			AddToWCollider(pCollider, inst);
 		}
 	}
 
@@ -427,9 +579,7 @@ namespace Render3DObjects {
 
 		if ((updateMask & 4) != 0) ProcessBarriers(pCollider);
 		if ((updateMask & 12) != 0) {
-			if (fHoverPlatform > -100.0) {
-				ProcessTrisNew(pCollider);
-			}
+			ProcessWColliderTris(pCollider);
 
 			// manually do GetTriList if required, as inserting stuff into the instance list doesn't work otherwise
 			// (they're called right after one another)

@@ -826,6 +826,7 @@ void ChaosModMenu() {
 
 				ChloeMenuLib::EndMenu();
 			}
+			QuickValueEditor("fHoverPlatform", Render3DObjects::fHoverPlatform);
 			if (DrawMenuOption("Scenery Group")) {
 				ChloeMenuLib::BeginMenu();
 
@@ -866,6 +867,10 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			QuickValueEditor("Ramp::rX", Effect_SpawnRamp::rX);
+			QuickValueEditor("Ramp::rY", Effect_SpawnRamp::rY);
+			QuickValueEditor("Ramp::rZ", Effect_SpawnRamp::rZ);
+			QuickValueEditor("Ramp::scale", Effect_SpawnRamp::scale);
 			QuickValueEditor("MouseDrag::crosshairSize", Effect_MouseDrag::crosshairSize);
 			QuickValueEditor("MouseDrag::selectRange", Effect_MouseDrag::selectRange);
 			QuickValueEditor("MouseDrag::dragSpeed", Effect_MouseDrag::dragSpeed);
@@ -934,7 +939,6 @@ void ChaosModMenu() {
 			DrawMenuOption(std::format("lastPassedCol: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
 			v.Normalize();
 			DrawMenuOption(std::format("lastPassedColNorm: {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z));
-			QuickValueEditor("Render3DObjects::CollisionStrength", Render3DObjects::CollisionStrength);
 			QuickValueEditor("bFO2Minimap", FlatOutHUD::CHUD_Minimap::bFO2Minimap);
 			ChloeMenuLib::EndMenu();
 		}

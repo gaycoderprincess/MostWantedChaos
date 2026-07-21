@@ -18,6 +18,7 @@ namespace CustomPhysics {
 	}
 
 	struct CustomArticleInstance {
+		WCollisionInstance* pOriginalPtr; // may be a stale ptr
 		int nSceneryGroupId;
 		std::vector<WCollisionTri> aTriStrips;
 		std::vector<WCollisionTri> aBarriers;
@@ -29,7 +30,10 @@ namespace CustomPhysics {
 	struct CustomArticle {
 		std::vector<CustomArticleInstance> aInstances;
 	};
-	CustomArticle aCollisionArticles[2700];
+	CustomArticle aCollisionArticles[2701];
+
+	const int COLLISIONARTICLE_CUSTOM = 2700;
+	int nNumTrisCustom = 0;
 
 	struct CustomObjectInstance {
 		b3BodyId nB3Body;
@@ -129,6 +133,7 @@ namespace CustomPhysics {
 		aCollisionArticles[articleId].aInstances.push_back({});
 		auto articleInst = &aCollisionArticles[articleId].aInstances[aCollisionArticles[articleId].aInstances.size()-1];
 
+		articleInst->pOriginalPtr = inst;
 		articleInst->nSceneryGroupId = inst->fGroupNumber;
 
 		auto stripSphere = (WCollisionStripSphere*)articles_end_ptr;
@@ -160,9 +165,7 @@ namespace CustomPhysics {
 	}
 
 	void ConvertCollisionArticle(CustomArticleInstance& article) {
-		if (article.pB3Mesh) {
-			b3DestroyMesh(article.pB3Mesh);
-		}
+		if (article.pB3Mesh) return;
 
 		std::vector<b3Vec3> vertices;
 		std::vector<int> indices;
@@ -197,10 +200,17 @@ namespace CustomPhysics {
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
 			//shapeDef.materials = materials;
 			//shapeDef.materialCount = 7;
-			auto nB3Shape = b3CreateMeshShape(article.nB3Body, &shapeDef, article.pB3Mesh, b3Vec3_one);
+			b3CreateMeshShape(article.nB3Body, &shapeDef, article.pB3Mesh, b3Vec3_one);
 
 			article.bB3MeshEnabled = true;
 		}
+	}
+
+	bool DoesCustomCollisionArticleExist(WCollisionInstance* inst) {
+		for (auto& custom : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
+			if (inst == custom.pOriginalPtr) return true;
+		}
+		return false;
 	}
 
 	struct CollisionGeometryBuffer {
@@ -438,6 +448,18 @@ namespace CustomPhysics {
 				}
 			}
 		}
+
+		auto customTris = Render3DObjects::GetFullTriList(true);
+		if (nNumTrisCustom != customTris.size()) {
+			for (auto& inst : customTris) {
+				if (DoesCustomCollisionArticleExist(inst)) continue;
+				ProcessCollisionArticle(COLLISIONARTICLE_CUSTOM, inst);
+			}
+			for (auto& inst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
+				ConvertCollisionArticle(inst);
+			}
+		}
+		nNumTrisCustom = customTris.size();
 
 		CollectWorldObjects();
 
