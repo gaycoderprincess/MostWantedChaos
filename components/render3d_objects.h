@@ -285,9 +285,14 @@ namespace Render3DObjects {
 					if (!ShouldTriBeBarrier(tri)) continue;
 					tris.push_back(tri);
 
+					std::vector<float> ySorted = {tri.fPt0.y, tri.fPt1.y, tri.fPt2.y};
+					std::sort(ySorted.begin(), ySorted.end());
+
 					// bit of leeway so i.e. ramps don't get messed up
-					float yMin = std::min(std::min(tri.fPt0.y, tri.fPt1.y), tri.fPt2.y) - 0.25;
-					float yMax = std::max(std::max(tri.fPt0.y, tri.fPt1.y), tri.fPt2.y) - 0.25;
+					// use second highest Y value for yMax so tilted objects dont have loose barriers
+					float yMin = ySorted[0] - 0.25;
+					float yMax = ySorted[1] - 0.25;
+					if (std::abs(yMin - yMax) < 0.25) continue;
 
 					auto dist01 = tri.fPt0 - tri.fPt1;
 					auto dist02 = tri.fPt0 - tri.fPt2;
@@ -430,7 +435,7 @@ namespace Render3DObjects {
 		aBarriers.push_back(CustomBarrier(max, min)); // inverted barrier so it's always double sided
 	}
 
-	std::vector<CustomBarrier> GetFullBarrierList(bool includeMarios = true) {
+	std::vector<CustomBarrier> GetFullBarrierList(bool includeMarios = true, bool includeTriBarriers = true) {
 		auto potentialBarriers = aBarriers;
 		if (includeMarios) {
 			for (auto& barrier : aSM64Barriers) {
@@ -439,6 +444,7 @@ namespace Render3DObjects {
 		}
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
+			if (!includeTriBarriers && obj->bTriCollidable) continue;
 
 			for (auto& barrier : obj->Barriers) {
 				potentialBarriers.push_back(barrier);
@@ -493,8 +499,6 @@ namespace Render3DObjects {
 	float fHoverPlatform = -999.0;
 	WCollisionInstance* pHoverPlatform = nullptr;
 	void ProcessHoverPlatform(WCollider* pCollider) {
-		if (pCollider->fInstanceCacheList.empty()) return;
-
 		auto pos = pCollider->fPosition;
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			pos = *ply->GetPosition();
@@ -545,6 +549,8 @@ namespace Render3DObjects {
 	}
 
 	void ProcessWColliderTris(WCollider* pCollider) {
+		bool isDummy = pCollider->fInstanceCacheList.empty();
+
 		if (fHoverPlatform > -100.0) {
 			ProcessHoverPlatform(pCollider);
 			AddToWCollider(pCollider, pHoverPlatform);
@@ -564,7 +570,7 @@ namespace Render3DObjects {
 			objPos.z *= -1;
 
 			auto dist = (objPos - pos).length();
-			if (dist > inst->fInvPosRadius.w) continue;
+			if (!isDummy && dist > inst->fInvPosRadius.w) continue;
 
 			AddToWCollider(pCollider, inst);
 		}
@@ -579,7 +585,9 @@ namespace Render3DObjects {
 
 		if ((updateMask & 4) != 0) ProcessBarriers(pCollider);
 		if ((updateMask & 12) != 0) {
-			ProcessWColliderTris(pCollider);
+			if (!pCollider->fInstanceCacheList.empty()) {
+				ProcessWColliderTris(pCollider);
+			}
 
 			// manually do GetTriList if required, as inserting stuff into the instance list doesn't work otherwise
 			// (they're called right after one another)

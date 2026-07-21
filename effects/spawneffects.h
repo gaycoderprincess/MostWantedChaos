@@ -1704,7 +1704,7 @@ public:
 
 	static inline std::vector<int> aRampsInWorld;
 
-	static void SpawnRamp(UMath::Matrix4 mat, NyaVec3 colPos) {
+	static void SpawnRamp(UMath::Matrix4 mat) {
 		if (models.empty() || models[0]->bInvalidated) {
 			models = Render3D::CreateModels("ramp.fbx");
 		}
@@ -1720,9 +1720,6 @@ public:
 			auto mat = UMath::Matrix4::kIdentity;
 			veh->GetMatrix4(&mat);
 			mat.p = *veh->GetPosition();
-			auto colPos = mat.p;
-			colPos += mat.x * offX;
-			colPos += mat.z * offZ;
 			mat.p += mat.x * offX;
 			mat.p += mat.y * offY;
 			mat.p += mat.z * offZ;
@@ -1733,7 +1730,7 @@ public:
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
-			SpawnRamp(mat, colPos);
+			SpawnRamp(mat);
 			DoChaosSave();
 		}
 	}

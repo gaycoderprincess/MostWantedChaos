@@ -344,6 +344,39 @@ void DoChaosABCLoad() {
 	}
 }
 
+bool DoChaosRampSave() {
+	std::vector<tObjectSaveNoCol> save;
+	for (auto& peanut : Effect_SpawnRamp::aRampsInWorld) {
+		auto model = Render3DObjects::aObjects[peanut];
+		if (model->IsEmpty()) continue;
+		save.push_back({model->mMatrix});
+	}
+
+	std::ofstream file("CwoeeChaos/save/ramp.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return false;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+	return true;
+}
+
+void DoChaosRampLoad() {
+	std::ifstream file("CwoeeChaos/save/ramp.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		tObjectSaveNoCol save;
+		file.read((char*)&save, sizeof(save));
+		Effect_SpawnRamp::SpawnRamp(save.matrix);
+	}
+}
+
 bool DoChaosSettingsSave() {
 	// using the non-mutex version here as this is called inside TriggerHighestVotedEffect
 	// also defining this here so the game can't crash while accessing the irc client and corrupt the savefile
@@ -416,9 +449,10 @@ void DoChaosSave() {
 	if (!DoChaos8DownSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosBombSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosVergilSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosScientistSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosBallsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosABCSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
-	if (!DoChaosScientistSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosRampSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 }
 
@@ -432,5 +466,6 @@ void DoChaosLoad() {
 	DoChaosScientistLoad();
 	DoChaosBallsLoad();
 	DoChaosABCLoad();
+	DoChaosRampLoad();
 	DoChaosSettingsLoad();
 }
