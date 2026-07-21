@@ -117,6 +117,7 @@ namespace CustomPhysicsBall {
 			static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
 			if (sound) {
 				NyaAudio::SetVolume(sound, GetSFXVolume()*0.66);
+				NyaAudio::SkipTo(sound, 0, false);
 				NyaAudio::Play(sound);
 			}
 		}

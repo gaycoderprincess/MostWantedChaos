@@ -277,6 +277,9 @@ namespace Render3D {
 
 		auto baseTextureName = material;
 		auto textureName = sTextureSubdir + baseTextureName;
+		if (baseTextureName.empty()) {
+			textureName = "white.png";
+		}
 		model->sTextureName = baseTextureName;
 
 		for (auto& texture : aAllTextures) {

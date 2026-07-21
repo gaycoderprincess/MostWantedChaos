@@ -186,6 +186,7 @@ namespace Render3DObjects {
 		void(*pTickFunction)(Object*, double) = nullptr;
 		void* CustomData = nullptr;
 		bool bTriCollidable = false;
+		bool bDontRender = false;
 		std::string sDebugName;
 
 		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
@@ -258,12 +259,14 @@ namespace Render3DObjects {
 					CollisionInstance = CreateCustomCollisionInstance(tris, currPos, surface);
 				}
 				ModifyCustomCollisionInstance(CollisionInstance, tris, currPos);
+				WriteLog(std::format("generated {} tris for {}", tris.size(), sDebugName));
 			}
 			if (!trisIgnored.empty()) {
 				if (!CollisionInstanceIgnored) {
-					CollisionInstanceIgnored = CreateCustomCollisionInstance(tris, currPos);
+					CollisionInstanceIgnored = CreateCustomCollisionInstance(trisIgnored, currPos);
 				}
-				ModifyCustomCollisionInstance(CollisionInstanceIgnored, tris, currPos);
+				ModifyCustomCollisionInstance(CollisionInstanceIgnored, trisIgnored, currPos);
+				WriteLog(std::format("generated {} ignored tris for {}", trisIgnored.size(), sDebugName));
 			}
 		}
 
@@ -424,6 +427,7 @@ namespace Render3DObjects {
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 
 		for (auto& obj : aObjects) {
+			if (obj->bDontRender) continue;
 			for (auto& model : obj->aModels) {
 				model->RenderAt(WorldToRenderMatrix(obj->mMatrix));
 			}
@@ -549,8 +553,6 @@ namespace Render3DObjects {
 	}
 
 	void ProcessWColliderTris(WCollider* pCollider) {
-		bool isDummy = pCollider->fInstanceCacheList.empty();
-
 		if (fHoverPlatform > -100.0) {
 			ProcessHoverPlatform(pCollider);
 			AddToWCollider(pCollider, pHoverPlatform);
@@ -564,18 +566,22 @@ namespace Render3DObjects {
 			auto inst = obj->CollisionInstance;
 			if (!inst) continue;
 
-			if (!isDummy) {
-				auto objPos = inst->fInvPosRadius;
-				objPos.x *= -1;
-				objPos.y *= -1;
-				objPos.z *= -1;
-	
-				auto dist = (objPos - pos).length();
-				if (dist > inst->fInvPosRadius.w) continue;
-			}
+			auto objPos = inst->fInvPosRadius;
+			objPos.x *= -1;
+			objPos.y *= -1;
+			objPos.z *= -1;
+
+			auto dist = (objPos - pos).length();
+			if (dist > inst->fInvPosRadius.w) continue;
 
 			AddToWCollider(pCollider, inst);
 		}
+	}
+
+	bool IsColliderInSpecialArea(NyaVec3 v) {
+		v.y = 0.0;
+		if ((v - NyaVec3(-4000, 0, -4000)).length() < 200) return true; // backrooms
+		return false;
 	}
 
 	void __thiscall ProcessCollider(WCollider* pCollider, uint32_t updateMask) {
@@ -587,7 +593,7 @@ namespace Render3DObjects {
 
 		if ((updateMask & 4) != 0) ProcessBarriers(pCollider);
 		if ((updateMask & 12) != 0) {
-			if (!pCollider->fInstanceCacheList.empty()) {
+			if (!pCollider->fInstanceCacheList.empty() || IsColliderInSpecialArea(pCollider->fPosition)) {
 				ProcessWColliderTris(pCollider);
 			}
 
