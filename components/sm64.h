@@ -937,7 +937,7 @@ namespace SM64 {
 
 	void OnDestroy() {
 		if (!bEnabled) return;
-		sm64_set_mario_health(marioId, 0);
+		sm64_mario_kill(marioId);
 	}
 
 	void OnTick() {
@@ -1236,6 +1236,6 @@ namespace SM64 {
 
 		fTimeSinceLastAttacked = -10.0;
 
-		sm64_set_mario_health(marioId, 0);
+		sm64_mario_kill(marioId);
 	}
 }
