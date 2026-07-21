@@ -5,6 +5,7 @@ namespace CollView {
 	bool bWireframeBarriers = false;
 	bool bWireframeCars = true;
 	bool bDrawCars = true;
+	bool bPlayerTrisOnly = false;
 
 	int nWallColR = 0;
 	int nWallColG = 0;
@@ -176,17 +177,11 @@ namespace CollView {
 		}
 	}
 
-	bool bLogCollisionArticle = false;
 	void ProcessCollisionArticle(WCollisionInstance* inst) {
 		if (!inst) return;
 
 		auto article = inst->fCollisionArticle;
 		if (!article) return;
-
-		if (bLogCollisionArticle) {
-			WriteLog(std::format("fNumStrips {}", article->fNumStrips));
-			WriteLog(std::format("fGroupNumber {}", inst->fGroupNumber));
-		}
 
 		UMath::Matrix4 instMat;
 		inst->MakeMatrix(&instMat, true);
@@ -206,22 +201,9 @@ namespace CollView {
 				WCollisionStrip::MakeFace(strip, j, &stripSphere->fPos, &tri);
 				tri.fSurfaceRef = *(Attrib::Collection**)(articles_end_ptr + (4 * tri.fSurface.fSurface) + article->fStripsSize + article->fEdgesSize);
 
-				if (bLogCollisionArticle) {
-					WriteLog(std::format("pre tri.fPt0 {:.2f} {:.2f} {:.2f}", tri.fPt0.x, tri.fPt0.y, tri.fPt0.z));
-					WriteLog(std::format("pre tri.fPt1 {:.2f} {:.2f} {:.2f}", tri.fPt1.x, tri.fPt1.y, tri.fPt1.z));
-					WriteLog(std::format("pre tri.fPt2 {:.2f} {:.2f} {:.2f}", tri.fPt2.x, tri.fPt2.y, tri.fPt2.z));
-				}
-
 				tri.fPt0 -= instMat.p;
 				tri.fPt1 -= instMat.p;
 				tri.fPt2 -= instMat.p;
-
-				if (bLogCollisionArticle) {
-					WriteLog(std::format("instMat.p {:.2f} {:.2f} {:.2f}", instMat.p.x, instMat.p.y, instMat.p.z));
-					WriteLog(std::format("post tri.fPt0 {:.2f} {:.2f} {:.2f}", tri.fPt0.x, tri.fPt0.y, tri.fPt0.z));
-					WriteLog(std::format("post tri.fPt1 {:.2f} {:.2f} {:.2f}", tri.fPt1.x, tri.fPt1.y, tri.fPt1.z));
-					WriteLog(std::format("post tri.fPt2 {:.2f} {:.2f} {:.2f}", tri.fPt2.x, tri.fPt2.y, tri.fPt2.z));
-				}
 
 				aCollisionTris.push_back(tri);
 			}
@@ -358,32 +340,41 @@ namespace CollView {
 			aCollisionTris.clear();
 			aCollisionBarriers.clear();
 
-			for (int i = 0; i < 2700; i++) {
-				auto pack = WCollisionAssets::mCollisionPackList[i];
-				if (!pack) continue;
-
-				for (int j = 0; j < pack->mInstanceNum; j++) {
-					ProcessCollisionArticle(&pack->mInstanceList[j]);
+			if (bPlayerTrisOnly) {
+				auto collider = (WCollider*)ply->GetWCollider();
+				for (int i = 0; i < collider->fTriList.size(); i++) {
+					auto& tri = *collider->fTriList[i];
+					for (int j = 0; j < tri.size(); j++) {
+						aCollisionTris.push_back(tri[j]);
+					}
 				}
 			}
+			else {
+				for (int i = 0; i < 2700; i++) {
+					auto pack = WCollisionAssets::mCollisionPackList[i];
+					if (!pack) continue;
 
-			// custom spawned barriers from chaos objects
-			std::vector<WCollisionBarrier> barriers;
-			auto customBarriers = Render3DObjects::GetFullBarrierList();
-			for (auto& barrier : customBarriers) {
-				barriers.push_back(barrier.data);
+					for (int j = 0; j < pack->mInstanceNum; j++) {
+						ProcessCollisionArticle(&pack->mInstanceList[j]);
+					}
+				}
+
+				// custom spawned barriers from chaos objects
+				std::vector<WCollisionBarrier> barriers;
+				auto customBarriers = Render3DObjects::GetFullBarrierList();
+				for (auto& barrier : customBarriers) {
+					barriers.push_back(barrier.data);
+				}
+				ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
+
+				WCollider colliderTemp = {};
+				colliderTemp.fPosition = *ply->GetPosition();
+				colliderTemp.fInstanceCacheList.clear();
+				Render3DObjects::ProcessTrisNew(&colliderTemp);
+				if (!colliderTemp.fInstanceCacheList.empty()) {
+					ProcessCollisionArticle(colliderTemp.fInstanceCacheList[0]);
+				}
 			}
-			ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
-
-			/*WCollider colliderTemp = {};
-			colliderTemp.fPosition = *ply->GetPosition();
-			colliderTemp.fInstanceCacheList.clear();
-			Render3DObjects::ProcessTrisNew(&colliderTemp);
-			if (!colliderTemp.fInstanceCacheList.empty()) {
-				bLogCollisionArticle = true;
-				ProcessCollisionArticle(colliderTemp.fInstanceCacheList[0]);
-				bLogCollisionArticle = false;
-			}*/
 
 			auto tmp = NyaDrawing::CNyaRGBA32();
 			tmp.b = nObjColR;

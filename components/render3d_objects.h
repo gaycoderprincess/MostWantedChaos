@@ -259,9 +259,10 @@ namespace Render3DObjects {
 
 	void ProcessTrisNew(WCollider* pCollider) {
 		auto pos = pCollider->fPosition;
-
-		//auto pt = pCollider->fPosition;
-		//auto radius = pCollider->fRadius;
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			pos = *ply->GetPosition();
+		}
+		//pos = {-2508,150,1762};
 
 		float width = 25.0;
 		float length = 25.0;
@@ -298,25 +299,26 @@ namespace Render3DObjects {
 			inst->fInvPosRadius.w = tmp.length();
 			inst->fIterStamp = 0;
 			inst->fFlags = 0;
-			inst->fHeight = 100.0; // temp value
+			inst->fHeight = 0.0; // temp value
 			inst->fGroupNumber = 0;
 			inst->fRenderInstanceInd = 0; // todo?
 
 			size_t numStrips = 2;
+			size_t numTris = numStrips*3;
 			size_t stripSphere_begin = sizeof(WCollisionArticle);
 			size_t strips_begin = stripSphere_begin+(sizeof(WCollisionStripSphere)*numStrips);
-			size_t surfaces_begin = strips_begin+(sizeof(WCollisionStrip)*numStrips);
+			size_t surfaces_begin = strips_begin+(sizeof(WCollisionStrip)*numTris);
 
-			size_t dataSize = sizeof(WCollisionArticle)+4+((sizeof(WCollisionStripSphere)+sizeof(WCollisionStrip))*numStrips);
+			size_t dataSize = sizeof(WCollisionArticle)+4+(sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numTris);
 			static auto data = new uint8_t[dataSize];
 			memset(data,0,dataSize);
 
 			auto article = (WCollisionArticle*)data;
 			article->fNumStrips = numStrips;
-			article->fStripsSize = (sizeof(WCollisionStripSphere)+sizeof(WCollisionStrip))*numStrips;
+			article->fStripsSize = (sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numTris);
 			article->fNumEdges = 0;
 			article->fEdgesSize = 0;
-			article->fResolvedFlag = 1;
+			article->fResolvedFlag = 0;
 			article->fNumSurfaces = 1;
 			article->fSurfacesSize = 4;
 			article->fIntermediatObjInd = 0; // ??
@@ -344,6 +346,10 @@ namespace Render3DObjects {
 				tris[i].fPt2.y += inst->fInvPosRadius.y;
 				tris[i].fPt2.z += inst->fInvPosRadius.z;
 
+				//WriteLog(std::format("tris[{}].fPt0 {:.2f} {:.2f} {:.2f}", i, tris[i].fPt0.x, tris[i].fPt0.y, tris[i].fPt0.z));
+				//WriteLog(std::format("tris[{}].fPt1 {:.2f} {:.2f} {:.2f}", i, tris[i].fPt1.x, tris[i].fPt1.y, tris[i].fPt1.z));
+				//WriteLog(std::format("tris[{}].fPt2 {:.2f} {:.2f} {:.2f}", i, tris[i].fPt2.x, tris[i].fPt2.y, tris[i].fPt2.z));
+
 				tris[i].fPt0 *= stripMult;
 				tris[i].fPt1 *= stripMult;
 				tris[i].fPt2 *= stripMult;
@@ -370,12 +376,6 @@ namespace Render3DObjects {
 				stripList->pt[2] = tris[i].fPt2.z;
 				stripList++;
 			}
-
-			/*auto triList = (WCollisionTri*)(data+sizeof(WCollisionArticle));
-
-			for (int i = 0; i < tris.size(); i++) {
-				triList[i] = tris[i];
-			}*/
 
 			auto surfaceList = (Attrib::Collection**)(data+surfaces_begin);
 			surfaceList[0] = tri.fSurfaceRef;
@@ -428,11 +428,22 @@ namespace Render3DObjects {
 
 	void __thiscall ProcessCollider(WCollider* pCollider, uint32_t updateMask) {
 		pCollider->PrepareRegion(updateMask);
+		
+		/*auto maskNoTris = updateMask;
+		maskNoTris &= ~8;
+		pCollider->PrepareRegion(maskNoTris);*/
 
 		if ((updateMask & 4) != 0) ProcessBarriers(pCollider);
-		//if ((updateMask & 12) != 0) {
-		//	ProcessTrisNew(pCollider);
-		//}
+		if ((updateMask & 12) != 0) {
+			/*ProcessTrisNew(pCollider);
+
+			// manually do GetTriList if required, as inserting stuff into the instance list doesn't work otherwise
+			// (they're called right after one another)
+			if ((updateMask & 12) != 0 && (updateMask & 8) != 0) {
+				WCollisionMgr::GetTriList(&pCollider->fInstanceCacheList, &pCollider->fPosition, pCollider->fRadius, &pCollider->fTriList);
+				//pCollider->PrepareRegion(8);
+			}*/
+		}
 		//if ((updateMask & 12) != 0) ProcessTris(pCollider); // doesn't work consistently
 	}
 

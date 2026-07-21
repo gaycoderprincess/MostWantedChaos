@@ -734,6 +734,9 @@ void ChaosModMenu() {
 							// fGroupNumber 0
 							// player pos -2508 148 1762
 						}
+						if (!collider->fTriList.empty()) {
+							DrawMenuOption(std::format("fTriList.size(): {}", collider->fTriList.size()));
+						}
 					}
 				}
 				auto cam = GetLocalPlayerCamera();
@@ -815,6 +818,7 @@ void ChaosModMenu() {
 				QuickValueEditor("bWireframeGround", CollView::bWireframeGround);
 				QuickValueEditor("bWireframeBarriers", CollView::bWireframeBarriers);
 				QuickValueEditor("bWireframeCars", CollView::bWireframeCars);
+				QuickValueEditor("bPlayerTrisOnly", CollView::bPlayerTrisOnly);
 
 				QuickValueEditor("nWallColR", CollView::nWallColR);
 				QuickValueEditor("nWallColG", CollView::nWallColG);
