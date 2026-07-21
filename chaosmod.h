@@ -867,6 +867,14 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			QuickValueEditor("Backrooms::playerX", Effect_Backrooms::playerX);
+			QuickValueEditor("Backrooms::playerY", Effect_Backrooms::playerY);
+			QuickValueEditor("Backrooms::playerZ", Effect_Backrooms::playerZ);
+			QuickValueEditor("Backrooms::rX", Effect_Backrooms::rX);
+			QuickValueEditor("Backrooms::rY", Effect_Backrooms::rY);
+			QuickValueEditor("Backrooms::rZ", Effect_Backrooms::rZ);
+			QuickValueEditor("Backrooms::scale", Effect_Backrooms::scale);
+			QuickValueEditor("Backrooms::invert", Effect_Backrooms::invert);
 			QuickValueEditor("Ramp::rX", Effect_SpawnRamp::rX);
 			QuickValueEditor("Ramp::rY", Effect_SpawnRamp::rY);
 			QuickValueEditor("Ramp::rZ", Effect_SpawnRamp::rZ);

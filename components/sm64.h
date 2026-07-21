@@ -1226,11 +1226,15 @@ namespace SM64 {
 	void TakeLavaDamage() {
 		if (!bEnabled && !bEnemyEnabled) return;
 
+		fTimeSinceLastAttacked = 0;
+
 		sm64_set_mario_action_arg(SM64::marioId, ACT_LAVA_BOOST, 1);
 	}
 
 	void TakeInstakillDamage() {
 		if (!bEnabled && !bEnemyEnabled) return;
+
+		fTimeSinceLastAttacked = -10.0;
 
 		sm64_set_mario_health(marioId, 0);
 	}

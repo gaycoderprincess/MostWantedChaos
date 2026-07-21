@@ -6,10 +6,14 @@ public:
 		bRigProportionalChances = true;
 	}
 
+	static inline bool invert = false;
 	static inline float rX = 90;
 	static inline float rY = -90;
 	static inline float rZ = 0;
 	static inline float scale = 10.0;
+	static inline float playerX = 4;
+	static inline float playerY = -12;
+	static inline float playerZ = -37;
 
 	void InitFunction() override {
 		Render3D::sTextureSubdir = "backrooms/";
@@ -31,6 +35,10 @@ public:
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			mat = (UMath::Matrix4)(mat * rotation);
 
+			if (invert) {
+				mat.x *= -1;
+			}
+
 			Render3DObjects::aObjects.push_back(new Render3DObjects::Object("map", models, mat, mat.p));
 
 			int id = Render3DObjects::aObjects.size();
@@ -43,9 +51,9 @@ public:
 
 		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
 			UMath::Vector3 playerPos = BACKROOMS_COORDS;
-			playerPos.x += 4;
-			playerPos.y -= 12;
-			playerPos.z -= 37;
+			playerPos.x += playerX;
+			playerPos.y += playerY;
+			playerPos.z += playerZ;
 			TeleportPlayer(playerPos, {-0.96,0.0,-0.3});
 		}
 	}
