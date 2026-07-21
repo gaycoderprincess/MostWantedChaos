@@ -858,6 +858,25 @@ struct PerformanceBenchmarkResult {
 };
 std::vector<PerformanceBenchmarkResult> aPerformanceBenchmarkResults;
 
+auto BACKROOMS_COORDS = NyaVec3(-4000,0,-4000);
+float BACKROOMS_DISTANCE = 400.0;
+float BACKROOMS_FLOOR_Y = -14.0933;
+bool GetWorldHeightAtPoint_WithCustom(const UMath::Vector3* pt, float* height, UMath::Vector3* normal) {
+	auto pt2d = *pt;
+	pt2d.y = 0;
+	if ((pt2d-BACKROOMS_COORDS).length() < BACKROOMS_DISTANCE) {
+		if (height) {
+			*height = BACKROOMS_FLOOR_Y;
+		}
+		if (normal) {
+			*normal = {0,1,0};
+		}
+		return true;
+	}
+
+	return WCollisionMgr::GetWorldHeightAtPointRigorous(pt, height, normal);
+}
+
 class PerformanceBenchmarker {
 public:
 	char sName[64];

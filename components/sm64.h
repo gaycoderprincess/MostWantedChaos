@@ -769,6 +769,8 @@ namespace SM64 {
 	}
 
 	void MarioCarInheritance() {
+		if (bEnemyEnabled) return;
+
 		auto ply = GetLocalPlayerInterface<ISpikeable>();
 		if (ply && ply->GetNumBlowouts() > 0) {
 			GetLocalPlayerInterface<IDamageable>()->ResetDamage();
@@ -1206,7 +1208,7 @@ namespace SM64 {
 	});
 
 	void OnTakeDamage(int damage, NyaVec3 pos, bool heavyDamage) {
-		if (!bEnabled) return;
+		if (!bEnabled && !bEnemyEnabled) return;
 
 		fTimeSinceLastAttacked = 0;
 
@@ -1222,8 +1224,14 @@ namespace SM64 {
 	}
 
 	void TakeLavaDamage() {
-		if (!bEnabled) return;
+		if (!bEnabled && !bEnemyEnabled) return;
 
 		sm64_set_mario_action_arg(SM64::marioId, ACT_LAVA_BOOST, 1);
+	}
+
+	void TakeInstakillDamage() {
+		if (!bEnabled && !bEnemyEnabled) return;
+
+		sm64_set_mario_health(marioId, 0);
 	}
 }

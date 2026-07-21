@@ -19,15 +19,13 @@ public:
 
 		//TeleportPlayer({-2485.08, 208.38, -1348.54}, {0.0,0.0,1.0}); // teleport behind old bridge
 
-		auto backrooms = NyaVec3(-4000,0,-4000);
-
 		static bool bOnce = true;
 		if (bOnce) {
 			auto mat = UMath::Matrix4::kIdentity;
 			mat.x *= scale;
 			mat.y *= scale;
 			mat.z *= scale;
-			mat.p = backrooms;
+			mat.p = BACKROOMS_COORDS;
 
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
@@ -44,7 +42,7 @@ public:
 		}
 
 		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
-			UMath::Vector3 playerPos = backrooms;
+			UMath::Vector3 playerPos = BACKROOMS_COORDS;
 			playerPos.x += 4;
 			playerPos.y -= 12;
 			playerPos.z -= 37;

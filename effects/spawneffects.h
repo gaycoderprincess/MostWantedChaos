@@ -173,7 +173,7 @@ public:
 			lastPeanutDistance = movePos.length();
 			movePos.Normalize();
 			obj->vColPosition += movePos * peanutSpeed * Sim::Internal::mSystem->mSpeed * delta;
-			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
+			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
 
 			obj->mMatrix = NyaMat4x4::LookAt(-movePos);
 
@@ -252,7 +252,7 @@ public:
 			auto mat = UMath::Matrix4::kIdentity;
 			veh->GetMatrix4(&mat);
 			mat.p = *veh->GetPosition();
-			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
 
 			mat.p += mat.x * offX;
 			mat.p += mat.y * offY;
@@ -369,6 +369,15 @@ public:
 
 	static inline std::vector<int> aBombsInWorld;
 
+	static void ExplodeBomb(Render3DObjects::Object* obj) {
+		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/puttbang.wav");
+		if (sound) {
+			NyaAudio::SetVolume(sound, GetSFXVolume());
+			NyaAudio::Play(sound);
+		}
+		obj->aModels.clear();
+	}
+
 	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
 		if (IsChaosBlocked()) return;
 
@@ -388,17 +397,21 @@ public:
 		obj->mMatrix.z *= scale;
 		obj->mMatrix.p = p;
 
+		// instakill enemy mario
+		if (SM64::bEnemyEnabled) {
+			auto dist = (SM64::GetMarioWorldPos() - obj->mMatrix.p);
+			if (dist.length() < 5) {
+				SM64::TakeLavaDamage();
+				SM64::TakeInstakillDamage();
+				ExplodeBomb(obj);
+			}
+		}
+
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
 			if (distFromCar < 5) {
 				if (!IsCarDestroyed(car)) {
-					static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/puttbang.wav");
-					if (sound) {
-						NyaAudio::SetVolume(sound, GetSFXVolume());
-						NyaAudio::Play(sound);
-					}
-
 					if (auto rb = car->mCOMObject->Find<IRigidBody>()) {
 						auto vel = *rb->GetLinearVelocity();
 						vel.y += 10;
@@ -416,7 +429,8 @@ public:
 						SM64::TakeLavaDamage();
 					}
 					DestroyCar(car);
-					obj->aModels.clear();
+
+					ExplodeBomb(obj);
 				}
 			}
 		}
@@ -446,7 +460,7 @@ public:
 			auto mat = UMath::Matrix4::kIdentity;
 			veh->GetMatrix4(&mat);
 			mat.p = *veh->GetPosition();
-			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
 			mat.p += mat.x * offX;
 			mat.p += mat.y * offY;
 			mat.p += mat.z * offZ;
@@ -564,7 +578,7 @@ public:
 		}
 
 		float groundY = -9999;
-		WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->mMatrix.p, &groundY, nullptr);
+		GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&obj->mMatrix.p, &groundY, nullptr);
 		if (obj->mMatrix.p.y < groundY) {
 			data->timeLeft = 0;
 			if (!NyaAudio::IsFinishedPlaying(FireSound)) {
@@ -932,7 +946,7 @@ public:
 
 		auto data = (tVergilData*)obj->CustomData;
 		auto newPosition = obj->vColPosition + data->direction * 7.5;
-		if (WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&newPosition, &newPosition.y, nullptr)) {
+		if (GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&newPosition, &newPosition.y, nullptr)) {
 			obj->vColPosition = newPosition;
 			VergilGenericAttack(obj, attackStingerRange, 0);
 		}
@@ -954,7 +968,7 @@ public:
 
 		// check ground exists before teleporting
 		auto newPosition = ply + fwd * 5;
-		if (!WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&newPosition, &newPosition.y, nullptr)) return;
+		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&newPosition, &newPosition.y, nullptr)) return;
 		obj->vColPosition = newPosition;
 
 		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/teleport.mp3");
@@ -974,7 +988,7 @@ public:
 		auto plyDist = (obj->vColPosition - plyPos).length();
 
 		if (auto closestCar = GetClosestActiveVehicle(obj->vColPosition)) {
-			WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
+			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
 
 			auto dir = (obj->vColPosition - *closestCar->GetPosition());
 			dir.y = 0;

@@ -580,7 +580,7 @@ namespace Render3DObjects {
 
 	bool IsColliderInSpecialArea(NyaVec3 v) {
 		v.y = 0.0;
-		if ((v - NyaVec3(-4000, 0, -4000)).length() < 200) return true; // backrooms
+		if ((v - BACKROOMS_COORDS).length() < BACKROOMS_DISTANCE) return true;
 		return false;
 	}
 
