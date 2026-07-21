@@ -257,28 +257,37 @@ namespace Render3DObjects {
 		}
 	}
 
+	float fHoverPlatform = -999.0;
 	void ProcessTrisNew(WCollider* pCollider) {
+		if (pCollider->fInstanceCacheList.empty()) return;
+
 		auto pos = pCollider->fPosition;
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			pos = *ply->GetPosition();
 		}
-		//pos = {-2508,150,1762};
+		pos.y = fHoverPlatform;
 
-		float width = 25.0;
-		float length = 25.0;
+		float width = 16.0;
+		float length = 16.0;
 
 		WCollisionTri tri = {};
-		tri.fPt2 = {pos.x - (width/2.0), 150, pos.z - (length/2.0)};
-		tri.fPt1 = {pos.x - (width/2.0), 150, pos.z + (length/2.0)};
-		tri.fPt0 = {pos.x + (width/2.0), 150, pos.z - (length/2.0)};
-		//tri.fPt0 = {-3500,150,-3500};
-		//tri.fPt1 = {-3500,150,3500};
-		//tri.fPt2 = {3500,150,-3500};
+		tri.fPt2 = {pos.x - (width/2.0), fHoverPlatform, pos.z - (length/2.0)};
+		tri.fPt1 = {pos.x - (width/2.0), fHoverPlatform, pos.z + (length/2.0)};
+		tri.fPt0 = {pos.x + (width/2.0), fHoverPlatform, pos.z - (length/2.0)};
 		tri.fSurface.fSurface = 0;
 		tri.fSurfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("unknown"));
 
 		auto tri3 = tri;
-		tri3.fPt2 = {pos.x + (width/2.0), 150, pos.z + (length/2.0)};
+		tri3.fPt2 = {pos.x + (width/2.0), fHoverPlatform, pos.z + (length/2.0)};
+
+		auto triRev = tri;
+		triRev.fPt0 = tri.fPt2;
+		triRev.fPt1 = tri.fPt1;
+		triRev.fPt2 = tri.fPt0;
+		auto tri3Rev = tri3;
+		tri3Rev.fPt0 = tri3.fPt2;
+		tri3Rev.fPt1 = tri3.fPt1;
+		tri3Rev.fPt2 = tri3.fPt0;
 
 		//if (pCollider->fInstanceCacheList.empty())
 		{
@@ -303,7 +312,7 @@ namespace Render3DObjects {
 			inst->fGroupNumber = 0;
 			inst->fRenderInstanceInd = 0; // todo?
 
-			size_t numStrips = 2;
+			size_t numStrips = 4;
 			size_t numTris = numStrips*3;
 			size_t stripSphere_begin = sizeof(WCollisionArticle);
 			size_t strips_begin = stripSphere_begin+(sizeof(WCollisionStripSphere)*numStrips);
@@ -334,6 +343,8 @@ namespace Render3DObjects {
 			std::vector<WCollisionTri> tris;
 			tris.push_back(tri);
 			tris.push_back(tri3);
+			tris.push_back(triRev);
+			tris.push_back(tri3Rev);
 			for (int i = 0; i < tris.size(); i++) {
 				// todo is this correct?
 				tris[i].fPt0.x += inst->fInvPosRadius.x;
@@ -400,49 +411,27 @@ namespace Render3DObjects {
 				pCollider->fInstanceCacheList.push_back(inst);
 			}
 		}
-
-		/*if (pCollider->fTriList.empty()) {
-			auto tmp = (WCollisionTriBlock*)gFastMem.Alloc(sizeof(WCollisionTriBlock), nullptr);
-			memset(tmp, 0, sizeof(WCollisionTriBlock));
-			//tmp->clear();
-			tmp->push_back(tri);
-			tmp->push_back(tri3);
-			pCollider->fTriList.push_back(tmp);
-		}
-		else {
-			for (int i = 0; i < pCollider->fTriList.size(); i++) {
-				auto tmp = pCollider->fTriList[i];
-				//tmp->clear();
-				tmp->push_back(tri);
-				tmp->push_back(tri3);
-
-				std::sort(tmp->mpBegin, tmp->mpEnd, [](const WCollisionTri& a, const WCollisionTri& b) { return AvgTriY(&a) > AvgTriY(&b); });
-				if (tmp->mpBegin[0].fPt0.y == 150.0f) {
-					tmp->clear();
-					tmp->push_back(tri);
-					tmp->push_back(tri3);
-				}
-			}
-		}*/
 	}
 
 	void __thiscall ProcessCollider(WCollider* pCollider, uint32_t updateMask) {
-		pCollider->PrepareRegion(updateMask);
-		
-		/*auto maskNoTris = updateMask;
+		//pCollider->PrepareRegion(updateMask);
+
+		auto maskNoTris = updateMask;
 		maskNoTris &= ~8;
-		pCollider->PrepareRegion(maskNoTris);*/
+		pCollider->PrepareRegion(maskNoTris);
 
 		if ((updateMask & 4) != 0) ProcessBarriers(pCollider);
 		if ((updateMask & 12) != 0) {
-			/*ProcessTrisNew(pCollider);
+			if (fHoverPlatform > -100.0) {
+				ProcessTrisNew(pCollider);
+			}
 
 			// manually do GetTriList if required, as inserting stuff into the instance list doesn't work otherwise
 			// (they're called right after one another)
 			if ((updateMask & 12) != 0 && (updateMask & 8) != 0) {
 				WCollisionMgr::GetTriList(&pCollider->fInstanceCacheList, &pCollider->fPosition, pCollider->fRadius, &pCollider->fTriList);
 				//pCollider->PrepareRegion(8);
-			}*/
+			}
 		}
 		//if ((updateMask & 12) != 0) ProcessTris(pCollider); // doesn't work consistently
 	}
@@ -454,5 +443,13 @@ namespace Render3DObjects {
 		aDrawing3DLoopFunctions.push_back(OnTick3D);
 
 		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x789FC1, &ProcessCollider);
+
+		// WWorldPos::FindClosestFace quitIfOnSameFace = false
+		NyaHookLib::Patch<uint8_t>(0x7867B2, 0xEB);
+		NyaHookLib::Fill(0x7791CD, 0x90, 6);
+
+		// WWorldPos::Update use different FindClosestFace that uses the collision instance cache
+		NyaHookLib::Patch<uint8_t>(0x789CDD + 2, 0x3C);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x789CE3, 0x786750);
 	});
 }
