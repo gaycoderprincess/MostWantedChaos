@@ -589,6 +589,8 @@ namespace SM64 {
 		UMath::Vector3 marioPos = GetMarioWorldPos();
 
 		for (auto& obj : Render3DObjects::aObjects) {
+			if (!obj->IsActive()) continue;
+
 			auto& car = *obj;
 			if (car.fColSize <= 0.0) continue;
 

@@ -1668,6 +1668,10 @@ public:
 	void TickFunctionMain(double delta) override {
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
 			Render3DObjects::fHoverPlatform = std::max(ply->GetPosition()->y - 2.0f, Render3DObjects::fHoverPlatform);
+
+			if (std::abs(ply->GetPosition()->y - Render3DObjects::fHoverPlatform) > 4.0) {
+				Render3DObjects::fHoverPlatform = ply->GetPosition()->y - 2.0f;
+			}
 		}
 	}
 	void DeinitFunction() override {

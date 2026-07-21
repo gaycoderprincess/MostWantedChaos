@@ -564,13 +564,15 @@ namespace Render3DObjects {
 			auto inst = obj->CollisionInstance;
 			if (!inst) continue;
 
-			auto objPos = inst->fInvPosRadius;
-			objPos.x *= -1;
-			objPos.y *= -1;
-			objPos.z *= -1;
-
-			auto dist = (objPos - pos).length();
-			if (!isDummy && dist > inst->fInvPosRadius.w) continue;
+			if (!isDummy) {
+				auto objPos = inst->fInvPosRadius;
+				objPos.x *= -1;
+				objPos.y *= -1;
+				objPos.z *= -1;
+	
+				auto dist = (objPos - pos).length();
+				if (dist > inst->fInvPosRadius.w) continue;
+			}
 
 			AddToWCollider(pCollider, inst);
 		}
