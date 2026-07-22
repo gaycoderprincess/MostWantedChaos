@@ -33,6 +33,7 @@ namespace CustomCamera {
 	double fMouse[2] = {};
 	NyaVec3 vPos = {0, 0, 0};
 	NyaVec3 vPosChange = {0, 0, 0};
+	NyaVec3 vPosAfterLook = {0, 0, 0};
 	float fLookatOffset = 0.7;
 	float fFollowOffset = 1.7;
 	float fLookatOffsetBall = 1.0;
@@ -50,6 +51,29 @@ namespace CustomCamera {
 
 	bool IsHeliCam() {
 		return !strcmp(pTargetPlayerVehicle->GetVehicleName(), "copheli");
+	}
+
+	NyaVec3 GetRawPlayerPosition(IRigidBody* ply) {
+		if (ply == GetLocalPlayerInterface<IRigidBody>()) {
+			if (IsMario()) {
+				static NyaVec3 v;
+				v = SM64::GetMarioWorldPos();
+				v.y += 1 * SM64::GetMarioScale();
+				v -= GetMarioDelayVector() * fMarioDelayFactor;
+				return v;
+			}
+			if (IsBallin()) {
+				NyaVec3 v;
+				auto tmp = b3Body_GetPosition(CustomPhysicsBall::BallBody);
+				v.x = tmp.x;
+				v.y = tmp.y;
+				v.z = tmp.z;
+				return v;
+			}
+		}
+
+		if (!ply) return {0,0,0};
+		return *ply->GetPosition();
 	}
 
 	double GetMinStringDistance(IRigidBody* ply) {
@@ -79,11 +103,13 @@ namespace CustomCamera {
 	}
 
 	NyaVec3 GetLookatOffset(IRigidBody* ply) {
-		if (IsMario()) {
-			return {0, fLookatOffset * SM64::GetMarioScale(), 0};
-		}
-		if (IsBallin()) {
-			return {0, CustomPhysicsBall::fBallSize * fLookatOffsetBall, 0};
+		if (ply == GetLocalPlayerInterface<IRigidBody>()) {
+			if (IsMario()) {
+				return {0, fLookatOffset * SM64::GetMarioScale(), 0};
+			}
+			if (IsBallin()) {
+				return {0, CustomPhysicsBall::fBallSize * fLookatOffsetBall, 0};
+			}
 		}
 
 		UMath::Vector3 dim;
@@ -92,11 +118,13 @@ namespace CustomCamera {
 	}
 
 	NyaVec3 GetFollowOffset(IRigidBody* ply) {
-		if (IsMario()) {
-			return {0, fFollowOffset * SM64::GetMarioScale(), 0};
-		}
-		if (IsBallin()) {
-			return {0, CustomPhysicsBall::fBallSize * fFollowOffsetBall, 0};
+		if (ply == GetLocalPlayerInterface<IRigidBody>()) {
+			if (IsMario()) {
+				return {0, fFollowOffset * SM64::GetMarioScale(), 0};
+			}
+			if (IsBallin()) {
+				return {0, CustomPhysicsBall::fBallSize * fFollowOffsetBall, 0};
+			}
 		}
 
 		if (IsHeliCam()) return {0, -4, 0};
@@ -107,25 +135,27 @@ namespace CustomCamera {
 	}
 
 	NyaVec3* GetTargetPosition(IRigidBody* ply) {
-		if (IsMario()) {
-			static NyaVec3 v;
-			v = SM64::GetMarioWorldPos();
-			v.y += 1 * SM64::GetMarioScale();
-			v += GetLookatOffset(ply);
-			v -= GetMarioDelayVector() * fMarioDelayFactor;
-			return &v;
-		}
-		if (IsBallin()) {
-			static NyaVec3 v;
-			auto tmp = b3Body_GetPosition(CustomPhysicsBall::BallBody);
-			v.x = tmp.x;
-			v.y = tmp.y;
-			v.z = tmp.z;
-			v += GetLookatOffset(ply);
-			return &v;
-		}
-
 		if (!ply) return nullptr;
+
+		if (ply == GetLocalPlayerInterface<IRigidBody>()) {
+			if (IsMario()) {
+				static NyaVec3 v;
+				v = SM64::GetMarioWorldPos();
+				v.y += 1 * SM64::GetMarioScale();
+				v += GetLookatOffset(ply);
+				v -= GetMarioDelayVector() * fMarioDelayFactor;
+				return &v;
+			}
+			if (IsBallin()) {
+				static NyaVec3 v;
+				auto tmp = b3Body_GetPosition(CustomPhysicsBall::BallBody);
+				v.x = tmp.x;
+				v.y = tmp.y;
+				v.z = tmp.z;
+				v += GetLookatOffset(ply);
+				return &v;
+			}
+		}
 
 		static NyaVec3 vec;
 		vec = *ply->GetPosition();
@@ -134,25 +164,27 @@ namespace CustomCamera {
 	}
 
 	NyaVec3* GetFollowPosition(IRigidBody* ply) {
-		if (IsMario()) {
-			static NyaVec3 v;
-			v = SM64::GetMarioWorldPos();
-			v.y += 1 * SM64::GetMarioScale();
-			v += GetFollowOffset(ply);
-			v -= GetMarioDelayVector() * fMarioDelayFactor;
-			return &v;
-		}
-		if (IsBallin()) {
-			static NyaVec3 v;
-			auto tmp = b3Body_GetPosition(CustomPhysicsBall::BallBody);
-			v.x = tmp.x;
-			v.y = tmp.y;
-			v.z = tmp.z;
-			v += GetFollowOffset(ply);
-			return &v;
-		}
-
 		if (!ply) return nullptr;
+
+		if (ply == GetLocalPlayerInterface<IRigidBody>()) {
+			if (IsMario()) {
+				static NyaVec3 v;
+				v = SM64::GetMarioWorldPos();
+				v.y += 1 * SM64::GetMarioScale();
+				v += GetFollowOffset(ply);
+				v -= GetMarioDelayVector() * fMarioDelayFactor;
+				return &v;
+			}
+			if (IsBallin()) {
+				static NyaVec3 v;
+				auto tmp = b3Body_GetPosition(CustomPhysicsBall::BallBody);
+				v.x = tmp.x;
+				v.y = tmp.y;
+				v.z = tmp.z;
+				v += GetFollowOffset(ply);
+				return &v;
+			}
+		}
 
 		static NyaVec3 vec;
 		vec = *ply->GetPosition();
@@ -168,6 +200,18 @@ namespace CustomCamera {
 		lookat.Normalize();
 		auto mat = NyaMat4x4::LookAt(lookat);
 		mat.p = vPos;
+		mat = WorldToRenderMatrix(mat);
+		ApplyCameraMatrix(pCam, mat);
+	}
+
+	void SetRotationAfterLook(Camera* pCam) {
+		auto plyPos = GetTargetPosition(pTargetPlayerBody);
+		if (!plyPos) return;
+
+		auto lookat = *plyPos - vPosAfterLook;
+		lookat.Normalize();
+		auto mat = NyaMat4x4::LookAt(lookat);
+		mat.p = vPosAfterLook;
 		mat = WorldToRenderMatrix(mat);
 		ApplyCameraMatrix(pCam, mat);
 	}
@@ -333,6 +377,17 @@ namespace CustomCamera {
 			SetRotation(cam);
 			DoMovement(cam);
 			SetRotation(cam);
+
+			if (GetLocalPlayerInterface<IInput>()->IsLookBackButtonPressed()) {
+				auto carPos = GetRawPlayerPosition(pTargetPlayerBody);
+				vPosAfterLook = vPos;
+				vPosAfterLook -= carPos;
+				vPosAfterLook.x *= -1;
+				vPosAfterLook.z *= -1;
+				vPosAfterLook += carPos;
+				SetRotationAfterLook(cam);
+			}
+
 			SetRotationSecondPerson(cam);
 		}
 

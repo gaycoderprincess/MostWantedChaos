@@ -231,6 +231,11 @@ namespace CustomPhysicsBall {
 			stick.x *= fSideMoveSpeed;
 			stick.y *= fFwdMoveSpeed;
 
+			if (GetLocalPlayerInterface<IInput>()->IsLookBackButtonPressed()) {
+				stick.x *= -1;
+				stick.y *= -1;
+			}
+
 			float y = vel.y;
 			vel.y = 0;
 

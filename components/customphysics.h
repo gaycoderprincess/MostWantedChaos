@@ -170,7 +170,6 @@ namespace CustomPhysics {
 		std::vector<b3Vec3> vertices;
 		std::vector<int> indices;
 		for (auto& tri : article.aTriStrips) {
-			int id = &tri - &article.aTriStrips[0];
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt0.x, tri.fPt0.y, tri.fPt0.z});
 			indices.push_back(vertices.size());
@@ -180,7 +179,6 @@ namespace CustomPhysics {
 		}
 
 		for (auto& tri : article.aBarriers) {
-			int id = &tri - &article.aBarriers[0];
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt0.x, tri.fPt0.y, tri.fPt0.z});
 			indices.push_back(vertices.size());
