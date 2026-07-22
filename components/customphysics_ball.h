@@ -3,7 +3,9 @@ namespace CustomPhysicsBall {
 
 	bool bDoReset = false;
 
+	float fMoveSpeedLow = 8.0;
 	float fMoveSpeed = 15.0;
+	float fMoveSpeedHigh = 20.0;
 	float fBrakeSpeed = 2.0;
 	float fMaxMoveSpeed = 50.0;
 	float fBallSize = 2.5;
@@ -62,6 +64,20 @@ namespace CustomPhysicsBall {
 
 	void OnTeleport() {
 		bDoReset = true;
+	}
+
+	float GetBallAcceleration() {
+		auto ply = GetLocalPlayerVehicle();
+		if (!ply) return fMoveSpeed;
+		Physics::Info::Performance perf;
+		if (!ply->GetPerformance(&perf)) return fMoveSpeed;
+		return std::lerp(fMoveSpeedLow, fMoveSpeedHigh, perf.Acceleration);
+	}
+
+	float GetBallTopSpeed() {
+		auto ply = GetLocalPlayerVehicle();
+		if (!ply) return fMaxMoveSpeed;
+		return ply->GetAIVehiclePtr()->GetTopSpeed();
 	}
 
 	void OnTick() {
@@ -222,10 +238,14 @@ namespace CustomPhysicsBall {
 
 			b3Vec3 velAdd = {0,0,0};
 
-			velAdd.x += fwd.x * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
-			velAdd.z += fwd.z * -stick.y * fMoveSpeed * gTimer.fDeltaTime;
-			velAdd.x += side.x * stick.x * fMoveSpeed * gTimer.fDeltaTime;
-			velAdd.z += side.z * stick.x * fMoveSpeed * gTimer.fDeltaTime;
+			auto accel = GetBallAcceleration();
+			auto maxSpeed = GetBallTopSpeed();
+			AddLogPopup(std::format("accel {:.2f} maxSpeed {:.2f}", accel, maxSpeed));
+
+			velAdd.x += fwd.x * -stick.y * accel * gTimer.fDeltaTime;
+			velAdd.z += fwd.z * -stick.y * accel * gTimer.fDeltaTime;
+			velAdd.x += side.x * stick.x * accel * gTimer.fDeltaTime;
+			velAdd.z += side.z * stick.x * accel * gTimer.fDeltaTime;
 
 			if (b3Length(velAdd) > 0.0) {
 				auto velNorm = b3Normalize(vel);
@@ -239,7 +259,7 @@ namespace CustomPhysicsBall {
 			vel += velAdd;
 
 			auto newLen = b3Length(vel);
-			if (newLen > fMaxMoveSpeed) {
+			if (newLen > maxSpeed) {
 				vel.x /= newLen;
 				vel.z /= newLen;
 				vel.x *= oldLen;

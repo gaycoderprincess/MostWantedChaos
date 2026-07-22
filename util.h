@@ -831,8 +831,12 @@ void ReloadCarBehaviors(eVehicleList vehicleType) {
 	NyaHookLib::Patch<uint16_t>(0x688378, 0x1274);
 }
 
+bool bDebugPrintsEnabled = false;
+
 std::vector<std::string> aLogPopups;
 void AddLogPopup(const std::string& str) {
+	if (!bDebugPrintsEnabled && !str.starts_with("PERFORMANCE WARNING")) return;
+
 	aLogPopups.push_back(str);
 }
 
