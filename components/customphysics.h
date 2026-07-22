@@ -42,11 +42,27 @@ namespace CustomPhysics {
 	};
 	std::vector<CustomObjectInstance> aB3Objects;
 
-	IRigidBody* GetGameBodyForB3Body(b3BodyId body) {
+	CustomObjectInstance* GetGameObjectInstanceForB3Body(b3BodyId body) {
 		for (auto& obj : aB3Objects) {
 			if (B3_ID_EQUALS(obj.nB3Body, body)) {
-				return obj.pGameBody;
+				return &obj;
 			}
+		}
+		return nullptr;
+	}
+
+	CustomObjectInstance* GetGameObjectInstanceForGameBody(IRigidBody* body) {
+		for (auto& obj : aB3Objects) {
+			if (obj.pGameBody == body) {
+				return &obj;
+			}
+		}
+		return nullptr;
+	}
+
+	IRigidBody* GetGameBodyForB3Body(b3BodyId body) {
+		if (auto obj = GetGameObjectInstanceForB3Body(body)) {
+			return obj->pGameBody;
 		}
 		return nullptr;
 	}
@@ -224,91 +240,24 @@ namespace CustomPhysics {
 		return out;
 	}
 
-	const int COLLVIEW_MAX_TRIANGLES = 16384;
-
-	template<int bufId>
-	void DebugRender(CollisionGeometryBuffer marioBuffers, NyaMat4x4 matrix) {
-		int numFaces = COLLVIEW_MAX_TRIANGLES;
-		int numVertices = 3 * numFaces;
-
-		size_t vertexTotalSize = numVertices * sizeof(Render3D::CwoeeVertexData);
-		size_t indexTotalSize = numFaces * 3 * 4;
-
-		static IDirect3DVertexBuffer9* vertexBuffer = nullptr;
-		static IDirect3DIndexBuffer9* indexBuffer = nullptr;
-
-		static auto hr1 = g_pd3dDevice->CreateVertexBuffer(vertexTotalSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1, D3DPOOL_DEFAULT, &vertexBuffer, nullptr);
-		if (hr1 != D3D_OK) {
-			return;
-		}
-		static auto hr2 = g_pd3dDevice->CreateIndexBuffer(indexTotalSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFMT_INDEX32, D3DPOOL_DEFAULT, &indexBuffer, nullptr);
-		if (hr2 != D3D_OK) {
-			return;
-		}
-
-		Render3D::CwoeeVertexData* verticesOut = nullptr;
-		int* indicesOut = nullptr;
-		auto hr = vertexBuffer->Lock(0, vertexTotalSize, (void**)&verticesOut, D3DLOCK_DISCARD);
-		if (hr != D3D_OK) {
-			return;
-		}
-		hr = indexBuffer->Lock(0, indexTotalSize, (void**)&indicesOut, D3DLOCK_DISCARD);
-		if (hr != D3D_OK) {
-			return;
-		}
-
-		int numFacesUsed = marioBuffers.numFaces;
-		int numVerticesUsed = marioBuffers.numVertices;
-		for (int i = 0; i < numVerticesUsed; i++) {
-			auto src = &marioBuffers.position[i*3];
-			auto dest = &verticesOut[i];
-
-			auto tmpPos = WorldToRender({src[0], src[1], src[2]});
-			dest->vPos[0] = tmpPos[0];
-			dest->vPos[1] = tmpPos[1];
-			dest->vPos[2] = tmpPos[2];
-
-			dest->vNormals[0] = 0;
-			dest->vNormals[1] = 1;
-			dest->vNormals[2] = 0;
-
-			dest->vTangents[0] = 0;
-			dest->vTangents[1] = 1;
-			dest->vTangents[2] = 0;
-
-			auto tmp = NyaDrawing::CNyaRGBA32();
-			tmp.b = 0;
-			tmp.g = 255;
-			tmp.r = 0;
-			tmp.a = 255;
-			dest->Color = *(uint32_t*)&tmp;
-
-			dest->vUV[0] = 0.0;
-			dest->vUV[1] = 0.0;
-		}
-		for (int i = 0; i < numFacesUsed*3; i++) {
-			indicesOut[i] = marioBuffers.index[i];
-		}
-
-		vertexBuffer->Unlock();
-		indexBuffer->Unlock();
-
-		Render3D::tModel tmpModel = {};
-		tmpModel.pVertexBuffer = vertexBuffer;
-		tmpModel.pIndexBuffer = indexBuffer;
-		tmpModel.nVertexCount = numVerticesUsed;
-		tmpModel.nFaceCount = numFacesUsed;
-
-		static auto tex = LoadTexture("CwoeeChaos/data/models/white.png");
-		tmpModel.pTexture = tex;
-		tmpModel.RenderAt_NoEffect(WorldToRenderMatrix(matrix), false);
-	}
-
 	bool bCollectLocalPlayerCar = true;
 	float fWorldObjectMassScale = 100.0;
 	float fWorldObjectMassMinimum = 400.0;
-	void CollectWorldObjects() {
+	void PurgeWorldObjects() {
+		std::vector<CustomObjectInstance> objectsToKeep;
+
 		for (auto& obj : aB3Objects) {
+			if (IsRigidBodyValidAndActive(obj.pGameBody)) {
+				if (auto veh = obj.pGameBody->mCOMObject->Find<IVehicle>()) {
+					if (auto rb = veh->mCOMObject->Find<IRBVehicle>()) {
+						if (rb->GetInvulnerability() != INVULNERABLE_NONE) obj.pGameBody = nullptr;
+					}
+				}
+			}
+			else {
+				obj.pGameBody = nullptr;
+			}
+
 			if (obj.pGameBody && obj.bReturnChangesToGame) {
 				auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(obj.nB3Body));
 
@@ -345,16 +294,32 @@ namespace CustomPhysics {
 				avel.y = av.y;
 				avel.z = av.z;
 				obj.pGameBody->SetAngularVelocity(&avel);
-			}
 
-			b3DestroyBody(obj.nB3Body);
+				obj.bReturnChangesToGame = false;
+				objectsToKeep.push_back(obj);
+			}
+			else {
+				b3DestroyBody(obj.nB3Body);
+			}
 		}
 		aB3Objects.clear();
+		aB3Objects = objectsToKeep;
+	}
+
+	void CollectWorldObjects() {
+		PurgeWorldObjects();
 
 		auto objs = GetActiveRigidBodies();
 		for (auto& rb : objs) {
 			if (!bCollectLocalPlayerCar && rb == GetLocalPlayerInterface<IRigidBody>()) continue;
 			if (rb->GetMass() < fWorldObjectMassMinimum) continue;
+			if (GetGameObjectInstanceForGameBody(rb)) continue;
+
+			if (auto veh = rb->mCOMObject->Find<IVehicle>()) {
+				if (auto rb = veh->mCOMObject->Find<IRBVehicle>()) {
+					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
+				}
+			}
 
 			auto objInst = CustomObjectInstance();
 
@@ -392,9 +357,10 @@ namespace CustomPhysics {
 			auto mass = rb->GetMass() * fWorldObjectMassScale;
 			b3Body_SetLinearVelocity(objInst.nB3Body, {vel.x,vel.y,vel.z});
 			b3Body_SetAngularVelocity(objInst.nB3Body, {avel.x,avel.y,avel.z});
-			b3MassData massData;
+
+			b3MassData massData = b3Body_GetMassData(objInst.nB3Body);
 			massData.mass = mass;
-			massData.inertia = {mass*dim.x,mass*dim.y,mass*dim.z};
+			//massData.inertia = {mass*dim.x,mass*dim.y,mass*dim.z};
 			massData.center = {0,0,0};
 			b3Body_SetMassData(objInst.nB3Body, massData);
 

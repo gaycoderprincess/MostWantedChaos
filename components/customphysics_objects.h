@@ -17,6 +17,7 @@ namespace CustomPhysicsObjects {
 		bool bRemoveOnOutOfBounds = false;
 		bool bRemoveOnOutOfRange = false;
 		bool bUseExpensiveCollisionCheck = false;
+		bool bAffectGamePhysics = false;
 		std::string sDebugName;
 
 		NyaVec3 vSpawnPosition = {0,0,0};
@@ -135,6 +136,23 @@ namespace CustomPhysicsObjects {
 				collided.time += delta;
 			}
 		}
+
+		void ProcessGamePhysicsIntegration() {
+			b3ContactData contactData[8];
+			int num = b3Body_GetContactData(nB3Body, contactData, 8);
+			for (int i = 0; i < num; i++) {
+				auto body = b3Shape_GetBody(contactData[i].shapeIdA);
+
+				auto gameObj = CustomPhysics::GetGameObjectInstanceForB3Body(body);
+				if (!gameObj) {
+					body = b3Shape_GetBody(contactData[i].shapeIdB);
+					gameObj = CustomPhysics::GetGameObjectInstanceForB3Body(body);
+				}
+				if (!gameObj) continue;
+
+				gameObj->bReturnChangesToGame = true;
+			}
+		}
 	};
 	std::vector<CustomPhysicsObject*> aPhysicsObjects;
 
@@ -236,17 +254,19 @@ namespace CustomPhysicsObjects {
 		while (PurgeOutOfWorld()) {}
 		while (PurgeByRange()) {}
 
-		b3ContactData contactData[8];
-
 		for (auto& pObj : aPhysicsObjects) {
 			auto& obj = *pObj;
-			if (!obj.pCollisionSound) continue;
-
-			if (obj.bUseExpensiveCollisionCheck) {
-				obj.ProcessExpensiveCollisionSound(gTimer.fDeltaTime);
+			if (obj.bAffectGamePhysics) {
+				obj.ProcessGamePhysicsIntegration();
 			}
-			else {
-				obj.ProcessLazyCollisionSound();
+
+			if (obj.pCollisionSound) {
+				if (obj.bUseExpensiveCollisionCheck) {
+					obj.ProcessExpensiveCollisionSound(gTimer.fDeltaTime);
+				}
+				else {
+					obj.ProcessLazyCollisionSound();
+				}
 			}
 		}
 	}
