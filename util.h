@@ -609,8 +609,10 @@ void DestroyCar(IVehicle* car) {
 			dam->Destroy();
 		}
 	}
-	for (auto& func : aPlayerDestroyFunctions) {
-		func();
+	if (car == GetLocalPlayerVehicle()) {
+		for (auto& func : aPlayerDestroyFunctions) {
+			func();
+		}
 	}
 }
 
