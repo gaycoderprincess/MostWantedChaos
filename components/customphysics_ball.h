@@ -178,23 +178,13 @@ namespace CustomPhysicsBall {
 				ply->SetPosition(&v);
 				v = {vel.x, vel.y, vel.z};
 				ply->SetLinearVelocity(&v);
-				v = {avel.x, avel.y, avel.z};
-				ply->SetAngularVelocity(&v);
+				ply->SetAngularVelocity(&UMath::Vector3::kZero);
 
-				UMath::Vector4 q = {quat.v.x, quat.v.y, quat.v.z, quat.s};
-				ply->SetOrientation(&q);
-				//auto m = b3MakeMatrixFromQuat(quat);
-				//UMath::Matrix4 mat;
-				//mat.x.x = m.cx.x;
-				//mat.x.y = m.cx.y;
-				//mat.x.z = m.cx.z;
-				//mat.y.x = m.cy.x;
-				//mat.y.y = m.cy.y;
-				//mat.y.z = m.cy.z;
-				//mat.z.x = m.cz.x;
-				//mat.z.y = m.cz.y;
-				//mat.z.z = m.cz.z;
-				//ply->SetOrientation(&mat);
+				if (v.length() > 0.01) {
+					v.Normalize();
+					auto mat = NyaMat4x4::LookAt(v);
+					ply->SetOrientation((UMath::Matrix4*)&mat);
+				}
 			}
 
 			auto mat = PrepareCameraMatrix(GetLocalPlayerCamera());
@@ -300,15 +290,23 @@ namespace CustomPhysicsBall {
 
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
 		if (!mdl.empty()) {
-			auto rb = GetLocalPlayerInterface<ICollisionBody>();
+			UMath::Matrix4 mat;
+			auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(BallBody));
 
-			UMath::Matrix4 mat = *rb->GetMatrix4();
-			mat.p = *rb->GetPosition();
+			auto pos = b3Body_GetPosition(BallBody);
 
-			//auto pos = b3Body_GetPosition(BallBody);
-			//mat.p.x = pos.x;
-			//mat.p.y = pos.y;
-			//mat.p.z = pos.z;
+			mat.x.x = m.cx.x;
+			mat.x.y = m.cx.y;
+			mat.x.z = m.cx.z;
+			mat.y.x = m.cy.x;
+			mat.y.y = m.cy.y;
+			mat.y.z = m.cy.z;
+			mat.z.x = m.cz.x;
+			mat.z.y = m.cz.y;
+			mat.z.z = m.cz.z;
+			mat.p.x = pos.x;
+			mat.p.y = pos.y;
+			mat.p.z = pos.z;
 
 			mat.x *= fBallSize;
 			mat.y *= fBallSize;
