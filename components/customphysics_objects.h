@@ -71,6 +71,10 @@ namespace CustomPhysicsObjects {
 			b3Body_SetAngularVelocity(nB3Body, {v->x,v->y,v->z});
 		}
 
+		bool CanRespawn() {
+			return !bRemoveOnOutOfBounds || !bRemoveOnSafehouse;
+		}
+
 		void Respawn() {
 			b3Body_SetTransform(nB3Body, {vSpawnPosition.x,vSpawnPosition.y,vSpawnPosition.z}, b3Quat_identity);
 			b3Body_SetLinearVelocity(nB3Body, b3Vec3_zero);
@@ -266,6 +270,14 @@ namespace CustomPhysicsObjects {
 				}
 				else {
 					obj.ProcessLazyCollisionSound();
+				}
+			}
+
+			// change spawn position if the object is stationary
+			if (obj.CanRespawn()) {
+				b3ContactData contactData[NUM_CONTACTS_CHECK];
+				if (b3Body_GetContactData(obj.nB3Body, contactData, NUM_CONTACTS_CHECK) > 0 && obj.GetLinearVelocity().length() <= TOMPS(1.0)) {
+					obj.vSpawnPosition = obj.GetPosition();
 				}
 			}
 		}

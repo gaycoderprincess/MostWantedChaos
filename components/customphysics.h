@@ -39,6 +39,71 @@ namespace CustomPhysics {
 		b3BodyId nB3Body;
 		IRigidBody* pGameBody;
 		bool bReturnChangesToGame = false;
+
+		void CollectFromGameBody() {
+			auto rb = pGameBody;
+
+			auto p = *rb->GetPosition();
+
+			UMath::Matrix4 m;
+			rb->GetMatrix4(&m);
+
+			b3Matrix3 m3;
+			m3.cx.x = m.x.x;
+			m3.cx.y = m.x.y;
+			m3.cx.z = m.x.z;
+			m3.cy.x = m.y.x;
+			m3.cy.y = m.y.y;
+			m3.cy.z = m.y.z;
+			m3.cz.x = m.z.x;
+			m3.cz.y = m.z.y;
+			m3.cz.z = m.z.z;
+
+			b3Body_SetTransform(nB3Body, {p.x,p.y,p.z}, b3MakeQuatFromMatrix(&m3));
+
+			auto vel = *rb->GetLinearVelocity();
+			auto avel = *rb->GetAngularVelocity();
+			b3Body_SetLinearVelocity(nB3Body, {vel.x,vel.y,vel.z});
+			b3Body_SetAngularVelocity(nB3Body, {avel.x,avel.y,avel.z});
+		}
+
+		void ApplyToGameBody() {
+			auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(nB3Body));
+
+			UMath::Matrix4 mat;
+			mat.x.x = m.cx.x;
+			mat.x.y = m.cx.y;
+			mat.x.z = m.cx.z;
+			mat.y.x = m.cy.x;
+			mat.y.y = m.cy.y;
+			mat.y.z = m.cy.z;
+			mat.z.x = m.cz.x;
+			mat.z.y = m.cz.y;
+			mat.z.z = m.cz.z;
+			pGameBody->SetOrientation(&mat);
+
+			auto p = b3Body_GetPosition(nB3Body);
+			auto v = b3Body_GetLinearVelocity(nB3Body);
+			auto av = b3Body_GetAngularVelocity(nB3Body);
+
+			UMath::Vector3 pos;
+			pos.x = p.x;
+			pos.y = p.y;
+			pos.z = p.z;
+			pGameBody->SetPosition(&pos);
+
+			UMath::Vector3 vel;
+			vel.x = v.x;
+			vel.y = v.y;
+			vel.z = v.z;
+			pGameBody->SetLinearVelocity(&vel);
+
+			UMath::Vector3 avel;
+			avel.x = av.x;
+			avel.y = av.y;
+			avel.z = av.z;
+			pGameBody->SetAngularVelocity(&avel);
+		}
 	};
 	std::vector<CustomObjectInstance> aB3Objects;
 
@@ -227,75 +292,48 @@ namespace CustomPhysics {
 		return false;
 	}
 
-	struct CollisionGeometryBuffer {
-		float *position;
-		int* index;
-		uint16_t numVertices;
-		uint16_t numFaces;
-	};
-
-	NyaVec3 WorldToRender(NyaVec3 in) {
-		auto out = in;
-		out.y *= -1;
-		return out;
-	}
-
 	bool bCollectLocalPlayerCar = true;
 	float fWorldObjectMassScale = 100.0;
 	float fWorldObjectMassMinimum = 400.0;
+
+	bool CanCollectWorldObject(IRigidBody* rb) {
+		if (!bCollectLocalPlayerCar && rb == GetLocalPlayerInterface<IRigidBody>()) return false;
+		if (rb->GetMass() < fWorldObjectMassMinimum) return false;
+
+		if (auto veh = rb->mCOMObject->Find<IVehicle>()) {
+			if (auto rb = veh->mCOMObject->Find<IRBVehicle>()) {
+				if (rb->GetInvulnerability() != INVULNERABLE_NONE) return false;
+			}
+		}
+		return true;
+	}
+
+	bool bLowFPSMode = false;
 	void PurgeWorldObjects() {
 		std::vector<CustomObjectInstance> objectsToKeep;
 
 		for (auto& obj : aB3Objects) {
 			if (IsRigidBodyValidAndActive(obj.pGameBody)) {
-				if (auto veh = obj.pGameBody->mCOMObject->Find<IVehicle>()) {
-					if (auto rb = veh->mCOMObject->Find<IRBVehicle>()) {
-						if (rb->GetInvulnerability() != INVULNERABLE_NONE) obj.pGameBody = nullptr;
-					}
+				if (!CanCollectWorldObject(obj.pGameBody)) {
+					obj.pGameBody = nullptr;
 				}
 			}
 			else {
 				obj.pGameBody = nullptr;
 			}
 
-			if (obj.pGameBody && obj.bReturnChangesToGame) {
-				auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(obj.nB3Body));
+			// either apply new state to game, or read new state from game and apply to b3
+			if (obj.pGameBody) {
+				if (obj.bReturnChangesToGame) {
+					obj.ApplyToGameBody();
+					obj.bReturnChangesToGame = false;
+				}
+				else {
+					obj.CollectFromGameBody();
+				}
+			}
 
-				UMath::Matrix4 mat;
-				mat.x.x = m.cx.x;
-				mat.x.y = m.cx.y;
-				mat.x.z = m.cx.z;
-				mat.y.x = m.cy.x;
-				mat.y.y = m.cy.y;
-				mat.y.z = m.cy.z;
-				mat.z.x = m.cz.x;
-				mat.z.y = m.cz.y;
-				mat.z.z = m.cz.z;
-				obj.pGameBody->SetOrientation(&mat);
-
-				auto p = b3Body_GetPosition(obj.nB3Body);
-				auto v = b3Body_GetLinearVelocity(obj.nB3Body);
-				auto av = b3Body_GetAngularVelocity(obj.nB3Body);
-
-				UMath::Vector3 pos;
-				pos.x = p.x;
-				pos.y = p.y;
-				pos.z = p.z;
-				obj.pGameBody->SetPosition(&pos);
-
-				UMath::Vector3 vel;
-				vel.x = v.x;
-				vel.y = v.y;
-				vel.z = v.z;
-				obj.pGameBody->SetLinearVelocity(&vel);
-
-				UMath::Vector3 avel;
-				avel.x = av.x;
-				avel.y = av.y;
-				avel.z = av.z;
-				obj.pGameBody->SetAngularVelocity(&avel);
-
-				obj.bReturnChangesToGame = false;
+			if (!bLowFPSMode && obj.pGameBody) {
 				objectsToKeep.push_back(obj);
 			}
 			else {
@@ -307,64 +345,38 @@ namespace CustomPhysics {
 	}
 
 	void CollectWorldObjects() {
+		auto objs = GetActiveRigidBodies();
+		bLowFPSMode = objs.size() > 100;
+
 		PurgeWorldObjects();
 
-		auto objs = GetActiveRigidBodies();
 		for (auto& rb : objs) {
-			if (!bCollectLocalPlayerCar && rb == GetLocalPlayerInterface<IRigidBody>()) continue;
-			if (rb->GetMass() < fWorldObjectMassMinimum) continue;
+			if (bLowFPSMode && rb != GetLocalPlayerInterface<IRigidBody>()) continue;
+			if (!CanCollectWorldObject(rb)) continue;
 			if (GetGameObjectInstanceForGameBody(rb)) continue;
-
-			if (auto veh = rb->mCOMObject->Find<IVehicle>()) {
-				if (auto rb = veh->mCOMObject->Find<IRBVehicle>()) {
-					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
-				}
-			}
 
 			auto objInst = CustomObjectInstance();
 
 			UMath::Vector3 dim;
 			rb->GetDimension(&dim);
 
-			auto p = *rb->GetPosition();
-
-			UMath::Matrix4 m;
-			rb->GetMatrix4(&m);
-
-			b3Matrix3 m3;
-			m3.cx.x = m.x.x;
-			m3.cx.y = m.x.y;
-			m3.cx.z = m.x.z;
-			m3.cy.x = m.y.x;
-			m3.cy.y = m.y.y;
-			m3.cy.z = m.y.z;
-			m3.cz.x = m.z.x;
-			m3.cz.y = m.z.y;
-			m3.cz.z = m.z.z;
-
 			b3BodyDef def = b3DefaultBodyDef();
 			def.type = b3_dynamicBody;
-			def.position = {p.x,p.y,p.z};
-			def.rotation = b3MakeQuatFromMatrix(&m3);
+			def.position = {0,0,0};
 			objInst.nB3Body = b3CreateBody(m_worldId, &def);
 
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
 			auto hull = b3MakeBoxHull(dim.x, dim.y, dim.z);
 			b3CreateHullShape(objInst.nB3Body, &shapeDef, &hull.base);
 
-			auto vel = *rb->GetLinearVelocity();
-			auto avel = *rb->GetAngularVelocity();
-			auto mass = rb->GetMass() * fWorldObjectMassScale;
-			b3Body_SetLinearVelocity(objInst.nB3Body, {vel.x,vel.y,vel.z});
-			b3Body_SetAngularVelocity(objInst.nB3Body, {avel.x,avel.y,avel.z});
-
 			b3MassData massData = b3Body_GetMassData(objInst.nB3Body);
-			massData.mass = mass;
+			massData.mass = rb->GetMass() * fWorldObjectMassScale;
 			//massData.inertia = {mass*dim.x,mass*dim.y,mass*dim.z};
 			massData.center = {0,0,0};
 			b3Body_SetMassData(objInst.nB3Body, massData);
 
 			objInst.pGameBody = rb;
+			objInst.CollectFromGameBody();
 			aB3Objects.push_back(objInst);
 		}
 	}

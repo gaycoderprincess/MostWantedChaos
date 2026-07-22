@@ -1752,7 +1752,7 @@ public:
 class Effect_SpawnHeavyBall : public ChaosEffect {
 public:
 	Effect_SpawnHeavyBall() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Spawn Tungsten Cube";
+		sName = "Spawn Inconvenient Cube";
 		bCanMultiTrigger = true;
 		bRigProportionalChances = true; // todo remove
 	}
@@ -1764,7 +1764,7 @@ public:
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
 		objData.aModels = mdl;
-		objData.vModelSize = {1,1,1};
+		objData.vModelSize = {1.5,1.5,1.5};
 		objData.bRemoveOnSafehouse = false;
 		objData.bRemoveOnOutOfBounds = false;
 		objData.bRemoveOnOutOfRange = false;
