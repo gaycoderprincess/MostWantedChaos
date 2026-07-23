@@ -369,6 +369,7 @@ namespace CollView {
 
 				WCollider colliderTemp = {};
 				colliderTemp.fPosition = *ply->GetPosition();
+				colliderTemp.fRadius = 15.0;
 				colliderTemp.fInstanceCacheList.clear();
 				Render3DObjects::ProcessWColliderTris(&colliderTemp);
 				if (!colliderTemp.fInstanceCacheList.empty()) {

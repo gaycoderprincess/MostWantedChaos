@@ -18,11 +18,10 @@ namespace CustomPhysics {
 	}
 
 	struct CustomArticleInstance {
-		WCollisionInstance* pOriginalPtr; // may be a stale ptr
 		int nSceneryGroupId;
 		std::vector<WCollisionTri> aTriStrips;
 		std::vector<WCollisionTri> aBarriers;
-		b3MeshData* pB3Mesh;
+		b3MeshData* pB3Mesh = nullptr;
 		b3BodyId nB3Body;
 		bool bB3MeshEnabled;
 	};
@@ -214,7 +213,6 @@ namespace CustomPhysics {
 		aCollisionArticles[articleId].aInstances.push_back({});
 		auto articleInst = &aCollisionArticles[articleId].aInstances[aCollisionArticles[articleId].aInstances.size()-1];
 
-		articleInst->pOriginalPtr = inst;
 		articleInst->nSceneryGroupId = inst->fGroupNumber;
 
 		auto stripSphere = (WCollisionStripSphere*)articles_end_ptr;
@@ -283,13 +281,6 @@ namespace CustomPhysics {
 
 			article.bB3MeshEnabled = true;
 		}
-	}
-
-	bool DoesCustomCollisionArticleExist(WCollisionInstance* inst) {
-		for (auto& custom : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
-			if (inst == custom.pOriginalPtr) return true;
-		}
-		return false;
 	}
 
 	bool bCollectLocalPlayerCar = true;
@@ -427,10 +418,39 @@ namespace CustomPhysics {
 
 		auto customTris = Render3DObjects::GetFullTriList(true);
 		if (nNumTrisCustom != customTris.size()) {
+			WriteLog(std::format("nNumTrisCustom {}", nNumTrisCustom));
+			WriteLog(std::format("customTris.size() {}", customTris.size()));
+
+			// delete all old custom col instances first, keeping them makes no sense in case something despawns
+			for (auto& oldInst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
+				if (oldInst.pB3Mesh) {
+					b3DestroyMesh(oldInst.pB3Mesh);
+				}
+				if (b3Body_IsValid(oldInst.nB3Body)) {
+					b3DestroyBody(oldInst.nB3Body);
+				}
+			}
+			aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances.clear();
+
 			for (auto& inst : customTris) {
-				if (DoesCustomCollisionArticleExist(inst)) continue;
 				ProcessCollisionArticle(COLLISIONARTICLE_CUSTOM, inst);
 			}
+
+			// combine everything into one huge collision article
+			auto bigArticle = CustomArticleInstance();
+			for (auto& inst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
+				for (auto& tri : inst.aTriStrips) {
+					bigArticle.aTriStrips.push_back(tri);
+				}
+				inst.aTriStrips.clear();
+
+				for (auto& tri : inst.aBarriers) {
+					bigArticle.aBarriers.push_back(tri);
+				}
+				inst.aBarriers.clear();
+			}
+			aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances = {bigArticle};
+
 			for (auto& inst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
 				ConvertCollisionArticle(inst);
 			}

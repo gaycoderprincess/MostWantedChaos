@@ -32,12 +32,10 @@ namespace MapSpawner {
 		void Despawn() {
 			for (auto& id : aSpawnedModels) {
 				Render3DObjects::aObjects[id]->Destroy(true);
-				WriteLog(std::format("Deregistered model {}", id));
 			}
 			aSpawnedModels.clear();
 			for (auto& id : aSpawnedCollisions) {
 				Render3DObjects::aObjects[id]->Destroy(true);
-				WriteLog(std::format("Deregistered collision {}", id));
 			}
 			aSpawnedCollisions.clear();
 
@@ -70,7 +68,6 @@ namespace MapSpawner {
 					}
 				}
 				Render3D::sTextureSubdir = "";
-				WriteLog("aLoadedModels");
 			}
 			for (auto& model : aLoadedModels) {
 				aSpawnedModels.push_back(Render3DObjects::aObjects.size());

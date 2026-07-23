@@ -19,15 +19,6 @@ namespace Render3D {
 
 	bool bForceNoEffect = false;
 
-	//D3DXVECTOR4 fDIFFUSEMIN = {1,1,1,1};
-	//D3DXVECTOR4 fDIFFUSERANGE = {1,1,1,-0.65};
-	//D3DXVECTOR4 fSPECULARMIN = {0,0,0,0};
-	//D3DXVECTOR4 fSPECULARRANGE = {0.3,0.3,0.3,0};
-	//D3DXVECTOR4 fENVMAPMIN = {0,0,0,0};
-	//D3DXVECTOR4 fENVMAPANGE = {1,1,1,0};
-	//float fSPECULARPOWER = 2.5;
-	//float fENVMAPPOWER = 1.0;
-
 	D3DXVECTOR4 fDIFFUSEMIN = {0.4,0.4,0.4,1};
 	D3DXVECTOR4 fDIFFUSERANGE = {0.6,0.6,0.6,0};
 	D3DXVECTOR4 fSPECULARMIN = {0.16,0.2,0.16,0};
@@ -146,8 +137,15 @@ namespace Render3D {
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
 			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-			g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
-			g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+			if (useAlpha) {
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 1);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+			}
+			else {
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+			}
 			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, useAlpha);
 			g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 			g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
@@ -221,14 +219,20 @@ namespace Render3D {
 
 		void Invalidate() {
 			if (bInvalidated) return;
-			pVertexBuffer->Release();
-			pIndexBuffer->Release();
-			pVertexBuffer = nullptr;
-			pIndexBuffer = nullptr;
-			if (pTexture) {
-				pTexture->Release();
-				pTexture = nullptr;
+
+			if (pVertexBuffer) {
+				pVertexBuffer->Release();
+				pVertexBuffer = nullptr;
 			}
+			if (pIndexBuffer) {
+				pIndexBuffer->Release();
+				pIndexBuffer = nullptr;
+			}
+			// textures are stored and shared in aAllTextures
+			//if (pTexture) {
+			//	pTexture->Release();
+			//	pTexture = nullptr;
+			//}
 			aVertices.clear();
 			aVertices.shrink_to_fit();
 			aIndices.clear();

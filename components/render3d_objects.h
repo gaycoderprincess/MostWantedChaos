@@ -474,10 +474,16 @@ namespace Render3DObjects {
 		}
 
 		void Destroy(bool deleteModels) {
-			for (auto& col : CollisionInstances) { Render3DObjects::DeRegisterCustomCollisionInstance(col); }
-			for (auto& col : CollisionInstancesIgnored) { Render3DObjects::DeRegisterCustomCollisionInstance(col); }
-			for (auto& col : CollisionInstances) { delete col; }
-			for (auto& col : CollisionInstancesIgnored) { delete col; }
+			for (auto& col : CollisionInstances) {
+				Render3DObjects::DeRegisterCustomCollisionInstance(col);
+				delete[] col->fCollisionArticle;
+				delete col;
+			}
+			for (auto& col : CollisionInstancesIgnored) {
+				Render3DObjects::DeRegisterCustomCollisionInstance(col);
+				delete[] col->fCollisionArticle;
+				delete col;
+			}
 
 			if (deleteModels) {
 				for (auto& mdl : aModels) {
@@ -564,6 +570,8 @@ namespace Render3DObjects {
 		std::vector<WCollisionInstance*> potentialInsts;
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
+			if (!obj->bTriCollidable) continue;
+
 			for (auto& inst : obj->CollisionInstances) {
 				potentialInsts.push_back(inst);
 			}
