@@ -80,7 +80,7 @@ public:
 
 			int effect = EEFFECT_WORLD;
 			//if (model->sTextureName == "skin1.dds") effect = EEFFECT_CAR;
-			//if (model->sTextureName.find("CARSKIN") != std::string::npos) effect = EEFFECT_CAR;
+			if (model->sTextureName.find("CARSKIN") != std::string::npos) effect = EEFFECT_CAR;
 
 			if (bIsDetached) {
 				if (DetachedTransform.p.y > -500) {

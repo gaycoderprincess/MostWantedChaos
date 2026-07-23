@@ -19,6 +19,9 @@ namespace Render3D {
 
 	bool bForceNoEffect = false;
 
+	D3DXVECTOR4 fENVMAPMIN = {0,0,0,0};
+	D3DXVECTOR4 fENVMAPANGE = {1,1,1,0};
+
 	struct tModel {
 		IDirect3DIndexBuffer9* pIndexBuffer = nullptr;
 		IDirect3DVertexBuffer9* pVertexBuffer = nullptr;
@@ -54,6 +57,14 @@ namespace Render3D {
 
 			effect->Start();
 
+			//static bool bOnce = true;
+			//if (bOnce) {
+			//	for (int i = 0; i < CParamHashTable::NUM_SHADER_PARAM; i++) {
+			//		WriteLog(std::format("{}: {}", i, effect->mParamTable->mParamMappingTable[i].mName));
+			//	}
+			//	bOnce = false;
+			//}
+
 			g_pd3dDevice->SetVertexDeclaration(effect->VertexDecl);
 
 			// this is kinda nasty but this function will refuse to update the matrix if its pointer is identical to the previous caller's
@@ -64,56 +75,54 @@ namespace Render3D {
 			matrixTempSecond = !matrixTempSecond;
 			ParticleSetTransform(pMatrix, EVIEW_PLAYER1);
 
-			static D3DXHANDLE TextureOffset = effect->hD3DXEffect->GetParameterByName(0, "TextureOffset");
-			static D3DXHANDLE TextureOffset2 = effect->hD3DXEffect->GetParameterByName(0, "TEXTUREOFFSET");
 			D3DXVECTOR4 textureOffset = {0,0,0,0};
-			if (TextureOffset) effect->hD3DXEffect->SetVector(TextureOffset, &textureOffset);
-			if (TextureOffset2) effect->hD3DXEffect->SetVector(TextureOffset2, &textureOffset);
+			effect->hD3DXEffect->SetMatrix(effect->mParamTable->mParamMappingTable[CParamHashTable::TEXTUREOFFSETMATRIX].mHandle, (D3DXMATRIX*)&UMath::Matrix4::kIdentity);
+			effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::TEXTUREOFFSET].mHandle, &textureOffset);
 
 			// desperate attempts to make stuff not carry over from the last drawn car (which is almost always traffic)
-			// none of this worked
-			/*if (effectId == EEFFECT_CAR) {
-				static D3DXHANDLE SpecularPower = effect->hD3DXEffect->GetParameterByName(0, "SpecularPower");
-				if (SpecularPower) {
-					effect->hD3DXEffect->SetFloat(SpecularPower, 2.5);
-				}
-				static D3DXHANDLE EnvmapPower = effect->hD3DXEffect->GetParameterByName(0, "EnvmapPower");
-				if (EnvmapPower) {
-					effect->hD3DXEffect->SetFloat(EnvmapPower, 1.0);
-				}
-				static D3DXHANDLE SpecularHotSpot = effect->hD3DXEffect->GetParameterByName(0, "SpecularHotSpot");
-				if (SpecularHotSpot) {
-					effect->hD3DXEffect->SetFloat(SpecularHotSpot, 1.0);
-				}
-				static D3DXHANDLE Desaturation = effect->hD3DXEffect->GetParameterByName(0, "Desaturation");
-				if (Desaturation) {
-					effect->hD3DXEffect->SetFloat(Desaturation, 0.0);
-				}
-				static D3DXHANDLE DiffuseMin = effect->hD3DXEffect->GetParameterByName(0, "DiffuseMin");
-				if (DiffuseMin) {
-					D3DXVECTOR4 v = {1,1,1,1};
-					effect->hD3DXEffect->SetVector(DiffuseMin, &v);
-				}
-				static D3DXHANDLE DiffuseRange = effect->hD3DXEffect->GetParameterByName(0, "DiffuseRange");
-				if (DiffuseRange) {
-					D3DXVECTOR4 v = {0,0,0,-0.65};
-					effect->hD3DXEffect->SetVector(DiffuseRange, &v);
-				}
-				static D3DXHANDLE SpecularMin = effect->hD3DXEffect->GetParameterByName(0, "SpecularMin");
-				if (SpecularMin) {
-					D3DXVECTOR4 v = {0,0,0,0};
-					effect->hD3DXEffect->SetVector(SpecularMin, &v);
-				}
-				static D3DXHANDLE SpecularRange = effect->hD3DXEffect->GetParameterByName(0, "SpecularRange");
-				if (SpecularRange) {
-					D3DXVECTOR4 v = {0,0,0,0};
-					effect->hD3DXEffect->SetVector(SpecularRange, &v);
-				}
-				static D3DXHANDLE g_bDoCarShadowMap = effect->hD3DXEffect->GetParameterByName(0, "g_bDoCarShadowMap");
-				if (g_bDoCarShadowMap) {
-					effect->hD3DXEffect->SetInt(g_bDoCarShadowMap, 1);
-				}
-			}*/
+			if (effectId == EEFFECT_CAR) {
+				// for all effects, game sets:
+				// DIFFUSEMIN vector
+				// DIFFUSERANGE vector
+
+				// if car, the game sets:
+				// SPECULARMIN vector
+				// SPECULARRANGE vector
+				// ENVMAPMIN vector
+				// ENVMAPANGE vector
+				// SPECULARPOWER float
+				// ENVMAPPOWER float
+
+				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARPOWER].mHandle, 2.5);
+				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPPOWER].mHandle, 1.0);
+
+				D3DXVECTOR4 v = {1,1,1,1};
+				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSEMIN].mHandle, &v);
+				v = {0,0,0,-0.65};
+				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSERANGE].mHandle, &v);
+				v = {0,0,0,0};
+				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARMIN].mHandle, &v);
+				v = {0,0,0,0};
+				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARRANGE].mHandle, &v);
+
+				v = fENVMAPMIN;
+				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPMIN].mHandle, &v);
+				v = fENVMAPANGE;
+				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPANGE].mHandle, &v);
+
+				//static D3DXHANDLE SpecularHotSpot = effect->hD3DXEffect->GetParameterByName(0, "SpecularHotSpot");
+				//if (SpecularHotSpot) {
+				//	effect->hD3DXEffect->SetFloat(SpecularHotSpot, 1.0);
+				//}
+				//static D3DXHANDLE Desaturation = effect->hD3DXEffect->GetParameterByName(0, "Desaturation");
+				//if (Desaturation) {
+				//	effect->hD3DXEffect->SetFloat(Desaturation, 0.0);
+				//}
+				//static D3DXHANDLE g_bDoCarShadowMap = effect->hD3DXEffect->GetParameterByName(0, "g_bDoCarShadowMap");
+				//if (g_bDoCarShadowMap) {
+				//	effect->hD3DXEffect->SetInt(g_bDoCarShadowMap, 1);
+				//}
+			}
 
 			effect->hD3DXEffect->Begin(nullptr, 0);
 			effect->hD3DXEffect->BeginPass(0);
@@ -241,6 +250,9 @@ namespace Render3D {
 			return nullptr;
 		}
 
+		bool overrideVertexColor = false;
+		if (material.find("CARSKIN") != std::string::npos) overrideVertexColor = true;
+
 		for (int i = 0; i < numVertices; i++) {
 			auto src = &vertices[i];
 			auto srcNormal = &normals[i];
@@ -260,7 +272,7 @@ namespace Render3D {
 				dest->vTangents[1] = srcTangent->y;
 				dest->vTangents[2] = srcTangent->z;
 			}
-			dest->Color = nVertexColorValue;
+			dest->Color = overrideVertexColor ? 0xFFFFFFFF : nVertexColorValue;
 			if (uvs) {
 				dest->vUV[0] = srcUV->x;
 				dest->vUV[1] = srcUV->y * -1;

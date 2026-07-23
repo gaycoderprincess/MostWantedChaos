@@ -849,7 +849,9 @@ void DrawLogPopups() {
 		data.x = 0.1 * GetAspectRatioInv();
 		data.y = y;
 		data.size = 0.03;
-		data.SetColor(255,0,0,255);
+		if (popup.starts_with("PERFORMANCE WARNING")) {
+			data.SetColor(255,0,0,255);
+		}
 		DrawString(data, popup);
 
 		y -= data.size;

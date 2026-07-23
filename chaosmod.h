@@ -501,6 +501,12 @@ void ChaosModMenu() {
 	if (DrawMenuOption("Debug")) {
 		ChloeMenuLib::BeginMenu();
 		QuickValueEditor("bDebugPrintsEnabled", bDebugPrintsEnabled);
+		QuickValueEditor("fENVMAPMIN.x", Render3D::fENVMAPMIN.x);
+		QuickValueEditor("fENVMAPMIN.y", Render3D::fENVMAPMIN.y);
+		QuickValueEditor("fENVMAPMIN.z", Render3D::fENVMAPMIN.z);
+		QuickValueEditor("fENVMAPANGE.x", Render3D::fENVMAPANGE.x);
+		QuickValueEditor("fENVMAPANGE.y", Render3D::fENVMAPANGE.y);
+		QuickValueEditor("fENVMAPANGE.z", Render3D::fENVMAPANGE.z);
 		if (SM64::bAvailable && DrawMenuOption("Mario Debug")) {
 			ChloeMenuLib::BeginMenu();
 
@@ -953,6 +959,9 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Performance Debug")) {
 			ChloeMenuLib::BeginMenu();
 
+			//auto stats = aPerformanceBenchmarkResults;
+			//std::sort(stats.begin(), stats.end(), [](PerformanceBenchmarkResult& a, PerformanceBenchmarkResult& b) { return a.ms > b.ms; });
+			//for (auto& perf : stats) {
 			for (auto& perf : aPerformanceBenchmarkResults) {
 				DrawMenuOption(std::format("{}: {}ms", perf.name, perf.ms));
 			}
