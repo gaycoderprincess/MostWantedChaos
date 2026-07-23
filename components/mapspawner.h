@@ -87,6 +87,7 @@ namespace MapSpawner {
 			}
 			for (auto& id : aSpawnedModels) {
 				Render3DObjects::aObjects[id]->bUseAlpha = bUseAlpha;
+				Render3DObjects::aObjects[id]->bNoBackfaceCulling = true;
 			}
 
 			if (aLoadedCollisions.empty() || aLoadedCollisions[0]->bInvalidated) {

@@ -951,14 +951,6 @@ void ChaosModMenu() {
 			QuickValueEditor("BLJRamp::offY", Effect_Mario64::offY);
 			QuickValueEditor("BLJRamp::offZ", Effect_Mario64::offZ);
 			QuickValueEditor("BLJRamp::scale", Effect_Mario64::scale);
-			QuickValueEditor("Backrooms::playerX", Effect_Backrooms::playerX);
-			QuickValueEditor("Backrooms::playerY", Effect_Backrooms::playerY);
-			QuickValueEditor("Backrooms::playerZ", Effect_Backrooms::playerZ);
-			QuickValueEditor("Backrooms::rX", Effect_Backrooms::rX);
-			QuickValueEditor("Backrooms::rY", Effect_Backrooms::rY);
-			QuickValueEditor("Backrooms::rZ", Effect_Backrooms::rZ);
-			QuickValueEditor("Backrooms::scale", Effect_Backrooms::scale);
-			QuickValueEditor("Backrooms::invert", Effect_Backrooms::invert);
 			QuickValueEditor("Ramp::rX", Effect_SpawnRamp::rX);
 			QuickValueEditor("Ramp::rY", Effect_SpawnRamp::rY);
 			QuickValueEditor("Ramp::rZ", Effect_SpawnRamp::rZ);

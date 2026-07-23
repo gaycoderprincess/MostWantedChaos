@@ -224,6 +224,7 @@ namespace Render3DObjects {
 		bool bTriCollidable = false;
 		bool bDontRender = false;
 		bool bUseAlpha = false;
+		bool bNoBackfaceCulling = false;
 		std::string sDebugName;
 
 		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
@@ -533,8 +534,14 @@ namespace Render3DObjects {
 			auto radius = obj->fRadius * obj->mMatrix.x.length();
 			if (dist > (radius * 2) + 200) continue;
 
+			if (obj->bNoBackfaceCulling) {
+				Render3D::bForceNoCulling = true;
+			}
 			for (auto& model : obj->aModels) {
 				model->RenderAt(WorldToRenderMatrix(obj->mMatrix), obj->bUseAlpha);
+			}
+			if (obj->bNoBackfaceCulling) {
+				Render3D::bForceNoCulling = false;
 			}
 		}
 	}

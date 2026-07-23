@@ -18,6 +18,7 @@ namespace Render3D {
 	};
 
 	bool bForceNoEffect = false;
+	bool bForceNoCulling = false;
 
 	D3DXVECTOR4 fDIFFUSEMIN = {0.4,0.4,0.4,1};
 	D3DXVECTOR4 fDIFFUSERANGE = {0.6,0.6,0.6,0};
@@ -136,7 +137,7 @@ namespace Render3D {
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : D3DCULL_CW);
 			if (useAlpha) {
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 1);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -191,7 +192,7 @@ namespace Render3D {
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, useZ);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : D3DCULL_CW);
 			if (useAlpha) {
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 127);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
