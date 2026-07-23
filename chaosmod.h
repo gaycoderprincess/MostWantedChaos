@@ -834,6 +834,9 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Toggle Custom Camera")) {
 				CustomCamera::bRunCustom = !CustomCamera::bRunCustom;
 			}
+			//if (DrawMenuOption("Game_EnterPostRaceFlow")) {
+			//	Game_EnterPostRaceFlow();
+			//}
 			if (DrawMenuOption("CollView")) {
 				ChloeMenuLib::BeginMenu();
 
@@ -901,6 +904,13 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			QuickValueEditor("BLJRamp::rX", Effect_Mario64::rX);
+			QuickValueEditor("BLJRamp::rY", Effect_Mario64::rY);
+			QuickValueEditor("BLJRamp::rZ", Effect_Mario64::rZ);
+			QuickValueEditor("BLJRamp::offX", Effect_Mario64::offX);
+			QuickValueEditor("BLJRamp::offY", Effect_Mario64::offY);
+			QuickValueEditor("BLJRamp::offZ", Effect_Mario64::offZ);
+			QuickValueEditor("BLJRamp::scale", Effect_Mario64::scale);
 			QuickValueEditor("Backrooms::playerX", Effect_Backrooms::playerX);
 			QuickValueEditor("Backrooms::playerY", Effect_Backrooms::playerY);
 			QuickValueEditor("Backrooms::playerZ", Effect_Backrooms::playerZ);

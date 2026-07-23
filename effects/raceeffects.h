@@ -730,3 +730,17 @@ public:
 
 	}
 } E_FinishRaceFake;*/
+
+class Effect_PlayerTPStart : public EffectBase_InRaceConditional {
+public:
+	Effect_PlayerTPStart() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Teleport To Race Start";
+		bAbortOnConditionFailed = true;
+		bCanQuickTrigger = false;
+	}
+
+	void InitFunction() override {
+		auto racer = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable());
+		TeleportPlayer(racer->mSavedPosition, racer->mSavedDirection);
+	}
+} E_PlayerTPStart;

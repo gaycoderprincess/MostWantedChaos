@@ -160,22 +160,13 @@ namespace CustomPhysicsObjects {
 	};
 	std::vector<CustomPhysicsObject*> aPhysicsObjects;
 
-	std::vector<b3MeshData*> CreateStaticColliderMeshes(const std::vector<Render3D::tModel*>& models) {
-		std::vector<b3MeshData*> meshes;
-		for (auto& model : models) {
-			auto mesh = CustomPhysics::CreateMesh((b3Vec3*)&model->aVertices[0], model->aVertices.size(), &model->aIndices[0], model->aIndices.size());
-			if (!mesh) continue;
-			meshes.push_back(mesh);
-		}
-		return meshes;
-	}
-
 	std::vector<b3HullData*> CreateDynamicColliderMeshes(const std::vector<Render3D::tModel*>& models, float scale) {
 		std::vector<b3HullData*> meshes;
 		for (auto& model : models) {
 			auto verts = model->aVertices;
 			for (auto& v : verts) {
 				v *= scale;
+				v.y *= -1;
 			}
 
 			auto mesh = b3CreateHull((b3Vec3*)&verts[0], verts.size(), verts.size());

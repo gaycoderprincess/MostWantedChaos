@@ -102,8 +102,14 @@ namespace Render3DObjects {
 			tri.fPt1 *= stripMult;
 			tri.fPt2 *= stripMult;
 
+			auto stripOffset = ((uintptr_t)stripList)-((uintptr_t)data)-sizeof(WCollisionArticle);
+			if (stripOffset > 65535) {
+				MessageBoxA(nullptr, std::format("Attempted to create collision with too high strip offset {} ({} tris)", stripOffset, tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+				exit(0);
+			}
+
 			stripSphere->fPos = {0,0,0}; // ?? this is still relative right?
-			stripSphere->fOffset = ((uintptr_t)stripList)-((uintptr_t)data)-sizeof(WCollisionArticle); // offset to strip from start of strip data?
+			stripSphere->fOffset = stripOffset; // offset to strip from start of strip data?
 			stripSphere->fRadius = stripSphereMult * inst->fInvPosRadius.w;
 			stripSphere++;
 
@@ -144,6 +150,11 @@ namespace Render3DObjects {
 			surfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("unknown"));
 		}
 
+		if (tris.size() > 65535) {
+			MessageBoxA(nullptr, std::format("Attempted to create collision with {} tris (max is 65535)", tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+			exit(0);
+		}
+
 		auto inst = new WCollisionInstance;
 		inst->fIterStamp = 0;
 		inst->fFlags = 0;
@@ -154,6 +165,11 @@ namespace Render3DObjects {
 
 		size_t numStrips = tris.size();
 		size_t numVerts = numStrips*3;
+		size_t stripsSize = (sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numVerts);
+		if (stripsSize > 65535) {
+			MessageBoxA(nullptr, std::format("Attempted to create collision with too high strip size {} ({} tris)", stripsSize, tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+			exit(0);
+		}
 
 		size_t dataSize = sizeof(WCollisionArticle)+4+(sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numVerts);
 		auto data = new uint8_t[dataSize];
@@ -161,7 +177,7 @@ namespace Render3DObjects {
 
 		auto article = (WCollisionArticle*)data;
 		article->fNumStrips = numStrips;
-		article->fStripsSize = (sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numVerts);
+		article->fStripsSize = stripsSize;
 		article->fNumEdges = 0;
 		article->fEdgesSize = 0;
 		article->fResolvedFlag = 0;

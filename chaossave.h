@@ -280,70 +280,6 @@ void DoChaosScientistLoad() {
 	}
 }
 
-bool DoChaosBallsSave() {
-	std::vector<UMath::Vector3> save;
-	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
-		if (obj->sDebugName != "beachball_save") continue;
-		save.push_back({obj->vSpawnPosition});
-	}
-
-	std::ofstream file("CwoeeChaos/save/balls.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return false;
-
-	int count = save.size();
-	file.write((char*)&count, sizeof(count));
-	for (auto& data : save) {
-		file.write((char*)&data, sizeof(data));
-	}
-	return true;
-}
-
-void DoChaosBallsLoad() {
-	std::ifstream file("CwoeeChaos/save/balls.sav", std::iostream::in | std::iostream::binary);
-	if (!file.is_open()) return;
-
-	int count = 0;
-	file.read((char*)&count, sizeof(count));
-
-	for (int i = 0; i < count; i++) {
-		UMath::Vector3 save;
-		file.read((char*)&save, sizeof(save));
-		Effect_SpawnBall::SpawnObject(save, {0,0,0});
-	}
-}
-
-bool DoChaosABCSave() {
-	std::vector<UMath::Vector3> save;
-	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
-		if (obj->sDebugName != "abcblock_save") continue;
-		save.push_back({obj->vSpawnPosition});
-	}
-
-	std::ofstream file("CwoeeChaos/save/abc.sav", std::iostream::out | std::iostream::binary);
-	if (!file.is_open()) return false;
-
-	int count = save.size();
-	file.write((char*)&count, sizeof(count));
-	for (auto& data : save) {
-		file.write((char*)&data, sizeof(data));
-	}
-	return true;
-}
-
-void DoChaosABCLoad() {
-	std::ifstream file("CwoeeChaos/save/abc.sav", std::iostream::in | std::iostream::binary);
-	if (!file.is_open()) return;
-
-	int count = 0;
-	file.read((char*)&count, sizeof(count));
-
-	for (int i = 0; i < count; i++) {
-		UMath::Vector3 save;
-		file.read((char*)&save, sizeof(save));
-		Effect_SpawnBlock::SpawnObject(save, {0,0,0});
-	}
-}
-
 bool DoChaosRampSave() {
 	std::vector<tObjectSaveNoCol> save;
 	for (auto& peanut : Effect_SpawnRamp::aRampsInWorld) {
@@ -377,14 +313,14 @@ void DoChaosRampLoad() {
 	}
 }
 
-bool DoChaosMetalBallSave() {
+bool DoChaosPhysicsObjectSave(const char* debugName, const char* fileName) {
 	std::vector<UMath::Vector3> save;
 	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
-		if (obj->sDebugName != "metalball_save") continue;
+		if (obj->sDebugName != debugName) continue;
 		save.push_back({obj->vSpawnPosition});
 	}
 
-	std::ofstream file("CwoeeChaos/save/metalball.sav", std::iostream::out | std::iostream::binary);
+	std::ofstream file(std::format("CwoeeChaos/save/{}.sav", fileName), std::iostream::out | std::iostream::binary);
 	if (!file.is_open()) return false;
 
 	int count = save.size();
@@ -395,8 +331,8 @@ bool DoChaosMetalBallSave() {
 	return true;
 }
 
-void DoChaosMetalBallLoad() {
-	std::ifstream file("CwoeeChaos/save/metalball.sav", std::iostream::in | std::iostream::binary);
+void DoChaosPhysicsObjectLoad(const char* fileName, void(*spawnFunction)(NyaVec3, NyaVec3)) {
+	std::ifstream file(std::format("CwoeeChaos/save/{}.sav", fileName), std::iostream::in | std::iostream::binary);
 	if (!file.is_open()) return;
 
 	int count = 0;
@@ -405,7 +341,7 @@ void DoChaosMetalBallLoad() {
 	for (int i = 0; i < count; i++) {
 		UMath::Vector3 save;
 		file.read((char*)&save, sizeof(save));
-		Effect_SpawnHeavyBall::SpawnObject(save, {0,0,0});
+		spawnFunction(save, {0,0,0});
 	}
 }
 
@@ -482,10 +418,11 @@ void DoChaosSave() {
 	if (!DoChaosBombSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosVergilSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosScientistSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
-	if (!DoChaosBallsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
-	if (!DoChaosABCSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosPhysicsObjectSave("beachball_save", "balls")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosPhysicsObjectSave("abcblock_save", "abc")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosPhysicsObjectSave("metalball_save", "metalball")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosPhysicsObjectSave("trafficcone_save", "cone")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosRampSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
-	if (!DoChaosMetalBallSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 }
 
@@ -497,9 +434,10 @@ void DoChaosLoad() {
 	DoChaosBombLoad();
 	DoChaosVergilLoad();
 	DoChaosScientistLoad();
-	DoChaosBallsLoad();
-	DoChaosABCLoad();
+	DoChaosPhysicsObjectLoad("balls", Effect_SpawnBall::SpawnObject);
+	DoChaosPhysicsObjectLoad("abc", Effect_SpawnBlock::SpawnObject);
+	DoChaosPhysicsObjectLoad("metalball", Effect_SpawnHeavyBall::SpawnObject);
+	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
 	DoChaosRampLoad();
-	DoChaosMetalBallLoad();
 	DoChaosSettingsLoad();
 }

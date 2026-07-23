@@ -1440,6 +1440,49 @@ public:
 		nFrequency *= 2;
 	}
 
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = 90;
+	static inline float rZ = 0;
+	static inline float offX = 0;
+	static inline float offY = -0.75;
+	static inline float offZ = 0;
+	static inline float scale = 2.5;
+
+	static inline int nRampInWorld = -1;
+
+	static void SpawnRamp(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("bljramp.fbx");
+		}
+
+		nRampInWorld = Render3DObjects::aObjects.size();
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("bljramp", models, mat, mat.p));
+		Render3DObjects::aObjects[nRampInWorld]->bTriCollidable = true;
+	}
+
+	static void SpawnOrMoveRamp(UMath::Matrix4 mat) {
+		if (nRampInWorld < 0 || !Render3DObjects::aObjects[nRampInWorld]->IsActive()) {
+			SpawnRamp(mat);
+		}
+		else {
+			auto obj = Render3DObjects::aObjects[nRampInWorld];
+			obj->mMatrix = mat;
+			obj->vColPosition = mat.p;
+		}
+	}
+
+	void DespawnRamp() {
+		if (nRampInWorld >= 0 && Render3DObjects::aObjects[nRampInWorld]->IsActive()) {
+			//Render3DObjects::aObjects[nRampInWorld]->aModels.clear();
+
+			// move away for later use
+			auto obj = Render3DObjects::aObjects[nRampInWorld];
+			obj->mMatrix.p = obj->vColPosition = {0,-100,0};
+		}
+	}
+
 	void InitFunction() override {
 		SM64::EnableMario();
 	}
@@ -1448,6 +1491,22 @@ public:
 
 		if (IsInNormalRace()) {
 			EffectInstance->fTimer -= delta; // halve the time left if in a race
+
+			auto racer = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable());
+
+			auto mat = NyaMat4x4::LookAt(racer->mSavedDirection, {0,1,0});
+			mat.p = racer->mSavedPosition;
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+			mat.x *= scale;
+			mat.y *= scale;
+			mat.z *= scale;
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			mat = (UMath::Matrix4)(mat * rotation);
+			SpawnOrMoveRamp(mat);
 		}
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
@@ -1458,6 +1517,7 @@ public:
 	}
 	void DeinitFunction() override {
 		SM64::DisableMario();
+		DespawnRamp();
 	}
 	bool IsAvailable() override { return SM64::bAvailable; }
 	bool HasTimer() override { return true; }
@@ -1790,7 +1850,7 @@ public:
 	}
 } E_SpawnHeavyBall;
 
-/*class Effect_SpawnHeavyCone : public ChaosEffect {
+class Effect_SpawnHeavyCone : public ChaosEffect {
 public:
 	Effect_SpawnHeavyCone() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Giant Traffic Cone";
@@ -1799,20 +1859,22 @@ public:
 	}
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		float scale = 3.0;
+
 		Render3D::nVertexColorValue = 0xFF000000;
-		static auto mdl = Render3D::CreateModels("beachball.fbx");
+		static auto mdl = Render3D::CreateModels("cone.fbx");
 		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 
-		static auto col = CustomPhysicsObjects::CreateDynamicColliderMeshes(mdl, 1.5);
+		static auto col = CustomPhysicsObjects::CreateDynamicColliderMeshes(mdl, scale);
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
 		objData.aModels = mdl;
-		objData.vModelSize = {1.5,1.5,1.5};
+		objData.vModelSize = {scale,scale,scale};
 		objData.bRemoveOnSafehouse = false;
 		objData.bRemoveOnOutOfBounds = false;
 		objData.bRemoveOnOutOfRange = false;
 		objData.bAffectGamePhysics = true;
-		objData.sDebugName = "metalball_save";
+		objData.sDebugName = "trafficcone_save";
 		//objData.bUseExpensiveCollisionCheck = true;
 		//objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
@@ -1831,4 +1893,4 @@ public:
 		SpawnObject(pos, vel);
 		DoChaosSave();
 	}
-} E_SpawnHeavyCone;*/
+} E_SpawnHeavyCone;
