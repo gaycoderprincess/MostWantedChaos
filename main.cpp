@@ -58,6 +58,7 @@ namespace FlatOutHUD {
 #include "include/libsm64.h"
 #include "box3d/box3d.h"
 #include "components/colrender.h"
+#include "components/mapspawner.h"
 #include "components/customphysics.h"
 #include "components/customphysics_ball.h"
 #include "components/customphysics_objects.h"

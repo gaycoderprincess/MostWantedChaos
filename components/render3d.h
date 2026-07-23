@@ -218,6 +218,23 @@ namespace Render3D {
 			g_pd3dDevice->SetTexture(0, pTexture);
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
 		}
+
+		void Invalidate() {
+			if (bInvalidated) return;
+			pVertexBuffer->Release();
+			pIndexBuffer->Release();
+			pVertexBuffer = nullptr;
+			pIndexBuffer = nullptr;
+			if (pTexture) {
+				pTexture->Release();
+				pTexture = nullptr;
+			}
+			aVertices.clear();
+			aVertices.shrink_to_fit();
+			aIndices.clear();
+			aIndices.shrink_to_fit();
+			bInvalidated = true;
+		}
 	};
 	std::vector<tModel*> aAllModels;
 	std::vector<tTextureInfo> aAllTextures;
@@ -350,16 +367,7 @@ namespace Render3D {
 
 	void OnD3DReset() {
 		for (auto& model : aAllModels) {
-			if (model->bInvalidated) continue;
-			model->pVertexBuffer->Release();
-			model->pIndexBuffer->Release();
-			model->pVertexBuffer = nullptr;
-			model->pIndexBuffer = nullptr;
-			if (model->pTexture) {
-				model->pTexture->Release();
-				model->pTexture = nullptr;
-			}
-			model->bInvalidated = true;
+			model->Invalidate();
 		}
 	}
 

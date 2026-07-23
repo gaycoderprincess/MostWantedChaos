@@ -34,6 +34,15 @@ namespace Render3DObjects {
 		aCustomCollisionInstances.push_back(inst);
 	}
 
+	void DeRegisterCustomCollisionInstance(WCollisionInstance* inst) {
+		for (auto& stored : aCustomCollisionInstances) {
+			if (stored == inst) {
+				aCustomCollisionInstances.erase(aCustomCollisionInstances.begin() + (&stored - &aCustomCollisionInstances[0]));
+				return;
+			}
+		}
+	}
+
 	void ModifyCustomCollisionInstance(WCollisionInstance* inst, const WCollisionTri* tris, int numTris, Attrib::Collection* surfaceRef = nullptr) {
 		float width = 0.0;
 		float length = 0.0;
@@ -46,8 +55,6 @@ namespace Render3DObjects {
 			centerPos += tris[i].fPt2;
 		}
 		centerPos /= (float)(numTris * 3.0);
-
-		//WriteLog(std::format("centerPos {:.2f} {:.2f} {:.2f}", centerPos.x, centerPos.y, centerPos.z));
 
 		for (int i = 0; i < numTris; i++) {
 			auto tri = tris[i];
@@ -62,9 +69,7 @@ namespace Render3DObjects {
 			length = std::max(std::abs(tri.fPt2.z-centerPos.z), length);
 		}
 
-		NyaVec3 tmp = {width,length,0};
-
-		//WriteLog(std::format("scale {:.2f} {:.2f} {:.2f}", tmp.x, tmp.y, tmp.z));
+		NyaVec3 tmp = {width,length,height};
 
 		inst->fInvMatRow0Width.x = 1.0;
 		inst->fInvMatRow0Width.y = 0.0;
@@ -467,6 +472,28 @@ namespace Render3DObjects {
 		bool IsEmpty() {
 			return aModels.empty();
 		}
+
+		void Destroy(bool deleteModels) {
+			for (auto& col : CollisionInstances) { Render3DObjects::DeRegisterCustomCollisionInstance(col); }
+			for (auto& col : CollisionInstancesIgnored) { Render3DObjects::DeRegisterCustomCollisionInstance(col); }
+			for (auto& col : CollisionInstances) { delete col; }
+			for (auto& col : CollisionInstancesIgnored) { delete col; }
+
+			if (deleteModels) {
+				for (auto& mdl : aModels) {
+					mdl->Invalidate();
+				}
+			}
+
+			aModels.clear();
+			Barriers.clear();
+			CollisionInstances.clear();
+			CollisionInstancesIgnored.clear();
+
+			Barriers.shrink_to_fit();
+			CollisionInstances.shrink_to_fit();
+			CollisionInstancesIgnored.shrink_to_fit();
+		}
 	};
 	std::vector<Object*> aObjects;
 
@@ -641,7 +668,7 @@ namespace Render3DObjects {
 				objPos.z *= -1;
 
 				auto dist = (objPos - pos).length();
-				if (dist > inst->fInvPosRadius.w) continue;
+				if (dist > inst->fInvPosRadius.w + pCollider->fRadius) continue;
 
 				AddToWCollider(pCollider, inst);
 			}

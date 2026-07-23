@@ -837,242 +837,41 @@ void ChaosModMenu() {
 			//if (DrawMenuOption("Game_EnterPostRaceFlow")) {
 			//	Game_EnterPostRaceFlow();
 			//}
-			if (DrawMenuOption("Spawn Aquatica")) {
-				auto mapPos = BACKROOMS_COORDS;
-				mapPos.y += 50;
-
-				static bool useAlpha = false;
-				static bool invert = false;
-				static float rX = 90;
-				static float rY = -90;
-				static float rZ = 0;
-				static float scale = 1.0;
-				static float playerX = -4231.55 - mapPos.x;
-				static float playerY = 102.52 - mapPos.y;
-				static float playerZ = -4537.59 - mapPos.z;
-
+			if (DrawMenuOption("Spawn Map")) {
 				ChloeMenuLib::BeginMenu();
 
-				QuickValueEditor("rX", rX);
-				QuickValueEditor("rY", rY);
-				QuickValueEditor("rZ", rZ);
-				QuickValueEditor("playerX", playerX);
-				QuickValueEditor("playerY", playerY);
-				QuickValueEditor("playerZ", playerZ);
-				QuickValueEditor("scale", scale);
-				QuickValueEditor("invert", invert);
-				QuickValueEditor("useAlpha", useAlpha);
+				for (auto& map : MapSpawner::aMaps) {
+					auto name = map.sTextureBasePath;
+					name.pop_back();
+					if (DrawMenuOption(name)) {
+						ChloeMenuLib::BeginMenu();
 
-				if (DrawMenuOption("Spawn")) {
-					const char* texturePath = "cotedazur/";
+						QuickValueEditor("rX", map.fRotateX);
+						QuickValueEditor("rY", map.fRotateY);
+						QuickValueEditor("rZ", map.fRotateZ);
+						QuickValueEditor("playerX", map.vPlayerOffset.x);
+						QuickValueEditor("playerY", map.vPlayerOffset.y);
+						QuickValueEditor("playerZ", map.vPlayerOffset.z);
+						QuickValueEditor("scale", map.fScale);
+						QuickValueEditor("invert", map.bInvertX);
+						QuickValueEditor("useAlpha", map.bUseAlpha);
 
-					const char* mdls[] = {
-							"cotedazur/1.fbx"
-					};
-					const char* mdlsCol[] = {
-							"cotedazur/col.fbx"
-					};
-
-					// -4231.55 102.52 -4537.59
-					/*const char* texturePath = "OlympicCity/";
-					const char* mdls[] = {
-							"OlympicCity/01.fbx",
-							"OlympicCity/02.fbx",
-							"OlympicCity/03.fbx",
-							"OlympicCity/04.fbx",
-							"OlympicCity/05.fbx",
-							"OlympicCity/06.fbx",
-							"OlympicCity/07.fbx",
-							"OlympicCity/08.fbx",
-							"OlympicCity/09.fbx",
-							"OlympicCity/10.fbx",
-							"OlympicCity/11.fbx",
-							"OlympicCity/12.fbx",
-							"OlympicCity/13.fbx",
-							"OlympicCity/14.fbx",
-							"OlympicCity/15.fbx",
-							"OlympicCity/16.fbx",
-							"OlympicCity/17.fbx",
-							"OlympicCity/18.fbx",
-							"OlympicCity/19.fbx",
-							"OlympicCity/20.fbx",
-							"OlympicCity/21.fbx",
-							"OlympicCity/22.fbx",
-							"OlympicCity/23.fbx",
-							"OlympicCity/24.fbx",
-							"OlympicCity/25.fbx",
-							"OlympicCity/26.fbx",
-							"OlympicCity/27.fbx",
-							"OlympicCity/28.fbx",
-							"OlympicCity/29.fbx",
-							"OlympicCity/30.fbx",
-							"OlympicCity/31.fbx",
-							"OlympicCity/32.fbx",
-							"OlympicCity/33.fbx",
-							"OlympicCity/34.fbx",
-							"OlympicCity/35.fbx",
-							"OlympicCity/36.fbx",
-							"OlympicCity/37.fbx",
-							"OlympicCity/38.fbx",
-							"OlympicCity/39.fbx",
-							"OlympicCity/40.fbx",
-							"OlympicCity/41.fbx",
-							"OlympicCity/42.fbx",
-							"OlympicCity/43.fbx",
-							"OlympicCity/44.fbx",
-							"OlympicCity/45.fbx",
-							"OlympicCity/46.fbx",
-							"OlympicCity/47.fbx",
-							"OlympicCity/48.fbx",
-							"OlympicCity/49.fbx",
-							"OlympicCity/50.fbx",
-					};
-					const char* mdlsCol[] = {
-							"OlympicCity/01_col.fbx",
-							"OlympicCity/02_col.fbx",
-							"OlympicCity/03_col.fbx",
-							"OlympicCity/04_col.fbx",
-							"OlympicCity/05_col.fbx",
-							"OlympicCity/06_col.fbx",
-							"OlympicCity/07_col.fbx",
-							"OlympicCity/08_col.fbx",
-							"OlympicCity/09_col.fbx",
-							"OlympicCity/10_col.fbx",
-							"OlympicCity/11_col.fbx",
-							"OlympicCity/12_col.fbx",
-							"OlympicCity/13_col.fbx",
-							"OlympicCity/14_col.fbx",
-							"OlympicCity/15_col.fbx",
-							"OlympicCity/16_col.fbx",
-							"OlympicCity/17_col.fbx",
-							"OlympicCity/18_col.fbx",
-							"OlympicCity/19_col.fbx",
-							"OlympicCity/20_col.fbx",
-							"OlympicCity/21_col.fbx",
-							"OlympicCity/22_col.fbx",
-							"OlympicCity/23_col.fbx",
-							"OlympicCity/24_col.fbx",
-							"OlympicCity/25_col.fbx",
-							"OlympicCity/26_col.fbx",
-							"OlympicCity/27_col.fbx",
-							"OlympicCity/28_col.fbx",
-							"OlympicCity/29_col.fbx",
-							"OlympicCity/30_col.fbx",
-							"OlympicCity/31_col.fbx",
-							"OlympicCity/32_col.fbx",
-							"OlympicCity/33_col.fbx",
-							"OlympicCity/34_col.fbx",
-							"OlympicCity/35_col.fbx",
-							"OlympicCity/36_col.fbx",
-							"OlympicCity/37_col.fbx",
-							"OlympicCity/38_col.fbx",
-							"OlympicCity/39_col.fbx",
-							"OlympicCity/40_col.fbx",
-							"OlympicCity/41_col.fbx",
-							"OlympicCity/42_col.fbx",
-							"OlympicCity/43_col.fbx",
-							"OlympicCity/44_col.fbx",
-							"OlympicCity/45_col.fbx",
-							"OlympicCity/46_col.fbx",
-							"OlympicCity/47_col.fbx",
-							"OlympicCity/48_col.fbx",
-							"OlympicCity/49_col.fbx",
-							"OlympicCity/50_col.fbx",
-					};*/
-
-					/*const char* texturePath = "aquatica/";
-					const char* mdls[] = {
-							"aquatica/aquatica.fbx_Section1.fbx",
-							"aquatica/aquatica.fbx_Section2.fbx",
-							"aquatica/aquatica.fbx_Section3.fbx",
-							"aquatica/aquatica.fbx_Section4.fbx",
-							"aquatica/aquatica.fbx_Section5.fbx",
-							"aquatica/aquatica.fbx_Section6.fbx",
-							"aquatica/aquatica.fbx_Section7.fbx",
-							"aquatica/aquatica.fbx_Section8.fbx",
-							"aquatica/aquatica.fbx_Section9.fbx",
-							"aquatica/aquatica.fbx_Section10.fbx",
-							"aquatica/aquatica.fbx_Section11.fbx",
-							"aquatica/aquatica.fbx_Seabox.fbx",
-					};
-					const char* mdlsCol[] = {
-							"aquatica/aquatica.fbx_Section1_col.fbx",
-							"aquatica/aquatica.fbx_Section2_col.fbx",
-							"aquatica/aquatica.fbx_Section3_col.fbx",
-							"aquatica/aquatica.fbx_Section4_col.fbx",
-							"aquatica/aquatica.fbx_Section5_col.fbx",
-							"aquatica/aquatica.fbx_Section6_col.fbx",
-							"aquatica/aquatica.fbx_Section7_col.fbx",
-							"aquatica/aquatica.fbx_Section8_col.fbx",
-							"aquatica/aquatica.fbx_Section9_col.fbx",
-							"aquatica/aquatica.fbx_Section10_col.fbx",
-							"aquatica/aquatica.fbx_Section11_col.fbx",
-					};*/
-
-					for (auto& mdl : mdls) {
-						Render3D::sTextureSubdir = texturePath;
-						auto models = Render3D::CreateModels(mdl);
-						Render3D::sTextureSubdir = "";
-
-						auto mat = UMath::Matrix4::kIdentity;
-						mat.x *= scale;
-						mat.y *= scale;
-						mat.z *= scale;
-						mat.p = mapPos;
-
-						UMath::Matrix4 rotation;
-						rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
-						mat = (UMath::Matrix4)(mat * rotation);
-
-						if (invert) {
-							mat.x *= -1;
+						if (DrawMenuOption("Spawn")) {
+							map.Spawn();
 						}
 
-						int id = Render3DObjects::aObjects.size();
-						Render3DObjects::aObjects.push_back(new Render3DObjects::Object("map", models, mat, mat.p));
-						Render3DObjects::aObjects[id]->bUseAlpha = useAlpha;
-					}
-					for (auto& mdl : mdlsCol) {
-						Render3D::sTextureSubdir = texturePath;
-						auto modelsCol = Render3D::CreateModels(mdl);
-						Render3D::sTextureSubdir = "";
-
-						auto mat = UMath::Matrix4::kIdentity;
-						mat.x *= scale;
-						mat.y *= scale;
-						mat.z *= scale;
-						mat.p = mapPos;
-
-						UMath::Matrix4 rotation;
-						rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
-						mat = (UMath::Matrix4)(mat * rotation);
-
-						if (invert) {
-							mat.x *= -1;
+						if (DrawMenuOption("Despawn")) {
+							map.Despawn();
 						}
 
-						int id = Render3DObjects::aObjects.size();
-						Render3DObjects::aObjects.push_back(new Render3DObjects::Object("mapCol", modelsCol, mat, mat.p));
-						Render3DObjects::aObjects[id]->bDontRender = true;
-						Render3DObjects::aObjects[id]->bTriCollidable = true;
-					}
+						if (DrawMenuOption("Teleport")) {
+							if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+								UMath::Vector3 playerPos = map.vMapPos + map.vPlayerOffset;
+								TeleportPlayer(playerPos, {-0.96,0.0,-0.3});
+							}
+						}
 
-					if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
-						UMath::Vector3 playerPos = mapPos;
-						playerPos.x += playerX;
-						playerPos.y += playerY;
-						playerPos.z += playerZ;
-						TeleportPlayer(playerPos, {-0.96,0.0,-0.3});
-					}
-				}
-
-				if (DrawMenuOption("Teleport")) {
-					if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
-						UMath::Vector3 playerPos = mapPos;
-						playerPos.x += playerX;
-						playerPos.y += playerY;
-						playerPos.z += playerZ;
-						TeleportPlayer(playerPos, {-0.96,0.0,-0.3});
+						ChloeMenuLib::EndMenu();
 					}
 				}
 
