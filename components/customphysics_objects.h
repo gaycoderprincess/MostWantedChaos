@@ -160,23 +160,51 @@ namespace CustomPhysicsObjects {
 	};
 	std::vector<CustomPhysicsObject*> aPhysicsObjects;
 
+	std::vector<b3MeshData*> CreateStaticColliderMeshes(const std::vector<Render3D::tModel*>& models) {
+		std::vector<b3MeshData*> meshes;
+		for (auto& model : models) {
+			auto mesh = CustomPhysics::CreateMesh((b3Vec3*)&model->aVertices[0], model->aVertices.size(), &model->aIndices[0], model->aIndices.size());
+			if (!mesh) continue;
+			meshes.push_back(mesh);
+		}
+		return meshes;
+	}
+
+	std::vector<b3HullData*> CreateDynamicColliderMeshes(const std::vector<Render3D::tModel*>& models, float scale) {
+		std::vector<b3HullData*> meshes;
+		for (auto& model : models) {
+			auto verts = model->aVertices;
+			for (auto& v : verts) {
+				v *= scale;
+			}
+
+			auto mesh = b3CreateHull((b3Vec3*)&verts[0], verts.size(), verts.size());
+			if (!mesh) continue;
+			meshes.push_back(mesh);
+		}
+		return meshes;
+	}
+
 	void CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
 		data.vSpawnPosition = position;
 		if (collider == BOX) {
 			b3BodyDef def = b3DefaultBodyDef();
 			def.type = b3_dynamicBody;
-			def.position = {0,0,0};
+			def.position.x = position.x;
+			def.position.y = position.y;
+			def.position.z = position.z;
 			data.nB3Body = b3CreateBody(CustomPhysics::m_worldId, &def);
 
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
 			auto hull = b3MakeBoxHull(data.vModelSize.x, data.vModelSize.y, data.vModelSize.z);
-			b3HullData hullData;
 			b3CreateHullShape(data.nB3Body, &shapeDef, &hull.base);
 		}
 		else if (collider == SPHERE) {
 			b3BodyDef def = b3DefaultBodyDef();
 			def.type = b3_dynamicBody;
-			def.position = {0,0,0};
+			def.position.x = position.x;
+			def.position.y = position.y;
+			def.position.z = position.z;
 			data.nB3Body = b3CreateBody(CustomPhysics::m_worldId, &def);
 
 			b3ShapeDef shapeDef = b3DefaultShapeDef();
@@ -184,6 +212,29 @@ namespace CustomPhysicsObjects {
 			sphere.center = {0,0,0};
 			sphere.radius = data.vModelSize.x;
 			b3CreateSphereShape(data.nB3Body, &shapeDef, &sphere);
+		}
+
+		b3Body_SetTransform(data.nB3Body, {position.x,position.y,position.z}, b3Quat_identity);
+		b3Body_SetLinearVelocity(data.nB3Body, {velocity.x,velocity.y,velocity.z});
+
+		auto obj = new CustomPhysicsObject;
+		*obj = data;
+		aPhysicsObjects.push_back(obj);
+	}
+
+	void CreatePhysicsObject(CustomPhysicsObject data, std::vector<b3HullData*>& meshes, NyaVec3 position, NyaVec3 velocity) {
+		data.vSpawnPosition = position;
+
+		b3BodyDef def = b3DefaultBodyDef();
+		def.type = b3_dynamicBody;
+		def.position.x = position.x;
+		def.position.y = position.y;
+		def.position.z = position.z;
+		data.nB3Body = b3CreateBody(CustomPhysics::m_worldId, &def);
+
+		for (auto& mesh : meshes) {
+			b3ShapeDef shapeDef = b3DefaultShapeDef();
+			b3CreateHullShape(data.nB3Body, &shapeDef, mesh);
 		}
 
 		b3Body_SetTransform(data.nB3Body, {position.x,position.y,position.z}, b3Quat_identity);

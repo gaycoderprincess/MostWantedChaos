@@ -1789,3 +1789,46 @@ public:
 		DoChaosSave();
 	}
 } E_SpawnHeavyBall;
+
+/*class Effect_SpawnHeavyCone : public ChaosEffect {
+public:
+	Effect_SpawnHeavyCone() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Giant Traffic Cone";
+		bCanMultiTrigger = true;
+		bRigProportionalChances = true; // todo remove
+	}
+
+	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		Render3D::nVertexColorValue = 0xFF000000;
+		static auto mdl = Render3D::CreateModels("beachball.fbx");
+		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+
+		static auto col = CustomPhysicsObjects::CreateDynamicColliderMeshes(mdl, 1.5);
+
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = mdl;
+		objData.vModelSize = {1.5,1.5,1.5};
+		objData.bRemoveOnSafehouse = false;
+		objData.bRemoveOnOutOfBounds = false;
+		objData.bRemoveOnOutOfRange = false;
+		objData.bAffectGamePhysics = true;
+		objData.sDebugName = "metalball_save";
+		//objData.bUseExpensiveCollisionCheck = true;
+		//objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
+	}
+
+	void InitFunction() override {
+		auto rb = GetLocalPlayerInterface<IRigidBody>();
+		auto ply = *rb->GetPosition();
+		auto vel = *rb->GetLinearVelocity();
+		UMath::Vector3 fwd;
+		rb->GetForwardVector(&fwd);
+
+		NyaVec3 pos = ply;
+		pos += fwd * 5;
+		pos.y += 2;
+		SpawnObject(pos, vel);
+		DoChaosSave();
+	}
+} E_SpawnHeavyCone;*/
