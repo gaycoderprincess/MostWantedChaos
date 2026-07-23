@@ -34,10 +34,20 @@ namespace Render3DObjects {
 		aCustomCollisionInstances.push_back(inst);
 	}
 
-	void ModifyCustomCollisionInstance(WCollisionInstance* inst, const WCollisionTri* tris, int numTris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
+	void ModifyCustomCollisionInstance(WCollisionInstance* inst, const WCollisionTri* tris, int numTris, Attrib::Collection* surfaceRef = nullptr) {
 		float width = 0.0;
 		float length = 0.0;
 		float height = 0.0;
+
+		NyaVec3 centerPos = {0,0,0};
+		for (int i = 0; i < numTris; i++) {
+			centerPos += tris[i].fPt0;
+			centerPos += tris[i].fPt1;
+			centerPos += tris[i].fPt2;
+		}
+		centerPos /= (float)(numTris * 3.0);
+
+		//WriteLog(std::format("centerPos {:.2f} {:.2f} {:.2f}", centerPos.x, centerPos.y, centerPos.z));
 
 		for (int i = 0; i < numTris; i++) {
 			auto tri = tris[i];
@@ -53,6 +63,8 @@ namespace Render3DObjects {
 		}
 
 		NyaVec3 tmp = {width,length,0};
+
+		//WriteLog(std::format("scale {:.2f} {:.2f} {:.2f}", tmp.x, tmp.y, tmp.z));
 
 		inst->fInvMatRow0Width.x = 1.0;
 		inst->fInvMatRow0Width.y = 0.0;
@@ -149,7 +161,7 @@ namespace Render3DObjects {
 		// player pos -2508 148 1762
 	}
 
-	WCollisionInstance* CreateCustomCollisionInstance(const WCollisionTri* tris, int numTris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
+	WCollisionInstance* CreateCustomCollisionInstance(const WCollisionTri* tris, int numTris, Attrib::Collection* surfaceRef = nullptr) {
 		if (!surfaceRef) {
 			surfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("unknown"));
 		}
@@ -191,7 +203,7 @@ namespace Render3DObjects {
 		article->fFlags = 0;
 		inst->fCollisionArticle = article;
 
-		ModifyCustomCollisionInstance(inst, tris, numTris, centerPos, surfaceRef);
+		ModifyCustomCollisionInstance(inst, tris, numTris, surfaceRef);
 
 		return inst;
 	}
@@ -206,6 +218,7 @@ namespace Render3DObjects {
 		void* CustomData = nullptr;
 		bool bTriCollidable = false;
 		bool bDontRender = false;
+		bool bUseAlpha = false;
 		std::string sDebugName;
 
 		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
@@ -213,6 +226,8 @@ namespace Render3DObjects {
 		std::vector<CustomBarrier> Barriers = {};
 		std::vector<WCollisionInstance*> CollisionInstances;
 		std::vector<WCollisionInstance*> CollisionInstancesIgnored;
+
+		float fRadius;
 
 		// skip tris that are flipped or sideways, these will become barriers
 		bool ShouldTriBeBarrier(const WCollisionTri& tri) {
@@ -233,7 +248,19 @@ namespace Render3DObjects {
 			return out;
 		}
 
-		void GenerateCollisionInstances(const std::vector<WCollisionTri>& tris, std::vector<WCollisionInstance*>& insts, NyaVec3 currPos) {
+		void CalculateRadius() {
+			NyaVec3 max;
+			for (auto& model : aModels) {
+				for (auto& v : model->aVertices) {
+					max.x = std::max(std::abs(v.x), max.x);
+					max.y = std::max(std::abs(v.y), max.y);
+					max.z = std::max(std::abs(v.z), max.z);
+				}
+			}
+			fRadius = max.length();
+		}
+
+		void GenerateCollisionInstances(const std::vector<WCollisionTri>& tris, std::vector<WCollisionInstance*>& insts) {
 			if (tris.empty()) return;
 
 			bool genFromScratch = insts.empty();
@@ -246,13 +273,13 @@ namespace Render3DObjects {
 				WCollisionInstance* inst = nullptr;
 				if (genFromScratch) {
 					auto surface = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("asphalt_no_leaves"));
-					insts.push_back(CreateCustomCollisionInstance(&tris[tris.size()-trisLeft], trisToDo, currPos, surface));
+					insts.push_back(CreateCustomCollisionInstance(&tris[tris.size()-trisLeft], trisToDo, surface));
 					inst = insts[insts.size()-1];
 				}
 				else {
 					inst = insts[instId++];
 				}
-				ModifyCustomCollisionInstance(inst, &tris[tris.size()-trisLeft], trisToDo, currPos);
+				ModifyCustomCollisionInstance(inst, &tris[tris.size()-trisLeft], trisToDo);
 
 				WriteLog(std::format("generated {} tris for {}", trisToDo, sDebugName));
 				trisLeft -= trisToDo;
@@ -299,8 +326,8 @@ namespace Render3DObjects {
 				}
 			}
 
-			GenerateCollisionInstances(tris, CollisionInstances, currPos);
-			GenerateCollisionInstances(trisIgnored, CollisionInstancesIgnored, currPos);
+			GenerateCollisionInstances(tris, CollisionInstances);
+			GenerateCollisionInstances(trisIgnored, CollisionInstancesIgnored);
 		}
 
 		void RegenerateTriBarriers() {
@@ -429,7 +456,9 @@ namespace Render3DObjects {
 			}
 		}
 
-		Object(const std::string& debugName, std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : sDebugName(debugName), aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {}
+		Object(const std::string& debugName, std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : sDebugName(debugName), aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {
+			CalculateRadius();
+		}
 
 		bool IsActive() {
 			return !aModels.empty() && !aModels[0]->bInvalidated;
@@ -463,10 +492,16 @@ namespace Render3DObjects {
 
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 
+		auto camPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
 		for (auto& obj : aObjects) {
 			if (obj->bDontRender) continue;
+
+			auto dist = (obj->mMatrix.p - camPos).length();
+			auto radius = obj->fRadius * obj->mMatrix.x.length();
+			if (dist > (radius * 2) + 200) continue;
+
 			for (auto& model : obj->aModels) {
-				model->RenderAt(WorldToRenderMatrix(obj->mMatrix));
+				model->RenderAt(WorldToRenderMatrix(obj->mMatrix), obj->bUseAlpha);
 			}
 		}
 	}
@@ -569,8 +604,8 @@ namespace Render3DObjects {
 		tris.push_back(triRev);
 		tris.push_back(tri3Rev);
 
-		static auto inst = CreateCustomCollisionInstance(&tris[0], tris.size(), pos);
-		ModifyCustomCollisionInstance(inst, &tris[0], tris.size(), pos);
+		static auto inst = CreateCustomCollisionInstance(&tris[0], tris.size());
+		ModifyCustomCollisionInstance(inst, &tris[0], tris.size());
 		pHoverPlatform = inst;
 	}
 
@@ -614,9 +649,11 @@ namespace Render3DObjects {
 	}
 
 	bool IsColliderInSpecialArea(NyaVec3 v) {
-		v.y = 0.0;
-		if ((v - BACKROOMS_COORDS).length() < BACKROOMS_DISTANCE) return true;
-		return false;
+		return true;
+
+		//v.y = 0.0;
+		//if ((v - BACKROOMS_COORDS).length() < BACKROOMS_DISTANCE) return true;
+		//return false;
 	}
 
 	void __thiscall ProcessCollider(WCollider* pCollider, uint32_t updateMask) {
