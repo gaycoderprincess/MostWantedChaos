@@ -241,6 +241,16 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::RenderPropsHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PREPROPS>);
 			NyaHooks::RenderPropsHook::aPostFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_POSTPROPS>);
 
+			//for (int i = 0; i < 65535; i++) {
+			//	size_t numStrips = i;
+			//	size_t numVerts = numStrips*3;
+			//	size_t stripsSize = (sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numVerts);
+			//	if (stripsSize > 65535) {
+			//		MessageBoxA(nullptr, std::format("Attempted to create collision with too high strip size {} ({} tris)", stripsSize, i).c_str(), "nya?!~", MB_ICONERROR);
+			//		exit(0);
+			//	}
+			//}
+
 			//SkipFE = true;
 		} break;
 		default:

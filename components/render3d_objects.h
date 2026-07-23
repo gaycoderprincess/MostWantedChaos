@@ -23,6 +23,9 @@ namespace Render3DObjects {
 	};
 	std::vector<CustomBarrier> aSM64Barriers;
 
+	// one tri is 40 bytes total
+	const int MAX_COLLISION_TRI_COUNT = 1638;
+
 	std::vector<WCollisionInstance*> aCustomCollisionInstances;
 	void RegisterCustomCollisionInstance(WCollisionInstance* inst) {
 		for (auto& stored : aCustomCollisionInstances) {
@@ -31,12 +34,13 @@ namespace Render3DObjects {
 		aCustomCollisionInstances.push_back(inst);
 	}
 
-	void ModifyCustomCollisionInstance(WCollisionInstance* inst, const std::vector<WCollisionTri>& tris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
+	void ModifyCustomCollisionInstance(WCollisionInstance* inst, const WCollisionTri* tris, int numTris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
 		float width = 0.0;
 		float length = 0.0;
 		float height = 0.0;
 
-		for (auto& tri : tris) {
+		for (int i = 0; i < numTris; i++) {
+			auto tri = tris[i];
 			width = std::max(std::abs(tri.fPt0.x-centerPos.x), width);
 			width = std::max(std::abs(tri.fPt1.x-centerPos.x), width);
 			width = std::max(std::abs(tri.fPt2.x-centerPos.x), width);
@@ -67,8 +71,8 @@ namespace Render3DObjects {
 		auto article = inst->fCollisionArticle;
 		auto data = (uint8_t*)inst->fCollisionArticle;
 
-		if (tris.size() != article->fNumStrips) {
-			MessageBoxA(nullptr, std::format("Attempted to modify collision instance with {} tris to have {} tris", article->fNumStrips, tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+		if (numTris != article->fNumStrips) {
+			MessageBoxA(nullptr, std::format("Attempted to modify collision instance with {} tris to have {} tris", article->fNumStrips, numTris).c_str(), "nya?!~", MB_ICONERROR);
 			exit(0);
 		}
 
@@ -86,7 +90,7 @@ namespace Render3DObjects {
 		float stripMult = 128.0; // 0.0078125
 		float stripSphereMult = 16.0; // 0.0625
 
-		for (int i = 0; i < tris.size(); i++) {
+		for (int i = 0; i < numTris; i++) {
 			auto tri = tris[i];
 			tri.fPt0.x += inst->fInvPosRadius.x;
 			tri.fPt0.y += inst->fInvPosRadius.y;
@@ -104,7 +108,7 @@ namespace Render3DObjects {
 
 			auto stripOffset = ((uintptr_t)stripList)-((uintptr_t)data)-sizeof(WCollisionArticle);
 			if (stripOffset > 65535) {
-				MessageBoxA(nullptr, std::format("Attempted to create collision with too high strip offset {} ({} tris)", stripOffset, tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+				MessageBoxA(nullptr, std::format("Attempted to create collision with too high strip offset {} ({} tris)", stripOffset, numTris).c_str(), "nya?!~", MB_ICONERROR);
 				exit(0);
 			}
 
@@ -145,13 +149,13 @@ namespace Render3DObjects {
 		// player pos -2508 148 1762
 	}
 
-	WCollisionInstance* CreateCustomCollisionInstance(const std::vector<WCollisionTri>& tris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
+	WCollisionInstance* CreateCustomCollisionInstance(const WCollisionTri* tris, int numTris, NyaVec3 centerPos, Attrib::Collection* surfaceRef = nullptr) {
 		if (!surfaceRef) {
 			surfaceRef = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("unknown"));
 		}
 
-		if (tris.size() > 65535) {
-			MessageBoxA(nullptr, std::format("Attempted to create collision with {} tris (max is 65535)", tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+		if (numTris > 65535) {
+			MessageBoxA(nullptr, std::format("Attempted to create collision with {} tris (max is 65535)", numTris).c_str(), "nya?!~", MB_ICONERROR);
 			exit(0);
 		}
 
@@ -163,11 +167,11 @@ namespace Render3DObjects {
 		inst->fRenderInstanceInd = 0; // todo?
 		RegisterCustomCollisionInstance(inst);
 
-		size_t numStrips = tris.size();
+		size_t numStrips = numTris;
 		size_t numVerts = numStrips*3;
 		size_t stripsSize = (sizeof(WCollisionStripSphere)*numStrips)+(sizeof(WCollisionStrip)*numVerts);
 		if (stripsSize > 65535) {
-			MessageBoxA(nullptr, std::format("Attempted to create collision with too high strip size {} ({} tris)", stripsSize, tris.size()).c_str(), "nya?!~", MB_ICONERROR);
+			MessageBoxA(nullptr, std::format("Attempted to create collision with too high strip size {} ({} tris)", stripsSize, numTris).c_str(), "nya?!~", MB_ICONERROR);
 			exit(0);
 		}
 
@@ -187,7 +191,7 @@ namespace Render3DObjects {
 		article->fFlags = 0;
 		inst->fCollisionArticle = article;
 
-		ModifyCustomCollisionInstance(inst, tris, centerPos, surfaceRef);
+		ModifyCustomCollisionInstance(inst, tris, numTris, centerPos, surfaceRef);
 
 		return inst;
 	}
@@ -207,8 +211,8 @@ namespace Render3DObjects {
 		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
 		NyaVec3 vLastTriPosition = UMath::Vector3::kZero;
 		std::vector<CustomBarrier> Barriers = {};
-		WCollisionInstance* CollisionInstance = nullptr;
-		WCollisionInstance* CollisionInstanceIgnored = nullptr;
+		std::vector<WCollisionInstance*> CollisionInstances;
+		std::vector<WCollisionInstance*> CollisionInstancesIgnored;
 
 		// skip tris that are flipped or sideways, these will become barriers
 		bool ShouldTriBeBarrier(const WCollisionTri& tri) {
@@ -227,6 +231,33 @@ namespace Render3DObjects {
 			auto out = mMatrix;
 			out.y *= -1;
 			return out;
+		}
+
+		void GenerateCollisionInstances(const std::vector<WCollisionTri>& tris, std::vector<WCollisionInstance*>& insts, NyaVec3 currPos) {
+			if (tris.empty()) return;
+
+			bool genFromScratch = insts.empty();
+			int instId = 0;
+
+			int trisLeft = tris.size();
+			while (trisLeft > 0) {
+				int trisToDo = std::min(trisLeft, MAX_COLLISION_TRI_COUNT);
+
+				WCollisionInstance* inst = nullptr;
+				if (genFromScratch) {
+					auto surface = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("asphalt_no_leaves"));
+					insts.push_back(CreateCustomCollisionInstance(&tris[tris.size()-trisLeft], trisToDo, currPos, surface));
+					inst = insts[insts.size()-1];
+				}
+				else {
+					inst = insts[instId++];
+				}
+				ModifyCustomCollisionInstance(inst, &tris[tris.size()-trisLeft], trisToDo, currPos);
+
+				WriteLog(std::format("generated {} tris for {}", trisToDo, sDebugName));
+				trisLeft -= trisToDo;
+			}
+			WriteLog(std::format("finished generating {} tris for {}", tris.size(), sDebugName));
 		}
 
 		void RegenerateTris() {
@@ -268,21 +299,8 @@ namespace Render3DObjects {
 				}
 			}
 
-			if (!tris.empty()) {
-				if (!CollisionInstance) {
-					auto surface = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("asphalt_no_leaves"));
-					CollisionInstance = CreateCustomCollisionInstance(tris, currPos, surface);
-				}
-				ModifyCustomCollisionInstance(CollisionInstance, tris, currPos);
-				WriteLog(std::format("generated {} tris for {}", tris.size(), sDebugName));
-			}
-			if (!trisIgnored.empty()) {
-				if (!CollisionInstanceIgnored) {
-					CollisionInstanceIgnored = CreateCustomCollisionInstance(trisIgnored, currPos);
-				}
-				ModifyCustomCollisionInstance(CollisionInstanceIgnored, trisIgnored, currPos);
-				WriteLog(std::format("generated {} ignored tris for {}", trisIgnored.size(), sDebugName));
-			}
+			GenerateCollisionInstances(tris, CollisionInstances, currPos);
+			GenerateCollisionInstances(trisIgnored, CollisionInstancesIgnored, currPos);
 		}
 
 		void RegenerateTriBarriers() {
@@ -484,11 +502,13 @@ namespace Render3DObjects {
 		std::vector<WCollisionInstance*> potentialInsts;
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
-			if (obj->CollisionInstance) {
-				potentialInsts.push_back(obj->CollisionInstance);
+			for (auto& inst : obj->CollisionInstances) {
+				potentialInsts.push_back(inst);
 			}
-			if (includeIgnored && obj->CollisionInstanceIgnored) {
-				potentialInsts.push_back(obj->CollisionInstanceIgnored);
+			if (includeIgnored) {
+				for (auto& inst : obj->CollisionInstancesIgnored) {
+					potentialInsts.push_back(inst);
+				}
 			}
 		}
 		return potentialInsts;
@@ -549,8 +569,8 @@ namespace Render3DObjects {
 		tris.push_back(triRev);
 		tris.push_back(tri3Rev);
 
-		static auto inst = CreateCustomCollisionInstance(tris, pos);
-		ModifyCustomCollisionInstance(inst, tris, pos);
+		static auto inst = CreateCustomCollisionInstance(&tris[0], tris.size(), pos);
+		ModifyCustomCollisionInstance(inst, &tris[0], tris.size(), pos);
 		pHoverPlatform = inst;
 	}
 
@@ -567,6 +587,8 @@ namespace Render3DObjects {
 	}
 
 	void ProcessWColliderTris(WCollider* pCollider) {
+		PerformanceBenchmarker _perf("Render3DObjects::ProcessWColliderTris");
+
 		if (fHoverPlatform > -100.0) {
 			ProcessHoverPlatform(pCollider);
 			AddToWCollider(pCollider, pHoverPlatform);
@@ -577,18 +599,17 @@ namespace Render3DObjects {
 			if (!obj->IsActive()) continue;
 			if (!obj->bTriCollidable) continue;
 
-			auto inst = obj->CollisionInstance;
-			if (!inst) continue;
+			for (auto& inst : obj->CollisionInstances) {
+				auto objPos = inst->fInvPosRadius;
+				objPos.x *= -1;
+				objPos.y *= -1;
+				objPos.z *= -1;
 
-			auto objPos = inst->fInvPosRadius;
-			objPos.x *= -1;
-			objPos.y *= -1;
-			objPos.z *= -1;
+				auto dist = (objPos - pos).length();
+				if (dist > inst->fInvPosRadius.w) continue;
 
-			auto dist = (objPos - pos).length();
-			if (dist > inst->fInvPosRadius.w) continue;
-
-			AddToWCollider(pCollider, inst);
+				AddToWCollider(pCollider, inst);
+			}
 		}
 	}
 
