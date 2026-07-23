@@ -19,8 +19,23 @@ namespace Render3D {
 
 	bool bForceNoEffect = false;
 
-	D3DXVECTOR4 fENVMAPMIN = {0,0,0,0};
-	D3DXVECTOR4 fENVMAPANGE = {1,1,1,0};
+	//D3DXVECTOR4 fDIFFUSEMIN = {1,1,1,1};
+	//D3DXVECTOR4 fDIFFUSERANGE = {1,1,1,-0.65};
+	//D3DXVECTOR4 fSPECULARMIN = {0,0,0,0};
+	//D3DXVECTOR4 fSPECULARRANGE = {0.3,0.3,0.3,0};
+	//D3DXVECTOR4 fENVMAPMIN = {0,0,0,0};
+	//D3DXVECTOR4 fENVMAPANGE = {1,1,1,0};
+	//float fSPECULARPOWER = 2.5;
+	//float fENVMAPPOWER = 1.0;
+
+	D3DXVECTOR4 fDIFFUSEMIN = {0.4,0.4,0.4,1};
+	D3DXVECTOR4 fDIFFUSERANGE = {0.6,0.6,0.6,0};
+	D3DXVECTOR4 fSPECULARMIN = {0.16,0.2,0.16,0};
+	D3DXVECTOR4 fSPECULARRANGE = {0.04,0.0,0.04,0};
+	D3DXVECTOR4 fENVMAPMIN = {1.75,1.75,1.75,0};
+	D3DXVECTOR4 fENVMAPANGE = {-1.65,-1.65,-1.65,0};
+	float fSPECULARPOWER = 8.0;
+	float fENVMAPPOWER = 0.15;
 
 	struct tModel {
 		IDirect3DIndexBuffer9* pIndexBuffer = nullptr;
@@ -93,16 +108,16 @@ namespace Render3D {
 				// SPECULARPOWER float
 				// ENVMAPPOWER float
 
-				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARPOWER].mHandle, 2.5);
-				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPPOWER].mHandle, 1.0);
+				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARPOWER].mHandle, fSPECULARPOWER);
+				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPPOWER].mHandle, fENVMAPPOWER);
 
-				D3DXVECTOR4 v = {1,1,1,1};
+				D3DXVECTOR4 v = fDIFFUSEMIN;
 				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSEMIN].mHandle, &v);
-				v = {0,0,0,-0.65};
+				v = fDIFFUSERANGE;
 				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSERANGE].mHandle, &v);
-				v = {0,0,0,0};
+				v = fSPECULARMIN;
 				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARMIN].mHandle, &v);
-				v = {0,0,0,0};
+				v = fSPECULARRANGE;
 				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARRANGE].mHandle, &v);
 
 				v = fENVMAPMIN;
@@ -351,4 +366,95 @@ namespace Render3D {
 	ChloeHook Init([](){
 		NyaHooks::D3DResetHook::aFunctions.push_back(OnD3DReset);
 	});
+}
+
+struct CarShaderParams {
+	// SPECULARMIN vector
+	// SPECULARRANGE vector
+	// ENVMAPMIN vector
+	// ENVMAPANGE vector
+	// SPECULARPOWER float
+	// ENVMAPPOWER float
+
+	D3DXVECTOR4 DIFFUSEMIN;
+	D3DXVECTOR4 DIFFUSERANGE;
+	D3DXVECTOR4 SPECULARMIN;
+	D3DXVECTOR4 SPECULARRANGE;
+	D3DXVECTOR4 ENVMAPMIN;
+	D3DXVECTOR4 ENVMAPANGE;
+	float SPECULARPOWER;
+	float ENVMAPPOWER;
+
+	bool operator==(CarShaderParams& other) {
+		if (DIFFUSEMIN != other.DIFFUSEMIN) return false;
+		if (DIFFUSERANGE != other.DIFFUSERANGE) return false;
+		if (SPECULARMIN != other.SPECULARMIN) return false;
+		if (SPECULARRANGE != other.SPECULARRANGE) return false;
+		if (ENVMAPMIN != other.ENVMAPMIN) return false;
+		if (ENVMAPANGE != other.ENVMAPANGE) return false;
+		if (SPECULARPOWER != other.SPECULARPOWER) return false;
+		if (ENVMAPPOWER != other.ENVMAPPOWER) return false;
+		return true;
+	}
+
+	void Collect() {
+		auto effect = eEffectStaticState::pCurrentEffect;
+		effect->hD3DXEffect->GetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSEMIN].mHandle, &DIFFUSEMIN);
+		effect->hD3DXEffect->GetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSERANGE].mHandle, &DIFFUSERANGE);
+		effect->hD3DXEffect->GetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARMIN].mHandle, &SPECULARMIN);
+		effect->hD3DXEffect->GetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARRANGE].mHandle, &SPECULARRANGE);
+		effect->hD3DXEffect->GetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPMIN].mHandle, &ENVMAPMIN);
+		effect->hD3DXEffect->GetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPANGE].mHandle, &ENVMAPANGE);
+		effect->hD3DXEffect->GetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARPOWER].mHandle, &SPECULARPOWER);
+		effect->hD3DXEffect->GetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPPOWER].mHandle, &ENVMAPPOWER);
+	}
+
+	void Log() {
+		auto v = DIFFUSEMIN;
+		auto v2 = DIFFUSERANGE;
+		auto v3 = SPECULARMIN;
+		auto v4 = SPECULARRANGE;
+		AddLogPopup(std::format("DIFFUSEMIN {:.2f} {:.2f} {:.2f} {:.2f} DIFFUSERANGE {:.2f} {:.2f} {:.2f} {:.2f} SPECULARMIN {:.2f} {:.2f} {:.2f} {:.2f} SPECULARRANGE {:.2f} {:.2f} {:.2f} {:.2f}", v.x, v.y, v.z, v.w, v2.x, v2.y, v2.z, v2.w, v3.x, v3.y, v3.z, v3.w, v4.x, v4.y, v4.z, v4.w));
+		v = ENVMAPMIN;
+		v2 = ENVMAPANGE;
+		AddLogPopup(std::format("ENVMAPMIN {:.2f} {:.2f} {:.2f} {:.2f} ENVMAPANGE {:.2f} {:.2f} {:.2f} {:.2f} SPECULARPOWER {:.2f} ENVMAPPOWER {:.2f}", v.x, v.y, v.z, v.w, v2.x, v2.y, v2.z, v2.w, SPECULARPOWER, ENVMAPPOWER));
+	}
+};
+std::vector<CarShaderParams> aCarShaderParamsCollected;
+
+void CollectCarShader() {
+	if (aCarShaderParamsCollected.size() > 255) aCarShaderParamsCollected.clear();
+
+	auto effect = eEffectStaticState::pCurrentEffect;
+	if (!effect) return;
+
+	if (effect->ID == EEFFECT_CAR) {
+		CarShaderParams temp;
+		temp.Collect();
+
+		for (auto& params : aCarShaderParamsCollected) {
+			if (params == temp) return;
+		}
+
+		aCarShaderParamsCollected.push_back(temp);
+
+		temp.Log();
+	}
+}
+
+static inline uintptr_t testhook_jmp = 0x6E0497;
+static inline uintptr_t testhook_jmp2 = 0x6E0630;
+static void __attribute__((naked)) testhook() {
+	__asm__ (
+		"pushad\n\t"
+		"call %2\n\t"
+		"popad\n\t"
+		"cmp [esi+4], ebp\n\t"
+		"jnz loc_6E0630\n\t"
+		"jmp %0\n\t"
+		"loc_6E0630:\n\t"
+		"jmp %1\n\t"
+			:
+			:  "m" (testhook_jmp), "m" (testhook_jmp2), "i" (CollectCarShader)
+	);
 }

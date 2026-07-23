@@ -843,12 +843,17 @@ void AddLogPopup(const std::string& str) {
 }
 
 void DrawLogPopups() {
+	float scale = 0.03;
+	while (aLogPopups.size() * scale > 0.9) {
+		scale *= 0.9;
+	}
+
 	float y = 0.9;
 	for (auto& popup : aLogPopups) {
 		tNyaStringData data;
 		data.x = 0.1 * GetAspectRatioInv();
 		data.y = y;
-		data.size = 0.03;
+		data.size = scale;
 		if (popup.starts_with("PERFORMANCE WARNING")) {
 			data.SetColor(255,0,0,255);
 		}

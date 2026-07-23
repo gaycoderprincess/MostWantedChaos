@@ -214,6 +214,8 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			aMainLoopFunctions.push_back(ProcessChaosEffects<ChaosEffect::HOOK_GAMETICK>);
 			aDrawing3DLoopFunctions.push_back(ProcessChaosEffects<ChaosEffect::HOOK_3D>);
 
+			//NyaHookLib::PatchRelative(NyaHookLib::JMP, 0x6E048E, &testhook);
+
 			NyaHooks::PlaceD3DHooks(true);
 			NyaHooks::D3DEndSceneHook::aFunctions.push_back(D3DHookMain);
 			NyaHooks::D3DResetHook::aFunctions.push_back(OnD3DReset);
