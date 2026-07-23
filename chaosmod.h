@@ -856,11 +856,11 @@ void ChaosModMenu() {
 						QuickValueEditor("invert", map.bInvertX);
 						QuickValueEditor("useAlpha", map.bUseAlpha);
 
-						if (DrawMenuOption("Spawn")) {
+						if (!map.IsSpawned() && DrawMenuOption("Spawn")) {
 							map.Spawn();
 						}
 
-						if (DrawMenuOption("Despawn")) {
+						if ((map.IsSpawned() || map.IsInvalidated()) && DrawMenuOption("Despawn")) {
 							map.Despawn();
 						}
 
@@ -1037,6 +1037,8 @@ void ChaosModMenu() {
 
 		if (DrawMenuOption("Performance Debug")) {
 			ChloeMenuLib::BeginMenu();
+
+			QuickValueEditor("bForceNoEffect", Render3D::bForceNoEffect);
 
 			//auto stats = aPerformanceBenchmarkResults;
 			//std::sort(stats.begin(), stats.end(), [](PerformanceBenchmarkResult& a, PerformanceBenchmarkResult& b) { return a.ms > b.ms; });

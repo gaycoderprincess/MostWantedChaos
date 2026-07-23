@@ -192,18 +192,27 @@ namespace Render3D {
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, useZ);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
 			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-			g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
-			g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+			if (useAlpha) {
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 127);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+			}
+			else {
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+			}
 			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, useAlpha);
 			g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 			g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+			// dont use vertex color when using noeffect
+			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);

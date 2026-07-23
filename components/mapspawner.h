@@ -14,10 +14,10 @@ namespace MapSpawner {
 		std::vector<std::string> aModelPaths;
 		std::vector<std::string> aCollisionPaths;
 
-		std::vector<int> aSpawnedModels;
-		std::vector<int> aSpawnedCollisions;
 		std::vector<Render3D::tModel*> aLoadedModels;
 		std::vector<Render3D::tModel*> aLoadedCollisions;
+		std::vector<int> aSpawnedModels;
+		std::vector<int> aSpawnedCollisions;
 
 		MapData(NyaVec3 mapPos, NyaVec3 playerPos, float scale, bool alpha, const std::string& textureBasePath, const std::vector<std::string>& modelPaths, const std::vector<std::string>& collisionPaths) {
 			aModelPaths = modelPaths;
@@ -27,6 +27,18 @@ namespace MapSpawner {
 			vPlayerOffset = playerPos;
 			vMapPos = mapPos;
 			fScale = scale;
+		}
+
+		bool IsSpawned() {
+			if (aSpawnedModels.empty()) return false;
+			if (aLoadedModels.empty()) return false;
+			if (aLoadedModels[0]->bInvalidated) return false;
+			return true;
+		}
+
+		bool IsInvalidated() {
+			if (aLoadedModels.empty()) return false;
+			return aLoadedModels[0]->bInvalidated;
 		}
 
 		void Despawn() {
@@ -128,7 +140,7 @@ namespace MapSpawner {
 						"aquatica/aquatica.fbx_Section9.fbx",
 						"aquatica/aquatica.fbx_Section10.fbx",
 						"aquatica/aquatica.fbx_Section11.fbx",
-						"aquatica/aquatica.fbx_Seabox.fbx",
+						//"aquatica/aquatica.fbx_Seabox.fbx",
 				},
 				{
 						"aquatica/aquatica.fbx_Section1_col.fbx",
