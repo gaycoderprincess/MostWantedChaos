@@ -881,7 +881,7 @@ namespace SM64 {
 		else {
 			marioInputs.buttonA = IsPadKeyPressed(NYA_PAD_KEY_A);
 			marioInputs.buttonB = IsPadKeyPressed(NYA_PAD_KEY_B);
-			marioInputs.buttonZ = IsPadKeyPressed(NYA_PAD_KEY_X) || IsPadKeyPressed(NYA_PAD_KEY_LB) || IsPadKeyPressed(NYA_PAD_KEY_RB);
+			marioInputs.buttonZ = IsPadKeyPressed(NYA_PAD_KEY_X) || IsPadKeyPressed(NYA_PAD_KEY_LB) || IsPadKeyPressed(NYA_PAD_KEY_RB) || IsPadKeyPressed(NYA_PAD_KEY_LT) || IsPadKeyPressed(NYA_PAD_KEY_RT);
 		}
 
 		float cameraPos[3] = {};
@@ -925,6 +925,11 @@ namespace SM64 {
 			if (IsKeyPressed(VK_LBUTTON) || IsKeyPressed(VK_SHIFT)) {
 				marioInputs.buttonB = 1;
 			}
+		}
+
+		if (GetLocalPlayerInterface<IInput>()->IsLookBackButtonPressed()) {
+			marioInputs.stickX *= -1;
+			marioInputs.stickY *= -1;
 		}
 
 		auto stick = NyaVec3(marioInputs.stickX, marioInputs.stickY, 0);
