@@ -22,6 +22,7 @@ This mod was entirely built by hand, by a human being, and I believe that any pr
 ## Recommended mods
 
 - [Open Limit Adjuster](https://github.com/gaycoderprincess/MostWantedOpenLimitAdjuster/releases/latest)
+- [Xbox 360 Stuff Pack](https://nfsmods.xyz/mod/1200)
 - [XtendedInput](https://github.com/xan1242/NFS-XtendedInput/releases/latest) (only if you're using a controller!)
 
 ## Incompatible mods
