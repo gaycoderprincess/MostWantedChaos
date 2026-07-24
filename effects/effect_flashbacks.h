@@ -17,6 +17,7 @@ public:
 		sName = "Forza Rewind";
 		fTimerLength = 240;
 		AddToIncompatiblityGroup("car_lag");
+		MakeIncompatibleWithFilterGroup("control_mode");
 	}
 
 	void CaptureAllCars() {

@@ -378,6 +378,14 @@ void ChaosLoop() {
 			AddRunningEffect(&ActiveEffect);
 		}
 
+		if (SM64::bAvailable) {
+			static ChaosEffect ActiveEffect("DUMMY", true);
+			if (!ActiveEffect.sName) {
+				ActiveEffect.sName = "Super Mario 64 detected, new chaos effects available";
+				AddRunningEffect(&ActiveEffect);
+			}
+		}
+
 		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
 		static auto textureL = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
 		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");

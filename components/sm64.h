@@ -1140,8 +1140,10 @@ namespace SM64 {
 		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND && bEnemyEnabled) return;
 		if (IsInLoadingScreen() || IsInMovie()) return;
 
+		Render3D::bNoEffect_ReadVertexColor = true;
 		RenderMario<0, false>(marioGeometry);
 		RenderMario<0, true>(marioGeometry);
+		Render3D::bNoEffect_ReadVertexColor = false;
 	}
 
 	void OnAudioTick() {
