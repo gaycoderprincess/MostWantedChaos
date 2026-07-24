@@ -336,7 +336,9 @@ namespace CollView {
 	void OnTick() {
 		if (!bEnabled) return;
 		
-		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {			
+		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
+			Render3D::bNoEffect_ReadVertexColor = true;
+
 			aCollisionTris.clear();
 			aCollisionBarriers.clear();
 
@@ -369,11 +371,11 @@ namespace CollView {
 
 				WCollider colliderTemp = {};
 				colliderTemp.fPosition = *ply->GetPosition();
-				colliderTemp.fRadius = 15.0;
+				colliderTemp.fRadius = 100.0;
 				colliderTemp.fInstanceCacheList.clear();
 				Render3DObjects::ProcessWColliderTris(&colliderTemp);
-				if (!colliderTemp.fInstanceCacheList.empty()) {
-					ProcessCollisionArticle(colliderTemp.fInstanceCacheList[0]);
+				for (int i = 0; i < colliderTemp.fInstanceCacheList.size(); i++) {
+					ProcessCollisionArticle(colliderTemp.fInstanceCacheList[i]);
 				}
 			}
 
@@ -436,6 +438,8 @@ namespace CollView {
 			}
 
 			UpdateMarioCollision();
+
+			Render3D::bNoEffect_ReadVertexColor = false;
 		}
 
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);

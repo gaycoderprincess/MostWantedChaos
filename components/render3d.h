@@ -17,8 +17,12 @@ namespace Render3D {
 		IDirect3DTexture9* pTexture;
 	};
 
+	eView* pViewToDraw = nullptr;
 	bool bForceNoEffect = false;
+	bool bForceNoEnvmap = false;
 	bool bForceNoCulling = false;
+
+	bool bNoEffect_ReadVertexColor = false;
 
 	D3DXVECTOR4 fDIFFUSEMIN = {0.4,0.4,0.4,1};
 	D3DXVECTOR4 fDIFFUSERANGE = {0.6,0.6,0.6,0};
@@ -44,6 +48,7 @@ namespace Render3D {
 
 		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD, bool zwrite = true) const {
 			if (bInvalidated) return;
+			if (bForceNoEnvmap && pViewToDraw->ID != EVIEW_PLAYER1) return;
 
 			if (bForceNoEffect) {
 				return RenderAt_NoEffect(matrix, useAlpha, zwrite);
@@ -53,8 +58,8 @@ namespace Render3D {
 			g_pd3dDevice->SetPixelShader(nullptr);
 			g_pd3dDevice->SetVertexShader(nullptr);
 
-			auto view = eViews[EVIEW_PLAYER1].PlatInfo->ViewMatrix;
-			auto proj = eViews[EVIEW_PLAYER1].PlatInfo->ProjectionMatrix;
+			auto view = pViewToDraw->PlatInfo->ViewMatrix;
+			auto proj = pViewToDraw->PlatInfo->ProjectionMatrix;
 			g_pd3dDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)&view);
 			g_pd3dDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&proj);
 #else
@@ -80,7 +85,7 @@ namespace Render3D {
 			UMath::Matrix4* pMatrix = matrixTempSecond ? &matrixTemp[1] : &matrixTemp[0];
 			*pMatrix = (UMath::Matrix4)matrix;
 			matrixTempSecond = !matrixTempSecond;
-			ParticleSetTransform(pMatrix, EVIEW_PLAYER1);
+			ParticleSetTransform(pMatrix, pViewToDraw->ID);
 
 			D3DXVECTOR4 textureOffset = {0,0,0,0};
 			effect->hD3DXEffect->SetMatrix(effect->mParamTable->mParamMappingTable[CParamHashTable::TEXTUREOFFSETMATRIX].mHandle, (D3DXMATRIX*)&UMath::Matrix4::kIdentity);
@@ -137,7 +142,7 @@ namespace Render3D {
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : D3DCULL_CW);
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : (pViewToDraw->ID == EVIEW_PLAYER1 ? D3DCULL_CW : D3DCULL_CCW));
 			if (useAlpha) {
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 1);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -181,18 +186,19 @@ namespace Render3D {
 
 		void RenderAt_NoEffect(NyaMat4x4 matrix, bool useAlpha = false, bool zwrite = true, bool useZ = true) const {
 			if (bInvalidated) return;
+			if (bForceNoEnvmap && pViewToDraw->ID != EVIEW_PLAYER1) return;
 
 			g_pd3dDevice->SetPixelShader(nullptr);
 			g_pd3dDevice->SetVertexShader(nullptr);
 
-			auto view = eViews[EVIEW_PLAYER1].PlatInfo->ViewMatrix;
-			auto proj = eViews[EVIEW_PLAYER1].PlatInfo->ProjectionMatrix;
+			auto view = pViewToDraw->PlatInfo->ViewMatrix;
+			auto proj = pViewToDraw->PlatInfo->ProjectionMatrix;
 			g_pd3dDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)&view);
 			g_pd3dDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&proj);
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, useZ);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : D3DCULL_CW);
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : (pViewToDraw->ID == EVIEW_PLAYER1 ? D3DCULL_CW : D3DCULL_CCW));
 			if (useAlpha) {
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 127);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -206,9 +212,7 @@ namespace Render3D {
 			g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 			g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-			// dont use vertex color when using noeffect
-			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, bNoEffect_ReadVertexColor ? D3DTOP_MODULATE : D3DTOP_SELECTARG1);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);

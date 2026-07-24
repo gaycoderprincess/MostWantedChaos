@@ -270,7 +270,7 @@ void DrawPerformanceWarnings(double delta) {
 	for (auto& perf : aPerformanceBenchmarkResults) {
 		if (!perf.once) continue;
 
-		if (perf.ms >= 20000) { // 20 milliseconds
+		if (perf.ms >= 30000) { // 30 milliseconds
 			if (!strcmp(perf.name, "Render3DObjects::OnTick3D")) {
 				fTimeRender3DBorked += delta;
 			}
@@ -282,6 +282,9 @@ void DrawPerformanceWarnings(double delta) {
 
 	// if 3d object takes too long, force them to not use effect
 	if (fTimeRender3DBorked > 2.0) {
+		Render3D::bForceNoEnvmap = true;
+	}
+	if (fTimeRender3DBorked > 4.0) {
 		Render3D::bForceNoEffect = true;
 	}
 }
@@ -472,6 +475,18 @@ void ChaosModMenu() {
 		QuickValueEditor("Allow multiple Vergils", Effect_Vergil::bAllowMultipleVergils);
 		QuickValueEditor("Despawn SCP-173 after a kill", Effect_173::bDespawnPeanuts);
 		QuickValueEditor("Disable epileptic effects", bDisableEpilepticEffects);
+		ChloeMenuLib::EndMenu();
+	}
+
+	if (DrawMenuOption("Graphics")) {
+		ChloeMenuLib::BeginMenu();
+
+		bool b = !Render3D::bForceNoEnvmap;
+		QuickValueEditor("Render Objects In Reflections", b);
+		Render3D::bForceNoEnvmap = !b;
+
+		QuickValueEditor("Cheap Object Rendering", Render3D::bForceNoEffect);
+
 		ChloeMenuLib::EndMenu();
 	}
 

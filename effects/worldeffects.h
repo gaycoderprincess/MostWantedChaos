@@ -486,6 +486,7 @@ public:
 		CollView::bWireframeGround = false;
 		CollView::bWireframeCars = false;
 		CollView::bDrawCars = false;
+		Render3DObjects::bDontRenderObjects = true;
 		NyaHookLib::Patch(0x723FA0, 0x530008C2);
 		NyaHookLib::Patch<uint8_t>(0x7538D0, 0xC3);
 	}
@@ -499,6 +500,7 @@ public:
 		CollView::bWireframeBarriers = false;
 		CollView::bWireframeCars = true;
 		CollView::bDrawCars = true;
+		Render3DObjects::bDontRenderObjects = false;
 		NyaHookLib::Patch(0x723FA0, 0x5314EC83);
 		NyaHookLib::Patch<uint8_t>(0x7538D0, 0x55);
 	}

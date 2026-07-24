@@ -1,4 +1,6 @@
 namespace Render3DObjects {
+	bool bDontRenderObjects = false;
+
 	class CustomBarrier {
 	public:
 		WCollisionBarrier data;
@@ -286,11 +288,8 @@ namespace Render3DObjects {
 					inst = insts[instId++];
 				}
 				ModifyCustomCollisionInstance(inst, &tris[tris.size()-trisLeft], trisToDo);
-
-				WriteLog(std::format("generated {} tris for {}", trisToDo, sDebugName));
 				trisLeft -= trisToDo;
 			}
-			WriteLog(std::format("finished generating {} tris for {}", tris.size(), sDebugName));
 		}
 
 		void RegenerateTris() {
@@ -525,6 +524,7 @@ namespace Render3DObjects {
 		PerformanceBenchmarker _perf("Render3DObjects::OnTick3D");
 
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
+		if (bDontRenderObjects) return;
 
 		auto camPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
 		for (auto& obj : aObjects) {

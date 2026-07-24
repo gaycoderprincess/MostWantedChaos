@@ -130,8 +130,11 @@ void CameraHook(CameraMover* pMover) {
 	ProcessChaosEffects<ChaosEffect::HOOK_CAMERA>();
 }
 
-void Render3DLoop() {
+void Render3DLoop(eView* view) {
 	PerformanceBenchmarker _perf("Render3DLoop");
+
+	Render3D::pViewToDraw = view;
+	//WriteLog(std::format("view {:X} id {}", (uintptr_t)view, (int)view->ID));
 
 	DLLDirSetter _setdir;
 
@@ -158,6 +161,10 @@ void Render3DLoop() {
 	state->Release();
 
 	ProcessChaosEffects<ChaosEffect::HOOK_POST3D>();
+}
+
+void Render3DLoopMain() {
+	Render3DLoop(&eViews[EVIEW_PLAYER1]);
 }
 
 void ExecuteRenderData_WithHooks() {
@@ -231,13 +238,16 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::CameraMoverHook::aFunctions.push_back(CameraHook);
 			NyaHooks::LateInitHook::Init();
 			NyaHooks::LateInitHook::aFunctions.push_back([](){
+				NyaHooks::RenderEnvHook::Init();
+				NyaHooks::RenderEnvHook::aPostFunctions.push_back(Render3DLoop);
+
 				if (!GetModuleHandleA("vulkan-1.dll") && !GetModuleHandleA("winevulkan.dll")) {
 					MessageBoxA(nullptr, "WARNING: DXVK is not installed properly! Make sure you've placed d3d9.dll from the mod's archive into the game folder or you WILL encounter stability issues!", "nya?!~", MB_ICONERROR);
 				}
 			});
 			NyaHooks::RenderWorldHook::Init();
 			NyaHooks::RenderWorldHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PRE3D>);
-			NyaHooks::RenderWorldHook::aPostFunctions.push_back(Render3DLoop);
+			NyaHooks::RenderWorldHook::aPostFunctions.push_back(Render3DLoopMain);
 			NyaHooks::RenderPropsHook::Init();
 			NyaHooks::RenderPropsHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PREPROPS>);
 			NyaHooks::RenderPropsHook::aPostFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_POSTPROPS>);
