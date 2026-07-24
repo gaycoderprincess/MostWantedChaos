@@ -927,7 +927,7 @@ namespace SM64 {
 			}
 		}
 
-		if (GetLocalPlayerInterface<IInput>()->IsLookBackButtonPressed()) {
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && GetLocalPlayerInterface<IInput>()->IsLookBackButtonPressed()) {
 			marioInputs.stickX *= -1;
 			marioInputs.stickY *= -1;
 		}

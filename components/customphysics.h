@@ -1,6 +1,8 @@
 namespace CustomPhysics {
 	b3WorldId m_worldId;
 
+	bool bLowQualityPhysics = false;
+
 	b3MeshData* CreateMesh(b3Vec3* vertices, int numVertices, int* indices, int numIndices) {
 		b3MeshDef def = {};
 		def.vertices = vertices;
@@ -460,7 +462,7 @@ namespace CustomPhysics {
 		CollectWorldObjects();
 
 		if (!FEManager::mPauseRequest) {
-			b3World_Step(m_worldId, gTimer.fDeltaTime, 4);
+			b3World_Step(m_worldId, gTimer.fDeltaTime, bLowQualityPhysics ? 1 : 4);
 		}
 	}
 

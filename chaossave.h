@@ -373,6 +373,9 @@ bool DoChaosSettingsSave() {
 	file.write((char*)&bDisableEpilepticEffects, sizeof(bDisableEpilepticEffects));
 	file.write((char*)&ChaosVoting::bTiebreakerRandom, sizeof(ChaosVoting::bTiebreakerRandom));
 	file.write((char*)&bManualKeybindEnabled, sizeof(bManualKeybindEnabled));
+	file.write((char*)&Render3D::bUserForceNoEnvmap, sizeof(Render3D::bUserForceNoEnvmap));
+	file.write((char*)&Render3D::bUserForceNoEffect, sizeof(Render3D::bUserForceNoEffect));
+	file.write((char*)&CustomPhysics::bLowQualityPhysics, sizeof(CustomPhysics::bLowQualityPhysics));
 	return true;
 }
 
@@ -401,6 +404,9 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&bDisableEpilepticEffects, sizeof(bDisableEpilepticEffects));
 	file.read((char*)&ChaosVoting::bTiebreakerRandom, sizeof(ChaosVoting::bTiebreakerRandom));
 	file.read((char*)&bManualKeybindEnabled, sizeof(bManualKeybindEnabled));
+	file.read((char*)&Render3D::bUserForceNoEnvmap, sizeof(Render3D::bUserForceNoEnvmap));
+	file.read((char*)&Render3D::bUserForceNoEffect, sizeof(Render3D::bUserForceNoEffect));
+	file.read((char*)&CustomPhysics::bLowQualityPhysics, sizeof(CustomPhysics::bLowQualityPhysics));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();

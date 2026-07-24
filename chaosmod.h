@@ -481,11 +481,13 @@ void ChaosModMenu() {
 	if (DrawMenuOption("Graphics")) {
 		ChloeMenuLib::BeginMenu();
 
-		bool b = !Render3D::bForceNoEnvmap;
+		bool b = !Render3D::bUserForceNoEnvmap;
 		QuickValueEditor("Render Objects In Reflections", b);
-		Render3D::bForceNoEnvmap = !b;
+		Render3D::bUserForceNoEnvmap = !b;
 
-		QuickValueEditor("Cheap Object Rendering", Render3D::bForceNoEffect);
+		QuickValueEditor("Cheap Object Rendering", Render3D::bUserForceNoEffect);
+
+		QuickValueEditor("Fast Physics", CustomPhysics::bLowQualityPhysics);
 
 		ChloeMenuLib::EndMenu();
 	}

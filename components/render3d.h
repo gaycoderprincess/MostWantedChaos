@@ -22,6 +22,16 @@ namespace Render3D {
 	bool bForceNoEnvmap = false;
 	bool bForceNoCulling = false;
 
+	bool bUserForceNoEffect = false;
+	bool bUserForceNoEnvmap = false;
+
+	bool IsEffectDisabled() {
+		return bForceNoEffect || bUserForceNoEffect;
+	}
+	bool IsEnvmapDisabled() {
+		return bForceNoEnvmap || bUserForceNoEnvmap;
+	}
+
 	bool bNoEffect_ReadVertexColor = false;
 
 	D3DXVECTOR4 fDIFFUSEMIN = {0.4,0.4,0.4,1};
@@ -48,9 +58,9 @@ namespace Render3D {
 
 		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD, bool zwrite = true) const {
 			if (bInvalidated) return;
-			if (bForceNoEnvmap && pViewToDraw->ID != EVIEW_PLAYER1) return;
+			if (IsEnvmapDisabled() && pViewToDraw->ID != EVIEW_PLAYER1) return;
 
-			if (bForceNoEffect) {
+			if (IsEffectDisabled()) {
 				return RenderAt_NoEffect(matrix, useAlpha, zwrite);
 			}
 
@@ -186,7 +196,7 @@ namespace Render3D {
 
 		void RenderAt_NoEffect(NyaMat4x4 matrix, bool useAlpha = false, bool zwrite = true, bool useZ = true) const {
 			if (bInvalidated) return;
-			if (bForceNoEnvmap && pViewToDraw->ID != EVIEW_PLAYER1) return;
+			if (IsEnvmapDisabled() && pViewToDraw->ID != EVIEW_PLAYER1) return;
 
 			g_pd3dDevice->SetPixelShader(nullptr);
 			g_pd3dDevice->SetVertexShader(nullptr);
