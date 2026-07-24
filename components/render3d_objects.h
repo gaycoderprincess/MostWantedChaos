@@ -690,14 +690,6 @@ namespace Render3DObjects {
 		}
 	}
 
-	bool IsColliderInSpecialArea(NyaVec3 v) {
-		return true;
-
-		//v.y = 0.0;
-		//if ((v - BACKROOMS_COORDS).length() < BACKROOMS_DISTANCE) return true;
-		//return false;
-	}
-
 	void __thiscall ProcessCollider(WCollider* pCollider, uint32_t updateMask) {
 		//pCollider->PrepareRegion(updateMask);
 
@@ -707,9 +699,7 @@ namespace Render3DObjects {
 
 		if ((updateMask & 4) != 0) ProcessBarriers(pCollider);
 		if ((updateMask & 12) != 0) {
-			if (!pCollider->fInstanceCacheList.empty() || IsColliderInSpecialArea(pCollider->fPosition)) {
-				ProcessWColliderTris(pCollider);
-			}
+			ProcessWColliderTris(pCollider);
 
 			// manually do GetTriList if required, as inserting stuff into the instance list doesn't work otherwise
 			// (they're called right after one another)

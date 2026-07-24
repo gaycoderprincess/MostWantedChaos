@@ -908,7 +908,7 @@ public:
 
 		for (auto& result : aPerformanceBenchmarkResults) {
 			if (!strcmp(sName, result.name)) {
-				// if result not hasn't been read yet then add the total time up
+				// if result hasn't been read yet then add the total time up
 				if (result.once) {
 					result.ms += ms;
 				}
