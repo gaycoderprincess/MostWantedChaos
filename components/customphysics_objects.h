@@ -336,11 +336,12 @@ namespace CustomPhysicsObjects {
 
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
+		float renderDist = Render3D::pViewToDraw->ID == EVIEW_PLAYER1 ? 250 : 50;
 		for (auto& pObj : aPhysicsObjects) {
 			auto& obj = *pObj;
 			auto pos = obj.GetPosition();
 			auto dist = (plyPos - pos);
-			if (dist.length() > 250) continue; // don't render far away objects
+			if (dist.length() > renderDist) continue; // don't render far away objects
 
 			UMath::Matrix4 mat;
 			auto m = b3MakeMatrixFromQuat(b3Body_GetRotation(obj.nB3Body));
