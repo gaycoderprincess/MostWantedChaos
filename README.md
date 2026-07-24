@@ -28,6 +28,7 @@ This mod was entirely built by hand, by a human being, and I believe that any pr
 ## Incompatible mods
 
 - Extended Customization (crashes the game during Acid Trip)
+- Sun Set (fully incompatible)
 
 ## Building
 
