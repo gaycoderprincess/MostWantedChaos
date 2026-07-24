@@ -1,0 +1,289 @@
+1% Chance Of Boss Skip To Razor
+10% Chance Of Game Crash
+15% Chance Of Boss Skip
+25% Chance Of Getting Busted
+4:3 Letterboxed
+4:3 Stretched
+Acid Trip
+Activate 10 Effects
+Activate All Votes
+Add 100K Bounty
+Add 100K Cost To State
+Add 3 Laps
+Add A Lap
+Add A Random Bonus Marker
+Add A Random Tuning Marker
+Add A Strike To Active Career Car
+Add Extra Voting Option
+Aerodynamics +100
+All Cars Are Blahaj (Become Fish)
+All Traffic Is TRAFPIZZA
+All Traffic Is Trucks
+Anti-Millionaire
+Auto-Drive
+Black & White Screen Overlay (Black & White)
+Blahaj Roof Racks (Friends Of Blahaj)
+Blind
+Blow Engine On Position Loss (Sudden Death)
+Blow One Opponent's Engine
+Blow Player's Engine
+Blue Screen Overlay (Da Ba Dee)
+Blur The Screen (Where's My Glasses?)
+Bottom-Up Camera
+Bouncy Cars
+Bouncy Mod
+Bouncy Suspension
+Break Tire Physics
+Cars Float Away
+Cars Snake Behind Player (Snake)
+Cars Stare At Each Other (Staredown)
+Cars Stare At You
+Cars Wreck When Flipped
+Challenge Series Camera
+Change Car To AI Traffic/Police Car
+Change Car To Dodge Neon (Seriously Weak, Dude)
+Change Car To FlatOut Pepper (Visual) (Pep)
+Change Car To GTA Greenwood (Visual) (Bucket-Ass Car)
+Change Car To Morgana (Visual) (Not A Cat)
+Change Car To Random Model
+Change Car To Razor's Mustang
+Change Car To TRAFPIZZA (It's Pizza Time)
+Chaos Mod Credits
+Chess Board Screen Overlay (Chess Board)
+Cinematic Camera
+Cocksbot
+Constant Pausing
+Cop Jenga Tower
+Cops Drive Traffic Cars (Truly Undercover)
+Cops Drive Trucks
+Cops Drop Cash
+Crazy Spinny Cars (Visual) (Is This What RPM Means?)
+Cruise Control
+DOS Era Graphics
+Debug View
+Decrease Heat Level
+Destroy Random Car
+Disable Autosave
+Disable Buildings
+Disable Car To Car Collision
+Disable Chaos Mod HUD
+Disable Cop Spawning
+Disable Cops
+Disable Everything
+Disable Game HUD (Disable HUD)
+Disable Hiding Spots
+Disable Instant Bust On Reset
+Disable Opponents' Nitro
+Disable Pausing
+Disable Player Input
+Disable Player Nitro
+Disable Player Physics
+Disable Player Steering (Broken Steering Wheel)
+Disable Race Barriers
+Disable Resetting
+Disable Rubberbanding
+Disable Speedbreaker
+Disable Traffic
+Disable Visual Treatment
+Disable Wall Collision
+Disable World Collision
+Disco Screen Overlay (Disco Time)
+Drag HUD
+Drunk Screen Overlay (Drunk Mode)
+Enable Game Moment Camera
+Exit To Main Menu
+Fake Blow Player's Engine
+Fake Crash
+False Starts
+Fast Motion
+Fill SMS Mailbox
+Fix Player's Tires
+Flashbang
+FlatOut Style HUD
+Flippy Cars
+Force Automatic Transmission
+Force Manual Transmission
+Force Player To Gear 1
+Force Player To Reverse Gear
+Force Player To Top Gear (Top Gear)
+Forced Rear View
+Forced Speedbreaker
+Forcefield On Random Car
+Forza Rewind
+Fragile Cars
+Freeze Camera
+Full Chat Chaos Control
+Give $5000 (FIVE GRAND)
+Give Other Cars Firework Rockets
+Give Player Firework Rockets
+Gran Turismo Camera
+Grippy World
+Halve Player Steering (Half-Broken Steering Wheel)
+Halve Player Throttle (Half-Broken Throttle)
+Handling +10
+Handling -10
+Helicopter Camera
+Hey Hotshot! (Sound Effect) (Hey Hotshot!)
+High Contrast
+Inception
+Increase Heat Level
+Infinite Cop Mass
+Infinite Player Mass (Juggernaut)
+Infinite Player Nitro
+Infinite Speedbreaker
+Infinite Traffic Mass
+Insanely Unfair RNG
+Inverted Colors
+Invincible Cops
+Invincible Player Engine
+Invincible Player Tires
+Invisible Cars
+Invisible World
+Lag For All Cars (Hosted by Cloudflare)
+Lag For All Other Cars
+Laggy Player (Connection Problem)
+Laser-Scanned World
+Launch Opponents Backwards
+Launch Opponents Sideways
+Launch Opponents Up
+Launch Player Backwards
+Launch Player Down
+Launch Player Forward
+Launch Player Sideways
+Launch Player Up
+Leaking Fuel Tank
+Lobotomized Traffic
+Lock Opponents In Place
+Lock Player In Place
+Lock Player Rotation
+Low Contrast
+Low Quality Movement
+Magnet On Random Car
+Majority Voting
+Midnight Club Mode
+Millionaire
+Mirror The Screen (British)
+Monster Truck Suspension
+Need For Speed
+Never Busted
+New Opponents Are Golfs
+New Opponents Are M3 GTRs
+New Opponents Copy Your Car
+New Opponents Steal Your Cars
+Nitro Boosting
+Nothing Happens
+Occasional Backstreet Boys
+Opponents Rubberband (FUCKING RUBBERBAND)
+Overwrite Active Career Car
+Pittable Opponents
+Pixelate The Screen
+Place Player Onto Closest Car (Piggyback Ride)
+Player Car Forcefield
+Player Car Magnet
+Player Hover Car
+Player Object Magnet
+Portrait Mode
+Punch-Hole Screen Overlay (Punch-Hole)
+Puncture One Player Tire
+Puncture Opponents' Tires
+Puncture Player's Tires
+Pursuit Breaker Sound Effect
+Quick-Time Event
+Racer AI For Traffic
+Rainbow World (Rainbow Road)
+Random Phone Call (Ring Ring)
+Random Text
+Randomize Active Car's Visuals
+Randomize Player Input (ChatGPT Take The Wheel)
+Randomized Chaos Timer (Chaos For Your Chaos)
+Randomized Player Steering
+Real Frame Drops
+Real Physics For Cops
+Real-Time Speedbreaker
+Realistic Fuel Prices
+Realistic Opponent Performance
+Refill Effect Timers
+Refuel Player Car
+Remove A Lap
+Remove All Wheels
+Replace Every Texture With OBSOLETE (OBSOLETE)
+Reset Player
+Respawn Props And Pursuit Breakers
+Restart Event
+Restart Event At 99% Completion
+Reverse Superhot
+Reverse Text
+Rigged Votes (Lowest Voted Wins) (Rigged Votes)
+Ruthless Cop Spawns (EVERYONE!!!)
+Ruthless Cross Spawns (It's Cross)
+Saturate The Screen
+Second Person View
+Set Heat Level To 1
+Set Heat Level To 6
+Shaky Cars (Visual) (Snap To Grid)
+Shoutouts to JJ902
+Shuffled Letters
+Simplified Physics For Player
+Skip Current Song
+Skyfall
+Slippery World
+Slow Motion
+Snowy World
+Spawn 1000 ABC Blocks (Learn The ABCs)
+Spawn 1000 Beach Balls
+Spawn ABC Blocks (Learn The ABCs)
+Spawn Beach Balls
+Spawn Bomb Behind Player
+Spawn Giant Traffic Cone
+Spawn Griefer Mario
+Spawn Griefer Vergil
+Spawn Griefer Vergils At Old Bridge (Spawn Griefer Vergils Somewhere)
+Spawn Inconvenient Cube
+Spawn Player As Random Cop Car
+Spawn Player As Random Traffic Car
+Spawn Player As Stock Punto
+Spawn Ramp
+Spawn SCP-173
+Spawn SCP-173 Somewhere
+Spawn Scientist In A Hiding Spot
+Spawn Teddie From Persona 4 (pee.)
+Spawn Truck On Player (Obligatory Truck Effect)
+Spawn Vending Machine (8 Down)
+Spin Player Out
+Spin Player Rapidly
+Spinning Opponents
+Spinning Player (Spain but the A is silent)
+Spinning Traffic
+Steal Car From Random Opponent (Grand Theft Auto)
+Steer To Change Heat Level (Heated Steering)
+Stop Player Car
+Streamer Votes (Streamer Votes (Press 1/2/3/4))
+Strong Nitro
+Subtract Bounty (100K/1Mil) (Subtract 100K Bounty)
+Swap Places With Random Opponent
+Teleport All Cars To Player
+Teleport Behind The Old Bridge
+Teleport To Backrooms
+Teleport To Perfect Hiding Spot
+Teleport To Race Start
+Throw Cars With Mouse
+Tik Tok Mode
+Top-Down Camera
+Traffic Car Physics For Player
+Trans Rights
+Trigger Police Pursuit
+Tumbling Cars
+Tunnel Vision
+Turn Into Giant Beach Ball (Super Rockport Ball)
+Turn Into Mario 64 (Super Mario 64 Mode)
+Uninstall Counter-Strike: Source
+Upside Down Screen (Meanwhile In Australia)
+Weak Nitro
+Wheel Camera
+Why's This Dealer?
+Wide Cars
+Widescreen Borders
+Wireframe Mode
+Wireframe World
+Zero Opponent Mass
+Zero Player Mass

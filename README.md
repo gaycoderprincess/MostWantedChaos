@@ -16,7 +16,7 @@ This mod was entirely built by hand, by a human being, and I believe that any pr
 
 - Make sure you have v1.3 of the game, as this is the only version this plugin is compatible with. (exe size of 6029312 bytes, other regions such as the Asian version are not and will never be supported)
 - Plop the files into your game folder, press F5 in game to open the menu.
-- If you're feeling adventurous, place a ROM of the US version of Super Mario 64 next to the files, renamed `baserom.us.z64`.
+- If you're feeling adventurous, place a ROM of the US version of Super Mario 64 next to the files, renamed to `baserom.us.z64`.
 - Enjoy, nya~ :3
 
 ## Recommended mods

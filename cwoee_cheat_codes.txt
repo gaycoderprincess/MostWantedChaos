@@ -94,8 +94,6 @@ GranTurismoCamera
 GrippyWorld
 HalvePlayerSteering (HalfBrokenSteeringWheel)
 HalvePlayerThrottle (HalfBrokenThrottle)
-Handling10
-Handling10
 HelicopterCamera
 HeyHotshotSoundEffect (HeyHotshot)
 HighContrast
@@ -149,6 +147,7 @@ PixelateTheScreen
 PlacePlayerOntoClosestCar (PiggybackRide)
 PlayerCarForcefield
 PlayerCarMagnet
+PlayerHoverCar
 PlayerObjectMagnet
 PortraitMode
 PunctureOnePlayerTire
@@ -178,20 +177,24 @@ SaturateTheScreen
 SecondPersonView
 SetHeatLevelTo1
 SetHeatLevelTo6
-ShakyCars (SnapToGrid)
+ShakyCarsVisual (SnapToGrid)
 ShoutoutstoJJ902
 ShuffledLetters
 SimplifiedPhysicsForPlayer
 SkipCurrentSong
 Skyfall
 SlipperyWorld
+Spawn1000ABCBlocks (LearnTheABCs)
 Spawn1000BeachBalls
 SpawnBeachBalls
+SpawnGiantTrafficCone
 SpawnGrieferVergil
 SpawnGrieferVergilsAtOldBridge (SpawnGrieferVergilsSomewhere)
+SpawnInconvenientCube
 SpawnPlayerAsRandomCopCar
 SpawnPlayerAsRandomTrafficCar
 SpawnPlayerAsStockPunto
+SpawnRamp
 SpawnSCP173Somewhere
 SpawnScientistInAHidingSpot
 SpawnTeddieFromPersona4 (pee)
