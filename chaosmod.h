@@ -478,7 +478,7 @@ void ChaosModMenu() {
 		ChloeMenuLib::EndMenu();
 	}
 
-	if (DrawMenuOption("Graphics")) {
+	if (DrawMenuOption("Graphics/Performance")) {
 		ChloeMenuLib::BeginMenu();
 
 		bool b = !Render3D::bUserForceNoEnvmap;
