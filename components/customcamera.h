@@ -8,7 +8,7 @@ namespace CustomCamera {
 	IRigidBody* pTargetPlayerBodySecondPerson = nullptr;
 
 	bool IsMario() {
-		return SM64::bEnabled && pTargetPlayerVehicle == GetLocalPlayerVehicle() && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
+		return SM64::bEnabled && !SM64::bDoReset && pTargetPlayerVehicle == GetLocalPlayerVehicle() && TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !IsInLoadingScreen();
 	}
 
 	double fMarioDelayFactor = 0.0;
@@ -23,7 +23,7 @@ namespace CustomCamera {
 	}
 
 	bool IsBallin() {
-		return CustomPhysicsBall::bEnabled;
+		return CustomPhysicsBall::bEnabled && !CustomPhysicsBall::bDoReset;
 	}
 
 	bool bSecondPersonOrbitMode = true;

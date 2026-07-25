@@ -182,8 +182,10 @@ namespace CustomPhysicsBall {
 
 				if (v.length() > 0.01) {
 					v.Normalize();
-					auto mat = NyaMat4x4::LookAt(v);
-					ply->SetOrientation((UMath::Matrix4*)&mat);
+					if (std::abs(v.x) > 0.01 || std::abs(v.z) > 0.01) {
+						auto mat = NyaMat4x4::LookAt(v);
+						ply->SetOrientation((UMath::Matrix4*)&mat);
+					}
 				}
 			}
 
@@ -257,8 +259,8 @@ namespace CustomPhysicsBall {
 			if (newLen > maxSpeed) {
 				vel.x /= newLen;
 				vel.z /= newLen;
-				vel.x *= oldLen;
-				vel.z *= oldLen;
+				vel.x *= std::max(oldLen, maxSpeed);
+				vel.z *= std::max(oldLen, maxSpeed);
 			}
 
 			// jump button if on ground
