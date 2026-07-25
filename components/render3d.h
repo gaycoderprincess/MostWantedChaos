@@ -183,6 +183,9 @@ namespace Render3D {
 #endif
 			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
 			g_pd3dDevice->SetIndices(pIndexBuffer);
+			//for (int i = 1; i < 8; i++) {
+			//	g_pd3dDevice->SetTexture(i, nullptr);
+			//}
 			g_pd3dDevice->SetTexture(0, pTexture);
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
 
@@ -266,6 +269,7 @@ namespace Render3D {
 	};
 	std::vector<tModel*> aAllModels;
 	std::vector<tTextureInfo> aAllTextures;
+	std::vector<std::string> aFailedTextures;
 
 	tModel* CreateOneModel(int numVertices, int numFaces, const NyaVec3* vertices, const NyaVec3* normals, const NyaVec3* tangents, const NyaVec3* bitangents, const NyaVec3* uvs, const NyaDrawing::CNyaRGBA32* colors, const uint32_t* indices, const std::string& material) {
 		auto model = new tModel;
@@ -365,7 +369,13 @@ namespace Render3D {
 				model->pTexture = tex;
 				aAllTextures.push_back({textureName, model->pTexture});
 			} else {
-				MessageBoxA(nullptr, std::format("Failed to load texture {}", textureName).c_str(), "nya?!~", MB_ICONERROR);
+				bool isNew = true;
+				for (auto& name : aFailedTextures) {
+					if (name == textureName) isNew = false;
+				}
+				if (isNew) {
+					aFailedTextures.push_back(textureName);
+				}
 			}
 		}
 
@@ -390,6 +400,15 @@ namespace Render3D {
 			models.push_back(model);
 			mesh.Destroy();
 		}
+		std::string textureFails;
+		for (auto& textureName : aFailedTextures) {
+			textureFails += "\n";
+			textureFails += textureName;
+		}
+		if (!textureFails.empty()) {
+			MessageBoxA(nullptr, std::format("Failed to load textures:{}", textureFails).c_str(), "nya?!~", MB_ICONERROR);
+		}
+		aFailedTextures.clear();
 		return models;
 	}
 

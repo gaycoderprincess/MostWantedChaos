@@ -281,11 +281,14 @@ void DrawPerformanceWarnings(double delta) {
 	}
 
 	// if 3d object takes too long, force them to not use effect
-	if (fTimeRender3DBorked > 2.0) {
-		Render3D::bForceNoEnvmap = true;
-	}
-	if (fTimeRender3DBorked > 4.0) {
-		Render3D::bForceNoEffect = true;
+	// (only if debug mode isnt on)
+	if (bTimerEnabled) {
+		if (fTimeRender3DBorked > 2.0) {
+			Render3D::bForceNoEnvmap = true;
+		}
+		if (fTimeRender3DBorked > 4.0) {
+			Render3D::bForceNoEffect = true;
+		}
 	}
 }
 

@@ -1473,7 +1473,7 @@ public:
 		}
 	}
 
-	void DespawnRamp() {
+	static void DespawnRamp() {
 		if (nRampInWorld >= 0 && Render3DObjects::aObjects[nRampInWorld]->IsActive()) {
 			//Render3DObjects::aObjects[nRampInWorld]->aModels.clear();
 

@@ -136,6 +136,15 @@ namespace Render3DObjects {
 			stripSphere->fRadius = stripSphereMult * inst->fInvPosRadius.w;
 			stripSphere++;
 
+			if (std::abs(tri.fPt0.x) > 32767.0 || std::abs(tri.fPt0.y) > 32767.0 || std::abs(tri.fPt0.z) > 32767.0 || std::abs(tri.fPt1.x) > 32767.0 || std::abs(tri.fPt1.y) > 32767.0 || std::abs(tri.fPt1.z) > 32767.0 || std::abs(tri.fPt2.x) > 32767.0 || std::abs(tri.fPt2.y) > 32767.0 || std::abs(tri.fPt2.z) > 32767.0) {
+				MessageBoxA(nullptr, "ERROR: Collision model too large!", "nya?!", MB_ICONERROR);
+				//exit(0);
+
+				article->fNumStrips = 0;
+				article->fStripsSize = 0;
+				return;
+			}
+
 			// one tri per strip, very inefficient but alas i am stupid
 			stripList->numTrisOrSurfaceId = 3;
 			stripList->pt[0] = tri.fPt0.x;
@@ -236,6 +245,8 @@ namespace Render3DObjects {
 		std::vector<WCollisionInstance*> CollisionInstancesIgnored;
 
 		float fRadius;
+		NyaVec3 vAABBMin;
+		NyaVec3 vAABBMax;
 
 		// skip tris that are flipped or sideways, these will become barriers
 		bool ShouldTriBeBarrier(const WCollisionTri& tri) {
@@ -257,15 +268,25 @@ namespace Render3DObjects {
 		}
 
 		void CalculateRadius() {
-			NyaVec3 max;
+			NyaVec3 min = {9999, 9999, 9999};
+			NyaVec3 max = {-9999, -9999, -9999};
+			NyaVec3 total;
 			for (auto& model : aModels) {
 				for (auto& v : model->aVertices) {
-					max.x = std::max(std::abs(v.x), max.x);
-					max.y = std::max(std::abs(v.y), max.y);
-					max.z = std::max(std::abs(v.z), max.z);
+					min.x = std::min(v.x, min.x);
+					min.y = std::min(v.y, min.y);
+					min.z = std::min(v.z, min.z);
+					max.x = std::max(v.x, max.x);
+					max.y = std::max(v.y, max.y);
+					max.z = std::max(v.z, max.z);
+					total.x = std::max(std::abs(v.x), total.x);
+					total.y = std::max(std::abs(v.y), total.y);
+					total.z = std::max(std::abs(v.z), total.z);
 				}
 			}
-			fRadius = max.length();
+			vAABBMin = min;
+			vAABBMax = max;
+			fRadius = total.length();
 		}
 
 		void GenerateCollisionInstances(const std::vector<WCollisionTri>& tris, std::vector<WCollisionInstance*>& insts) {
@@ -278,16 +299,13 @@ namespace Render3DObjects {
 			while (trisLeft > 0) {
 				int trisToDo = std::min(trisLeft, MAX_COLLISION_TRI_COUNT);
 
-				WCollisionInstance* inst = nullptr;
 				if (genFromScratch) {
 					auto surface = Attrib::FindCollection(Attrib::StringHash32("simsurface"), Attrib::StringHash32("asphalt_no_leaves"));
 					insts.push_back(CreateCustomCollisionInstance(&tris[tris.size()-trisLeft], trisToDo, surface));
-					inst = insts[insts.size()-1];
 				}
 				else {
-					inst = insts[instId++];
+					ModifyCustomCollisionInstance(insts[instId++], &tris[tris.size()-trisLeft], trisToDo);
 				}
-				ModifyCustomCollisionInstance(inst, &tris[tris.size()-trisLeft], trisToDo);
 				trisLeft -= trisToDo;
 			}
 		}
@@ -527,18 +545,22 @@ namespace Render3DObjects {
 		if (bDontRenderObjects) return;
 
 		auto camPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
+		float renderDist = Render3D::pViewToDraw->ID == EVIEW_PLAYER1 ? 250 : 50;
 		for (auto& obj : aObjects) {
 			if (obj->bDontRender) continue;
 
 			auto dist = (obj->mMatrix.p - camPos).length();
 			auto radius = obj->fRadius * obj->mMatrix.x.length();
-			if (dist > (radius * 2) + 200) continue;
+			if (dist > (radius * 2) + renderDist) continue;
+
+			auto mat = WorldToRenderMatrix(obj->mMatrix);
+			if (!eView::GetVisibleState(Render3D::pViewToDraw, (bVector3*)&obj->vAABBMin, (bVector3*)&obj->vAABBMax, (bMatrix4*)&mat)) continue;
 
 			if (obj->bNoBackfaceCulling) {
 				Render3D::bForceNoCulling = true;
 			}
 			for (auto& model : obj->aModels) {
-				model->RenderAt(WorldToRenderMatrix(obj->mMatrix), obj->bUseAlpha);
+				model->RenderAt(mat, obj->bUseAlpha);
 			}
 			if (obj->bNoBackfaceCulling) {
 				Render3D::bForceNoCulling = false;

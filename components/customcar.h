@@ -302,6 +302,7 @@ public:
 
 	void Render(IVehicle* parentCar) {
 		if (!DrawCars) return;
+		if (Render3D::pViewToDraw->ID != EVIEW_PLAYER1) return;
 
 		Load();
 
@@ -339,6 +340,8 @@ public:
 	}
 
 	void Update(IVehicle* parentCar, double delta) {
+		if (Render3D::pViewToDraw->ID != EVIEW_PLAYER1) return;
+
 		auto veh = parentCar->mCOMObject->Find<IRigidBody>();
 		auto currentVelocity = *veh->GetLinearVelocity();
 		if (IsInLoadingScreen() || IsInNIS()) {
