@@ -377,6 +377,9 @@ bool DoChaosSettingsSave() {
 	file.write((char*)&Render3D::bUserForceNoEffect, sizeof(Render3D::bUserForceNoEffect));
 	file.write((char*)&CustomPhysics::bLowQualityPhysics, sizeof(CustomPhysics::bLowQualityPhysics));
 	file.write((char*)&StatTracker::fTimePlayed, sizeof(StatTracker::fTimePlayed));
+	file.write((char*)&StatTracker::nVergilKills, sizeof(StatTracker::nVergilKills));
+	file.write((char*)&StatTracker::nVergilKillsCop, sizeof(StatTracker::nVergilKillsCop));
+	file.write((char*)&StatTracker::nVergilKillsPlayer, sizeof(StatTracker::nVergilKillsPlayer));
 	return true;
 }
 
@@ -409,6 +412,9 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&Render3D::bUserForceNoEffect, sizeof(Render3D::bUserForceNoEffect));
 	file.read((char*)&CustomPhysics::bLowQualityPhysics, sizeof(CustomPhysics::bLowQualityPhysics));
 	file.read((char*)&StatTracker::fTimePlayed, sizeof(StatTracker::fTimePlayed));
+	file.read((char*)&StatTracker::nVergilKills, sizeof(StatTracker::nVergilKills));
+	file.read((char*)&StatTracker::nVergilKillsCop, sizeof(StatTracker::nVergilKillsCop));
+	file.read((char*)&StatTracker::nVergilKillsPlayer, sizeof(StatTracker::nVergilKillsPlayer));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();
