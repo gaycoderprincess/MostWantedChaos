@@ -890,6 +890,31 @@ bool GetWorldHeightAtPoint_WithCustom(const UMath::Vector3* pt, float* height, U
 	return WCollisionMgr::GetWorldHeightAtPointRigorous(pt, height, normal);
 }
 
+bool IsRenderingShadows(eView* view) {
+	return view->ID == EVIEW_SHADOWMATTE;
+}
+
+bool IsRenderingEnvmap(eView* view) {
+	if (view->ID == EVIEW_ENVMAP0F) return true;
+	if (view->ID == EVIEW_ENVMAP0R) return true;
+	if (view->ID == EVIEW_ENVMAP0B) return true;
+	if (view->ID == EVIEW_ENVMAP0L) return true;
+	if (view->ID == EVIEW_ENVMAP0U) return true;
+	if (view->ID == EVIEW_ENVMAP0D) return true;
+	return false;
+}
+
+bool IsRenderingRVM(eView* view) {
+	if (view->ID == EVIEW_ENVMAP0B) return true;
+	if (view->ID == EVIEW_PLAYER1_RVM) return true;
+	return false;
+}
+
+bool IsRenderingMainView(eView* view) {
+	if (view->ID == EVIEW_PLAYER1) return true;
+	return false;
+}
+
 class PerformanceBenchmarker {
 public:
 	char sName[64];

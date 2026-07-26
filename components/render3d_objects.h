@@ -236,6 +236,7 @@ namespace Render3DObjects {
 		bool bDontRender = false;
 		bool bUseAlpha = false;
 		bool bNoBackfaceCulling = false;
+		bool bNoShadowCasting = false;
 		std::string sDebugName;
 
 		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
@@ -545,9 +546,12 @@ namespace Render3DObjects {
 		if (bDontRenderObjects) return;
 
 		auto camPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
-		float renderDist = Render3D::pViewToDraw->ID == EVIEW_PLAYER1 ? 250 : 50;
+		float renderDist = IsRenderingMainView(Render3D::pViewToDraw) || IsRenderingShadows(Render3D::pViewToDraw) ? 250 : 50;
+		bool isShadow = IsRenderingShadows(Render3D::pViewToDraw);
 		for (auto& obj : aObjects) {
+			if (!obj->IsActive()) continue;
 			if (obj->bDontRender) continue;
+			if (obj->bNoShadowCasting && isShadow) continue;
 
 			auto dist = (obj->mMatrix.p - camPos).length();
 			auto radius = obj->fRadius * obj->mMatrix.x.length();
@@ -556,15 +560,11 @@ namespace Render3DObjects {
 			auto mat = WorldToRenderMatrix(obj->mMatrix);
 			if (!eView::GetVisibleState(Render3D::pViewToDraw, (bVector3*)&obj->vAABBMin, (bVector3*)&obj->vAABBMax, (bMatrix4*)&mat)) continue;
 
-			if (obj->bNoBackfaceCulling) {
-				Render3D::bForceNoCulling = true;
-			}
+			if (obj->bNoBackfaceCulling) { Render3D::bForceNoCulling = true; }
 			for (auto& model : obj->aModels) {
 				model->RenderAt(mat, obj->bUseAlpha);
 			}
-			if (obj->bNoBackfaceCulling) {
-				Render3D::bForceNoCulling = false;
-			}
+			if (obj->bNoBackfaceCulling) { Render3D::bForceNoCulling = false; }
 		}
 	}
 

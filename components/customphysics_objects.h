@@ -336,7 +336,7 @@ namespace CustomPhysicsObjects {
 
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
-		float renderDist = Render3D::pViewToDraw->ID == EVIEW_PLAYER1 ? 250 : 50;
+		float renderDist = IsRenderingMainView(Render3D::pViewToDraw) || IsRenderingShadows(Render3D::pViewToDraw) ? 250 : 50;
 		for (auto& pObj : aPhysicsObjects) {
 			auto& obj = *pObj;
 			auto pos = obj.GetPosition();

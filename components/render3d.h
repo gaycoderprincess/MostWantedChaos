@@ -20,16 +20,21 @@ namespace Render3D {
 	eView* pViewToDraw = nullptr;
 	bool bForceNoEffect = false;
 	bool bForceNoEnvmap = false;
+	bool bForceNoShadows = false;
 	bool bForceNoCulling = false;
 
 	bool bUserForceNoEffect = false;
 	bool bUserForceNoEnvmap = false;
+	bool bUserForceNoShadows = false;
 
 	bool IsEffectDisabled() {
 		return bForceNoEffect || bUserForceNoEffect;
 	}
 	bool IsEnvmapDisabled() {
 		return bForceNoEnvmap || bUserForceNoEnvmap;
+	}
+	bool IsShadowingDisabled() {
+		return bForceNoShadows || bUserForceNoShadows;
 	}
 
 	bool bNoEffect_ReadVertexColor = false;
@@ -58,10 +63,23 @@ namespace Render3D {
 
 		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD, bool zwrite = true) const {
 			if (bInvalidated) return;
-			if (IsEnvmapDisabled() && pViewToDraw->ID != EVIEW_PLAYER1) return;
 
-			if (IsEffectDisabled()) {
+			bool isShadow = IsRenderingShadows(pViewToDraw);
+			bool isEnvmap = IsRenderingEnvmap(pViewToDraw);
+
+			if (IsEnvmapDisabled() && isEnvmap) return;
+			if (IsShadowingDisabled() && isShadow) return;
+
+			if (IsEffectDisabled() && !isShadow) {
 				return RenderAt_NoEffect(matrix, useAlpha, zwrite);
+			}
+
+			int cullMode = D3DCULL_CW;
+			if (isEnvmap) cullMode = D3DCULL_CCW;
+			if (bForceNoCulling) cullMode = D3DCULL_NONE;
+
+			if (isShadow) {
+				effectId = EEFFECT_WORLDNOFOG;
 			}
 
 #ifdef RENDER3D_NOEFFECT
@@ -152,7 +170,7 @@ namespace Render3D {
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : (pViewToDraw->ID == EVIEW_PLAYER1 ? D3DCULL_CW : D3DCULL_CCW));
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
 			if (useAlpha) {
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 1);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -199,7 +217,20 @@ namespace Render3D {
 
 		void RenderAt_NoEffect(NyaMat4x4 matrix, bool useAlpha = false, bool zwrite = true, bool useZ = true) const {
 			if (bInvalidated) return;
-			if (IsEnvmapDisabled() && pViewToDraw->ID != EVIEW_PLAYER1) return;
+
+			bool isShadow = IsRenderingShadows(pViewToDraw);
+			bool isEnvmap = IsRenderingEnvmap(pViewToDraw);
+
+			if (IsEnvmapDisabled() && isEnvmap) return;
+			if (IsShadowingDisabled() && isShadow) return;
+
+			if (isShadow) {
+				return RenderAt(matrix);
+			}
+
+			int cullMode = D3DCULL_CW;
+			if (isEnvmap) cullMode = D3DCULL_CCW;
+			if (bForceNoCulling) cullMode = D3DCULL_NONE;
 
 			g_pd3dDevice->SetPixelShader(nullptr);
 			g_pd3dDevice->SetVertexShader(nullptr);
@@ -211,7 +242,7 @@ namespace Render3D {
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, useZ);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, bForceNoCulling ? D3DCULL_NONE : (pViewToDraw->ID == EVIEW_PLAYER1 ? D3DCULL_CW : D3DCULL_CCW));
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
 			if (useAlpha) {
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 127);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);

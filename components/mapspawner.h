@@ -9,7 +9,7 @@ namespace MapSpawner {
 		float fRotateZ = 0;
 		float fScale = 1.0;
 		NyaVec3 vPlayerOffset = {0,0,0};
-		uint32_t nVertexColor = 0xFF808080;
+		uint32_t nVertexColor = 0xFF404040;
 
 		std::string sTextureBasePath;
 		std::vector<std::string> aModelPaths;
@@ -91,6 +91,9 @@ namespace MapSpawner {
 			for (auto& id : aSpawnedModels) {
 				Render3DObjects::aObjects[id]->bUseAlpha = bUseAlpha;
 				Render3DObjects::aObjects[id]->bNoBackfaceCulling = true;
+				if (sTextureBasePath == "backrooms/") {
+					Render3DObjects::aObjects[id]->bNoShadowCasting = true;
+				}
 			}
 
 			if (aLoadedCollisions.empty() || aLoadedCollisions[0]->bInvalidated) {

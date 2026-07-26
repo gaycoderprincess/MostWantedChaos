@@ -1875,8 +1875,8 @@ public:
 		objData.bRemoveOnOutOfRange = false;
 		objData.bAffectGamePhysics = true;
 		objData.sDebugName = "trafficcone_save";
-		//objData.bUseExpensiveCollisionCheck = true;
-		//objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		objData.bUseExpensiveCollisionCheck = true;
+		objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/roadcone.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
 	}
 
