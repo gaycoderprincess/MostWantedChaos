@@ -9,6 +9,7 @@ namespace MapSpawner {
 		float fRotateZ = 0;
 		float fScale = 1.0;
 		NyaVec3 vPlayerOffset = {0,0,0};
+		uint32_t nVertexColor = 0xFF808080;
 
 		std::string sTextureBasePath;
 		std::vector<std::string> aModelPaths;
@@ -56,6 +57,8 @@ namespace MapSpawner {
 		}
 
 		void Spawn() {
+			Render3D::nVertexColorValue = nVertexColor;
+
 			auto mat = UMath::Matrix4::kIdentity;
 			mat.x *= fScale;
 			mat.y *= fScale;
@@ -114,6 +117,8 @@ namespace MapSpawner {
 				UMath::Vector3 playerPos = vMapPos + vPlayerOffset;
 				TeleportPlayer(playerPos, {-0.96,0.0,-0.3});
 			}
+
+			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 		}
 	};
 

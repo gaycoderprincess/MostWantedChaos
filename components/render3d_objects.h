@@ -137,7 +137,7 @@ namespace Render3DObjects {
 			stripSphere++;
 
 			if (std::abs(tri.fPt0.x) > 32767.0 || std::abs(tri.fPt0.y) > 32767.0 || std::abs(tri.fPt0.z) > 32767.0 || std::abs(tri.fPt1.x) > 32767.0 || std::abs(tri.fPt1.y) > 32767.0 || std::abs(tri.fPt1.z) > 32767.0 || std::abs(tri.fPt2.x) > 32767.0 || std::abs(tri.fPt2.y) > 32767.0 || std::abs(tri.fPt2.z) > 32767.0) {
-				MessageBoxA(nullptr, "ERROR: Collision model too large!", "nya?!", MB_ICONERROR);
+				MessageBoxA(nullptr, "ERROR: Collision model too large! Collisions have a maximum size of 256x256 meters", "nya?!", MB_ICONERROR);
 				//exit(0);
 
 				article->fNumStrips = 0;

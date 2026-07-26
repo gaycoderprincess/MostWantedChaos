@@ -321,6 +321,7 @@ namespace Render3D {
 			auto src = &vertices[i];
 			auto srcNormal = &normals[i];
 			auto srcTangent = &tangents[i];
+			auto srcColor = &colors[i];
 			auto srcUV = &uvs[i];
 			auto dest = &verticesOut[i];
 			dest->vPos[0] = src->x;
@@ -336,7 +337,17 @@ namespace Render3D {
 				dest->vTangents[1] = srcTangent->y;
 				dest->vTangents[2] = srcTangent->z;
 			}
-			dest->Color = overrideVertexColor ? 0xFFFFFFFF : nVertexColorValue;
+			if (!nVertexColorValue) {
+				auto tmp = NyaDrawing::CNyaRGBA32();
+				tmp.b = srcColor->r;
+				tmp.g = srcColor->g;
+				tmp.r = srcColor->b;
+				tmp.a = 255;
+				dest->Color = *(uint32_t*)&tmp;
+			}
+			else {
+				dest->Color = overrideVertexColor ? 0xFFFFFFFF : nVertexColorValue;
+			}
 			if (uvs) {
 				dest->vUV[0] = srcUV->x;
 				dest->vUV[1] = srcUV->y * -1;

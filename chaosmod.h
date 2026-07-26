@@ -325,7 +325,6 @@ void ChaosLoop() {
 	static CNyaTimer gTimer;
 	gTimer.Process();
 	DrawPerformanceWarnings(gTimer.fDeltaTime);
-	DrawLogPopups();
 
 	if (ChaosVoting::IsEnabled()) {
 		ChaosVoting::pAllOfTheAbove = &E_VotingAll; // this is such a hack lol woof meow
@@ -337,6 +336,7 @@ void ChaosLoop() {
 	bRNGCycles = !ChaosVoting::IsEnabled();
 
 	if (IsInSplashScreenOrIntros()) {
+		DrawLogPopups();
 		return;
 	}
 
@@ -348,9 +348,11 @@ void ChaosLoop() {
 	if (IsChaosBlocked()) {
 		bool inMenu = TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND;
 		ProcessChaosEffectsMain(gTimer.fDeltaTime, inMenu, !inMenu);
+		DrawLogPopups();
 		return;
 	}
 	ProcessChaosEffectsMain(gTimer.fDeltaTime, false, false);
+	DrawLogPopups();
 
 	// just to rub it in a little
 	static bool bSMSSent = false;
@@ -883,6 +885,22 @@ void ChaosModMenu() {
 						QuickValueEditor("scale", map.fScale);
 						QuickValueEditor("invert", map.bInvertX);
 						QuickValueEditor("useAlpha", map.bUseAlpha);
+
+						if (DrawMenuOption("original vertex color")) {
+							map.nVertexColor = 0;
+						}
+
+						if (DrawMenuOption("40 vertex color")) {
+							map.nVertexColor = 0xFF404040;
+						}
+
+						if (DrawMenuOption("80 vertex color")) {
+							map.nVertexColor = 0xFF808080;
+						}
+
+						if (DrawMenuOption("FF vertex color")) {
+							map.nVertexColor = 0xFFFFFFFF;
+						}
 
 						if (!map.IsSpawned() && DrawMenuOption("Spawn")) {
 							map.Spawn();
