@@ -930,12 +930,19 @@ public:
 				data->styleRanking += attackStyleIncrease;
 
 				if (car->GetDriverClass() == DRIVER_HUMAN) {
-					SM64::OnTakeDamage(1, obj->vColPosition, true);
+					StatTracker::nVergilKillsPlayer++;
+
+					if (SM64::bEnabled) {
+						SM64::OnTakeDamage(1, obj->vColPosition, true);
+					}
 				}
 
 				if (car->GetDriverClass() == DRIVER_COP) {
+					StatTracker::nVergilKillsCop++;
 					DestroyCar(car);
 				}
+
+				StatTracker::nVergilKills++;
 			}
 		}
 	}

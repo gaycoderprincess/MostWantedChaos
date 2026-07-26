@@ -532,6 +532,7 @@ void ChaosModMenu() {
 		}
 		DrawMenuOption(std::format("Times Busted - {}", StatTracker::nTimesBusted));
 		DrawMenuOption(std::format("Time Wasted Playing This Mod - {}", GetTimeFromSeconds(StatTracker::fTimePlayed)));
+		DrawMenuOption(std::format("Vergil's Kill Count - {} ({} you, {} cops)", StatTracker::nVergilKills, StatTracker::nVergilKillsPlayer, StatTracker::nVergilKillsCop));
 		ChloeMenuLib::EndMenu();
 	}
 

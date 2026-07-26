@@ -2,6 +2,10 @@ namespace StatTracker {
 	int nTimesBusted = 0;
 	double fTimePlayed = 0;
 
+	int nVergilKills = 0;
+	int nVergilKillsCop = 0;
+	int nVergilKillsPlayer = 0;
+
 	void OnTick() {
 		static CNyaTimer gTimer;
 		gTimer.Process();

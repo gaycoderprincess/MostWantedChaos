@@ -44,6 +44,7 @@ namespace Achievements {
 		new CAchievement("REFUEL", "Second Chance", "Get your leaking gas tank refueled"),
 		new CAchievement("BUSTED_MANY", "Skill Issues", "Get busted 25 times"),
 		new CAchievement("QTE", "Button Masher", "Pass a Quick-Time Event"),
+		new CAchievement("VERGIL_1000", "Smokin' Sexy Style", "Vergil's kill-count has reached 1000"),
 	};
 
 	const float fSpriteBGX = 960;
@@ -374,9 +375,21 @@ namespace Achievements {
 		}
 	}
 
+	void VergilKillCheck(CAchievement* pThis, double delta) {
+		pThis->fInternalProgress = StatTracker::nVergilKills;
+		pThis->fMaxInternalProgress = 1000;
+		if (StatTracker::nVergilKills >= 1000) {
+			AwardAchievement(pThis);
+		}
+	}
+
 	ChloeHook Init([]() {
 		Load();
 		aDrawingLoopFunctions.push_back(OnTick);
+
+		if (auto achievement = GetAchievement("VERGIL_1000")) {
+			achievement->pTickFunction = VergilKillCheck;
+		}
 	});
 }
 
