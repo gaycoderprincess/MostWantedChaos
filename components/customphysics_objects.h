@@ -30,6 +30,7 @@ namespace CustomPhysicsObjects {
 		double fTimeSinceCollidedWorld = 0.0;
 		std::vector<CollidedObject> aLastCollidedGameObject;
 		int nLazyLastCollided = 0;
+		double fTimeSinceSpawned = 0.0;
 
 		void AddCollision(IRigidBody* body) {
 			for (auto& obj : aLastCollidedGameObject) {
@@ -79,9 +80,12 @@ namespace CustomPhysicsObjects {
 			b3Body_SetTransform(nB3Body, {vSpawnPosition.x,vSpawnPosition.y,vSpawnPosition.z}, b3Quat_identity);
 			b3Body_SetLinearVelocity(nB3Body, b3Vec3_zero);
 			b3Body_SetAngularVelocity(nB3Body, b3Vec3_zero);
+			fTimeSinceSpawned = 0.0;
 		}
 
 		void PlayCollisionSound() {
+			if (fTimeSinceSpawned < 0.5) return;
+
 			auto dist = (*GetLocalPlayerVehicle()->GetPosition() - GetPosition());
 			auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
 			if (volume > 1) volume = 1;
@@ -96,8 +100,6 @@ namespace CustomPhysicsObjects {
 		}
 
 		void ProcessLazyCollisionSound() {
-			if (!pCollisionSound) return;
-
 			b3ContactData contactData[NUM_CONTACTS_CHECK];
 			int num = b3Body_GetContactData(nB3Body, contactData, NUM_CONTACTS_CHECK);
 			//if (num > nLazyLastCollided) { // this results in too many false positives
@@ -302,6 +304,7 @@ namespace CustomPhysicsObjects {
 
 		for (auto& pObj : aPhysicsObjects) {
 			auto& obj = *pObj;
+			obj.fTimeSinceSpawned += gTimer.fDeltaTime;
 			if (obj.bAffectGamePhysics) {
 				obj.ProcessGamePhysicsIntegration();
 			}

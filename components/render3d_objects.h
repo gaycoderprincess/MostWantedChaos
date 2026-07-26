@@ -546,7 +546,9 @@ namespace Render3DObjects {
 		if (bDontRenderObjects) return;
 
 		auto camPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
-		float renderDist = IsRenderingMainView(Render3D::pViewToDraw) || IsRenderingShadows(Render3D::pViewToDraw) ? 250 : 50;
+		float renderDist = 250.0;
+		if (IsRenderingShadows(Render3D::pViewToDraw)) renderDist = 150.0;
+		if (IsRenderingEnvmap(Render3D::pViewToDraw)) renderDist = 50.0;
 		bool isShadow = IsRenderingShadows(Render3D::pViewToDraw);
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
