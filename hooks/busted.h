@@ -1,9 +1,7 @@
-int nTimesBusted = 0;
-
 void __thiscall MessageBustedHooked(NISListenerActivity* pThis, MPerpBusted* a2) {
 	if (!INIS::mInstance) {
-		nTimesBusted++;
-		if (nTimesBusted >= 25) {
+		StatTracker::nTimesBusted++;
+		if (StatTracker::nTimesBusted >= 25) {
 			Achievements::AwardAchievement(GetAchievement("BUSTED_MANY"));
 		}
 	}

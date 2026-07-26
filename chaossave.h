@@ -354,7 +354,7 @@ bool DoChaosSettingsSave() {
 	if (!file.is_open()) return false;
 
 	file.write((char*)&bDarkMode, sizeof(bDarkMode));
-	file.write((char*)&nTimesBusted, sizeof(nTimesBusted));
+	file.write((char*)&StatTracker::nTimesBusted, sizeof(StatTracker::nTimesBusted));
 	file.write((char*)&fEffectCycleTimer, sizeof(fEffectCycleTimer));
 	file.write((char*)&fEffectX, sizeof(fEffectX));
 	file.write((char*)&fEffectY, sizeof(fEffectY));
@@ -376,6 +376,7 @@ bool DoChaosSettingsSave() {
 	file.write((char*)&Render3D::bUserForceNoEnvmap, sizeof(Render3D::bUserForceNoEnvmap));
 	file.write((char*)&Render3D::bUserForceNoEffect, sizeof(Render3D::bUserForceNoEffect));
 	file.write((char*)&CustomPhysics::bLowQualityPhysics, sizeof(CustomPhysics::bLowQualityPhysics));
+	file.write((char*)&StatTracker::fTimePlayed, sizeof(StatTracker::fTimePlayed));
 	return true;
 }
 
@@ -384,7 +385,7 @@ void DoChaosSettingsLoad() {
 	if (!file.is_open()) return;
 
 	file.read((char*)&bDarkMode, sizeof(bDarkMode));
-	file.read((char*)&nTimesBusted, sizeof(nTimesBusted));
+	file.read((char*)&StatTracker::nTimesBusted, sizeof(StatTracker::nTimesBusted));
 	file.read((char*)&fEffectCycleTimer, sizeof(fEffectCycleTimer));
 	file.read((char*)&fEffectX, sizeof(fEffectX));
 	file.read((char*)&fEffectY, sizeof(fEffectY));
@@ -407,6 +408,7 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&Render3D::bUserForceNoEnvmap, sizeof(Render3D::bUserForceNoEnvmap));
 	file.read((char*)&Render3D::bUserForceNoEffect, sizeof(Render3D::bUserForceNoEffect));
 	file.read((char*)&CustomPhysics::bLowQualityPhysics, sizeof(CustomPhysics::bLowQualityPhysics));
+	file.read((char*)&StatTracker::fTimePlayed, sizeof(StatTracker::fTimePlayed));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();

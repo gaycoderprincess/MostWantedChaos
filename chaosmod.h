@@ -356,7 +356,7 @@ void ChaosLoop() {
 
 	// just to rub it in a little
 	static bool bSMSSent = false;
-	if (!bSMSSent && nTimesBusted > 0 && IsInCareerMode() && GetUserProfile()->TheCareerSettings.CurrentBin <= 15 && !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
+	if (!bSMSSent && StatTracker::nTimesBusted == 1 && IsInCareerMode() && GetUserProfile()->TheCareerSettings.CurrentBin <= 15 && !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
 		SendSMS(98, true, true);
 		bSMSSent = true;
 	}
@@ -530,7 +530,8 @@ void ChaosModMenu() {
 			}
 			ChloeMenuLib::EndMenu();
 		}
-		DrawMenuOption(std::format("Times Busted - {}", nTimesBusted));
+		DrawMenuOption(std::format("Times Busted - {}", StatTracker::nTimesBusted));
+		DrawMenuOption(std::format("Time Wasted Playing This Mod - {}", GetTimeFromSeconds(StatTracker::fTimePlayed)));
 		ChloeMenuLib::EndMenu();
 	}
 

@@ -27,6 +27,7 @@ std::vector<void(*)()> aPlayerDestroyFunctions;
 #include "d3dhook.h"
 #include "chaosvars.h"
 #include "chaospopup.h"
+#include "components/stats.h"
 #include "components/achievements.h"
 #include "components/render3d.h"
 #include "components/render3d_objects.h"
