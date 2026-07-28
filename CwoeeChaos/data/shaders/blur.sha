@@ -14,18 +14,18 @@ float4 main(PS_INPUT input) : COLOR {
 		outUVs[i] = input.UV;
 	}
 	for (int i = 0; i < 64-8; i = i + 8) {
-		outUVs[i].x -= 0.0005 * (i / 8) * factor;
-		outUVs[i].y -= 0.0005 * (i / 8) * factor;
-		outUVs[i+1].x += 0.0005 * (i / 8) * factor;
-		outUVs[i+1].y -= 0.0005 * (i / 8) * factor;
-		outUVs[i+2].x += 0.0005 * (i / 8) * factor;
-		outUVs[i+2].y += 0.0005 * (i / 8) * factor;
-		outUVs[i+3].x -= 0.0005 * (i / 8) * factor;
-		outUVs[i+3].y += 0.0005 * (i / 8) * factor;
-		outUVs[i+4].x -= 0.0005 * (i / 8) * factor;
-		outUVs[i+5].x += 0.0005 * (i / 8) * factor;
-		outUVs[i+6].y -= 0.0005 * (i / 8) * factor;
-		outUVs[i+7].y += 0.0005 * (i / 8) * factor;
+		outUVs[i].x -= 0.0005 * (i / 4) * factor;
+		outUVs[i].y -= 0.0005 * (i / 4) * factor;
+		outUVs[i+1].x += 0.0005 * (i / 4) * factor;
+		outUVs[i+1].y -= 0.0005 * (i / 4) * factor;
+		outUVs[i+2].x += 0.0005 * (i / 4) * factor;
+		outUVs[i+2].y += 0.0005 * (i / 4) * factor;
+		outUVs[i+3].x -= 0.0005 * (i / 4) * factor;
+		outUVs[i+3].y += 0.0005 * (i / 4) * factor;
+		outUVs[i+4].x -= 0.0005 * (i / 4) * factor;
+		outUVs[i+5].x += 0.0005 * (i / 4) * factor;
+		outUVs[i+6].y -= 0.0005 * (i / 4) * factor;
+		outUVs[i+7].y += 0.0005 * (i / 4) * factor;
 	}
 	float4 outColors[64];
 	float4 outColor = {0,0,0,1};
