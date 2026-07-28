@@ -85,7 +85,7 @@ namespace CustomPhysicsObjects {
 		}
 
 		void PlayCollisionSound() {
-			if (fTimeSinceSpawned < 0.5) return;
+			if (fTimeSinceSpawned < 1.0) return;
 
 			auto dist = (*GetLocalPlayerVehicle()->GetPosition() - GetPosition());
 			auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
