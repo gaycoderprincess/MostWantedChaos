@@ -454,11 +454,13 @@ public:
 		for (auto& otherCar : objs) {
 			auto v = GetLocalPlayerVehicle()->GetPosition();
 			auto c = otherCar->GetPosition();
+			if ((*v - c).length() > 500) continue;
 			auto vel = otherCar->GetLinearVelocity();
 			vel.x += (v->x - c.x) * force * delta;
 			vel.y += (v->y - c.y) * force * delta;
 			vel.z += (v->z - c.z) * force * delta;
 			otherCar->SetLinearVelocity(&vel);
+			otherCar->fTimeSinceMovedByScript = 0.0;
 		}
 	}
 	bool HasTimer() override { return true; }

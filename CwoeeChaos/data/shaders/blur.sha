@@ -9,11 +9,11 @@ struct PS_INPUT {
 float4 main(PS_INPUT input) : COLOR {
 	float2 outUV = input.UV;
 	float factor = reg_timer[0];
-	float2 outUVs[128];
-	for (int i = 0; i < 128; i++) {
+	float2 outUVs[64];
+	for (int i = 0; i < 64; i++) {
 		outUVs[i] = input.UV;
 	}
-	for (int i = 0; i < 128; i = i + 8) {
+	for (int i = 0; i < 64-8; i = i + 8) {
 		outUVs[i].x -= 0.0005 * (i / 8) * factor;
 		outUVs[i].y -= 0.0005 * (i / 8) * factor;
 		outUVs[i+1].x += 0.0005 * (i / 8) * factor;
@@ -27,17 +27,17 @@ float4 main(PS_INPUT input) : COLOR {
 		outUVs[i+6].y -= 0.0005 * (i / 8) * factor;
 		outUVs[i+7].y += 0.0005 * (i / 8) * factor;
 	}
-	float4 outColors[128];
+	float4 outColors[64];
 	float4 outColor = {0,0,0,1};
-	for (int j = 0; j < 128; j++) {
+	for (int j = 0; j < 64; j++) {
 		outColors[j] = tex2D(pTexture, outUVs[j]) * input.Color;
 		outColor.x += outColors[j].x;
 		outColor.y += outColors[j].y;
 		outColor.z += outColors[j].z;
 	}
-	outColor.x = outColor.x / 128.0;
-	outColor.y = outColor.y / 128.0;
-	outColor.z = outColor.z / 128.0;
+	outColor.x = outColor.x / 64.0;
+	outColor.y = outColor.y / 64.0;
+	outColor.z = outColor.z / 64.0;
 	outColor.w = 1.0;
 	return outColor;
 }

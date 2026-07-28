@@ -473,7 +473,8 @@ public:
 			RenderCheckpointFinish(RenderToWorldCoords(cam.z), cp->mWorldTrigger.fPosRadius);
 		}
 
-		if (GetLocalPlayer()->GetHud()->IsHudVisible()) {
+		auto hud = GetLocalPlayer()->GetHud();
+		if (hud && hud->IsHudVisible()) {
 			RenderPlayerArrow(RenderToWorldCoords(cam.p), RenderToWorldCoords(cam.z), cp->mWorldTrigger.fPosRadius);
 		}
 

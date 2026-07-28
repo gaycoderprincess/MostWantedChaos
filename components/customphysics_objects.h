@@ -31,6 +31,7 @@ namespace CustomPhysicsObjects {
 		std::vector<CollidedObject> aLastCollidedGameObject;
 		int nLazyLastCollided = 0;
 		double fTimeSinceSpawned = 0.0;
+		double fTimeSinceMovedByScript = 0.0;
 
 		void AddCollision(IRigidBody* body) {
 			for (auto& obj : aLastCollidedGameObject) {
@@ -305,6 +306,7 @@ namespace CustomPhysicsObjects {
 		for (auto& pObj : aPhysicsObjects) {
 			auto& obj = *pObj;
 			obj.fTimeSinceSpawned += gTimer.fDeltaTime;
+			obj.fTimeSinceMovedByScript += gTimer.fDeltaTime;
 			if (obj.bAffectGamePhysics) {
 				obj.ProcessGamePhysicsIntegration();
 			}
@@ -319,7 +321,7 @@ namespace CustomPhysicsObjects {
 			}
 
 			// change spawn position if the object is stationary
-			if (obj.CanRespawn()) {
+			if (obj.CanRespawn() && obj.fTimeSinceMovedByScript > 2.0) {
 				b3ContactData contactData[NUM_CONTACTS_CHECK];
 				if (b3Body_GetContactData(obj.nB3Body, contactData, NUM_CONTACTS_CHECK) > 0 && obj.GetLinearVelocity().length() <= TOMPS(1.0)) {
 					obj.vSpawnPosition = obj.GetPosition();

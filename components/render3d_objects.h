@@ -237,6 +237,7 @@ namespace Render3DObjects {
 		bool bUseAlpha = false;
 		bool bNoBackfaceCulling = false;
 		bool bNoShadowCasting = false;
+		bool bNoEnvmap = false;
 		std::string sDebugName;
 
 		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
@@ -545,15 +546,18 @@ namespace Render3DObjects {
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 		if (bDontRenderObjects) return;
 
+		bool isShadow = IsRenderingShadows(Render3D::pViewToDraw);
+		bool isEnvmap = IsRenderingEnvmap(Render3D::pViewToDraw);
+
 		auto camPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
 		float renderDist = 250.0;
-		if (IsRenderingShadows(Render3D::pViewToDraw)) renderDist = 150.0;
-		if (IsRenderingEnvmap(Render3D::pViewToDraw)) renderDist = 50.0;
-		bool isShadow = IsRenderingShadows(Render3D::pViewToDraw);
+		if (isShadow) renderDist = 150.0;
+		if (isEnvmap) renderDist = 50.0;
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
 			if (obj->bDontRender) continue;
 			if (obj->bNoShadowCasting && isShadow) continue;
+			if (obj->bNoEnvmap && isEnvmap) continue;
 
 			auto dist = (obj->mMatrix.p - camPos).length();
 			auto radius = obj->fRadius * obj->mMatrix.x.length();

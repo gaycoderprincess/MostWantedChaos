@@ -73,7 +73,9 @@ int __thiscall CarGetVisibleStateHooked(eView* a1, const bVector3* a2, const bVe
 	if (CarRender_Spin) {
 		float rpm = 2000.0;
 		if (auto veh = GetClosestActiveVehicle(RenderToWorldCoords(carMatrix->p))) {
-			rpm = veh->mCOMObject->Find<IEngine>()->GetRPM();
+			if (auto engine = veh->mCOMObject->Find<IEngine>()) {
+				rpm = engine->GetRPM();
+			}
 		}
 
 		static CNyaTimer gTimer;

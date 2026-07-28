@@ -186,7 +186,7 @@ public:
 			auto cars = GetActiveVehicles();
 			for (auto& car : cars) {
 				auto distFromCar = (*car->GetPosition() - obj->vColPosition).length();
-				if (distFromCar < 5) {
+				if (distFromCar < 7.5) {
 					static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap3.ogg");
 					static auto soundAlt = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap1.ogg");
 					if (car == GetLocalPlayerVehicle()) {
@@ -241,8 +241,10 @@ public:
 			models = Render3D::CreateModels("scp173.fbx");
 		}
 
-		aPeanutsInWorld.push_back(Render3DObjects::aObjects.size());
+		auto id = Render3DObjects::aObjects.size();
+		aPeanutsInWorld.push_back(id);
 		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("peanut", models, mat, mat.p, colScale, PeanutMove));
+		Render3DObjects::aObjects[id]->bNoEnvmap = true;
 
 		bPeanutEverSpawned = true;
 	}
@@ -1519,7 +1521,7 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
 
-		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), GetLocalPlayerVehicle());
+		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), nullptr);
 		CustomCamera::ProcessCam(pMoverCamera, delta);
 	}
 	void DeinitFunction() override {
@@ -1549,7 +1551,7 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
 
-		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), GetLocalPlayerVehicle());
+		CustomCamera::SetTargetCar(GetLocalPlayerVehicle(), nullptr);
 		CustomCamera::ProcessCam(pMoverCamera, delta);
 	}
 	void DeinitFunction() override {
