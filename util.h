@@ -709,6 +709,13 @@ bool IsInPursuitRace() {
 	return true;
 }
 
+bool IsInSpeedtrapRace() {
+	if (!GRaceStatus::fObj) return false;
+	if (!GRaceStatus::fObj->mRaceParms) return false;
+	if (GRaceStatus::fObj->mRaceParms->GetRaceType() != GRace::kRaceType_SpeedTrap) return false;
+	return true;
+}
+
 bool IsInNamedRace(const char* eventId) {
 	if (!GRaceStatus::fObj) return false;
 	if (!GRaceStatus::fObj->mRaceParms) return false;

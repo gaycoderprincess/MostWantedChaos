@@ -266,6 +266,7 @@ public:
 	}
 
 	bool IsAvailable() override {
+		if (IsInSpeedtrapRace()) return false;
 		return nNumPlayerCarChangesThisRace <= 0;
 	}
 };

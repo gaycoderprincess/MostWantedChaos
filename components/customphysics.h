@@ -462,7 +462,7 @@ namespace CustomPhysics {
 		CollectWorldObjects();
 
 		if (!FEManager::mPauseRequest) {
-			b3World_Step(m_worldId, gTimer.fDeltaTime, bLowQualityPhysics ? 1 : 4);
+			b3World_Step(m_worldId, gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed, bLowQualityPhysics ? 1 : 4);
 		}
 	}
 

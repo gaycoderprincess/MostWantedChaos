@@ -239,10 +239,10 @@ namespace CustomPhysicsBall {
 			auto maxSpeed = GetBallTopSpeed();
 			AddLogPopup(std::format("accel {:.2f} maxSpeed {:.2f}", accel, maxSpeed));
 
-			velAdd.x += fwd.x * -stick.y * accel * gTimer.fDeltaTime;
-			velAdd.z += fwd.z * -stick.y * accel * gTimer.fDeltaTime;
-			velAdd.x += side.x * stick.x * accel * gTimer.fDeltaTime;
-			velAdd.z += side.z * stick.x * accel * gTimer.fDeltaTime;
+			velAdd.x += fwd.x * -stick.y * accel * gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
+			velAdd.z += fwd.z * -stick.y * accel * gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
+			velAdd.x += side.x * stick.x * accel * gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
+			velAdd.z += side.z * stick.x * accel * gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
 
 			if (b3Length(velAdd) > 0.0) {
 				auto velNorm = b3Normalize(vel);

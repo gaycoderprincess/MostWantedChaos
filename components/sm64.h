@@ -952,6 +952,11 @@ namespace SM64 {
 	void OnTick() {
 		PerformanceBenchmarker _perf("SM64::OnTick");
 
+		if (!bAvailable) {
+			bEnabled = false;
+			bEnemyEnabled = false;
+			return;
+		}
 		if (!bEnabled && !bEnemyEnabled) {
 			bDoReset = true;
 			return;
@@ -1089,12 +1094,14 @@ namespace SM64 {
 			static CNyaTimer gTimer;
 			gTimer.Process();
 
-			fTimeSinceLastAttacked += gTimer.fDeltaTime;
+			fTimeSinceLastAttacked += gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
 			if (fTimeSinceLastAttacked > 2.0) {
 				sm64_set_mario_health(marioId, 0x880);
 			}
 
-			while (gTimer.fTotalTime >= 1.0 / 30.0) {
+			float marioDelta = (1.0 / 30.0);
+			marioDelta /= Sim::Internal::mSystem->mSpeed;
+			while (gTimer.fTotalTime >= marioDelta) {
 				if (bEnemyEnabled) {
 					DoEnemyMarioControls();
 					CreateMarioBarriers();
@@ -1107,15 +1114,15 @@ namespace SM64 {
 				memcpy(lastPos, currPos, sizeof(currPos));
 				memcpy(lastGeoPos, currGeoPos, sizeof(currGeoPos));
 
-				gTimer.fTotalTime -= 1.f/30;
+				gTimer.fTotalTime -= marioDelta;
 				sm64_mario_tick( marioId, &marioInputs, &marioState, &marioGeometry );
 
 				memcpy(currPos, marioState.position, sizeof(currPos));
 				memcpy(currGeoPos, marioGeometry.position, sizeof(currGeoPos));
 			}
 
-			for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / (1.f/30));
-			for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / (1.f/30));
+			for (int i=0; i<3; i++) marioState.position[i] = std::lerp(lastPos[i], currPos[i], gTimer.fTotalTime / marioDelta);
+			for (int i=0; i<marioGeometry.numTrianglesUsed*9; i++) marioGeometry.position[i] = std::lerp(lastGeoPos[i], currGeoPos[i], gTimer.fTotalTime / marioDelta);
 		}
 
 		static CNyaTimer gInvincibilityTimer;

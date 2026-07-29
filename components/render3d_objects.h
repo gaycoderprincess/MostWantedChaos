@@ -535,7 +535,7 @@ namespace Render3DObjects {
 			obj->RegenerateTris();
 			obj->RegenerateTriBarriers();
 			if (obj->pTickFunction) {
-				obj->pTickFunction(obj, gTimer.fDeltaTime);
+				obj->pTickFunction(obj, gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed);
 			}
 		}
 	}

@@ -421,6 +421,23 @@ void DoChaosSettingsLoad() {
 	}
 }
 
+bool DoChaosSM64Save() {
+	std::ofstream file("CwoeeChaos/save/mario.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return false;
+
+	file.write((char*)&SM64::bEnemyEnabled, sizeof(SM64::bEnemyEnabled));
+	file.write((char*)&SM64::vEnemySpawnPosition, sizeof(SM64::vEnemySpawnPosition));
+	return true;
+}
+
+void DoChaosSM64Load() {
+	std::ifstream file("CwoeeChaos/save/mario.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	file.read((char*)&SM64::bEnemyEnabled, sizeof(SM64::bEnemyEnabled));
+	file.read((char*)&SM64::vEnemySpawnPosition, sizeof(SM64::vEnemySpawnPosition));
+}
+
 void DoChaosSave() {
 	std::filesystem::create_directory("CwoeeChaos");
 	std::filesystem::create_directory("CwoeeChaos/save");
@@ -437,6 +454,7 @@ void DoChaosSave() {
 	if (!DoChaosPhysicsObjectSave("metalball_save", "metalball")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosPhysicsObjectSave("trafficcone_save", "cone")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosRampSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosSM64Save()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 }
 
@@ -453,5 +471,6 @@ void DoChaosLoad() {
 	DoChaosPhysicsObjectLoad("metalball", Effect_SpawnHeavyBall::SpawnObject);
 	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
 	DoChaosRampLoad();
+	DoChaosSM64Load();
 	DoChaosSettingsLoad();
 }

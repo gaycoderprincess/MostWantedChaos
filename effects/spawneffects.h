@@ -172,7 +172,7 @@ public:
 			auto movePos = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition);
 			lastPeanutDistance = movePos.length();
 			movePos.Normalize();
-			obj->vColPosition += movePos * peanutSpeed * Sim::Internal::mSystem->mSpeed * delta;
+			obj->vColPosition += movePos * peanutSpeed * delta;
 			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
 
 			obj->mMatrix = NyaMat4x4::LookAt(-movePos);
@@ -1015,13 +1015,13 @@ public:
 			obj->mMatrix.p = obj->vColPosition;
 		}
 
-		data->styleRanking -= styleDecay * delta * Sim::Internal::mSystem->mSpeed;
+		data->styleRanking -= styleDecay * delta;
 		if (data->styleRanking < 0) {
 			data->styleRanking = 0;
 			memset(data->stylesCalledOut, 0, sizeof(data->stylesCalledOut));
 		}
 
-		data->attackTimer -= delta * Sim::Internal::mSystem->mSpeed;
+		data->attackTimer -= delta;
 		if (data->attackTimer <= 0) {
 			auto cars = GetActiveVehicles();
 			for (auto& car: cars) {
@@ -1211,7 +1211,7 @@ public:
 			obj->mMatrix.p = obj->vColPosition;
 		}
 
-		data->attackTimer -= delta * Sim::Internal::mSystem->mSpeed;
+		data->attackTimer -= delta;
 		if (data->attackTimer <= 0) {
 			auto cars = GetActiveVehicles();
 			for (auto& car: cars) {

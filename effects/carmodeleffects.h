@@ -363,12 +363,13 @@ public:
 	}
 } E_SetCarRandom;
 
-class Effect_SetCarRandomAI : public ChaosEffect {
+class Effect_SetCarRandomAI : public EffectBase_NoCarChangeYetConditional {
 public:
-	Effect_SetCarRandomAI() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_SetCarRandomAI() : EffectBase_NoCarChangeYetConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Change Car To AI Traffic/Police Car";
 		AddToFilterGroup("change_player_car");
 		bCanQuickTrigger = false;
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -444,6 +445,7 @@ public:
 	}
 	bool IsAvailable() override {
 		if (!EffectBase_OpponentInRaceConditional::IsAvailable()) return false;
+		if (IsInSpeedtrapRace()) return false;
 		return nNumPlayerCarChangesThisRace <= 0;
 	}
 } E_SetCarRandomOpponent;
