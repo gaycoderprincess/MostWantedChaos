@@ -266,6 +266,7 @@ public:
 	}
 
 	bool IsAvailable() override {
+		// crash during speedtrap point deduction if the player car changes and an opponent finishes first
 		if (IsInSpeedtrapRace()) return false;
 		return nNumPlayerCarChangesThisRace <= 0;
 	}
