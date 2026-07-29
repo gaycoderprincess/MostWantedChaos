@@ -10,7 +10,7 @@ namespace CustomPhysics {
 		def.indices = indices;
 		def.triangleCount = numIndices / 3;
 		def.materialIndices = nullptr;
-		def.useMedianSplit = false; // todo?
+		def.useMedianSplit = false;
 		def.identifyEdges = true;
 		def.weldVertices = true;
 		def.weldTolerance = 0.002f;

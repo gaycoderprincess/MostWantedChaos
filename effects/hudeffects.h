@@ -3,7 +3,7 @@
 class Effect_DragHUD : public ChaosEffect {
 public:
 	Effect_DragHUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Drag HUD";
+		sName = "Drag Race HUD";
 	}
 
 	void InitFunction() override {

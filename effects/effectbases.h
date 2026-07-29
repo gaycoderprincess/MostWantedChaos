@@ -229,7 +229,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		return FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0;
+		return !IsInCareerMode() || FEPlayerCarDB::GetNumCareerCars(GetPlayerCarDB()) > 0;
 	}
 };
 

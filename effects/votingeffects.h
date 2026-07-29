@@ -72,6 +72,7 @@ public:
 		sName = "Insanely Unfair RNG";
 		nFrequency *= 2;
 		fCycleTimeMultiplier = 2;
+		bAbortOnConditionFailed = true;
 		bCanQuickTrigger = false;
 		bSaveStateToDisk = true;
 	}
@@ -88,6 +89,7 @@ public:
 		fTimerLength = max * 5;
 		EffectInstance->fTimer = nSmartRNG * 5;
 	}
+	bool IsAvailable() override { return StatTracker::fTimePlayed > 60 * 60; } // minimum 60 mins of playtime before this can happen
 	bool ShouldAbort() override { return !nSmartRNG; }
 	bool HasTimer() override { return true; }
 	void OnTimerRefill() override { InitFunction(); }

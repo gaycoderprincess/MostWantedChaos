@@ -192,7 +192,7 @@ namespace Render3DObjects {
 		inst->fFlags = 0;
 		inst->fHeight = 0.0;
 		inst->fGroupNumber = 0;
-		inst->fRenderInstanceInd = 0; // todo?
+		inst->fRenderInstanceInd = 0;
 		RegisterCustomCollisionInstance(inst);
 
 		size_t numStrips = numTris;

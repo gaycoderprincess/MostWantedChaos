@@ -260,6 +260,18 @@ std::vector<ChaosEffect*> aEffectsFromSavegameInstant;
 void DoChaosSave();
 void DoChaosLoad();
 
+ChaosEffectInstance* GetEffectRunning(const std::string& name) {
+	for (auto& running : aRunningEffects) {
+		if (!running.IsActive()) continue;
+		if (!running.pEffect) continue;
+
+		if (running.pEffect->sName == name || running.pEffect->GetFriendlyName() == name) {
+			return &running;
+		}
+	}
+	return nullptr;
+}
+
 ChaosEffectInstance* GetEffectRunning(ChaosEffect* effect) {
 	for (auto& running : aRunningEffects) {
 		if (!running.IsActive()) continue;

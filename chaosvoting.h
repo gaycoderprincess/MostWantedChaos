@@ -434,7 +434,7 @@ namespace ChaosVoting {
 
 	void ActivateChatCheat() {
 		ChaosVoting::bRecordChatCheat = true;
-		ChaosVoting::bRecordChatCheatDuplicates = ChaosVoting::nNumVotingUsers <= 3; // allow duplicate effects per user if the chat is small
+		ChaosVoting::bRecordChatCheatDuplicates = ChaosVoting::nNumVotingUsers <= 5; // allow duplicate effects per user if the chat is small
 	}
 
 	void DeactivateChatCheat() {

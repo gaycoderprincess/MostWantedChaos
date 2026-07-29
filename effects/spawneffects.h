@@ -798,6 +798,7 @@ public:
 	static inline float attackStingerRange = 15;
 	static inline float attackPower = 100;
 	static inline float attackPowerAng = 25;
+	static inline float attackPowerWeakMult = 0.1;
 
 	static inline float attackStyleIncrease = 0.75;
 	static inline float styleDecay = 1;
@@ -920,24 +921,31 @@ public:
 
 				auto rb = car->mCOMObject->Find<IRigidBody>();
 
-				auto vel = *rb->GetLinearVelocity();
-				vel += dir * attackPower;
-				vel.y += extraUp;
-				rb->SetLinearVelocity(&vel);
-
-				auto avel = *rb->GetAngularVelocity();
-				avel += dir * attackPowerAng;
-				rb->SetAngularVelocity(&avel);
-
-				data->styleRanking += attackStyleIncrease;
-
+				bool doWeak = false;
 				if (car->GetDriverClass() == DRIVER_HUMAN) {
 					StatTracker::nVergilKillsPlayer++;
 
 					if (SM64::bEnabled) {
 						SM64::OnTakeDamage(1, obj->vColPosition, true);
 					}
+
+					if (GetEffectRunning("Juggernaut")) {
+						doWeak = true;
+					}
 				}
+
+				float powerMult = doWeak ? attackPowerWeakMult : 1.0;
+
+				auto vel = *rb->GetLinearVelocity();
+				vel += dir * attackPower * powerMult;
+				vel.y += extraUp * powerMult;
+				rb->SetLinearVelocity(&vel);
+
+				auto avel = *rb->GetAngularVelocity();
+				avel += dir * attackPowerAng * powerMult;
+				rb->SetAngularVelocity(&avel);
+
+				data->styleRanking += attackStyleIncrease;
 
 				if (car->GetDriverClass() == DRIVER_COP) {
 					StatTracker::nVergilKillsCop++;
@@ -1124,6 +1132,10 @@ public:
 			SpawnVergil(mat);
 			DoChaosSave();
 		}
+	}
+	bool IsAvailable() override {
+		if (!EffectBase_NotInPrologueConditional::IsAvailable()) return false;
+		return StatTracker::fTimePlayed > 60 * 60 * 2; // minimum 2 hours of playtime before this can happen
 	}
 } E_Vergil;
 
@@ -1543,7 +1555,8 @@ public:
 		AddToIncompatiblityGroup("control_mode");
 		bCanQuickTrigger = false;
 		bRigProportionalChances = true;
-		nFrequency *= 3;
+		bSaveStateToDisk = true;
+		nFrequency *= 2;
 	}
 
 	void InitFunction() override {
