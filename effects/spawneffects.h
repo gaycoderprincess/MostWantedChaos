@@ -426,7 +426,7 @@ public:
 						avel.z += 10 * right.z;
 						rb->SetAngularVelocity(&vel);
 					}
-					if (car->GetDriverClass() == DRIVER_HUMAN) {
+					if (car->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled) {
 						SM64::TakeLavaDamage();
 					}
 					DestroyCar(car);
@@ -626,7 +626,7 @@ public:
 					car->SetAngularVelocity(&avel);
 
 					if (auto iveh = car->mCOMObject->Find<IVehicle>()) {
-						if (iveh->GetDriverClass() == DRIVER_HUMAN) {
+						if (iveh->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled) {
 							SM64::OnTakeDamage(1, obj->vColPosition, true);
 						}
 
@@ -867,7 +867,7 @@ public:
 			}
 		}
 
-		if (data->styleRanking > NUM_STYLES) data->styleRanking = NUM_STYLES; // cap at top of SSS
+		if ((int)data->styleRanking >= NUM_STYLES) data->styleRanking = NUM_STYLES; // cap at top of SSS
 	}
 
 	static void VergilAttack_Box3D(NyaVec3 colPosition, b3BodyId bodyId, float range, float extraUp) {
@@ -1337,7 +1337,9 @@ public:
 				avel += dir * attackPowerAng;
 				rb->SetAngularVelocity(&avel);
 
-				SM64::OnTakeDamage(1, obj->vColPosition, true);
+				if (SM64::bEnabled) {
+					SM64::OnTakeDamage(1, obj->vColPosition, true);
+				}
 
 				NyaAudio::Delete(&data->audio);
 

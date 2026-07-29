@@ -1173,7 +1173,6 @@ namespace SM64 {
 	}
 
 	void InitAudio() {
-		WriteLog("InitAudio");
 		std::thread(OnAudioTick).detach();
 	}
 
@@ -1218,7 +1217,6 @@ namespace SM64 {
 
 		aDrawing3DLoopFunctions.push_back(OnTick3D);
 		aDrawingLoopFunctions.push_back(OnTick);
-		//aDrawing3DLoopFunctionsOnce.push_back(InitAudio);
 		aPlayerTeleportFunctions.push_back(OnTeleport);
 		aPlayerDestroyFunctions.push_back(OnDestroy);
 

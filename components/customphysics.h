@@ -466,27 +466,6 @@ namespace CustomPhysics {
 		}
 	}
 
-	void OnTick3D() {
-		/*for (int i = 0; i < 2700; i++) {
-			auto mesh = aCollisionArticles[i].pB3Mesh;
-			if (!mesh) continue;
-
-			auto verts = b3GetMeshVertices(mesh);
-			auto tris = b3GetMeshTriangles(mesh);
-			if (!verts || !tris) continue;
-
-			CollisionGeometryBuffer tmp;
-			tmp.position = (float*)verts;
-			tmp.index = (int*)tris;
-			tmp.numVertices = mesh->vertexCount;
-			tmp.numFaces = mesh->triangleCount;
-
-			NyaMat4x4 mat;
-			mat.SetIdentity();
-			DebugRender<6969>(tmp, mat);
-		}*/
-	}
-
 	ChloeHook Init([]{
 		aMainLoopFunctions.push_back(OnWorldTick);
 
