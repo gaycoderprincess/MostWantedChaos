@@ -1686,6 +1686,8 @@ public:
 			ply->SetAngularVelocity(&UMath::Vector3::kZero);
 		}
 		SM64::vEnemySpawnPosition = v;
+
+		DoChaosSave();
 	}
 	bool IsAvailable() override { return SM64::bAvailable; }
 } E_Mario64Enemy;
