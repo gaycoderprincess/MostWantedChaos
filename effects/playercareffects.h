@@ -1442,7 +1442,7 @@ public:
 				if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin >= BIN_BARON) {
 					fMinSpeed = fMinSpeedSlow;
 				}
-				else if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin <= BIN_BULL) {
+				else if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin <= BIN_MING) {
 					fMinSpeed = fMinSpeedFast;
 				}
 			}
