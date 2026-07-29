@@ -69,7 +69,7 @@ public:
 class Effect_VotingSmart : public ChaosEffect {
 public:
 	Effect_VotingSmart() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Insanely Unfair RNG";
+		sName = "Insanely Unfair Effect RNG";
 		nFrequency *= 2;
 		fCycleTimeMultiplier = 2;
 		bAbortOnConditionFailed = true;
