@@ -851,10 +851,10 @@ public:
 		fTimerLength = 15;
 	}
 
-	void TickFunctionMain(double delta) override {
-		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			ply->ClearInput();
-		}
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
+		memset(gCustomPlayerInput, 0, sizeof(*gCustomPlayerInput));
 	}
 	bool HasTimer() override { return true; }
 } E_NoInput;
@@ -1131,11 +1131,8 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_INPUT) return;
 
-		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			auto controls = ply->GetControls();
-			controls->fBrake = 0;
-			controls->fHandBrake = 0;
-		}
+		gCustomPlayerInput->fBrake = 0;
+		gCustomPlayerInput->fHandBrake = 0;
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerNoBrakes;*/
@@ -1151,10 +1148,7 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_INPUT) return;
 
-		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			auto controls = ply->GetControls();
-			controls->fSteering = 0;
-		}
+		gCustomPlayerInput->fSteering = 0;
 		if (CustomPhysicsBall::bEnabled) {
 			CustomPhysicsBall::fSideMoveSpeed = 0.0;
 		}
@@ -1181,14 +1175,11 @@ public:
 			timer -= 3;
 		}
 
-		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			auto controls = ply->GetControls();
-			if (forcedDirection) {
-				controls->fSteering = std::abs(controls->fSteering);
-			}
-			else {
-				controls->fSteering = -std::abs(controls->fSteering);
-			}
+		if (forcedDirection) {
+			gCustomPlayerInput->fSteering = std::abs(gCustomPlayerInput->fSteering);
+		}
+		else {
+			gCustomPlayerInput->fSteering = -std::abs(gCustomPlayerInput->fSteering);
 		}
 	}
 	bool HasTimer() override { return true; }
@@ -1205,17 +1196,34 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_INPUT) return;
 
-		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			auto controls = ply->GetControls();
-			if (controls->fSteering < -0.5) controls->fSteering = -0.5;
-			if (controls->fSteering > 0.5) controls->fSteering = 0.5;
-		}
+		if (gCustomPlayerInput->fSteering < -0.5) gCustomPlayerInput->fSteering = -0.5;
+		if (gCustomPlayerInput->fSteering > 0.5) gCustomPlayerInput->fSteering = 0.5;
+
 		if (CustomPhysicsBall::bEnabled) {
 			CustomPhysicsBall::fSideMoveSpeed = 0.5;
 		}
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerHalfSteering;
+
+class Effect_PlayerInvSteering : public ChaosEffect {
+public:
+	Effect_PlayerInvSteering() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Inverted Player Steering";
+		fTimerLength = 30;
+	}
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
+		gCustomPlayerInput->fSteering *= -1;
+
+		if (CustomPhysicsBall::bEnabled) {
+			CustomPhysicsBall::fSideMoveSpeed = 0.5;
+		}
+	}
+	bool HasTimer() override { return true; }
+} E_PlayerInvSteering;
 
 class Effect_PlayerHalfGas : public ChaosEffect {
 public:
@@ -1228,10 +1236,8 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_INPUT) return;
 
-		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			auto controls = ply->GetControls();
-			if (controls->fGas > 0.5) controls->fGas = 0.5;
-		}
+		if (gCustomPlayerInput->fGas > 0.5) gCustomPlayerInput->fGas = 0.5;
+
 		if (CustomPhysicsBall::bEnabled) {
 			CustomPhysicsBall::fFwdMoveSpeed = 0.5;
 		}
@@ -1544,15 +1550,12 @@ public:
 			timer -= 3;
 		}
 
-		if (auto ply = GetLocalPlayerInterface<IInput>()) {
-			auto controls = ply->GetControls();
-			controls->fSteering = steer;
-			controls->fGas = gas;
-			controls->fBrake = brake;
-			controls->fHandBrake = 0;
-			controls->fActionButton = false;
-			controls->fNOS = false;
-		}
+		gCustomPlayerInput->fSteering = steer;
+		gCustomPlayerInput->fGas = gas;
+		gCustomPlayerInput->fBrake = brake;
+		gCustomPlayerInput->fHandBrake = 0;
+		gCustomPlayerInput->fActionButton = false;
+		gCustomPlayerInput->fNOS = false;
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerRandomInput;

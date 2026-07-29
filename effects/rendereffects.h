@@ -263,8 +263,9 @@ public:
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook == HOOK_INPUT) {
-			auto controls = GetLocalPlayerInterface<IInput>()->GetControls();
-			if (controls->fGas > 0.75) controls->fGas = 0.75;
+			if (gCustomPlayerInput->fGas > 0.75) {
+				gCustomPlayerInput->fGas = 0.75;
+			}
 		}
 		else if (hook == HOOK_3D) {
 			CarRender_DontRenderPlayer = true;

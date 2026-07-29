@@ -482,3 +482,23 @@ public:
 		aMainLoopFunctionsOnce.push_back([](){ SendSMS(95, false, false); });
 	}
 } E_SFXHotshot;
+
+class Effect_RandomTextMessage : public ChaosEffect {
+public:
+	Effect_RandomTextMessage() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Ring Ring";
+		sFriendlyName = "Random Phone Call";
+		bCanQuickTrigger = false;
+	}
+
+	void InitFunction() override {
+		std::vector<int> messages;
+		for (int i = 0; i < 150; i++) {
+			auto message = &GetUserProfile()->TheCareerSettings.SMSMessages[i];
+			if (!message->IsValid()) continue;
+			if (!message->IsVoice()) continue;
+			messages.push_back(i);
+		}
+		SendSMS(messages[rand()%messages.size()], !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued(), false);
+	}
+} E_RandomTextMessage;

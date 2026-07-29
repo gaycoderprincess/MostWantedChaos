@@ -57,6 +57,12 @@ public:
 		fTimerLength = 60;
 		sFileName = "mirror";
 	}
+
+	void TickFunction(eChaosHook hook, double delta) override {
+		if (hook != HOOK_INPUT) return;
+
+		gCustomPlayerInput->fSteering *= -1;
+	}
 } E_ShaderMirror;
 
 class Effect_ShaderPixel : public EffectBase_ScreenShader {
