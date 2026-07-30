@@ -54,12 +54,13 @@ public:
 	Effect_ShaderMirror() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
 		sName = "British";
 		sFriendlyName = "Mirror The Screen";
-		fTimerLength = 60;
+		fTimerLength = 90;
 		sFileName = "mirror";
 	}
 
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_INPUT) return;
+		if (IsInDragRace()) return;
 
 		gCustomPlayerInput->fSteering *= -1;
 	}
