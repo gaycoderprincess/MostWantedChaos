@@ -530,7 +530,7 @@ public:
 			if (state.destroyed) continue;
 			if (!IsCarDestroyed(state.vehicle)) continue;
 
-			FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += GetCashRewardForCar(state.vehicle);
+			GetUserProfile()->TheCareerSettings.CurrentCash += GetCashRewardForCar(state.vehicle);
 		}
 	}
 

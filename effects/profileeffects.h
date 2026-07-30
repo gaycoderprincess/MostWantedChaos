@@ -8,10 +8,10 @@ public:
 	}
 
 	void InitFunction() override {
-		FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.JumpCam = true;
+		GetUserProfile()->TheOptionsSettings.TheGameplaySettings.JumpCam = true;
 	}
 	bool IsAvailable() override {
-		return !FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.JumpCam;
+		return !GetUserProfile()->TheOptionsSettings.TheGameplaySettings.JumpCam;
 	}
 } E_EnableMomentCam;
 
@@ -24,13 +24,13 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = false;
+		GetUserProfile()->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = false;
 	}
 	void DeinitFunction() override {
-		FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = true;
+		GetUserProfile()->TheOptionsSettings.TheGameplaySettings.AutoSaveOn = true;
 	}
 	bool IsAvailable() override {
-		return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheGameplaySettings.AutoSaveOn;
+		return GetUserProfile()->TheOptionsSettings.TheGameplaySettings.AutoSaveOn;
 	}
 	bool HasTimer() override { return true; }
 	bool RunInMenus() override { return true; }
@@ -66,7 +66,7 @@ public:
 	}
 
 	void InitFunction() override {
-		FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += 1000000;
+		GetUserProfile()->TheCareerSettings.CurrentCash += 1000000;
 	}
 } E_Millionaire;
 
@@ -77,9 +77,25 @@ public:
 	}
 
 	void InitFunction() override {
-		FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash -= 1000000;
+		GetUserProfile()->TheCareerSettings.CurrentCash -= 1000000;
 	}
 } E_Millionaire2;
+
+class Effect_Millionaire3 : public EffectBase_CareerConditional {
+public:
+	Effect_Millionaire3() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "IRS Visit";
+		sFriendlyName = "Halve Player's Money";
+	}
+
+	void InitFunction() override {
+		GetUserProfile()->TheCareerSettings.CurrentCash /= 2;
+	}
+	bool IsAvailable() override {
+		if (!EffectBase_CareerConditional::IsAvailable()) return false;
+		return GetUserProfile()->TheCareerSettings.CurrentCash >= 1000000;
+	}
+} E_Millionaire3;
 
 class Effect_5Grand : public EffectBase_CareerConditional {
 public:
@@ -91,7 +107,7 @@ public:
 	NyaAudio::NyaSound sound = 0;
 
 	void InitFunction() override {
-		FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += 5000;
+		GetUserProfile()->TheCareerSettings.CurrentCash += 5000;
 
 		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/5grand.mp3");
 		if (sound) {
@@ -323,7 +339,7 @@ public:
 		strcpy_s(effectName, 64, std::format("{} ({})", sName, selectedMarker.name).c_str());
 		EffectInstance->sNameToDisplay = std::format("{} ({})", sName, selectedMarker.name);
 		if (selectedMarker.type == FEMarkerManager::MARKER_CASH) {
-			FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCash += 50000;
+			GetUserProfile()->TheCareerSettings.CurrentCash += 50000;
 		}
 		else if (selectedMarker.type == FEMarkerManager::MARKER_PINK_SLIP) {
 			Achievements::AwardAchievement(GetAchievement("WIN_PINKSLIP"));
@@ -367,7 +383,7 @@ public:
 					}
 				}
 				aMainLoopFunctionsOnce.push_back([]() {
-					EEnterBin::Create(FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin - 1);
+					EEnterBin::Create(GetUserProfile()->TheCareerSettings.CurrentBin - 1);
 					EQuitToFE::Create(GARAGETYPE_CAREER_SAFEHOUSE, "MainMenu_Sub.fng");
 				});
 				EffectInstance->sNameToDisplay = std::format("{} (Succeeded)", sName);
@@ -379,7 +395,7 @@ public:
 		}
 	}
 	bool IsAvailable() override {
-		return FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > 1 && IsInCareerMode();
+		return GetUserProfile()->TheCareerSettings.CurrentBin > 1 && IsInCareerMode();
 	}
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
@@ -421,7 +437,7 @@ public:
 		}
 	}
 	bool IsAvailable() override {
-		return FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin > 1 && IsInCareerMode();
+		return GetUserProfile()->TheCareerSettings.CurrentBin > 1 && IsInCareerMode();
 	}
 	bool RunInMenus() override { return true; }
 	bool RunWhenBlocked() override { return true; }
@@ -441,7 +457,7 @@ public:
 		obj->StartLicensedMusic(song->PathEvent);
 	}
 	bool IsAvailable() override {
-		return FEDatabase->CurrentUserProfiles[0]->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
+		return GetUserProfile()->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
 	}
 } E_SkipMusic;
 
@@ -514,7 +530,7 @@ public:
 	}
 
 	void InitFunction() override {
-		bool mil = FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin < BIN_MING || FEPlayerCarDB::GetTotalBounty(GetPlayerCarDB()) >= 1500000;
+		bool mil = GetUserProfile()->TheCareerSettings.CurrentBin < BIN_MING || FEPlayerCarDB::GetTotalBounty(GetPlayerCarDB()) >= 1500000;
 		int amount = mil ? 1000000 : 100000;
 		GetPlayerCarDB()->SoldHistoryBounty -= amount;
 		if (mil) {
@@ -535,3 +551,19 @@ public:
 		NyaHookLib::Patch<uint16_t>(0x548B55, 0x9090);
 	}
 } E_FillInbox;
+
+class Effect_UnlockAllCars : public EffectBase_CareerConditional {
+public:
+	Effect_UnlockAllCars() : EffectBase_CareerConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Unlock All Cars";
+		fTimerLength = 30; // short timer on purpose since this is very powerful
+	}
+
+	void InitFunction() override {
+		bUnlockAllCars = true;
+	}
+	void DeinitFunction() override {
+		bUnlockAllCars = false;
+	}
+	bool HasTimer() override { return true; }
+} E_UnlockAllCars;

@@ -1438,11 +1438,11 @@ public:
 		fMinSpeed = fMinSpeedMid;
 		if (IsInCareerMode()) {
 			// 150km/h in prologue
-			if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin != BIN_ROG) {
-				if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin >= BIN_BARON) {
+			if (GetUserProfile()->TheCareerSettings.CurrentBin != BIN_ROG) {
+				if (GetUserProfile()->TheCareerSettings.CurrentBin >= BIN_BARON) {
 					fMinSpeed = fMinSpeedSlow;
 				}
-				else if (FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentBin <= BIN_MING) {
+				else if (GetUserProfile()->TheCareerSettings.CurrentBin <= BIN_MING) {
 					fMinSpeed = fMinSpeedFast;
 				}
 			}

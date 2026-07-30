@@ -30,6 +30,8 @@ void FixIndexLapCount() {
 	}
 }
 
+bool bUnlockAllCars = false;
+
 // always unlock all cars in the career garage
 auto IsCarUnlockedOrig = (bool(__cdecl*)(void* a1, uint32_t a2, int a3))nullptr;
 bool IsCarUnlockedFixed(void* a1, uint32_t a2, int a3) {
@@ -37,6 +39,7 @@ bool IsCarUnlockedFixed(void* a1, uint32_t a2, int a3) {
 	if (auto rec = FEPlayerCarDB::GetCarRecordByHandle(cars, a2)) {
 		if (FEPlayerCarDB::GetCareerRecordByHandle(cars, rec->CareerHandle) != nullptr) return true;
 	}
+	if (bUnlockAllCars) return true;
 	return IsCarUnlockedOrig(a1, a2, a3);
 }
 
