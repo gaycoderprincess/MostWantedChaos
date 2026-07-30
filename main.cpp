@@ -245,8 +245,11 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::LateInitHook::aFunctions.push_back([](){
 				NyaHooks::RenderEnvHook::Init();
 				NyaHooks::RenderEnvHook::aPostFunctions.push_back(Render3DLoop);
-				NyaHooks::RenderShadowsHook::Init();
-				NyaHooks::RenderShadowsHook::aPostFunctions.push_back(Render3DLoopShadows);
+
+				if (GetModuleHandleA("X360Stuff.asi")) {
+					NyaHooks::RenderShadowsHook::Init();
+					NyaHooks::RenderShadowsHook::aPostFunctions.push_back(Render3DLoopShadows);
+				}
 
 				if (!GetModuleHandleA("vulkan-1.dll") && !GetModuleHandleA("winevulkan.dll")) {
 					MessageBoxA(nullptr, "WARNING: DXVK is not installed properly! Make sure you've placed d3d9.dll from the mod's archive into the game folder or you WILL encounter stability issues!", "nya?!~", MB_ICONERROR);

@@ -1094,13 +1094,15 @@ namespace SM64 {
 			static CNyaTimer gTimer;
 			gTimer.Process();
 
-			fTimeSinceLastAttacked += gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
+			float gameSpeed = Sim::Internal::mSystem ? Sim::Internal::mSystem->mSpeed : 1.0;
+
+			fTimeSinceLastAttacked += gTimer.fDeltaTime * gameSpeed;
 			if (fTimeSinceLastAttacked > 2.0) {
 				sm64_set_mario_health(marioId, 0x880);
 			}
 
 			float marioDelta = (1.0 / 30.0);
-			marioDelta /= Sim::Internal::mSystem->mSpeed;
+			marioDelta /= gameSpeed;
 			while (gTimer.fTotalTime >= marioDelta) {
 				if (bEnemyEnabled) {
 					DoEnemyMarioControls();

@@ -108,6 +108,9 @@ public:
 	}
 
 	static void DrawPlayerOnMap(IVehicle* ply, bool isPlayer) {
+		if (!ply) return;
+		if (!ply->mCOMObject) return;
+
 		static auto arrow = LoadTexture("CwoeeChaos/data/global/overlay/map_playerarrow.tga");
 		static auto arrowPlayer = LoadTexture("CwoeeChaos/data/global/overlay/map_playerarrow_local.tga");
 
