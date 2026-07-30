@@ -378,6 +378,7 @@ public:
 		sFriendlyName = "Replace Every Texture With OBSOLETE";
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("world_textures");
+		nFrequency = 1; // lowest frequency possible, nobody understands this effect
 	}
 
 	void TickFunction(eChaosHook hook, double delta) override {

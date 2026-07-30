@@ -236,7 +236,9 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
 
-		DoTopDownCamera(pMoverCamera, delta, false);
+		bool flip = false;
+		if (GetEffectRunning("Upside Down Screen")) flip = !flip;
+		DoTopDownCamera(pMoverCamera, delta, flip);
 	}
 	bool HasTimer() override { return true; }
 } E_TopDownCamera;
@@ -252,7 +254,9 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_CAMERA) return;
 
-		DoTopDownCamera(pMoverCamera, delta, true);
+		bool flip = true;
+		if (GetEffectRunning("Upside Down Screen")) flip = !flip;
+		DoTopDownCamera(pMoverCamera, delta, flip);
 	}
 } E_TopDownCamera2;
 

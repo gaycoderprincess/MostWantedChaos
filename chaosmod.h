@@ -391,6 +391,14 @@ void ChaosLoop() {
 			}
 		}
 
+		if (!GetModuleHandleA("X360Stuff.asi")) {
+			static ChaosEffect ActiveEffect("DUMMY", true);
+			if (!ActiveEffect.sName) {
+				ActiveEffect.sName = "Xbox 360 Stuff Pack not found, your experience may not be ideal";
+				AddRunningEffect(&ActiveEffect);
+			}
+		}
+
 		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
 		static auto textureL = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
 		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");

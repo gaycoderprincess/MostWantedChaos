@@ -281,7 +281,7 @@ class Effect_RuthlessCopCross : public EffectBase_PursuitConditional {
 public:
 	Effect_RuthlessCopCross() : EffectBase_PursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "It's Cross";
-		sFriendlyName = "Ruthless Cross Spawns";
+		sFriendlyName = "Ruthless Cop Cross Spawns";
 		fTimerLength = 90;
 		AddToIncompatiblityGroup("coprequest");
 		bIsRehideable = true;

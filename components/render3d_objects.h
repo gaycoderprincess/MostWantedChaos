@@ -544,7 +544,19 @@ namespace Render3DObjects {
 		PerformanceBenchmarker _perf("Render3DObjects::OnTick3D");
 
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
-		if (bDontRenderObjects) return;
+
+		if (bDontRenderObjects) {
+			// specifically only draw vergil
+			for (auto& obj : aObjects) {
+				if (!obj->IsActive()) continue;
+				if (obj->sDebugName != "vergil") continue;
+
+				for (auto& model : obj->aModels) {
+					model->RenderAt(WorldToRenderMatrix(obj->mMatrix), obj->bUseAlpha);
+				}
+			}
+			return;
+		}
 
 		bool isShadow = IsRenderingShadows(Render3D::pViewToDraw);
 		bool isEnvmap = IsRenderingEnvmap(Render3D::pViewToDraw);

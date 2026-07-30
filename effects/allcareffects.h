@@ -568,6 +568,8 @@ public:
 		CarRender_TruncateRotation = false;
 	}
 	bool HasTimer() override { return true; }
+	bool RunWhenBlocked() override { return true; }
+	bool RunInMenus() override { return true; }
 } E_LaggyLookingCars;
 
 class Effect_LaggyLookingCars2 : public ChaosEffect {
