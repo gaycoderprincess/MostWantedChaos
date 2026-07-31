@@ -492,13 +492,15 @@ public:
 	}
 
 	void InitFunction() override {
-		std::vector<int> messages;
-		for (int i = 0; i < 150; i++) {
-			auto message = &GetUserProfile()->TheCareerSettings.SMSMessages[i];
-			if (!message->IsValid()) continue;
-			if (!message->IsVoice()) continue;
-			messages.push_back(i);
-		}
-		SendSMS(messages[rand()%messages.size()], !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued(), false);
+		aMainLoopFunctionsOnce.push_back([](){
+			std::vector<int> messages;
+			for (int i = 0; i < 150; i++) {
+				auto message = &GetUserProfile()->TheCareerSettings.SMSMessages[i];
+				if (!message->IsValid()) continue;
+				if (!message->IsVoice()) continue;
+				messages.push_back(i);
+			}
+			SendSMS(messages[rand()%messages.size()], !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued(), false);
+		});
 	}
 } E_RandomTextMessage;
