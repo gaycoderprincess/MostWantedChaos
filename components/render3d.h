@@ -48,6 +48,19 @@ namespace Render3D {
 	float fSPECULARPOWER = 8.0;
 	float fENVMAPPOWER = 0.15;
 
+	eEffect* pLastUsedEffect = nullptr;
+	void BeginRendering() {
+		pLastUsedEffect = nullptr;
+	}
+
+	void FinalizeRendering() {
+		if (!pLastUsedEffect) return;
+		pLastUsedEffect->End();
+		pLastUsedEffect->hD3DXEffect->EndPass();
+		pLastUsedEffect->hD3DXEffect->End();
+		pLastUsedEffect = nullptr;
+	}
+
 	struct tModel {
 		IDirect3DIndexBuffer9* pIndexBuffer = nullptr;
 		IDirect3DVertexBuffer9* pVertexBuffer = nullptr;
@@ -62,6 +75,9 @@ namespace Render3D {
 		std::vector<int> aIndices;
 
 		void RenderAt(NyaMat4x4 matrix, bool useAlpha = false, int effectId = EEFFECT_WORLD, bool zwrite = true) const {
+#ifdef RENDER3D_NOEFFECT
+			return RenderAt_NoEffect(matrix, useAlpha, zwrite);
+#else
 			if (bInvalidated) return;
 
 			bool isShadow = IsRenderingShadows(pViewToDraw);
@@ -82,28 +98,18 @@ namespace Render3D {
 				effectId = EEFFECT_WORLDNOFOG;
 			}
 
-#ifdef RENDER3D_NOEFFECT
-			g_pd3dDevice->SetPixelShader(nullptr);
-			g_pd3dDevice->SetVertexShader(nullptr);
+			auto effect = eEffectStaticState::pCurrentEffect = eEffects[effectId];
 
-			auto view = pViewToDraw->PlatInfo->ViewMatrix;
-			auto proj = pViewToDraw->PlatInfo->ProjectionMatrix;
-			g_pd3dDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)&view);
-			g_pd3dDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&proj);
-#else
+			if (pLastUsedEffect != effect) {
+				// finish last pass if needed
+				FinalizeRendering();
 
-			eEffectStaticState::pCurrentEffect = eEffects[effectId];
-			auto effect = eEffectStaticState::pCurrentEffect;
-
-			effect->Start();
-
-			//static bool bOnce = true;
-			//if (bOnce) {
-			//	for (int i = 0; i < CParamHashTable::NUM_SHADER_PARAM; i++) {
-			//		WriteLog(std::format("{}: {}", i, effect->mParamTable->mParamMappingTable[i].mName));
-			//	}
-			//	bOnce = false;
-			//}
+				// begin new pass
+				effect->Start();
+				effect->hD3DXEffect->Begin(nullptr, 0);
+				effect->hD3DXEffect->BeginPass(0);
+				pLastUsedEffect = effect;
+			}
 
 			g_pd3dDevice->SetVertexDeclaration(effect->VertexDecl);
 
@@ -164,10 +170,6 @@ namespace Render3D {
 				//}
 			}
 
-			effect->hD3DXEffect->Begin(nullptr, 0);
-			effect->hD3DXEffect->BeginPass(0);
-#endif
-
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
 			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
@@ -195,23 +197,16 @@ namespace Render3D {
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
 
-#ifdef RENDER3D_NOEFFECT
-			g_pd3dDevice->SetTransform(D3DTS_WORLD, (D3DMATRIX*)&matrix);
-			g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-#endif
 			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
 			g_pd3dDevice->SetIndices(pIndexBuffer);
 			//for (int i = 1; i < 8; i++) {
 			//	g_pd3dDevice->SetTexture(i, nullptr);
 			//}
 			g_pd3dDevice->SetTexture(0, pTexture);
+
+			effect->hD3DXEffect->CommitChanges();
+
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
-
-#ifndef RENDER3D_NOEFFECT
-			effect->hD3DXEffect->EndPass();
-			effect->hD3DXEffect->End();
-
-			effect->End();
 #endif
 		}
 
@@ -227,6 +222,9 @@ namespace Render3D {
 			if (isShadow) {
 				return RenderAt(matrix);
 			}
+
+			// finish last pass if needed
+			FinalizeRendering();
 
 			int cullMode = D3DCULL_CW;
 			if (isEnvmap) cullMode = D3DCULL_CCW;

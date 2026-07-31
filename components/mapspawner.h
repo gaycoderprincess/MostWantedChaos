@@ -164,7 +164,7 @@ namespace MapSpawner {
 						"aquatica/aquatica.fbx_Section10_col.fbx",
 						"aquatica/aquatica.fbx_Section11_col.fbx",
 				}),
-		MapData(TEMP_CUSTOMMAP_COORDS, {-4231.55 - TEMP_CUSTOMMAP_COORDS.x, 102.52 - TEMP_CUSTOMMAP_COORDS.y, -4537.59 - TEMP_CUSTOMMAP_COORDS.z}, 1.0, true, "OlympicCity/",
+		MapData(TEMP_CUSTOMMAP_COORDS, {-4231.55 - TEMP_CUSTOMMAP_COORDS.x, 5.0, -4537.59 - TEMP_CUSTOMMAP_COORDS.z}, 1.0, true, "OlympicCity/",
 				{
 						"OlympicCity/01.fbx",
 						"OlympicCity/02.fbx",

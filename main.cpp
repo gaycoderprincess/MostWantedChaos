@@ -149,6 +149,8 @@ void Render3DLoop(eView* view) {
 		return;
 	}
 
+	Render3D::BeginRendering();
+
 	for (auto& func : aDrawing3DLoopFunctions) {
 		func();
 	}
@@ -157,6 +159,8 @@ void Render3DLoop(eView* view) {
 		func();
 	}
 	aDrawing3DLoopFunctionsOnce.clear();
+
+	Render3D::FinalizeRendering();
 
 	state->Apply();
 	state->Release();
