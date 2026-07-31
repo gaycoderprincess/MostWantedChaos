@@ -548,7 +548,7 @@ void ChaosModMenu() {
 		ChloeMenuLib::BeginMenu();
 		QuickValueEditor("bDebugPrintsEnabled", bDebugPrintsEnabled);
 
-		if (DrawMenuOption("Shader Debug")) {
+		if (DrawMenuOption("Car Shader Debug")) {
 			ChloeMenuLib::BeginMenu();
 
 			QuickValueEditor("fDIFFUSEMIN.x", Render3D::fDIFFUSEMIN.x);

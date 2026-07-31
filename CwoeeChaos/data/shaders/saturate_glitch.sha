@@ -1,0 +1,25 @@
+uniform sampler2D pTexture : register(s0);
+float4 reg_timer : register(c1);
+
+struct PS_INPUT {
+	float4 Color : COLOR;
+	float2 UV : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : COLOR {
+	float2 outUV = input.UV;
+	float factor = reg_timer[0];
+	float4 outColor = tex2D(pTexture, outUV) * input.Color;
+	float f = sqrt(outColor.x * outColor.x * 0.299 + outColor.y * outColor.y * 0.587 + outColor.z * outColor.z * 0.114);
+	outColor.x = f + (outColor.x - f) * (1 + (factor * 32));
+	outColor.y = f + (outColor.y - f) * (1 + (factor * 32));
+	outColor.z = f + (outColor.z - f) * (1 + (factor * 32));
+	// letting saturation overflow like this creates an interesting effect
+	while (outColor.x > 1.0) { outColor.x -= 1.0; }
+	while (outColor.y > 1.0) { outColor.y -= 1.0; }
+	while (outColor.z > 1.0) { outColor.z -= 1.0; }
+	while (outColor.x < 0.0) { outColor.x += 1.0; }
+	while (outColor.y < 0.0) { outColor.y += 1.0; }
+	while (outColor.z < 0.0) { outColor.z += 1.0; }
+	return outColor;
+}

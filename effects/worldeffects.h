@@ -246,6 +246,7 @@ public:
 		fTimerLength = 60;
 		AddToIncompatiblityGroup("world_textures");
 		bEpilepsyWarning = true;
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -255,6 +256,9 @@ public:
 		NyaHookLib::Patch<uint64_t>(0x6E05DB, 0x8B0000010491FF50);
 	}
 	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		return !GetModuleHandleA("X360Stuff.asi");
+	}
 } E_BreakTextures;
 
 class Effect_RainbowRoad : public ChaosEffect {

@@ -13,7 +13,7 @@ public:
 	};
 	
 	void InitFunction() override {
-		if (!pShader) {
+		if (!pShader || (IsKeyPressed(VK_CONTROL) && IsKeyJustPressed('L'))) { // debug reload key
 			auto path = std::format("CwoeeChaos/data/shaders/{}.sha", sFileName);
 			if (!std::filesystem::exists(path)) {
 				MessageBoxA(nullptr, std::format("Failed to find shader {}", path).c_str(), "nya?!~", MB_ICONERROR);
@@ -38,6 +38,10 @@ public:
 		}
 	}
 	void TickFunctionMain(double delta) override {
+		if (IsKeyPressed(VK_CONTROL) && IsKeyJustPressed('L')) { // debug reload key
+			InitFunction();
+		}
+
 		if (!pShader) return;
 		aShadersToDraw.push_back(pShader);
 		if (bEasedTimer) bShaderTimerEase1 = true;
@@ -210,6 +214,15 @@ public:
 	}
 } E_ShaderSaturate;
 
+class Effect_ShaderSaturate2 : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderSaturate2() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
+		sName = "Glitchy Visuals";
+		fTimerLength = 60;
+		sFileName = "saturate_glitch";
+	}
+} E_ShaderSaturate2;
+
 class Effect_ShaderBlur : public EffectBase_ScreenShader {
 public:
 	Effect_ShaderBlur() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
@@ -229,3 +242,12 @@ public:
 		sFileName = "drunk";
 	}
 } E_ShaderBlur2;
+
+class Effect_ShaderArc : public EffectBase_ScreenShader {
+public:
+	Effect_ShaderArc() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {
+		sName = "Curved Screen";
+		fTimerLength = 60;
+		sFileName = "arc";
+	}
+} E_ShaderArc;
