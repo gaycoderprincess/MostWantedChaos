@@ -249,16 +249,26 @@ public:
 		bAbortOnConditionFailed = true;
 	}
 
+	static inline uint64_t nBackup360Stuff = 0;
+
 	void InitFunction() override {
-		NyaHookLib::Patch<uint64_t>(0x6E05DB, 0x8B90909090909090);
+		if (nBackup360Stuff || *(uint8_t*)0x6E0566 == 0xE8) {
+			nBackup360Stuff = *(uint64_t*)0x6E0566;
+			NyaHookLib::Patch<uint64_t>(0x6E0566, 0x9090909090909090);
+		}
+		else {
+			NyaHookLib::Patch<uint64_t>(0x6E05DB, 0x8B90909090909090);
+		}
 	}
 	void DeinitFunction() override {
-		NyaHookLib::Patch<uint64_t>(0x6E05DB, 0x8B0000010491FF50);
+		if (nBackup360Stuff) {
+			NyaHookLib::Patch<uint64_t>(0x6E0566, nBackup360Stuff);
+		}
+		else {
+			NyaHookLib::Patch<uint64_t>(0x6E05DB, 0x8B0000010491FF50);
+		}
 	}
 	bool HasTimer() override { return true; }
-	bool IsAvailable() override {
-		return !GetModuleHandleA("X360Stuff.asi");
-	}
 } E_BreakTextures;
 
 class Effect_RainbowRoad : public ChaosEffect {

@@ -11,6 +11,7 @@ public:
 		int i = rand() % cars.size();
 		auto racer = cars[i];
 		std::string carName = cars[i]->GetVehicleName();
+		std::transform(carName.begin(), carName.end(), carName.begin(), [](unsigned char c){ return std::toupper(c); });
 		if (racer == GetLocalPlayerVehicle()) {
 			Achievements::AwardAchievement(GetAchievement("DESTROY_RANDOM_PLAYER"));
 			carName = GetUserProfile()->m_aProfileName;
