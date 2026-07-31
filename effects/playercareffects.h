@@ -851,10 +851,14 @@ public:
 		fTimerLength = 15;
 	}
 
+	InputControls gInputs;
+
+	void InitFunction() override {
+		gInputs = *gCustomPlayerInput;
+	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_INPUT) return;
-
-		memset(gCustomPlayerInput, 0, sizeof(*gCustomPlayerInput));
+		*gCustomPlayerInput = gInputs;
 	}
 	bool HasTimer() override { return true; }
 } E_NoInput;

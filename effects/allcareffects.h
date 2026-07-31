@@ -10,10 +10,17 @@ public:
 		auto cars = GetActiveVehicles();
 		int i = rand() % cars.size();
 		auto racer = cars[i];
+		std::string carName = cars[i]->GetVehicleName();
 		if (racer == GetLocalPlayerVehicle()) {
 			Achievements::AwardAchievement(GetAchievement("DESTROY_RANDOM_PLAYER"));
+			carName = GetUserProfile()->m_aProfileName;
+		}
+		else if (auto racerInfo = GRaceStatus::fObj->GetRacerInfo(cars[i]->GetSimable())) {
+			carName = racerInfo->mName;
 		}
 		DestroyCar(racer);
+
+		EffectInstance->sNameToDisplay = std::format("Destroy Random Car ({})", carName);
 	}
 } E_DestroyRandomCar;
 

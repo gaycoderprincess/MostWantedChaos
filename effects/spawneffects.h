@@ -351,7 +351,7 @@ public:
 class Effect_ReVoltBomb : public ChaosEffect {
 public:
 	Effect_ReVoltBomb() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Spawn Bomb Behind Player";
+		sName = "Spawn Landmine Behind Player";
 		bCanQuickTrigger = false;
 	}
 

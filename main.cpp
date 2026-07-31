@@ -248,6 +248,10 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				NyaHooks::RenderShadowsHook::Init();
 				NyaHooks::RenderShadowsHook::aPostFunctions.push_back(Render3DLoopShadows);
 
+				// get rid of exopts stuff that could mess with the mod in bad ways
+				NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x663EE8, 0x64B380); // remove exopts loop, disables hotkeys
+				UnlockAllThings = false;
+
 				if (!GetModuleHandleA("vulkan-1.dll") && !GetModuleHandleA("winevulkan.dll")) {
 					MessageBoxA(nullptr, "WARNING: DXVK is not installed properly! Make sure you've placed d3d9.dll from the mod's archive into the game folder or you WILL encounter stability issues!", "nya?!~", MB_ICONERROR);
 				}
