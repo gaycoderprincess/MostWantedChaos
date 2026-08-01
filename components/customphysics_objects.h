@@ -303,6 +303,8 @@ namespace CustomPhysicsObjects {
 		while (PurgeOutOfWorld()) {}
 		while (PurgeByRange()) {}
 
+		AddLogPopup(std::format("{} physics objects", aPhysicsObjects.size()));
+
 		for (auto& pObj : aPhysicsObjects) {
 			auto& obj = *pObj;
 			obj.fTimeSinceSpawned += gTimer.fDeltaTime;

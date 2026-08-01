@@ -48,9 +48,19 @@ namespace Render3D {
 	float fSPECULARPOWER = 8.0;
 	float fENVMAPPOWER = 0.15;
 
+	int LAST_D3DRS[210];
+	void SetRenderState_Fast(D3DRENDERSTATETYPE type, DWORD value) {
+		if (LAST_D3DRS[type] == value) return;
+		g_pd3dDevice->SetRenderState(type, value);
+		LAST_D3DRS[type] = value;
+	}
+
 	eEffect* pLastUsedEffect = nullptr;
 	void BeginRendering() {
 		pLastUsedEffect = nullptr;
+		for (auto& i : LAST_D3DRS) {
+			i = 0xCDCDCDCD;
+		}
 	}
 
 	void FinalizeRendering() {
@@ -158,6 +168,21 @@ namespace Render3D {
 					//	effect->hD3DXEffect->SetInt(g_bDoCarShadowMap, 1);
 					//}
 				}
+
+				SetRenderState_Fast(D3DRS_ZENABLE, TRUE);
+				SetRenderState_Fast(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				SetRenderState_Fast(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+				g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+				g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+				g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+				//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+				//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+				//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+
+				g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+				g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+				g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
 			}
 
 			g_pd3dDevice->SetVertexDeclaration(effect->VertexDecl);
@@ -170,32 +195,18 @@ namespace Render3D {
 			matrixTempSecond = !matrixTempSecond;
 			ParticleSetTransform(pMatrix, pViewToDraw->ID);
 
-			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
+			SetRenderState_Fast(D3DRS_ZWRITEENABLE, zwrite);
+			SetRenderState_Fast(D3DRS_CULLMODE, cullMode);
 			if (useAlpha) {
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 1);
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+				SetRenderState_Fast(D3DRS_ALPHAREF, 1);
+				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, TRUE);
+				SetRenderState_Fast(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 			}
 			else {
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, 0);
+				SetRenderState_Fast(D3DRS_ALPHAREF, 0);
 			}
-			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, useAlpha);
-			g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-			//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-
-			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
-			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+			SetRenderState_Fast(D3DRS_ALPHABLENDENABLE, useAlpha);
 
 			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
 			g_pd3dDevice->SetIndices(pIndexBuffer);
@@ -238,21 +249,21 @@ namespace Render3D {
 			g_pd3dDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)&view);
 			g_pd3dDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&proj);
 
-			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, useZ);
-			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
-			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
+			SetRenderState_Fast(D3DRS_ZENABLE, useZ);
+			SetRenderState_Fast(D3DRS_ZWRITEENABLE, zwrite);
+			SetRenderState_Fast(D3DRS_CULLMODE, cullMode);
 			if (useAlpha) {
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 127);
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+				SetRenderState_Fast(D3DRS_ALPHAREF, 127);
+				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, TRUE);
+				SetRenderState_Fast(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 			}
 			else {
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, 0);
+				SetRenderState_Fast(D3DRS_ALPHAREF, 0);
 			}
-			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, useAlpha);
-			g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			SetRenderState_Fast(D3DRS_ALPHABLENDENABLE, useAlpha);
+			SetRenderState_Fast(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+			SetRenderState_Fast(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, bNoEffect_ReadVertexColor ? D3DTOP_MODULATE : D3DTOP_SELECTARG1);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);

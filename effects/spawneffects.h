@@ -106,7 +106,7 @@ public:
 		auto id = Render3DObjects::aObjects.size();
 		aTeddiesInWorld.push_back(id);
 		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("teddie", models, mat, colPos, colScale));
-		Render3DObjects::aObjects[id]->fColHeight = 2.0;
+		Render3DObjects::aObjects[id]->fColHeight = 3.0;
 	}
 
 	void InitFunction() override {
