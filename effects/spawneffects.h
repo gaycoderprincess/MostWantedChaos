@@ -1641,6 +1641,10 @@ public:
 	}
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		// dont spawn stuff into the void permanently
+		float y;
+		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&pos, &y, nullptr)) return;
+
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
@@ -1755,6 +1759,10 @@ public:
 	}
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		// dont spawn stuff into the void permanently
+		float y;
+		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&pos, &y, nullptr)) return;
+
 		static auto mdl = Render3D::CreateModels("abcblock.fbx");
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
