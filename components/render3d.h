@@ -57,7 +57,7 @@ namespace Render3D {
 		pLastUsedTexture = (IDirect3DTexture9*)0xCDCDCDCD;
 		pLastUsedVBuffer = (IDirect3DVertexBuffer9*)0xCDCDCDCD;
 		pLastUsedIBuffer = (IDirect3DIndexBuffer9*)0xCDCDCDCD;
-		*(uint32_t*)0x982CB4 = 0; // set last texture to null
+		*(uint32_t*)0x982CB4 = 0; // set last texture to null, fixes sky
 	}
 
 	void FinalizeRendering() {
@@ -78,7 +78,11 @@ namespace Render3D {
 	};
 	tRenderProperties LastRenderProperties;
 	bool ShouldRefreshRenderProperties(bool useAlpha, int effectId, bool zwrite, int cullMode) {
-		auto newProp = tRenderProperties{useAlpha, effectId, zwrite, cullMode};
+		auto newProp = tRenderProperties();
+		newProp.useAlpha = useAlpha;
+		newProp.effectId = effectId;
+		newProp.zwrite = zwrite;
+		newProp.cullMode = cullMode;
 		if (!memcmp(&LastRenderProperties, &newProp, sizeof(LastRenderProperties))) return false;
 		LastRenderProperties = newProp;
 		return true;
@@ -216,8 +220,8 @@ namespace Render3D {
 
 				int blendState[5] = {};
 				if (useAlpha) {
-					blendState[1] = 1; // D3DRS_ALPHAREF
 					blendState[0] = TRUE; // D3DRS_ALPHATESTENABLE
+					blendState[1] = 1; // D3DRS_ALPHAREF
 					g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 				}
 				else {
@@ -249,6 +253,9 @@ namespace Render3D {
 			//}
 			if (pLastUsedTexture != pTexture) {
 				effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::DiffuseMap].mHandle, pTexture);
+				if (effectId == EEFFECT_CAR) {
+					effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::NormalMapTexture].mHandle, pTexture);
+				}
 				pLastUsedTexture = pTexture;
 			}
 			effect->hD3DXEffect->CommitChanges();
@@ -277,7 +284,7 @@ namespace Render3D {
 			if (isEnvmap) cullMode = D3DCULL_CCW;
 			if (bForceNoCulling) cullMode = D3DCULL_NONE;
 
-			ShouldRefreshRenderProperties(useAlpha, useZ, zwrite, cullMode);
+			ShouldRefreshRenderProperties(useAlpha, (int)useZ + 64, zwrite, cullMode);
 
 			g_pd3dDevice->SetPixelShader(nullptr);
 			g_pd3dDevice->SetVertexShader(nullptr);

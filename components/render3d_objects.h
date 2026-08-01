@@ -595,7 +595,7 @@ namespace Render3DObjects {
 		}
 		if (isEnvmap) {
 			renderDist = 50.0;
-			visTimerRefresh = 0.5;
+			visTimerRefresh = 0.25;
 		}
 		if (isRVM) {
 			renderDist = 50.0;
