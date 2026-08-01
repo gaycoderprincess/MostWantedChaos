@@ -109,6 +109,55 @@ namespace Render3D {
 				effect->hD3DXEffect->Begin(nullptr, 0);
 				effect->hD3DXEffect->BeginPass(0);
 				pLastUsedEffect = effect;
+
+				D3DXVECTOR4 textureOffset = {0,0,0,0};
+				effect->hD3DXEffect->SetMatrix(effect->mParamTable->mParamMappingTable[CParamHashTable::TEXTUREOFFSETMATRIX].mHandle, (D3DXMATRIX*)&UMath::Matrix4::kIdentity);
+				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::TEXTUREOFFSET].mHandle, &textureOffset);
+
+				// desperate attempts to make stuff not carry over from the last drawn car (which is almost always traffic)
+				if (effectId == EEFFECT_CAR) {
+					// for all effects, game sets:
+					// DIFFUSEMIN vector
+					// DIFFUSERANGE vector
+
+					// if car, the game sets:
+					// SPECULARMIN vector
+					// SPECULARRANGE vector
+					// ENVMAPMIN vector
+					// ENVMAPANGE vector
+					// SPECULARPOWER float
+					// ENVMAPPOWER float
+
+					effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARPOWER].mHandle, fSPECULARPOWER);
+					effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPPOWER].mHandle, fENVMAPPOWER);
+
+					D3DXVECTOR4 v = fDIFFUSEMIN;
+					effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSEMIN].mHandle, &v);
+					v = fDIFFUSERANGE;
+					effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSERANGE].mHandle, &v);
+					v = fSPECULARMIN;
+					effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARMIN].mHandle, &v);
+					v = fSPECULARRANGE;
+					effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARRANGE].mHandle, &v);
+
+					v = fENVMAPMIN;
+					effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPMIN].mHandle, &v);
+					v = fENVMAPANGE;
+					effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPANGE].mHandle, &v);
+
+					//static D3DXHANDLE SpecularHotSpot = effect->hD3DXEffect->GetParameterByName(0, "SpecularHotSpot");
+					//if (SpecularHotSpot) {
+					//	effect->hD3DXEffect->SetFloat(SpecularHotSpot, 1.0);
+					//}
+					//static D3DXHANDLE Desaturation = effect->hD3DXEffect->GetParameterByName(0, "Desaturation");
+					//if (Desaturation) {
+					//	effect->hD3DXEffect->SetFloat(Desaturation, 0.0);
+					//}
+					//static D3DXHANDLE g_bDoCarShadowMap = effect->hD3DXEffect->GetParameterByName(0, "g_bDoCarShadowMap");
+					//if (g_bDoCarShadowMap) {
+					//	effect->hD3DXEffect->SetInt(g_bDoCarShadowMap, 1);
+					//}
+				}
 			}
 
 			g_pd3dDevice->SetVertexDeclaration(effect->VertexDecl);
@@ -120,55 +169,6 @@ namespace Render3D {
 			*pMatrix = (UMath::Matrix4)matrix;
 			matrixTempSecond = !matrixTempSecond;
 			ParticleSetTransform(pMatrix, pViewToDraw->ID);
-
-			D3DXVECTOR4 textureOffset = {0,0,0,0};
-			effect->hD3DXEffect->SetMatrix(effect->mParamTable->mParamMappingTable[CParamHashTable::TEXTUREOFFSETMATRIX].mHandle, (D3DXMATRIX*)&UMath::Matrix4::kIdentity);
-			effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::TEXTUREOFFSET].mHandle, &textureOffset);
-
-			// desperate attempts to make stuff not carry over from the last drawn car (which is almost always traffic)
-			if (effectId == EEFFECT_CAR) {
-				// for all effects, game sets:
-				// DIFFUSEMIN vector
-				// DIFFUSERANGE vector
-
-				// if car, the game sets:
-				// SPECULARMIN vector
-				// SPECULARRANGE vector
-				// ENVMAPMIN vector
-				// ENVMAPANGE vector
-				// SPECULARPOWER float
-				// ENVMAPPOWER float
-
-				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARPOWER].mHandle, fSPECULARPOWER);
-				effect->hD3DXEffect->SetFloat(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPPOWER].mHandle, fENVMAPPOWER);
-
-				D3DXVECTOR4 v = fDIFFUSEMIN;
-				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSEMIN].mHandle, &v);
-				v = fDIFFUSERANGE;
-				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::DIFFUSERANGE].mHandle, &v);
-				v = fSPECULARMIN;
-				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARMIN].mHandle, &v);
-				v = fSPECULARRANGE;
-				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARRANGE].mHandle, &v);
-
-				v = fENVMAPMIN;
-				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPMIN].mHandle, &v);
-				v = fENVMAPANGE;
-				effect->hD3DXEffect->SetVector(effect->mParamTable->mParamMappingTable[CParamHashTable::ENVMAPANGE].mHandle, &v);
-
-				//static D3DXHANDLE SpecularHotSpot = effect->hD3DXEffect->GetParameterByName(0, "SpecularHotSpot");
-				//if (SpecularHotSpot) {
-				//	effect->hD3DXEffect->SetFloat(SpecularHotSpot, 1.0);
-				//}
-				//static D3DXHANDLE Desaturation = effect->hD3DXEffect->GetParameterByName(0, "Desaturation");
-				//if (Desaturation) {
-				//	effect->hD3DXEffect->SetFloat(Desaturation, 0.0);
-				//}
-				//static D3DXHANDLE g_bDoCarShadowMap = effect->hD3DXEffect->GetParameterByName(0, "g_bDoCarShadowMap");
-				//if (g_bDoCarShadowMap) {
-				//	effect->hD3DXEffect->SetInt(g_bDoCarShadowMap, 1);
-				//}
-			}
 
 			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);

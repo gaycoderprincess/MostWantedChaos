@@ -230,6 +230,7 @@ namespace Render3DObjects {
 		NyaMat4x4 mMatrix = UMath::Matrix4::kIdentity;
 		NyaVec3 vColPosition = UMath::Vector3::kZero;
 		float fColSize = 1;
+		float fColHeight = 1;
 		void(*pTickFunction)(Object*, double) = nullptr;
 		void* CustomData = nullptr;
 		bool bTriCollidable = false;
@@ -476,13 +477,14 @@ namespace Render3DObjects {
 			Barriers.push_back(CustomBarrier(NyaVec3(v1), NyaVec3(v4)));
 
 			for (auto& barrier : Barriers) {
-				barrier.data.fPts[0].y = vColPosition.y - (fColSize * 0.5);
-				barrier.data.fPts[1].y = vColPosition.y + (fColSize * 0.5);
+				barrier.data.fPts[0].y = vColPosition.y - (fColHeight * 0.5);
+				barrier.data.fPts[1].y = vColPosition.y + (fColHeight * 0.5);
 			}
 		}
 
 		Object(const std::string& debugName, std::vector<Render3D::tModel*> models, NyaMat4x4 matrix, NyaVec3 colPosition = {0,0,0}, float collisionSize = 0, void(*tickFunction)(Object*, double) = nullptr) : sDebugName(debugName), aModels(models), mMatrix(matrix), vColPosition(colPosition), fColSize(collisionSize), pTickFunction(tickFunction) {
 			CalculateRadius();
+			fColHeight = fColSize;
 		}
 
 		bool IsActive() {

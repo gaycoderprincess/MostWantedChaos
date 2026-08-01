@@ -103,8 +103,10 @@ public:
 			models = Render3D::CreateModels("teddie.fbx");
 		}
 
-		aTeddiesInWorld.push_back(Render3DObjects::aObjects.size());
+		auto id = Render3DObjects::aObjects.size();
+		aTeddiesInWorld.push_back(id);
 		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("teddie", models, mat, colPos, colScale));
+		Render3DObjects::aObjects[id]->fColHeight = 2.0;
 	}
 
 	void InitFunction() override {
@@ -322,6 +324,7 @@ public:
 		aObjectsInWorld.push_back(id);
 		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("8down", models, mat, colPos, colScale));
 		//Render3DObjects::aObjects[id]->bTriCollidable = true;
+		Render3DObjects::aObjects[id]->fColHeight = 2.0;
 	}
 
 	void InitFunction() override {

@@ -934,16 +934,15 @@ public:
 	char sName[64];
 	CNyaTimer nTimer;
 
-	PerformanceBenchmarker(const char* name) {
+	PerformanceBenchmarker(const std::string& name) {
 		nTimer.Process();
-		strcpy_s(sName, 64, name);
+		strcpy_s(sName, 64, name.c_str());
 	}
 
 	~PerformanceBenchmarker() {
 		nTimer.Process();
 
 		uint64_t ms = nTimer.nDeltaTimeMicroseconds;
-		//WriteLog(std::format("{} took {}ms", name, ms));
 
 		for (auto& result : aPerformanceBenchmarkResults) {
 			if (!strcmp(sName, result.name)) {
@@ -993,3 +992,20 @@ auto LoadAudioFile_SetDir(const std::string& path) {
 	DLLDirSetter _setdir;
 	return NyaAudio::LoadFile(path);
 }
+
+template<uintptr_t addr>
+class VanillaPerformanceHook {
+public:
+	static inline std::string sName;
+
+	static inline auto OrigFunction = (void(*)())nullptr;
+	static void __thiscall HookedFunction() {
+		PerformanceBenchmarker _perf(sName);
+		OrigFunction();
+	}
+
+	VanillaPerformanceHook(const std::string& name) {
+		OrigFunction = (void(*)())NyaHookLib::PatchRelative(NyaHookLib::CALL, addr, &HookedFunction);
+		sName = name;
+	}
+};
