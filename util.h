@@ -905,7 +905,7 @@ bool GetWorldHeightAtPoint_WithCustom(const UMath::Vector3* pt, float* height, U
 }
 
 bool IsRenderingShadows(eView* view) {
-	return view->ID == EVIEW_SHADOWMATTE;
+	return view->ID == EVIEW_SHADOWMAP1 || view->ID == EVIEW_SHADOWMATTE;
 }
 
 bool IsRenderingEnvmap(eView* view) {
@@ -925,8 +925,7 @@ bool IsRenderingRVM(eView* view) {
 }
 
 bool IsRenderingMainView(eView* view) {
-	if (view->ID == EVIEW_PLAYER1) return true;
-	return false;
+	return view->ID == EVIEW_PLAYER1;
 }
 
 class PerformanceBenchmarker {

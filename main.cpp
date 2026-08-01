@@ -165,7 +165,7 @@ void Render3DLoopMain() {
 }
 
 void Render3DLoopShadows() {
-	Render3DLoop(&eViews[EVIEW_SHADOWMATTE]);
+	Render3DLoop(&eViews[EVIEW_SHADOWMAP1]);
 }
 
 void ExecuteRenderData_WithHooks() {

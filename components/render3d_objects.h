@@ -251,6 +251,8 @@ namespace Render3DObjects {
 		NyaVec3 vAABBMin;
 		NyaVec3 vAABBMax;
 
+		bool bVisibleInView[NUM_EVIEWS] = {};
+
 		// skip tris that are flipped or sideways, these will become barriers
 		bool ShouldTriBeBarrier(const WCollisionTri& tri) {
 			auto faceNormal = (tri.fPt1 - tri.fPt0).Cross(tri.fPt2 - tri.fPt0);
@@ -495,6 +497,24 @@ namespace Render3DObjects {
 			return aModels.empty();
 		}
 
+		bool IsVisibleInView(UMath::Vector3 camPos, float renderDist) {
+			auto dist = (mMatrix.p - camPos).length();
+			auto radius = fRadius * mMatrix.x.length();
+			if (dist > (radius * 2) + renderDist) return false;
+
+			auto mat = WorldToRenderMatrix(mMatrix);
+			if (!eView::GetVisibleState(Render3D::pViewToDraw, (bVector3*)&vAABBMin, (bVector3*)&vAABBMax, (bMatrix4*)&mat)) return false;
+			return true;
+		}
+
+		void Render() {
+			if (bNoBackfaceCulling) { Render3D::bForceNoCulling = true; }
+			for (auto& model : aModels) {
+				model->RenderAt(WorldToRenderMatrix(mMatrix), bUseAlpha);
+			}
+			if (bNoBackfaceCulling) { Render3D::bForceNoCulling = false; }
+		}
+
 		void Destroy(bool deleteModels) {
 			for (auto& col : CollisionInstances) {
 				Render3DObjects::DeRegisterCustomCollisionInstance(col);
@@ -542,6 +562,7 @@ namespace Render3DObjects {
 		}
 	}
 
+	double fVisibilityTimer[NUM_EVIEWS] = {};
 	void OnTick3D() {
 		PerformanceBenchmarker _perf("Render3DObjects::OnTick3D");
 
@@ -551,40 +572,59 @@ namespace Render3DObjects {
 			// specifically only draw vergil
 			for (auto& obj : aObjects) {
 				if (!obj->IsActive()) continue;
+				if (obj->bDontRender) continue;
 				if (obj->sDebugName != "vergil") continue;
-
-				for (auto& model : obj->aModels) {
-					model->RenderAt(WorldToRenderMatrix(obj->mMatrix), obj->bUseAlpha);
-				}
+				obj->Render();
 			}
 			return;
 		}
 
+		static CNyaTimer gTimer[NUM_EVIEWS] = {};
+
+		int viewId = Render3D::pViewToDraw->ID;
+
 		bool isShadow = IsRenderingShadows(Render3D::pViewToDraw);
 		bool isEnvmap = IsRenderingEnvmap(Render3D::pViewToDraw);
+		bool isRVM = IsRenderingRVM(Render3D::pViewToDraw);
+
+		float renderDist = 250.0;
+		float visTimerRefresh = 0.033;
+		if (isShadow) {
+			renderDist = 150.0;
+			visTimerRefresh = 0.25;
+		}
+		if (isEnvmap) {
+			renderDist = 50.0;
+			visTimerRefresh = 0.5;
+		}
+		if (isRVM) {
+			renderDist = 50.0;
+			visTimerRefresh = 0.033;
+		}
+
+		auto& timer = gTimer[viewId];
+		timer.Process();
+		fVisibilityTimer[viewId] += timer.fDeltaTime;
+
+		bool recalculateVisibility = false;
+		while (fVisibilityTimer[viewId] > visTimerRefresh) {
+			fVisibilityTimer[viewId] -= visTimerRefresh;
+			recalculateVisibility = true;
+		}
 
 		auto camPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
-		float renderDist = 250.0;
-		if (isShadow) renderDist = 150.0;
-		if (isEnvmap) renderDist = 50.0;
 		for (auto& obj : aObjects) {
 			if (!obj->IsActive()) continue;
 			if (obj->bDontRender) continue;
 			if (obj->bNoShadowCasting && isShadow) continue;
 			if (obj->bNoEnvmap && isEnvmap) continue;
 
-			auto dist = (obj->mMatrix.p - camPos).length();
-			auto radius = obj->fRadius * obj->mMatrix.x.length();
-			if (dist > (radius * 2) + renderDist) continue;
-
-			auto mat = WorldToRenderMatrix(obj->mMatrix);
-			if (!eView::GetVisibleState(Render3D::pViewToDraw, (bVector3*)&obj->vAABBMin, (bVector3*)&obj->vAABBMax, (bMatrix4*)&mat)) continue;
-
-			if (obj->bNoBackfaceCulling) { Render3D::bForceNoCulling = true; }
-			for (auto& model : obj->aModels) {
-				model->RenderAt(mat, obj->bUseAlpha);
+			if (recalculateVisibility) {
+				obj->bVisibleInView[viewId] = obj->IsVisibleInView(camPos, renderDist);
 			}
-			if (obj->bNoBackfaceCulling) { Render3D::bForceNoCulling = false; }
+
+			if (!obj->bVisibleInView[viewId]) continue;
+			obj->Render();
 		}
 	}
 

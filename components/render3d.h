@@ -170,8 +170,6 @@ namespace Render3D {
 				}
 
 				SetRenderState_Fast(D3DRS_ZENABLE, TRUE);
-				SetRenderState_Fast(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-				SetRenderState_Fast(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 				g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 				g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -195,26 +193,30 @@ namespace Render3D {
 			matrixTempSecond = !matrixTempSecond;
 			ParticleSetTransform(pMatrix, pViewToDraw->ID);
 
+			effect->hD3DXEffect->SetInt(effect->mParamTable->mParamMappingTable[CParamHashTable::CULL_MODE].mHandle, cullMode);
+
 			SetRenderState_Fast(D3DRS_ZWRITEENABLE, zwrite);
-			SetRenderState_Fast(D3DRS_CULLMODE, cullMode);
+			int blendState[5] = {};
 			if (useAlpha) {
-				SetRenderState_Fast(D3DRS_ALPHAREF, 1);
-				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, TRUE);
+				blendState[1] = 1; // D3DRS_ALPHAREF
+				blendState[0] = TRUE; // D3DRS_ALPHATESTENABLE
 				SetRenderState_Fast(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 			}
 			else {
-				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, 0);
-				SetRenderState_Fast(D3DRS_ALPHAREF, 0);
+				blendState[0] = 0; // D3DRS_ALPHATESTENABLE
+				blendState[1] = 0; // D3DRS_ALPHAREF
 			}
-			SetRenderState_Fast(D3DRS_ALPHABLENDENABLE, useAlpha);
+			blendState[2] = useAlpha; // D3DRS_ALPHABLENDENABLE
+			blendState[3] = D3DBLEND_SRCALPHA; // D3DRS_SRCBLEND
+			blendState[4] = D3DBLEND_INVSRCALPHA; // D3DRS_DESTBLEND
+			effect->hD3DXEffect->SetIntArray(effect->mParamTable->mParamMappingTable[CParamHashTable::BLENDSTATE].mHandle, blendState, 5);
 
 			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
 			g_pd3dDevice->SetIndices(pIndexBuffer);
 			//for (int i = 1; i < 8; i++) {
 			//	g_pd3dDevice->SetTexture(i, nullptr);
 			//}
-			g_pd3dDevice->SetTexture(0, pTexture);
-
+			effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::DiffuseMap].mHandle, pTexture);
 			effect->hD3DXEffect->CommitChanges();
 
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
