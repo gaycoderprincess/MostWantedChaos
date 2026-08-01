@@ -302,6 +302,8 @@ public:
 
 	void Render(IVehicle* parentCar) {
 		if (!DrawCars) return;
+		// dont render custom cars in the mirror as they clip through
+		// dont render custom cars in shadows as cars aren't supposed to self shadow
 		if (Render3D::pViewToDraw->ID != EVIEW_PLAYER1) return;
 
 		Load();

@@ -48,19 +48,16 @@ namespace Render3D {
 	float fSPECULARPOWER = 8.0;
 	float fENVMAPPOWER = 0.15;
 
-	int LAST_D3DRS[210];
-	void SetRenderState_Fast(D3DRENDERSTATETYPE type, DWORD value) {
-		if (LAST_D3DRS[type] == value) return;
-		g_pd3dDevice->SetRenderState(type, value);
-		LAST_D3DRS[type] = value;
-	}
-
 	eEffect* pLastUsedEffect = nullptr;
+	IDirect3DTexture9* pLastUsedTexture = nullptr;
+	IDirect3DVertexBuffer9* pLastUsedVBuffer = nullptr;
+	IDirect3DIndexBuffer9* pLastUsedIBuffer = nullptr;
 	void BeginRendering() {
 		pLastUsedEffect = nullptr;
-		for (auto& i : LAST_D3DRS) {
-			i = 0xCDCDCDCD;
-		}
+		pLastUsedTexture = (IDirect3DTexture9*)0xCDCDCDCD;
+		pLastUsedVBuffer = (IDirect3DVertexBuffer9*)0xCDCDCDCD;
+		pLastUsedIBuffer = (IDirect3DIndexBuffer9*)0xCDCDCDCD;
+		*(uint32_t*)0x982CB4 = 0; // set last texture to null
 	}
 
 	void FinalizeRendering() {
@@ -69,6 +66,22 @@ namespace Render3D {
 		pLastUsedEffect->hD3DXEffect->EndPass();
 		pLastUsedEffect->hD3DXEffect->End();
 		pLastUsedEffect = nullptr;
+		pLastUsedTexture = (IDirect3DTexture9*)0xCDCDCDCD;
+	}
+
+	struct tRenderProperties {
+		bool useAlpha;
+		int effectId;
+		bool zwrite;
+		int cullMode;
+		bool noeffect_vertexColor = bNoEffect_ReadVertexColor;
+	};
+	tRenderProperties LastRenderProperties;
+	bool ShouldRefreshRenderProperties(bool useAlpha, int effectId, bool zwrite, int cullMode) {
+		auto newProp = tRenderProperties{useAlpha, effectId, zwrite, cullMode};
+		if (!memcmp(&LastRenderProperties, &newProp, sizeof(LastRenderProperties))) return false;
+		LastRenderProperties = newProp;
+		return true;
 	}
 
 	struct tModel {
@@ -105,12 +118,16 @@ namespace Render3D {
 			if (bForceNoCulling) cullMode = D3DCULL_NONE;
 
 			if (isShadow) {
-				effectId = EEFFECT_WORLDNOFOG;
+				effectId = effectId == EEFFECT_CAR ? EEFFECT_CARSHADOWMAP : EEFFECT_WORLDNOFOG;
 			}
+
+			bool shouldRefresh = ShouldRefreshRenderProperties(useAlpha, effectId, zwrite, cullMode);
 
 			auto effect = eEffectStaticState::pCurrentEffect = eEffects[effectId];
 
 			if (pLastUsedEffect != effect) {
+				shouldRefresh = true;
+
 				// finish last pass if needed
 				FinalizeRendering();
 
@@ -169,7 +186,7 @@ namespace Render3D {
 					//}
 				}
 
-				SetRenderState_Fast(D3DRS_ZENABLE, TRUE);
+				g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 
 				g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 				g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -193,30 +210,47 @@ namespace Render3D {
 			matrixTempSecond = !matrixTempSecond;
 			ParticleSetTransform(pMatrix, pViewToDraw->ID);
 
-			effect->hD3DXEffect->SetInt(effect->mParamTable->mParamMappingTable[CParamHashTable::CULL_MODE].mHandle, cullMode);
+			if (shouldRefresh) {
+				effect->hD3DXEffect->SetInt(effect->mParamTable->mParamMappingTable[CParamHashTable::CULL_MODE].mHandle, cullMode);
+				g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
 
-			SetRenderState_Fast(D3DRS_ZWRITEENABLE, zwrite);
-			int blendState[5] = {};
-			if (useAlpha) {
-				blendState[1] = 1; // D3DRS_ALPHAREF
-				blendState[0] = TRUE; // D3DRS_ALPHATESTENABLE
-				SetRenderState_Fast(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+				int blendState[5] = {};
+				if (useAlpha) {
+					blendState[1] = 1; // D3DRS_ALPHAREF
+					blendState[0] = TRUE; // D3DRS_ALPHATESTENABLE
+					g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+				}
+				else {
+					blendState[0] = 0; // D3DRS_ALPHATESTENABLE
+					blendState[1] = 0; // D3DRS_ALPHAREF
+				}
+				blendState[2] = useAlpha; // D3DRS_ALPHABLENDENABLE
+				blendState[3] = D3DBLEND_SRCALPHA; // D3DRS_SRCBLEND
+				blendState[4] = D3DBLEND_INVSRCALPHA; // D3DRS_DESTBLEND
+				effect->hD3DXEffect->SetIntArray(effect->mParamTable->mParamMappingTable[CParamHashTable::BLENDSTATE].mHandle, blendState, 5);
 			}
-			else {
-				blendState[0] = 0; // D3DRS_ALPHATESTENABLE
-				blendState[1] = 0; // D3DRS_ALPHAREF
-			}
-			blendState[2] = useAlpha; // D3DRS_ALPHABLENDENABLE
-			blendState[3] = D3DBLEND_SRCALPHA; // D3DRS_SRCBLEND
-			blendState[4] = D3DBLEND_INVSRCALPHA; // D3DRS_DESTBLEND
-			effect->hD3DXEffect->SetIntArray(effect->mParamTable->mParamMappingTable[CParamHashTable::BLENDSTATE].mHandle, blendState, 5);
 
-			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
-			g_pd3dDevice->SetIndices(pIndexBuffer);
+			if (effectId == EEFFECT_CAR) {
+				auto light = (eDynamicLightContext*)eFrameMalloc(sizeof(eDynamicLightContext));
+				elSetupLightContext(light, &ShaperLightsCarsInGame, pMatrix, &pViewToDraw->pCamera->CurrentKey.Matrix, (UMath::Vector4*)&pViewToDraw->pCamera->CurrentKey.Position, pViewToDraw);
+				eEffect::SetLightContext(light, pMatrix);
+			}
+
+			if (pLastUsedVBuffer != pVertexBuffer) {
+				g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
+				pLastUsedVBuffer = pVertexBuffer;
+			}
+			if (pLastUsedIBuffer != pIndexBuffer) {
+				g_pd3dDevice->SetIndices(pIndexBuffer);
+				pLastUsedIBuffer = pIndexBuffer;
+			}
 			//for (int i = 1; i < 8; i++) {
 			//	g_pd3dDevice->SetTexture(i, nullptr);
 			//}
-			effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::DiffuseMap].mHandle, pTexture);
+			if (pLastUsedTexture != pTexture) {
+				effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::DiffuseMap].mHandle, pTexture);
+				pLastUsedTexture = pTexture;
+			}
 			effect->hD3DXEffect->CommitChanges();
 
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
@@ -243,6 +277,8 @@ namespace Render3D {
 			if (isEnvmap) cullMode = D3DCULL_CCW;
 			if (bForceNoCulling) cullMode = D3DCULL_NONE;
 
+			ShouldRefreshRenderProperties(useAlpha, useZ, zwrite, cullMode);
+
 			g_pd3dDevice->SetPixelShader(nullptr);
 			g_pd3dDevice->SetVertexShader(nullptr);
 
@@ -251,21 +287,21 @@ namespace Render3D {
 			g_pd3dDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)&view);
 			g_pd3dDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&proj);
 
-			SetRenderState_Fast(D3DRS_ZENABLE, useZ);
-			SetRenderState_Fast(D3DRS_ZWRITEENABLE, zwrite);
-			SetRenderState_Fast(D3DRS_CULLMODE, cullMode);
+			g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, useZ);
+			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
+			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
 			if (useAlpha) {
-				SetRenderState_Fast(D3DRS_ALPHAREF, 127);
-				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, TRUE);
-				SetRenderState_Fast(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 127);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 			}
 			else {
-				SetRenderState_Fast(D3DRS_ALPHATESTENABLE, 0);
-				SetRenderState_Fast(D3DRS_ALPHAREF, 0);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, 0);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 0);
 			}
-			SetRenderState_Fast(D3DRS_ALPHABLENDENABLE, useAlpha);
-			SetRenderState_Fast(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			SetRenderState_Fast(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, useAlpha);
+			g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+			g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, bNoEffect_ReadVertexColor ? D3DTOP_MODULATE : D3DTOP_SELECTARG1);
 			g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -280,8 +316,14 @@ namespace Render3D {
 
 			g_pd3dDevice->SetTransform(D3DTS_WORLD, (D3DMATRIX*)&matrix);
 			g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-			g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
-			g_pd3dDevice->SetIndices(pIndexBuffer);
+			if (pLastUsedVBuffer != pVertexBuffer) {
+				g_pd3dDevice->SetStreamSource(0, pVertexBuffer, 0, sizeof(CwoeeVertexData));
+				pLastUsedVBuffer = pVertexBuffer;
+			}
+			if (pLastUsedIBuffer != pIndexBuffer) {
+				g_pd3dDevice->SetIndices(pIndexBuffer);
+				pLastUsedIBuffer = pIndexBuffer;
+			}
 			g_pd3dDevice->SetTexture(0, pTexture);
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
 		}
