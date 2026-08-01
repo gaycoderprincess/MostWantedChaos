@@ -314,16 +314,18 @@ public:
 		auto mat = UMath::Matrix4::kIdentity;
 		rb->GetMatrix4(&mat);
 		mat.p = *rb->GetPosition();
+
+		ModifyCarWorldMatrix(mat);
+
 		mat.p.y += sus->GetWheelLocalPos(0)->y;
 		mat.p += mat.x * vMoveOffset.x;
 		mat.p += mat.y * vMoveOffset.y;
 		mat.p += mat.z * vMoveOffset.z;
+
 		UMath::Matrix4 rotation;
 		rotation.Rotate(vRotateOffset);
 		mat = (UMath::Matrix4)(mat * rotation);
-		mat.x *= CarScaleMatrix.y.y;
-		mat.y *= CarScaleMatrix.z.z;
-		mat.z *= CarScaleMatrix.x.x;
+
 		for (auto& part : aParts) {
 			part->Render(parentCar, mat, false);
 		}

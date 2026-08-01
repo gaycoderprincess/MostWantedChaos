@@ -645,6 +645,15 @@ NyaMat4x4 WorldToRenderMatrix(NyaMat4x4 world) {
 	return out;
 }
 
+NyaMat4x4 RenderToWorldMatrix(NyaMat4x4 world) {
+	NyaMat4x4 out;
+	out.x = RenderToWorldCoords(world.x);
+	out.y = -RenderToWorldCoords(world.y); // v1, up
+	out.z = RenderToWorldCoords(world.z);
+	out.p = RenderToWorldCoords(world.p);
+	return out;
+}
+
 // view to world
 NyaMat4x4 PrepareCameraMatrix(Camera* pCamera) {
 	return pCamera->CurrentKey.Matrix.Invert();

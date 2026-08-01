@@ -412,6 +412,7 @@ public:
 			"",
 			"With additional help from",
 			"xan1242",
+			"ToruTheRedFox",
 			"fredimachado's C++ IRC Client",
 			"",
 	};

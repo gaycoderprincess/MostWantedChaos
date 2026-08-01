@@ -989,6 +989,9 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			QuickValueEditor("fCarWorldX", fCarWorldX);
+			QuickValueEditor("fCarWorldY", fCarWorldY);
+			QuickValueEditor("fCarWorldZ", fCarWorldZ);
 			QuickValueEditor("BLJRamp::rX", Effect_Mario64::rX);
 			QuickValueEditor("BLJRamp::rY", Effect_Mario64::rY);
 			QuickValueEditor("BLJRamp::rZ", Effect_Mario64::rZ);

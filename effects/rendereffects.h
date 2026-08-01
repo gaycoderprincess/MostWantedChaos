@@ -6,6 +6,7 @@ public:
 		sName = "Friends Of Blahaj";
 		sFriendlyName = "Blahaj Roof Racks";
 		fTimerLength = 90;
+		bSaveStateToDisk = true;
 	}
 
 	std::vector<Render3D::tModel*> models;
@@ -34,6 +35,7 @@ public:
 					UMath::Vector3 dim;
 					veh->GetDimension(&dim);
 					mat.p = *veh->GetPosition();
+					ModifyCarWorldMatrix(mat);
 					mat.p += mat.x * offX;
 					mat.p += mat.y * (dim.y + offY);
 					mat.p += mat.z * offZ;
@@ -61,6 +63,7 @@ public:
 		fTimerLength = 60;
 		//AddToIncompatiblityGroup("customplayercar");
 		MakeIncompatibleWithFilterGroup("change_player_car");
+		bSaveStateToDisk = true;
 	}
 
 	std::vector<Render3D::tModel*> models;
@@ -88,28 +91,7 @@ public:
 		UMath::Matrix4 rotation;
 		rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 		mat = (UMath::Matrix4)(mat * rotation);
-
-		auto carMatrix = WorldToRenderMatrix(mat);
-		if (CarRender_Billboard) {
-			auto cameraMatrix = PrepareCameraMatrix(eViews[EVIEW_PLAYER1].pCamera);
-			auto cameraPos = cameraMatrix.p;
-			auto carPos = carMatrix.p;
-
-			auto lookat = carPos - cameraPos;
-			lookat.Normalize();
-			auto lookatMatrix = NyaMat4x4::LookAt(lookat, {0, 0, 1});
-			carMatrix.x = lookatMatrix.x;
-			carMatrix.y = lookatMatrix.y;
-			carMatrix.z = lookatMatrix.z;
-
-			NyaMat4x4 offsetMatrix;
-			offsetMatrix.Rotate(NyaVec3(stareX * 0.01745329, stareY * 0.01745329, stareZ * 0.01745329));
-			carMatrix = carMatrix * offsetMatrix;
-		}
-		carMatrix.x *= CarScaleMatrix.x.x;
-		carMatrix.y *= CarScaleMatrix.z.z;
-		carMatrix.z *= CarScaleMatrix.y.y;
-		model->RenderAt(carMatrix);
+		model->RenderAt(WorldToRenderMatrix(mat));
 	}
 
 	void TickFunction(eChaosHook hook, double delta) override {
@@ -125,6 +107,7 @@ public:
 			for (auto& model : models) {
 				auto mat = UMath::Matrix4::kIdentity;
 				mat.p.y += 1;
+				ModifyCarWorldMatrix(mat);
 				DrawAFish(model, mat);
 			}
 		}
@@ -136,6 +119,7 @@ public:
 						auto mat = UMath::Matrix4::kIdentity;
 						veh->GetMatrix4(&mat);
 						mat.p = *veh->GetPosition();
+						ModifyCarWorldMatrix(mat);
 						DrawAFish(model, mat);
 					}
 				}

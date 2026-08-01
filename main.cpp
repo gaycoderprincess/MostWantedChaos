@@ -31,6 +31,7 @@ std::vector<void(*)()> aPlayerDestroyFunctions;
 #include "components/achievements.h"
 #include "components/render3d.h"
 #include "components/render3d_objects.h"
+#include "hooks/carrender.h"
 #include "components/customcar.h"
 #include "components/hints.h"
 
@@ -45,7 +46,6 @@ namespace FlatOutHUD {
 	#include "components/fo1hud/ingame.h"
 }
 #include "hooks/shaders.h"
-#include "hooks/carrender.h"
 #include "hooks/eventwin.h"
 #include "hooks/worldrender.h"
 #include "hooks/input.h"
