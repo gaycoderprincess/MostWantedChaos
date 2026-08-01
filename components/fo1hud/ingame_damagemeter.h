@@ -98,9 +98,9 @@ public:
 		int nXOffset = fXOffset * 1920;
 		int nYOffset = fYOffset * 1080;
 
-		static auto ai_damage_meter = LoadTexture("CwoeeChaos/data/global/overlay/ai_damage_meter.tga");
-		static auto ai_damage_meter_glow = LoadTexture("CwoeeChaos/data/global/overlay/ai_damage_meter_glow.tga");
-		static auto ai_damage_meter_bg = LoadTexture("CwoeeChaos/data/global/overlay/ai_damage_meter_bg.tga");
+		static auto ai_damage_meter = LoadTexture_SetDir("CwoeeChaos/data/global/overlay/ai_damage_meter.tga");
+		static auto ai_damage_meter_glow = LoadTexture_SetDir("CwoeeChaos/data/global/overlay/ai_damage_meter_glow.tga");
+		static auto ai_damage_meter_bg = LoadTexture_SetDir("CwoeeChaos/data/global/overlay/ai_damage_meter_bg.tga");
 
 		ProcessHealthBarAlpha();
 

@@ -180,12 +180,12 @@ namespace SM64 {
 		auto mat = NyaMat4x4();
 		mat.SetIdentity();
 		if (textured) {
-			static auto marioTextured = LoadTexture("CwoeeChaos/data/models/letsago.png");
+			static auto marioTextured = LoadTexture_SetDir("CwoeeChaos/data/models/letsago.png");
 			tmpModel.pTexture = marioTextured;
 			tmpModel.RenderAt(WorldToRenderMatrix(mat), true);
 		}
 		else {
-			static auto marioColored = LoadTexture("CwoeeChaos/data/models/letsago_white.png");
+			static auto marioColored = LoadTexture_SetDir("CwoeeChaos/data/models/letsago_white.png");
 			tmpModel.pTexture = marioColored;
 			tmpModel.RenderAt(WorldToRenderMatrix(mat), false);
 		}

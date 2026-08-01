@@ -111,8 +111,8 @@ public:
 		if (!ply) return;
 		if (!ply->mCOMObject) return;
 
-		static auto arrow = LoadTexture("CwoeeChaos/data/global/overlay/map_playerarrow.tga");
-		static auto arrowPlayer = LoadTexture("CwoeeChaos/data/global/overlay/map_playerarrow_local.tga");
+		static auto arrow = LoadTexture_SetDir("CwoeeChaos/data/global/overlay/map_playerarrow.tga");
+		static auto arrowPlayer = LoadTexture_SetDir("CwoeeChaos/data/global/overlay/map_playerarrow_local.tga");
 
 		UMath::Matrix4 plyMatrix;
 		ply->mCOMObject->Find<IRigidBody>()->GetMatrix4(&plyMatrix);
@@ -128,7 +128,7 @@ public:
 
 	NyaVec3 gArcadeCheckpoint;
 	static void DrawCheckpointOnMap(NyaVec3 pos) {
-		static auto texture = LoadTexture("CwoeeChaos/data/global/overlay/map_checkpoint.tga");
+		static auto texture = LoadTexture_SetDir("CwoeeChaos/data/global/overlay/map_checkpoint.tga");
 
 		auto spritePos = GetPositionOnMap(pos);
 		DrawRectangle(spritePos.x - (fArrowSize * GetAspectRatioInv()), spritePos.x + (fArrowSize * GetAspectRatioInv()), spritePos.y - fArrowSize, spritePos.y + fArrowSize, {8,200,8,255}, 0, texture);
@@ -139,7 +139,7 @@ public:
 		if (!IsRaceHUDUp()) return;
 
 		if (!pMapTexture) {
-			pMapTexture = LoadTexture("CwoeeChaos/data/textures/gamemap.png");
+			pMapTexture = LoadTexture_SetDir("CwoeeChaos/data/textures/gamemap.png");
 		}
 
 		bool bIsDerby = false;

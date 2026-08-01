@@ -409,7 +409,7 @@ public:
 	NyaAudio::NyaSound sound = 0;
 
 	void InitFunction() override {
-		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/funky.mp3");
+		if (!sound) sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/funky.mp3");
 		if (sound) {
 			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);

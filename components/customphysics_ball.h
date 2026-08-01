@@ -130,7 +130,7 @@ namespace CustomPhysicsBall {
 
 		static int nLastBallCollisions = 0;
 		if (numCollisions > nLastBallCollisions) {
-			static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
 			if (sound) {
 				NyaAudio::SetVolume(sound, GetSFXVolume()*0.66);
 				NyaAudio::SkipTo(sound, 0, false);

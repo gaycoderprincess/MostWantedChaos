@@ -64,10 +64,10 @@ public:
 
 		if (fTextTimer < 1 && !ignoreTimers) x = std::lerp(1 + width + barWidth + barTipWidth, x, easeInOutQuart(fTextTimer));
 
-		static auto textureBarL = LoadTexture("CwoeeChaos/data/textures/effectbg_bar.png");
-		static auto textureTipL = LoadTexture("CwoeeChaos/data/textures/effectbg_end.png");
-		static auto textureBarD = LoadTexture("CwoeeChaos/data/textures/effectbg_dark_bar.png");
-		static auto textureTipD = LoadTexture("CwoeeChaos/data/textures/effectbg_dark_end.png");
+		static auto textureBarL = LoadTexture_SetDir("CwoeeChaos/data/textures/effectbg_bar.png");
+		static auto textureTipL = LoadTexture_SetDir("CwoeeChaos/data/textures/effectbg_end.png");
+		static auto textureBarD = LoadTexture_SetDir("CwoeeChaos/data/textures/effectbg_dark_bar.png");
+		static auto textureTipD = LoadTexture_SetDir("CwoeeChaos/data/textures/effectbg_dark_end.png");
 		auto textureBar = bDarkMode ? textureBarD : textureBarL;
 		auto textureTip = bDarkMode ? textureTipD : textureTipL;
 		if (textureBar && textureTip) {

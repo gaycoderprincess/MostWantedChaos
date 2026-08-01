@@ -62,7 +62,7 @@ public:
 				pos.z += fwd.z * 10;
 				rb->SetPosition(&pos);
 
-				static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/truck.mp3");
+				static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/truck.mp3");
 				if (sound) {
 					NyaAudio::SetVolume(sound, GetSFXVolume());
 					NyaAudio::Play(sound);
@@ -187,8 +187,8 @@ public:
 			for (auto& car : cars) {
 				auto distFromCar = (*car->GetPosition() - obj->vColPosition).length();
 				if (distFromCar < 7.5) {
-					static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap3.ogg");
-					static auto soundAlt = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/NeckSnap1.ogg");
+					static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/173/NeckSnap3.ogg");
+					static auto soundAlt = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/173/NeckSnap1.ogg");
 					if (car == GetLocalPlayerVehicle()) {
 						if (sound) {
 							NyaAudio::SetVolume(sound, GetSFXVolume());
@@ -226,7 +226,7 @@ public:
 				}
 			}
 			else {
-				audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/173/StoneDrag.ogg");
+				audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/173/StoneDrag.ogg");
 			}
 		}
 		else {
@@ -372,7 +372,7 @@ public:
 	static inline std::vector<int> aBombsInWorld;
 
 	static void ExplodeBomb(Render3DObjects::Object* obj) {
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/puttbang.wav");
+		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/puttbang.wav");
 		if (sound) {
 			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
@@ -451,7 +451,7 @@ public:
 	}
 
 	void InitFunction() override {
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/pickgen.wav");
+		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickgen.wav");
 		if (sound) {
 			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
@@ -697,13 +697,13 @@ public:
 		screenPos.x /= (double)nResX;
 		screenPos.y /= (double)nResY;
 
-		static auto texture = LoadTexture("CwoeeChaos/data/textures/firework_crosshair.png");
+		static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/firework_crosshair.png");
 		DrawRectangle(screenPos.x - crosshairSize * GetAspectRatioInv(), screenPos.x + crosshairSize * GetAspectRatioInv(), screenPos.y - crosshairSize, screenPos.y + crosshairSize, isPlayerCrosshair ? NyaDrawing::CNyaRGBA32(0,255,0,255) : NyaDrawing::CNyaRGBA32(255,0,0,255), 0, texture);
 	}
 
 	static void LoadSounds() {
-		if (!FireSound) FireSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firefire.wav");
-		if (!ExplodeSound) ExplodeSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/firebang.wav");
+		if (!FireSound) FireSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/firefire.wav");
+		if (!ExplodeSound) ExplodeSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/firebang.wav");
 	}
 
 	void InitFunction() override {
@@ -853,13 +853,13 @@ public:
 
 			static NyaAudio::NyaSound styles[] = {
 					0,
-					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/d.wav"),
-					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/c.wav"),
-					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/b.wav"),
-					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/a.wav"),
-					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/s.wav"),
-					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/ss.wav"),
-					NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/style/sss.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/style/d.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/style/c.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/style/b.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/style/a.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/style/s.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/style/ss.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/style/sss.wav"),
 			};
 
 			if (auto sound = styles[currentStyle]) {
@@ -967,8 +967,8 @@ public:
 			VergilGenericAttack(obj, attackStingerRange, 0);
 		}
 
-		static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger.mp3");
-		static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/stinger_2.mp3");
+		static auto sound1 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/stinger.mp3");
+		static auto sound2 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/stinger_2.mp3");
 
 		auto sound = PercentageChanceCheck(50) ? sound1 : sound2;
 		if (sound) {
@@ -987,7 +987,7 @@ public:
 		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&newPosition, &newPosition.y, nullptr)) return;
 		obj->vColPosition = newPosition;
 
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/teleport.mp3");
+		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/teleport.mp3");
 		if (sound) {
 			NyaAudio::SetVolume(sound, GetSFXVolume() * attackVolume);
 			NyaAudio::Play(sound);
@@ -1048,8 +1048,8 @@ public:
 							bool up = PercentageChanceCheck(50);
 							VergilGenericAttack(obj, attackRange, up ? 15 : 0);
 
-							static auto sound1 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/swing_hard.mp3");
-							static auto sound2 = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/up.mp3");
+							static auto sound1 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/swing_hard.mp3");
+							static auto sound2 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/up.mp3");
 
 							auto sound = up ? sound2 : sound1;
 							if (sound) {
@@ -1080,7 +1080,7 @@ public:
 			}
 		}
 		else {
-			data->audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/vergil/btl.mp3");
+			data->audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/vergil/btl.mp3");
 		}
 	}
 
@@ -1250,7 +1250,7 @@ public:
 			}
 		}
 		else {
-			data->audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/franklin/bugatti.mp3");
+			data->audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/franklin/bugatti.mp3");
 		}
 	}
 
@@ -1355,7 +1355,7 @@ public:
 
 				NyaAudio::Delete(&data->audio);
 
-				if (!data->launchAudio) data->launchAudio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/sci_pain4.wav");
+				if (!data->launchAudio) data->launchAudio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain4.wav");
 				if (data->launchAudio) {
 					NyaAudio::SetVolume(data->launchAudio, GetSFXVolume());
 					if (NyaAudio::IsFinishedPlaying(data->launchAudio)) {
@@ -1370,7 +1370,7 @@ public:
 				// snap to ground
 				WCollisionMgr::GetWorldHeightAtPointRigorous((UMath::Vector3*)&obj->vColPosition, &obj->vColPosition.y, nullptr);
 
-				if (!data->audio) data->audio = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/c1a4_sci_gener.wav");
+				if (!data->audio) data->audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/c1a4_sci_gener.wav");
 				if (data->audio) {
 					NyaAudio::SetVolume(data->audio, GetSFXVolume());
 					if (NyaAudio::IsFinishedPlaying(data->audio)) {
@@ -1601,7 +1601,7 @@ public:
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
 		objData.aModels = mdl;
@@ -1620,7 +1620,7 @@ public:
 		auto ply = *GetLocalPlayerInterface<IRigidBody>()->GetPosition();
 		auto vel = *GetLocalPlayerInterface<IRigidBody>()->GetLinearVelocity();
 
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
 		for (int x = -50; x < 50; x += 3) {
 			for (int y = -50; y < 50; y += 3) {
 				NyaVec3 pos = ply;
@@ -1643,7 +1643,7 @@ public:
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 		// dont spawn stuff into the void permanently
 		float y;
-		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&pos, &y, nullptr)) return;
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&pos, &y, nullptr)) return;
 
 		static auto mdl = Render3D::CreateModels("beachball.fbx");
 
@@ -1655,7 +1655,7 @@ public:
 		objData.bRemoveOnOutOfRange = false;
 		objData.bUseExpensiveCollisionCheck = true;
 		objData.sDebugName = "beachball_save";
-		objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
 	}
 
@@ -1721,7 +1721,7 @@ public:
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 		static auto mdl = Render3D::CreateModels("abcblock.fbx");
-		static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/toybrick.wav");
+		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/toybrick.wav");
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
 		objData.aModels = mdl;
@@ -1761,7 +1761,7 @@ public:
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 		// dont spawn stuff into the void permanently
 		float y;
-		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&pos, &y, nullptr)) return;
+		if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING && !GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&pos, &y, nullptr)) return;
 
 		static auto mdl = Render3D::CreateModels("abcblock.fbx");
 
@@ -1773,7 +1773,7 @@ public:
 		objData.bRemoveOnOutOfRange = false;
 		objData.bUseExpensiveCollisionCheck = true;
 		objData.sDebugName = "abcblock_save";
-		objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/toybrick.wav");
+		objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/toybrick.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::BOX, pos, vel);
 	}
 
@@ -1865,7 +1865,7 @@ public:
 		objData.bAffectGamePhysics = true;
 		objData.sDebugName = "metalball_save";
 		//objData.bUseExpensiveCollisionCheck = true;
-		//objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/beachball.wav");
+		//objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::BOX, pos, vel);
 	}
 
@@ -1910,7 +1910,7 @@ public:
 		objData.bAffectGamePhysics = true;
 		objData.sDebugName = "trafficcone_save";
 		objData.bUseExpensiveCollisionCheck = true;
-		objData.pCollisionSound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/roadcone.wav");
+		objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/roadcone.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
 	}
 

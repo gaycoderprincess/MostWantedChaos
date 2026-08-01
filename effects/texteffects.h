@@ -47,7 +47,7 @@ public:
 		NyaHookLib::Patch<uint8_t>(0x5DC86E, 0xEB); // remove duplicate racer name check
 
 		for (int i = 0; i < 3; i++) {
-			if (!sound[i]) sound[i] = NyaAudio::LoadFile(std::format("CwoeeChaos/data/sound/effect/sink{}.mp3", i+1));
+			if (!sound[i]) sound[i] = LoadAudioFile_SetDir(std::format("CwoeeChaos/data/sound/effect/sink{}.mp3", i+1));
 		}
 	}
 	void TickFunctionMain(double delta) override {

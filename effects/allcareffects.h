@@ -502,7 +502,7 @@ public:
 
 		state = 0;
 
-		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/dealer.mp3");
+		if (!sound) sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/dealer.mp3");
 	}
 	void TickFunctionMain(double delta) override {
 		state += delta * (goBack ? -GroovySpeed : GroovySpeed);

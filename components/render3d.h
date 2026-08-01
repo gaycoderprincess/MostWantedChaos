@@ -405,7 +405,7 @@ namespace Render3D {
 			}
 		}
 		if (!model->pTexture) {
-			if (auto tex = LoadTexture(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
+			if (auto tex = LoadTexture_SetDir(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
 				model->pTexture = tex;
 				aAllTextures.push_back({textureName, model->pTexture});
 			} else {

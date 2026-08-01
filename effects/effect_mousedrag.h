@@ -31,7 +31,7 @@ public:
 	static void DrawCrosshair(CwoeeSharedRigidBody target, bool isDragging) {
 		auto screenPos = GetScreenPosition(target.GetPosition());
 
-		static auto texture = LoadTexture("CwoeeChaos/data/textures/firework_crosshair.png");
+		static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/firework_crosshair.png");
 		DrawRectangle(screenPos.x - crosshairSize * GetAspectRatioInv(), screenPos.x + crosshairSize * GetAspectRatioInv(), screenPos.y - crosshairSize, screenPos.y + crosshairSize, isDragging ? NyaDrawing::CNyaRGBA32(0,255,0,255) : NyaDrawing::CNyaRGBA32(255,0,0,255), 0, texture);
 	}
 

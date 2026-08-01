@@ -65,7 +65,7 @@ public:
 		switch (hook) {
 			case HOOK_PRE3D:
 			case HOOK_PREPROPS:
-				static auto texture = LoadTexture("CwoeeChaos/data/textures/wireframe.png");
+				static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/wireframe.png");
 				pWorldTextureOverride = texture;
 				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 				break;
@@ -284,7 +284,7 @@ public:
 		switch (hook) {
 			case HOOK_PRE3D:
 			case HOOK_PREPROPS:
-				static auto texture = LoadTexture("CwoeeChaos/data/textures/rainbow.png");
+				static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/rainbow.png");
 				pWorldTextureOverride = texture;
 				break;
 			case HOOK_POST3D:
@@ -336,7 +336,7 @@ public:
 	void TickFunction(eChaosHook hook, double delta) override {
 		switch (hook) {
 			case HOOK_PRE3D:
-				static auto texture = LoadTexture("CwoeeChaos/data/textures/snow.png");
+				static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/snow.png");
 				if (ShouldSnowifyModel()) pWorldTextureOverride = texture;
 				break;
 			case HOOK_POST3D:
@@ -372,7 +372,7 @@ public:
 		switch (hook) {
 			case HOOK_PRE3D:
 			case HOOK_PREPROPS:
-				static auto texture = LoadTexture("CwoeeChaos/data/textures/missing.png");
+				static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/missing.png");
 				pWorldTextureOverride = texture;
 				break;
 			case HOOK_POST3D:
@@ -399,7 +399,7 @@ public:
 		switch (hook) {
 			case HOOK_PRE3D:
 			case HOOK_PREPROPS:
-				static auto texture = LoadTexture("CwoeeChaos/data/textures/obsolete.png");
+				static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/obsolete.png");
 				pWorldTextureOverride = texture;
 				break;
 			case HOOK_POST3D:

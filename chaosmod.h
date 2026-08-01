@@ -392,8 +392,8 @@ void ChaosLoop() {
 		}
 
 		fTimeSinceLastEffect += gTimer.fDeltaTime * fEffectCycleTimerSpeedMult;
-		static auto textureL = LoadTexture("CwoeeChaos/data/textures/effectbar.png");
-		static auto textureD = LoadTexture("CwoeeChaos/data/textures/effectbar_dark.png");
+		static auto textureL = LoadTexture_SetDir("CwoeeChaos/data/textures/effectbar.png");
+		static auto textureD = LoadTexture_SetDir("CwoeeChaos/data/textures/effectbar_dark.png");
 		auto texture = bDarkMode ? textureD : textureL;
 		NyaDrawing::CNyaRGBA32 rgb = bDarkMode ? NyaDrawing::CNyaRGBA32(133,122,168,255) : NyaDrawing::CNyaRGBA32(243,138,175,255);
 		if (!bDisableChaosHUD) DrawBottomBar(fTimeSinceLastEffect / fEffectCycleTimer, rgb, texture);

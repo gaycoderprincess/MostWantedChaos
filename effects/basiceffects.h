@@ -33,7 +33,7 @@ public:
 	NyaAudio::NyaSound sound = 0;
 
 	void InitFunction() override {
-		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/flashbang_explode2.wav");
+		if (!sound) sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/flashbang_explode2.wav");
 		if (sound) {
 			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
@@ -259,7 +259,7 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		static auto texture = LoadTexture("CwoeeChaos/data/textures/punchhole.png");
+		static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/punchhole.png");
 		DrawRectangle(0, 1, 0, 1, {255,255,255,255}, 0, texture);
 	}
 	bool HasTimer() override { return true; }
@@ -291,7 +291,7 @@ public:
 	NyaAudio::NyaSound sound = 0;
 
 	void InitFunction() override {
-		if (!sound) sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/effect/fish.mp3");
+		if (!sound) sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/fish.mp3");
 		if (sound) {
 			NyaAudio::SetVolume(sound, GetSFXVolume());
 			NyaAudio::Play(sound);
@@ -313,7 +313,7 @@ public:
 	void InitFunction() override {
 		timer = 0;
 		for (int i = 0; i < 9; i++) {
-			if (!sound[i]) sound[i] = NyaAudio::LoadFile(std::format("CwoeeChaos/data/sound/effect/backstreet{}.mp3", i+1));
+			if (!sound[i]) sound[i] = LoadAudioFile_SetDir(std::format("CwoeeChaos/data/sound/effect/backstreet{}.mp3", i+1));
 		}
 	}
 	void TickFunctionMain(double delta) override {

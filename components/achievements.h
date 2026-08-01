@@ -242,7 +242,7 @@ namespace Achievements {
 			bHiddenAchievementUnlocked = achievement->bHidden;
 			aUnlockBuffer.erase(aUnlockBuffer.begin());
 
-			static auto sound = NyaAudio::LoadFile("CwoeeChaos/data/sound/achievement/unlock.mp3");
+			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/achievement/unlock.mp3");
 			if (sound) {
 				NyaAudio::SetVolume(sound, GetSFXVolume());
 				NyaAudio::Play(sound);
@@ -282,9 +282,9 @@ namespace Achievements {
 			delta = fSpritePopTimer;
 		}
 
-		static auto bgTex = LoadTexture("CwoeeChaos/data/textures/achievement/bg.png");
-		static auto bg2Tex = LoadTexture("CwoeeChaos/data/textures/achievement/flowersponk.png");
-		static auto fgTex = LoadTexture("CwoeeChaos/data/textures/achievement/flowers.png");
+		static auto bgTex = LoadTexture_SetDir("CwoeeChaos/data/textures/achievement/bg.png");
+		static auto bg2Tex = LoadTexture_SetDir("CwoeeChaos/data/textures/achievement/flowersponk.png");
+		static auto fgTex = LoadTexture_SetDir("CwoeeChaos/data/textures/achievement/flowers.png");
 
 		if (delta <= 0) delta = 0;
 		if (delta >= 1) delta = 1;

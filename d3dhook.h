@@ -9,6 +9,8 @@ void UpdateD3DProperties() {
 bool bDeviceJustReset = false;
 void D3DHookMain() {
 	if (!g_pd3dDevice) {
+		DLLDirSetter _setdir;
+
 		UpdateD3DProperties();
 		InitHookBase();
 	}
