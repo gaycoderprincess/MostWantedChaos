@@ -439,6 +439,8 @@ void DoChaosSM64Load() {
 }
 
 void DoChaosSave() {
+	DLLDirSetter _setdir;
+
 	std::filesystem::create_directory("CwoeeChaos");
 	std::filesystem::create_directory("CwoeeChaos/save");
 
@@ -459,6 +461,8 @@ void DoChaosSave() {
 }
 
 void DoChaosLoad() {
+	DLLDirSetter _setdir;
+
 	DoChaosEffectLoad();
 	DoChaos173Load();
 	DoChaosTeddieLoad();

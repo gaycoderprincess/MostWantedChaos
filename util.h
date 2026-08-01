@@ -983,3 +983,13 @@ public:
 		SetCurrentDirectoryW(backup);
 	}
 };
+
+auto LoadTexture_SetDir(const char* fileName) {
+	DLLDirSetter _setdir;
+	return LoadTexture(fileName);
+}
+
+auto LoadAudioFile_SetDir(const std::string& path) {
+	DLLDirSetter _setdir;
+	return NyaAudio::LoadFile(path);
+}

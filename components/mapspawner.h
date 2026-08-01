@@ -31,15 +31,15 @@ namespace MapSpawner {
 		}
 
 		bool IsSpawned() {
-			if (aSpawnedModels.empty()) return false;
-			if (aLoadedModels.empty()) return false;
-			if (aLoadedModels[0]->bInvalidated) return false;
+			if (aSpawnedCollisions.empty()) return false;
+			if (aLoadedCollisions.empty()) return false;
+			if (aLoadedCollisions[0]->bInvalidated) return false;
 			return true;
 		}
 
 		bool IsInvalidated() {
-			if (aLoadedModels.empty()) return false;
-			return aLoadedModels[0]->bInvalidated;
+			if (aLoadedCollisions.empty()) return false;
+			return aLoadedCollisions[0]->bInvalidated;
 		}
 
 		void Despawn() {

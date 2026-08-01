@@ -4,8 +4,6 @@ namespace Achievements {
 		return "CwoeeChaos/achievements.sav";
 	}
 
-	int nTotalProgression = 0;
-
 	class CAchievement {
 	public:
 		const char* sIdentifier;
@@ -109,6 +107,8 @@ namespace Achievements {
 	}
 
 	void Save() {
+		DLLDirSetter _setdir;
+
 		auto file = std::ofstream(GetAchievementSavePath(), std::ios::out | std::ios::binary);
 		if (!file.is_open()) return;
 
@@ -119,11 +119,6 @@ namespace Achievements {
 			file.write((char*)&achievement->fInternalProgress, sizeof(achievement->fInternalProgress));
 			file.write((char*)&achievement->bUnlocked, sizeof(achievement->bUnlocked));
 		}
-	}
-
-	void Delete() {
-		if (!std::filesystem::exists(GetAchievementSavePath())) return;
-		std::filesystem::remove(GetAchievementSavePath());
 	}
 
 	void Clear() {
@@ -161,6 +156,8 @@ namespace Achievements {
 	}
 
 	void Load() {
+		DLLDirSetter _setdir;
+
 		for (auto& achievement : gAchievements) {
 			achievement->nProgress = 0;
 			achievement->fInternalProgress = 0;
@@ -344,8 +341,6 @@ namespace Achievements {
 	}
 
 	void OnTick() {
-		nTotalProgression = ((double)GetNumUnlockedAchievements() / (double)GetNumVisibleAchievements()) * 100;
-
 		static CNyaTimer gTimer;
 		gTimer.Process();
 

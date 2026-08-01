@@ -356,8 +356,6 @@ namespace ChaosVoting {
 	std::vector<ChatCheatRequest> aChatCheatPool;
 
 	void ProcessChatCheatRequest(const std::string& username, const std::string& message) {
-		DLLDirSetter _setdir;
-
 		if (!bRecordChatCheatDuplicates) {
 			for (auto& user : aChatCheatUsers) {
 				if (user == username) return;
@@ -508,6 +506,8 @@ namespace ChaosVoting {
 
 		static bool bOnce = true;
 		if (bOnce) {
+			DLLDirSetter _setdir;
+
 			if (std::filesystem::exists("CwoeeChaos/irc.toml")) {
 				auto toml = toml::parse_file("CwoeeChaos/irc.toml");
 				url = toml["url"].value_or(url);

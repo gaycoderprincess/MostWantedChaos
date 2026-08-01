@@ -8,8 +8,6 @@ void UpdateD3DProperties() {
 
 bool bDeviceJustReset = false;
 void D3DHookMain() {
-	DLLDirSetter _setdir;
-
 	if (!g_pd3dDevice) {
 		UpdateD3DProperties();
 		InitHookBase();
@@ -23,8 +21,6 @@ void D3DHookMain() {
 }
 
 void OnD3DReset() {
-	DLLDirSetter _setdir;
-
 	if (g_pd3dDevice) {
 		UpdateD3DProperties();
 		ImGui_ImplDX9_InvalidateDeviceObjects();

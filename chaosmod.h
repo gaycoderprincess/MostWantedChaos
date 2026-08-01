@@ -37,14 +37,6 @@ void ProcessChaosEffects() {
 	}
 }
 
-template<ChaosEffect::eChaosHook hook>
-void ProcessChaosEffects_SetDir() {
-	PerformanceBenchmarker _perf(std::format("ProcessChaosEffects_SetDir<{}>", (int)hook).c_str());
-
-	DLLDirSetter _setdir;
-	ProcessChaosEffects<hook>();
-}
-
 void MoneyChecker() {
 	static ChaosEffect TempEffect("DUMMY", true);
 	if (!TempEffect.sName) TempEffect.sName = "(DUMMY) MONEY CHANGE";
@@ -433,8 +425,6 @@ void ChaosLoop() {
 }
 
 void ChaosModMenu() {
-	DLLDirSetter _setdir;
-
 	ChloeMenuLib::BeginMenu();
 
 	if (DrawMenuOption(std::format("Chaos On - {}", bTimerEnabled))) {

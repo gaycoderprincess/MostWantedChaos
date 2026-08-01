@@ -71,8 +71,6 @@ namespace FlatOutHUD {
 #include "chaossave.h"
 
 void OnWinRace() {
-	DLLDirSetter _setdir;
-
 	Achievements::AwardAchievement(GetAchievement("WIN_RACE"));
 	if (GetEffectRunning(&E_LeakTank)) {
 		Achievements::AwardAchievement(GetAchievement("WIN_RACE_LEAKTANK"));
@@ -97,13 +95,11 @@ void OnWinRace() {
 void PlayerInputLoop() {
 	PerformanceBenchmarker _perf("PlayerInputLoop");
 
-	ProcessChaosEffects_SetDir<ChaosEffect::HOOK_INPUT>();
+	ProcessChaosEffects<ChaosEffect::HOOK_INPUT>();
 }
 
 void MainLoop() {
 	PerformanceBenchmarker _perf("MainLoop");
-
-	DLLDirSetter _setdir;
 
 	for (auto& func : aMainLoopFunctions) {
 		func();
@@ -117,8 +113,6 @@ void MainLoop() {
 
 void CameraHook(CameraMover* pMover) {
 	PerformanceBenchmarker _perf("CameraHook");
-
-	DLLDirSetter _setdir;
 
 	if (CustomCamera::bRunCustom) {
 		static CNyaTimer gTimer;
@@ -136,8 +130,6 @@ void Render3DLoop(eView* view) {
 
 	Render3D::pViewToDraw = view;
 	//WriteLog(std::format("view {:X} id {}", (uintptr_t)view, (int)view->ID));
-
-	DLLDirSetter _setdir;
 
 	static IDirect3DStateBlock9* state = nullptr;
 	if (g_pd3dDevice->CreateStateBlock(D3DSBT_ALL, &state) != D3D_OK) {
@@ -261,11 +253,11 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				}
 			});
 			NyaHooks::RenderWorldHook::Init();
-			NyaHooks::RenderWorldHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PRE3D>);
+			NyaHooks::RenderWorldHook::aPreFunctions.push_back(ProcessChaosEffects<ChaosEffect::HOOK_PRE3D>);
 			NyaHooks::RenderWorldHook::aPostFunctions.push_back(Render3DLoopMain);
 			NyaHooks::RenderPropsHook::Init();
-			NyaHooks::RenderPropsHook::aPreFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_PREPROPS>);
-			NyaHooks::RenderPropsHook::aPostFunctions.push_back(ProcessChaosEffects_SetDir<ChaosEffect::HOOK_POSTPROPS>);
+			NyaHooks::RenderPropsHook::aPreFunctions.push_back(ProcessChaosEffects<ChaosEffect::HOOK_PREPROPS>);
+			NyaHooks::RenderPropsHook::aPostFunctions.push_back(ProcessChaosEffects<ChaosEffect::HOOK_POSTPROPS>);
 
 			//for (int i = 0; i < 65535; i++) {
 			//	size_t numStrips = i;

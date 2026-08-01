@@ -438,6 +438,8 @@ public:
 
 		static bool bOnce = true;
 		if (bOnce) {
+			DLLDirSetter _setdir;
+
 			std::ifstream fin("CwoeeChaos/data/models/model_credits.txt");
 			if (!fin.is_open()) return;
 

@@ -424,6 +424,8 @@ namespace Render3D {
 	}
 
 	std::vector<tModel*> CreateModels(const std::string& path) {
+		DLLDirSetter _setdir;
+
 		auto fullPathCwo = std::format("CwoeeChaos/data/models/{}.cwo", path);
 		if (!std::filesystem::exists(fullPathCwo)) {
 			MessageBoxA(0, std::format("Failed to find model {}!", fullPathCwo).c_str(), "nya?!~", MB_ICONERROR);

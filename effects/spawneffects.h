@@ -497,7 +497,7 @@ public:
 	static inline float rotSpeed = 2.5;
 	static inline float inFrontThreshold = 0.6;
 	static inline float crosshairSize = 0.02;
-	static inline float sfxVolume = 0.5;
+	static inline float sfxVolume = 0.33;
 
 	static inline NyaAudio::NyaSound FireSound = 0;
 	static inline NyaAudio::NyaSound ExplodeSound = 0;

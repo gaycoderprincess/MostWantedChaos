@@ -14,6 +14,8 @@ public:
 	
 	void InitFunction() override {
 		if (!pShader || (IsKeyPressed(VK_CONTROL) && IsKeyJustPressed('L'))) { // debug reload key
+			DLLDirSetter _setdir;
+			
 			auto path = std::format("CwoeeChaos/data/shaders/{}.sha", sFileName);
 			if (!std::filesystem::exists(path)) {
 				MessageBoxA(nullptr, std::format("Failed to find shader {}", path).c_str(), "nya?!~", MB_ICONERROR);

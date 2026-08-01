@@ -19,6 +19,8 @@ public:
 	static inline float fYOffset = -0.6;
 
 	void InitFunction() override {
+		DLLDirSetter _setdir;
+
 		SetSoundControlState(true, SNDSTATE_STOP_MUSIC);
 
 		state = 0;
