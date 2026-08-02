@@ -218,6 +218,13 @@ namespace Powerups {
 			}
 		}
 
+		bool IsCarExplodeable(IVehicle* veh) {
+			if (auto rb = veh->mCOMObject->Find<IRBVehicle>()) {
+				return rb->GetInvulnerability() == INVULNERABLE_NONE;
+			}
+			return true;
+		}
+
 		void BombOnTick(Render3DObjects::Object* obj, double delta) {
 			if (IsChaosBlocked()) return;
 
@@ -253,7 +260,9 @@ namespace Powerups {
 
 			auto cars = GetActiveRigidBodies();
 			for (auto& car : cars) {
-				if (!car->mCOMObject->Find<IVehicle>()) continue;
+				auto iveh = car->mCOMObject->Find<IVehicle>();
+				if (!iveh) continue;
+				if (!IsCarExplodeable(iveh)) continue;
 
 				auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
 				if (distFromCar < 4) {
@@ -296,6 +305,9 @@ namespace Powerups {
 				for (auto& car : cars) {
 					auto dist = (*car->GetPosition() - obj->mMatrix.p);
 					if (dist.length() < fExplosionMaxDistance) {
+						auto iveh = car->mCOMObject->Find<IVehicle>();
+						if (iveh && !IsCarExplodeable(iveh)) continue;
+
 						auto cb = car->mCOMObject->Find<ICollisionBody>();
 
 						auto impulse = dist * (fExplosionPower * car->GetMass() / 1000.0 * std::min((fExplosionMaxDistance - dist.length()) * 2.0 / fExplosionMaxDistance, 1.0) / std::max(dist.length(), 0.01));
@@ -311,7 +323,7 @@ namespace Powerups {
 						car->SetLinearVelocity(&vel);
 						car->SetAngularVelocity(&avel);
 
-						if (auto iveh = car->mCOMObject->Find<IVehicle>()) {
+						if (iveh) {
 							if (iveh->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled) {
 								SM64::OnTakeDamage(1, obj->vColPosition, true);
 							}
@@ -425,15 +437,16 @@ namespace Powerups {
 	enum ePowerup {
 		//POWERUP_SHOCKWAVE,
 		POWERUP_PUTTYBOMB,
-		POWERUP_FIREWORK,
 		POWERUP_FIREWORKPACK,
+		POWERUP_FIREWORK,
 		//POWERUP_WATERBOMB,
 		POWERUP_CLONE,
 		//POWERUP_OILSLICK, // todo? copying the relevant collision polys out would work here i think
 		POWERUP_ELECTROPULSE,
 		POWERUP_CHROMEBALL,
-		POWERUP_TURBO,
 		POWERUP_STAR,
+		POWERUP_TURBO,
+		POWERUP_INVINCIBLE,
 		POWERUP_BEACHBALL,
 		NUM_POWERUPS
 	};
@@ -441,15 +454,16 @@ namespace Powerups {
 	const char* aPowerupSpriteNames[] = {
 			//"CwoeeChaos/data/textures/revolt_1.png",
 			"CwoeeChaos/data/textures/revolt_2.png",
-			"CwoeeChaos/data/textures/revolt_3.png",
 			"CwoeeChaos/data/textures/revolt_4.png",
+			"CwoeeChaos/data/textures/revolt_3.png",
 			//"CwoeeChaos/data/textures/revolt_5.png",
 			"CwoeeChaos/data/textures/revolt_6.png",
 			//"CwoeeChaos/data/textures/revolt_7.png",
 			"CwoeeChaos/data/textures/revolt_8.png",
 			"CwoeeChaos/data/textures/revolt_9.png",
-			"CwoeeChaos/data/textures/mk64_1.png",
 			"CwoeeChaos/data/textures/revolt_12.png",
+			"CwoeeChaos/data/textures/mk64_1.png",
+			"CwoeeChaos/data/textures/mk64_2.png",
 			"CwoeeChaos/data/textures/powerup_beachball.png",
 	};
 	IDirect3DTexture9* aPowerupTextures[NUM_POWERUPS] = {};
@@ -517,6 +531,12 @@ namespace Powerups {
 					pUser->SetSpeed(TOMPS(300));
 					return true;
 				} break;
+				case POWERUP_INVINCIBLE: {
+					if (auto ply = pUser->mCOMObject->Find<IRBVehicle>()) {
+						ply->SetInvulnerability(INVULNERABLE_FROM_RESET, 15.0);
+					}
+					return true;
+				} break;
 				case POWERUP_BEACHBALL: {
 					if (!wbombfire) wbombfire = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/wbombfire.wav");
 					PlayAudioFromCar(wbombfire, pUser);
@@ -531,7 +551,7 @@ namespace Powerups {
 					auto pos = *rb->GetPosition();
 					auto vel = *rb->GetLinearVelocity();
 					pos += fwd * (dim.z + 2.5);
-					vel += fwd * 25;
+					vel += fwd * 50;
 					SpawnPhysicalBeachBall(pos, vel);
 					return true;
 				} break;
@@ -609,7 +629,7 @@ namespace Powerups {
 					if (fRollTime < 1.5) scroll = 5;
 
 					// always make sure it smoothly lands on the powerup it should
-					powerupId = std::abs(PowerupID - ((fRollTime - 0.75) * scroll));
+					powerupId = PowerupID + ((fRollTime - 0.75) * scroll);
 					powerupId %= NUM_POWERUPS;
 				}
 				powerupAlpha = 127;
