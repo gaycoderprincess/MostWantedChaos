@@ -5,11 +5,15 @@ namespace Render3D {
 	struct {
 		uint32_t nVertexColorValue = nDefaultVertexColor;
 		bool bColorByNormals = false;
+		float fColorByNormalsScale = 1.0;
+		uint8_t nAlphaValue = 255;
 		std::string sTextureSubdir;
 
 		void Reset() {
 			nVertexColorValue = nDefaultVertexColor;
 			bColorByNormals = false;
+			fColorByNormalsScale = 1.0;
+			nAlphaValue = 255;
 			sTextureSubdir.clear();
 		}
 	} ModelLoaderConfig;
@@ -443,7 +447,7 @@ namespace Render3D {
 				tmp.b = srcColor->r;
 				tmp.g = srcColor->g;
 				tmp.r = srcColor->b;
-				tmp.a = 255;
+				tmp.a = ModelLoaderConfig.nAlphaValue;
 				dest->Color = *(uint32_t*)&tmp;
 			}
 			else {
@@ -456,10 +460,10 @@ namespace Render3D {
 			
 			if (ModelLoaderConfig.bColorByNormals && normals) {
 				auto tmp = NyaDrawing::CNyaRGBA32();
-				tmp.b = srcNormal->x * 255;
-				tmp.g = srcNormal->y * 255;
-				tmp.r = srcNormal->z * 255;
-				tmp.a = 255;
+				tmp.b = srcNormal->x * 255 * ModelLoaderConfig.fColorByNormalsScale;
+				tmp.g = srcNormal->y * 255 * ModelLoaderConfig.fColorByNormalsScale;
+				tmp.r = srcNormal->z * 255 * ModelLoaderConfig.fColorByNormalsScale;
+				tmp.a = ModelLoaderConfig.nAlphaValue;
 				dest->Color = *(uint32_t*)&tmp;
 			}
 		}

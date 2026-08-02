@@ -990,6 +990,16 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			//QuickValueEditor("PowerupBlock::rX", Effect_PowerupBlock::rX);
+			//QuickValueEditor("PowerupBlock::rY", Effect_PowerupBlock::rY);
+			//QuickValueEditor("PowerupBlock::rZ", Effect_PowerupBlock::rZ);
+			//QuickValueEditor("PowerupBlock::offX", Effect_PowerupBlock::offX);
+			//QuickValueEditor("PowerupBlock::offY", Effect_PowerupBlock::offY);
+			//QuickValueEditor("PowerupBlock::offZ", Effect_PowerupBlock::offZ);
+			//QuickValueEditor("PowerupBlock::scale", Effect_PowerupBlock::scale);
+			//QuickValueEditor("PowerupBlock::rotSpeedX", Effect_PowerupBlock::rotSpeedX);
+			//QuickValueEditor("PowerupBlock::rotSpeedY", Effect_PowerupBlock::rotSpeedY);
+			//QuickValueEditor("PowerupBlock::rotSpeedZ", Effect_PowerupBlock::rotSpeedZ);
 			QuickValueEditor("fCarWorldX", fCarWorldX);
 			QuickValueEditor("fCarWorldY", fCarWorldY);
 			QuickValueEditor("fCarWorldZ", fCarWorldZ);

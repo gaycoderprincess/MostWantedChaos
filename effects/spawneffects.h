@@ -358,117 +358,9 @@ public:
 		bCanQuickTrigger = false;
 	}
 
-	static inline std::vector<Render3D::tModel*> models;
-
-	static inline float rX = 90;
-	static inline float rY = 0;
-	static inline float rZ = 0;
-	static inline float offX = 0;
-	static inline float offY = 1.5;
-	static inline float offZ = -6;
-	static inline float scale = 2;
-
-	static inline float rotSpeedX = 0;
-	static inline float rotSpeedY = 0;
-	static inline float rotSpeedZ = -1.5;
-
-	static inline std::vector<int> aBombsInWorld;
-
-	static void ExplodeBomb(Render3DObjects::Object* obj) {
-		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/puttbang.wav");
-		if (sound) {
-			NyaAudio::SetVolume(sound, GetSFXVolume());
-			NyaAudio::Play(sound);
-		}
-		obj->aModels.clear();
-	}
-
-	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
-		auto& rotDelta = *(float*)&obj->CustomData;
-		rotDelta += delta;
-
-		auto p = obj->mMatrix.p;
-		obj->mMatrix = UMath::Matrix4::kIdentity;
-		obj->mMatrix.Rotate(NyaVec3(rotDelta * rotSpeedX, rotDelta * rotSpeedY, rotDelta * rotSpeedZ));
-
-		UMath::Matrix4 rotation;
-		rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
-		obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
-		obj->mMatrix.x *= scale;
-		obj->mMatrix.y *= scale;
-		obj->mMatrix.z *= scale;
-		obj->mMatrix.p = p;
-
-		if (IsChaosBlocked()) return;
-
-		// instakill enemy mario
-		if (SM64::bEnemyEnabled) {
-			auto dist = (SM64::GetMarioWorldPos() - obj->mMatrix.p);
-			if (dist.length() < 5) {
-				SM64::TakeLavaDamage();
-				SM64::TakeInstakillDamage();
-				ExplodeBomb(obj);
-			}
-		}
-
-		auto cars = GetActiveVehicles();
-		for (auto& car : cars) {
-			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
-			if (distFromCar < 5) {
-				if (!IsCarDestroyed(car)) {
-					if (auto rb = car->mCOMObject->Find<IRigidBody>()) {
-						auto vel = *rb->GetLinearVelocity();
-						vel.y += 10;
-						rb->SetLinearVelocity(&vel);
-
-						auto avel = *rb->GetAngularVelocity();
-						UMath::Vector3 right;
-						rb->GetForwardVector(&right);
-						avel.x += 10 * right.x;
-						avel.y += 10 * right.y;
-						avel.z += 10 * right.z;
-						rb->SetAngularVelocity(&vel);
-					}
-					if (car->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled) {
-						SM64::TakeLavaDamage();
-					}
-					DestroyCar(car);
-
-					ExplodeBomb(obj);
-				}
-			}
-		}
-	}
-
-	static void SpawnBomb(UMath::Matrix4 mat) {
-		if (models.empty() || models[0]->bInvalidated) {
-			Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF808080;
-			models = Render3D::CreateModels("pickup.fbx");
-			Render3D::ModelLoaderConfig.Reset();
-		}
-
-		aBombsInWorld.push_back(Render3DObjects::aObjects.size());
-		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("bomb", models, mat, {0,0,0}, 0, BombOnTick));
-	}
-
 	void InitFunction() override {
-		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickgen.wav");
-		if (sound) {
-			NyaAudio::SetVolume(sound, GetSFXVolume());
-			NyaAudio::Play(sound);
-		}
-
-		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
-			auto mat = UMath::Matrix4::kIdentity;
-			veh->GetMatrix4(&mat);
-			mat.p = *veh->GetPosition();
-			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
-			mat.p += mat.x * offX;
-			mat.p += mat.y * offY;
-			mat.p += mat.z * offZ;
-			SpawnBomb(mat);
-			DoChaosSave();
-		}
+		Powerups::ReVoltBomb::SpawnBomb(GetLocalPlayerInterface<IRigidBody>());
+		DoChaosSave();
 	}
 } E_ReVoltBomb;
 
@@ -1853,9 +1745,7 @@ public:
 	}
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
-		Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF000000;
-		static auto mdl = Render3D::CreateModels("abcblock.fbx");
-		Render3D::ModelLoaderConfig.Reset();
+		static auto mdl = Render3D::CreateModels("heavyblock.fbx");
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
 		objData.aModels = mdl;
@@ -1926,3 +1816,107 @@ public:
 		DoChaosSave();
 	}
 } E_SpawnHeavyCone;
+
+/*class Effect_PowerupBlock : public ChaosEffect {
+public:
+	Effect_PowerupBlock() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Powerup Pickup";
+		bCanQuickTrigger = false;
+	}
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline float rX = 90;
+	static inline float rY = 0;
+	static inline float rZ = 0;
+	static inline float offX = 0;
+	static inline float offY = 2.5;
+	static inline float offZ = 6;
+	static inline float scale = 1;
+
+	static inline float rotSpeedX = 0;
+	static inline float rotSpeedY = 0;
+	static inline float rotSpeedZ = -1.5;
+
+	static inline std::vector<int> aObjectsInWorld;
+
+	enum ePowerup {
+		POWERUP_EXPLODE,
+		POWERUP_FIREWORK,
+		NUM_POWERUPS
+	};
+
+	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
+		auto& rotDelta = *(float*)&obj->CustomData;
+		rotDelta += delta;
+
+		auto p = obj->mMatrix.p;
+		obj->mMatrix = UMath::Matrix4::kIdentity;
+		obj->mMatrix.Rotate(NyaVec3(rotDelta * rotSpeedX, rotDelta * rotSpeedY, rotDelta * rotSpeedZ));
+
+		UMath::Matrix4 rotation;
+		rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+		obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
+		obj->mMatrix.x *= scale;
+		obj->mMatrix.y *= scale;
+		obj->mMatrix.z *= scale;
+		obj->mMatrix.p = p;
+
+		if (IsChaosBlocked()) return;
+
+		auto cars = GetActiveVehicles();
+		for (auto& car : cars) {
+			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
+			if (distFromCar < 5) {
+				if (car->GetDriverClass() == DRIVER_HUMAN) {
+					int r = rand() % NUM_POWERUPS;
+					switch (r) {
+						case POWERUP_EXPLODE:
+							if (!IsCarDestroyed(car)) {
+								DestroyCar(car);
+							} break;
+						case POWERUP_FIREWORK:
+
+							break;
+					}
+					obj->aModels.clear();
+				}
+			}
+		}
+	}
+
+	static void SpawnObject(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			Render3D::ModelLoaderConfig.bColorByNormals = true;
+			Render3D::ModelLoaderConfig.fColorByNormalsScale = 0.25;
+			Render3D::ModelLoaderConfig.nAlphaValue = 127;
+			models = Render3D::CreateModels("powerupblock.fbx");
+			Render3D::ModelLoaderConfig.Reset();
+		}
+
+		auto id = Render3DObjects::aObjects.size();
+		aObjectsInWorld.push_back(id);
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("powerup", models, mat, {0,0,0}, 0, BombOnTick));
+		Render3DObjects::aObjects[id]->bUseAlpha = true;
+	}
+
+	void InitFunction() override {
+		//static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickgen.wav");
+		//if (sound) {
+		//	NyaAudio::SetVolume(sound, GetSFXVolume());
+		//	NyaAudio::Play(sound);
+		//}
+
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			mat.p += mat.x * offX;
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+			SpawnObject(mat);
+			DoChaosSave();
+		}
+	}
+} E_PowerupBlock;*/

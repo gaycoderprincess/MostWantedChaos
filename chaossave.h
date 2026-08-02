@@ -175,7 +175,7 @@ void DoChaos8DownLoad() {
 
 bool DoChaosBombSave() {
 	std::vector<UMath::Matrix4> save;
-	for (auto& peanut : Effect_ReVoltBomb::aBombsInWorld) {
+	for (auto& peanut : Powerups::ReVoltBomb::aBombsInWorld) {
 		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
 		save.push_back(model->mMatrix);
@@ -202,7 +202,7 @@ void DoChaosBombLoad() {
 	for (int i = 0; i < count; i++) {
 		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Effect_ReVoltBomb::SpawnBomb(save);
+		Powerups::ReVoltBomb::SpawnBomb(save);
 	}
 }
 
