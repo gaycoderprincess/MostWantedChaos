@@ -447,7 +447,7 @@ namespace Powerups {
 			//"CwoeeChaos/data/textures/revolt_7.png",
 			"CwoeeChaos/data/textures/revolt_8.png",
 			"CwoeeChaos/data/textures/revolt_9.png",
-			//"CwoeeChaos/data/textures/revolt_10.png",
+			"CwoeeChaos/data/textures/mk64_1.png",
 			"CwoeeChaos/data/textures/revolt_12.png",
 	};
 	IDirect3DTexture9* aPowerupTextures[NUM_POWERUPS] = {};
@@ -461,11 +461,20 @@ namespace Powerups {
 		int PowerupID = NUM_POWERUPS;
 		int PowerupCount = 0;
 		double fRollTime = 0.0;
-		double fUseTime = 0.0;
 		double fTimeSinceLastFire = 0.0;
+		double fElectroTime = 0.0;
+
+		// audio
+		NyaAudio::NyaSound electro = 0;
+		NyaAudio::NyaSound electrozap = 0;
+		NyaAudio::NyaSound balldrop = 0;
+		NyaAudio::NyaSound starfire = 0;
 
 		bool ExecutePowerup() {
 			switch (PowerupID) {
+				case POWERUP_ELECTROPULSE:
+					fElectroTime = 15.0;
+					return true;
 				case POWERUP_CLONE:
 					ReVoltBomb::SpawnBomb<false>(pUser->mCOMObject->Find<IRigidBody>());
 					return true;
@@ -480,8 +489,8 @@ namespace Powerups {
 				case POWERUP_CHROMEBALL: {
 					HeavyBall::SpawnBehindCar(pUser->mCOMObject->Find<IRigidBody>());
 
-					static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/balldrop.wav");
-					PlayAudioFromCar(sound, pUser);
+					if (!balldrop) balldrop = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/balldrop.wav");
+					PlayAudioFromCar(balldrop, pUser);
 					return true;
 				} break;
 				case POWERUP_TURBO: {
@@ -489,10 +498,10 @@ namespace Powerups {
 					return true;
 				} break;
 				case POWERUP_STAR: {
-					static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/starfire.wav");
-					if (sound) {
-						NyaAudio::SetVolume(sound, GetSFXVolume());
-						NyaAudio::Play(sound);
+					if (!starfire) starfire = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/starfire.wav");
+					if (starfire) {
+						NyaAudio::SetVolume(starfire, GetSFXVolume());
+						NyaAudio::Play(starfire);
 					}
 
 					auto cars = GetActiveVehicles();
@@ -516,43 +525,6 @@ namespace Powerups {
 					auto target = ReVoltFirework::PickTarget(pUser);
 					if (target && (bIsLocalPlayer || target == GetLocalPlayerVehicle())) {
 						ReVoltFirework::DrawCrosshair(target, bIsLocalPlayer);
-					}
-				} break;
-				case POWERUP_ELECTROPULSE: {
-					static auto loop1 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electro.wav");
-					static auto loop2 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electrozap.wav");
-					if (loop1) {
-						NyaAudio::SetVolume(loop1, GetSFXVolume());
-						NyaAudio::Play(loop1);
-					}
-
-					fUseTime -= delta;
-					if (fUseTime <= 0.0) {
-						NyaAudio::Stop(loop1);
-						NyaAudio::Stop(loop2);
-						return true;
-					}
-
-					auto plyPos = *pUser->GetPosition();
-					auto cars = GetActiveVehicles();
-					for (auto& car : cars) {
-						if (car == pUser) continue;
-						if (IsCarDestroyed(car)) continue;
-
-						auto dist = (plyPos - *car->GetPosition()).length();
-						if (dist < 5) {
-							if (auto sus = car->mCOMObject->Find<ISuspension>()) {
-								for (int i = 0; i < 4; i++) {
-									sus->SetWheelAngularVelocity(i, 0.0);
-								}
-							}
-							//if (!IsCarDestroyed(car)) {
-							//	DestroyCar(car);
-							//}
-
-							NyaAudio::SetVolume(loop2, GetSFXVolume());
-							NyaAudio::Play(loop2);
-						}
 					}
 				} break;
 			}
@@ -584,7 +556,6 @@ namespace Powerups {
 			//PowerupCount = (PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_WATERBOMB) ? 3 : 1;
 			PowerupCount = PowerupID == POWERUP_FIREWORKPACK ? 3 : 1;
 			fRollTime = 4.0;
-			fUseTime = 15.0;
 
 			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup.wav");
 			PlayAudioFromCar(sound, pUser);
@@ -643,7 +614,58 @@ namespace Powerups {
 			return true;
 		}
 
+		void ProcessLastingEffects(double delta) {
+			if (fElectroTime > 0.0) {
+				if (!electro) electro = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electro.wav");
+				if (!electrozap) electrozap = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electrozap.wav");
+
+				if (electro) {
+					NyaAudio::SetVolume(electro, GetSFXVolume());
+					NyaAudio::Play(electro);
+				}
+
+				bool doZap = false;
+
+				auto plyPos = *pUser->GetPosition();
+				auto cars = GetActiveVehicles();
+				for (auto& car : cars) {
+					if (car == pUser) continue;
+					if (IsCarDestroyed(car)) continue;
+
+					auto dist = (plyPos - *car->GetPosition()).length();
+					if (dist < 10) {
+						if (auto sus = car->mCOMObject->Find<ISuspension>()) {
+							for (int i = 0; i < 4; i++) {
+								sus->SetWheelAngularVelocity(i, 0.0);
+							}
+						}
+						//if (!IsCarDestroyed(car)) {
+						//	DestroyCar(car);
+						//}
+
+						doZap = true;
+					}
+				}
+
+				if (doZap) {
+					NyaAudio::SetVolume(electrozap, GetSFXVolume());
+					NyaAudio::Play(electrozap);
+				}
+				else {
+					NyaAudio::Stop(electrozap);
+				}
+
+				fElectroTime -= delta;
+				if (fElectroTime <= 0.0) {
+					NyaAudio::Stop(electro);
+					NyaAudio::Stop(electrozap);
+				}
+			}
+		}
+
 		void Process(double delta) {
+			ProcessLastingEffects(delta);
+
 			fTimeSinceLastFire += delta;
 
 			fRollTime -= delta;
@@ -660,9 +682,7 @@ namespace Powerups {
 		}
 
 		void Process3D() {
-			if (fRollTime > 0) return;
-
-			if (PowerupID == POWERUP_ELECTROPULSE) {
+			if (fElectroTime > 0.0) {
 				NyaDrawing::CNyaRGBA32 tmp;
 				tmp.b = 0;
 				tmp.g = 255;

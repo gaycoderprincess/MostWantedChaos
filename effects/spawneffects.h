@@ -1591,6 +1591,13 @@ public:
 		if (GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&p, &p.y, nullptr)) {
 			p.y += offY;
 		}
+		else {
+			auto ply = GetLocalPlayerVehicle();
+			if (ply && (*ply->GetPosition() - p).length() < 50) {
+				obj->aModels.clear();
+				return;
+			}
+		}
 
 		obj->mMatrix = UMath::Matrix4::kIdentity;
 		obj->mMatrix.Rotate(NyaVec3(rotDelta * rotSpeedX, rotDelta * rotSpeedY, rotDelta * rotSpeedZ));
