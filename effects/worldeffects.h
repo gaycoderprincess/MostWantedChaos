@@ -528,3 +528,48 @@ public:
 	bool RunWhenBlocked() override { return true; }
 	bool ShouldAbort() override { return false; }
 } E_CollisionView2;
+
+class Effect_EnableBarriers : public ChaosEffect {
+public:
+	Effect_EnableBarriers() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Enable All Race Barriers";
+		MakeIncompatibleWithFilterGroup("remove_barriers");
+	}
+
+	void InitFunction() override {
+		auto group = SceneryGroupList.HeadNode.Next;
+		while (group != &SceneryGroupList.HeadNode) {
+			auto id = group->GroupNumber;
+			if (!SceneryGroupEnabledTable[id]) {
+				auto oldHash = group->NameHash;
+				group->NameHash = 696969;
+				EnableSceneryGroup(696969, false);
+				group->NameHash = oldHash;
+			}
+			group = group->Next;
+		}
+	}
+} E_EnableBarriers;
+
+class Effect_UnlockOldBridge : public ChaosEffect {
+public:
+	Effect_UnlockOldBridge() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Unlock Old Bridge";
+		bAbortOnConditionFailed = true;
+	}
+
+	void InitFunction() override {
+		int id = 71;
+		if (auto group = NyaHelpers::FindSceneryGroupById(id)) {
+			if (SceneryGroupEnabledTable[id]) {
+				auto oldHash = group->NameHash;
+				group->NameHash = 696969;
+				DisableSceneryGroup(696969);
+				group->NameHash = oldHash;
+			}
+		}
+	}
+	bool IsAvailable() override {
+		return IsInPursuitRace() || (!IsInAnyRace() && IsInAnyPursuit());
+	}
+} E_UnlockOldBridge;

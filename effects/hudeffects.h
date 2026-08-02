@@ -108,7 +108,7 @@ public:
 		flags &= ~0x100000;
 		// remove CostToState
 		flags &= ~0x1000;
-		if (IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued())) {
+		if (IsInNormalRace() || IsInAnyPursuit()) {
 			// remove Minimap
 			flags &= ~0x10000;
 		}
@@ -129,6 +129,6 @@ public:
 	}
 	bool HasTimer() override { return true; }
 	bool IsAvailable() override {
-		return IsInNormalRace() || (GetLocalPlayerInterface<IPerpetrator>() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued());
+		return IsInNormalRace() || IsInAnyPursuit();
 	}
 } E_FO1HUD;

@@ -120,7 +120,6 @@ float fCarWorldY = 0.0;
 float fCarWorldZ = 90.0;
 void ModifyCarWorldMatrix(NyaMat4x4& mat) {
 	UMath::Matrix4 rotate_temp;
-	//rotate_temp.Rotate({0, 90 * 0.01745329, 0});
 	rotate_temp.Rotate({fCarWorldX * 0.01745329, fCarWorldY * 0.01745329, fCarWorldZ * 0.01745329});
 	mat = (UMath::Matrix4)(mat * rotate_temp);
 
@@ -132,7 +131,6 @@ void ModifyCarWorldMatrix(NyaMat4x4& mat) {
 	mat = RenderToWorldMatrix(mat);
 
 	rotate_temp = rotate_temp.Invert();
-	//rotate_temp.Rotate({-fCarWorldX * 0.01745329, -fCarWorldY * 0.01745329, -fCarWorldZ * 0.01745329});
 	mat = (UMath::Matrix4)(mat * rotate_temp);
 }
 

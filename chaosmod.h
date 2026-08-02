@@ -343,7 +343,7 @@ void ChaosLoop() {
 
 	// just to rub it in a little
 	static bool bSMSSent = false;
-	if (!bSMSSent && StatTracker::nTimesBusted == 1 && IsInCareerMode() && GetUserProfile()->TheCareerSettings.CurrentBin <= 15 && !IsInAnyRace() && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
+	if (!bSMSSent && StatTracker::nTimesBusted == 1 && IsInCareerMode() && GetUserProfile()->TheCareerSettings.CurrentBin <= 15 && !IsInAnyRace() && !IsInAnyPursuit()) {
 		SendSMS(98, true, true);
 		bSMSSent = true;
 	}

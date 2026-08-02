@@ -80,10 +80,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-			return ply->IsBeingPursued();
-		}
-		return false;
+		return IsInAnyPursuit();
 	}
 };
 
@@ -94,10 +91,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-			return ply->IsBeingPursued() && !IsInNormalRace();
-		}
-		return false;
+		return IsInAnyPursuit() && !IsInNormalRace();
 	}
 };
 
@@ -108,10 +102,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-			return !ply->IsBeingPursued();
-		}
-		return false;
+		return !IsInAnyPursuit();
 	}
 };
 

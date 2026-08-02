@@ -738,6 +738,13 @@ bool IsInNamedRace(const char* eventId) {
 	return !strcmp(GRaceStatus::fObj->mRaceParms->GetEventID(), eventId);
 }
 
+bool IsInAnyPursuit() {
+	if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
+		return ply->IsBeingPursued();
+	}
+	return false;
+}
+
 bool IsPlayerApproachingOldBridge() {
 	return (*GetLocalPlayerVehicle()->GetPosition() - NyaVec3(-2878, 220, -729)).length() < 25;
 }

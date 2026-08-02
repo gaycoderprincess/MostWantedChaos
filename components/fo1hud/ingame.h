@@ -47,10 +47,7 @@ bool IsInRace() {
 }
 
 bool IsInPursuit() {
-	if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-		return ply->IsBeingPursued();
-	}
-	return false;
+	return IsInAnyPursuit();
 }
 
 bool IsRacerKOd(GRacerInfo* ply) {

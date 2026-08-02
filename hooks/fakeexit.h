@@ -18,8 +18,7 @@ bool CanAltF4() {
 	if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_RACING) {
 		if (IsInLoadingScreen()) return false;
 		if (IsInNIS()) return false;
-		auto ply = GetLocalPlayerInterface<IPerpetrator>();
-		if (ply && ply->IsBeingPursued()) return false;
+		if (IsInAnyPursuit()) return false;
 		return true;
 	}
 

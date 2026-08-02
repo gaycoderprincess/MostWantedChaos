@@ -390,10 +390,7 @@ public:
 		//EAXDispatch::Report911(SoundAI::mInstance->mDispatch, Csis::Type_pursuit_type_Reckless);
 	}
 	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-			return !ply->IsBeingPursued();
-		}
-		return true;
+		return !IsInAnyPursuit();
 	}
 	bool IsConditionallyAvailable() override { return true; }
 } E_911;*/

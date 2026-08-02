@@ -27,9 +27,9 @@ public:
 	}
 } E_SpawnCop;*/
 
-class Effect_Pursuit : public ChaosEffect {
+class Effect_Pursuit : public EffectBase_NotInPursuitConditional {
 public:
-	Effect_Pursuit() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_Pursuit() : EffectBase_NotInPursuitConditional(EFFECT_CATEGORY_TEMP) {
 		sName = "Trigger Police Pursuit";
 		bAbortOnConditionFailed = true;
 	}
@@ -37,12 +37,6 @@ public:
 	void InitFunction() override {
 		ForceEnableCops();
 		ICopMgr::mInstance->PursueAtHeatLevel(GetLocalPlayerInterface<IPerpetrator>()->GetHeat());
-	}
-	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerInterface<IPerpetrator>()) {
-			return !ply->IsBeingPursued();
-		}
-		return true;
 	}
 } E_Pursuit;
 

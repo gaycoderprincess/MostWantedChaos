@@ -457,7 +457,7 @@ public:
 		obj->StartLicensedMusic(song->PathEvent);
 	}
 	bool IsAvailable() override {
-		return GetUserProfile()->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued();
+		return GetUserProfile()->TheOptionsSettings.TheAudioSettings.IGMusicVol > 0 && !IsInAnyPursuit();
 	}
 } E_SkipMusic;
 

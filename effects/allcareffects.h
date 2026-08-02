@@ -324,7 +324,7 @@ public:
 		if (timer > 1) {
 			int applyChance = 25;
 			int captureChance = 50;
-			if (!IsInNormalRace() && GetLocalPlayerInterface<IPerpetrator>()->IsBeingPursued()) {
+			if (!IsInNormalRace() && IsInAnyPursuit()) {
 				applyChance = 40;
 				captureChance = 60;
 
