@@ -847,7 +847,9 @@ bool PercentageChanceCheck(int percent) {
 }
 
 void SendSMS(int id, bool popup, bool once) {
-	if (once && GetUserProfile()->TheCareerSettings.SMSMessages[id].IsInInbox()) return;
+	auto message = &GetUserProfile()->TheCareerSettings.SMSMessages[id];
+	if (once && message->IsInInbox()) return;
+	message->Flags = 0;
 
 	if (popup) return GManager::mObj->AddSMS(id);
 	return GManager::mObj->DispatchSMSMessage(id);
