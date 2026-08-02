@@ -1004,14 +1004,15 @@ void ChaosModMenu() {
 			}
 			QuickValueEditor("Powerups::fSpriteY", Powerups::fSpriteY);
 			QuickValueEditor("Powerups::fSpriteSize", Powerups::fSpriteSize);
-			QuickValueEditor("PowerupBlock::rX", Effect_PowerupBlock::rX);
-			QuickValueEditor("PowerupBlock::rY", Effect_PowerupBlock::rY);
-			QuickValueEditor("PowerupBlock::rZ", Effect_PowerupBlock::rZ);
-			QuickValueEditor("PowerupBlock::offY", Effect_PowerupBlock::offY);
-			QuickValueEditor("PowerupBlock::scale", Effect_PowerupBlock::scale);
-			QuickValueEditor("PowerupBlock::rotSpeedX", Effect_PowerupBlock::rotSpeedX);
-			QuickValueEditor("PowerupBlock::rotSpeedY", Effect_PowerupBlock::rotSpeedY);
-			QuickValueEditor("PowerupBlock::rotSpeedZ", Effect_PowerupBlock::rotSpeedZ);
+			QuickValueEditor("PowerupBlock::bLightSpawnMode", Powerups::PowerupBlock::bLightSpawnMode);
+			QuickValueEditor("PowerupBlock::rX", Powerups::PowerupBlock::rX);
+			QuickValueEditor("PowerupBlock::rY", Powerups::PowerupBlock::rY);
+			QuickValueEditor("PowerupBlock::rZ", Powerups::PowerupBlock::rZ);
+			QuickValueEditor("PowerupBlock::offY", Powerups::PowerupBlock::offY);
+			QuickValueEditor("PowerupBlock::scale", Powerups::PowerupBlock::scale);
+			QuickValueEditor("PowerupBlock::rotSpeedX", Powerups::PowerupBlock::rotSpeedX);
+			QuickValueEditor("PowerupBlock::rotSpeedY", Powerups::PowerupBlock::rotSpeedY);
+			QuickValueEditor("PowerupBlock::rotSpeedZ", Powerups::PowerupBlock::rotSpeedZ);
 			QuickValueEditor("fCarWorldX", fCarWorldX);
 			QuickValueEditor("fCarWorldY", fCarWorldY);
 			QuickValueEditor("fCarWorldZ", fCarWorldZ);

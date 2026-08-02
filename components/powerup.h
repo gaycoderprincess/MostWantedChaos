@@ -12,6 +12,7 @@ namespace Powerups {
 			if (volume < 0) volume = 0;
 		}
 
+		if (volume <= 0.0) return;
 		NyaAudio::SetVolume(sound, volume * GetSFXVolume());
 		NyaAudio::SkipTo(sound, 0, false);
 		NyaAudio::Play(sound);
@@ -489,7 +490,11 @@ namespace Powerups {
 		objData.bAffectGamePhysics = true;
 		objData.sDebugName = "beachball";
 		objData.pCollisionSound = sound;
-		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+
+		auto obj = CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+		auto massData = b3Body_GetMassData(obj);
+		massData.mass *= 50;
+		b3Body_SetMassData(obj, massData);
 	}
 
 	float fSpriteY = 0.3;
@@ -556,12 +561,15 @@ namespace Powerups {
 
 					UMath::Vector3 dim;
 					UMath::Vector3 fwd;
+					UMath::Vector3 up;
 					rb->GetDimension(&dim);
 					rb->GetForwardVector(&fwd);
+					rb->GetUpVector(&up);
 
 					auto pos = *rb->GetPosition();
 					auto vel = *rb->GetLinearVelocity();
 					pos += fwd * (dim.z + 2.5);
+					pos += up * 0.5;
 					vel += fwd * 50;
 					SpawnPhysicalBeachBall(pos, vel);
 					return true;
@@ -617,11 +625,33 @@ namespace Powerups {
 				hasNOS = engine->HasNOS();
 			}
 
+			bool isFirstPlace = false;
+			bool isLastPlace = false;
+			if (GRaceStatus::fObj) {
+				if (auto ply = GRaceStatus::fObj->GetRacerInfo(pUser->GetSimable())) {
+					isFirstPlace = ply->mRanking == 1;
+					isLastPlace = ply->mRanking == GRaceStatus::fObj->mRacerCount;
+				}
+			}
+			if (isFirstPlace && isLastPlace) {
+				isFirstPlace = false;
+				isLastPlace = false;
+			}
+
 			std::vector<int> powerupsAvailable;
 			for (int i = 0; i < NUM_POWERUPS; i++) {
+				if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
+				if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
+				if (isFirstPlace && i == POWERUP_FIREWORK) continue;
+				if (isFirstPlace && i == POWERUP_FIREWORKPACK) continue;
+				if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
+				if (isFirstPlace && i == POWERUP_STAR) continue;
+
 				if (!isPlayer && i == POWERUP_STAR) continue; // too OP
+
 				if (!isPlayer && i == POWERUP_TURBO) continue; // turbo is player only cuz of input overrides
 				if (!hasNOS && i == POWERUP_TURBO) continue; // turbo is forced infinite nos
+
 				powerupsAvailable.push_back(i);
 			}
 			GivePowerup(powerupsAvailable[rand()%powerupsAvailable.size()]);
@@ -711,6 +741,7 @@ namespace Powerups {
 				fTurboTime -= delta;
 				if (fTurboTime <= 0.0) {
 					bForcePlayerNOS = false;
+					gCustomPlayerInput->fNOS = false;
 				}
 			}
 			if (fElectroTime > 0.0) {
@@ -903,6 +934,122 @@ namespace Powerups {
 			}
 		}
 		return false;
+	}
+
+	namespace PowerupBlock {
+		bool bLightSpawnMode = false;
+
+		std::vector<Render3D::tModel*> models;
+
+		float rX = 90;
+		float rY = 0;
+		float rZ = 0;
+		float offY = 2.0;
+		float scale = 0.75;
+
+		float rotSpeedX = 0;
+		float rotSpeedY = 0;
+		float rotSpeedZ = -1.5;
+
+		std::vector<int> aObjectsInWorld;
+
+		void BombOnTick(Render3DObjects::Object* obj, double delta) {
+			auto& rotDelta = *(float*)&obj->CustomData;
+
+			auto p = obj->mMatrix.p;
+			if (GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&p, &p.y, nullptr)) {
+				p.y += offY;
+			}
+			else {
+				auto ply = GetLocalPlayerVehicle();
+				if (ply && (*ply->GetPosition() - p).length() < 100) {
+					obj->aModels.clear();
+					return;
+				}
+			}
+
+			obj->mMatrix = UMath::Matrix4::kIdentity;
+			obj->mMatrix.Rotate(NyaVec3(rotDelta * rotSpeedX, rotDelta * rotSpeedY, rotDelta * rotSpeedZ));
+
+			UMath::Matrix4 rotation;
+			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
+			obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
+			obj->mMatrix.x *= scale;
+			obj->mMatrix.y *= scale;
+			obj->mMatrix.z *= scale;
+			obj->mMatrix.p = p;
+
+			if (IsChaosBlocked()) return;
+			rotDelta += delta;
+
+			bool canPlayerPowerup = true;
+			if (SM64::bEnabled) canPlayerPowerup = false;
+			if (CustomPhysicsBall::bEnabled) canPlayerPowerup = false;
+
+			auto cars = GetActiveVehicles();
+			for (auto& car : cars) {
+				if (car->GetDriverClass() != DRIVER_HUMAN && car->GetDriverClass() != DRIVER_RACER) continue;
+				if (car->GetDriverClass() == DRIVER_HUMAN && !canPlayerPowerup) continue;
+
+				auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
+				if (distFromCar < 5) {
+					if (Powerups::PlayerHasPowerup(car)) continue;
+					Powerups::RollPowerup(car);
+					obj->aModels.clear();
+				}
+			}
+		}
+
+		void SpawnObject(UMath::Matrix4 mat) {
+			if (models.empty() || models[0]->bInvalidated) {
+				Render3D::ModelLoaderConfig.bColorByNormals = true;
+				Render3D::ModelLoaderConfig.fColorByNormalsScale = 0.25;
+				Render3D::ModelLoaderConfig.nAlphaValue = 127;
+				models = Render3D::CreateModels("powerupblock.fbx");
+				Render3D::ModelLoaderConfig.Reset();
+			}
+
+			auto id = Render3DObjects::aObjects.size();
+			aObjectsInWorld.push_back(id);
+			Render3DObjects::aObjects.push_back(new Render3DObjects::Object("powerup", models, mat, {0,0,0}, 0, BombOnTick));
+			Render3DObjects::aObjects[id]->bUseAlpha = true;
+		}
+
+		void SpawnForAllCheckpoints() {
+			for (int i = 0; i < GRaceStatus::fObj->mCheckpoints.size(); i++) {
+				auto& cp = GRaceStatus::fObj->mCheckpoints[i];
+				auto dir = cp->mDirection;
+				auto pos = cp->mWorldTrigger.fPosRadius;
+
+				auto lookat = NyaMat4x4::LookAt(dir);
+
+				NyaVec3 center = {pos.x, pos.y, pos.z};
+				//auto left = center - lookat.x * pos.w;
+				//auto right = center + lookat.x * pos.w;
+				center.y += 5.0; // to make sure the height checks will work
+
+				if (bLightSpawnMode) {
+					UMath::Matrix4 objMat;
+					objMat.p = center - lookat.x * (pos.w * 0.33);
+					SpawnObject(objMat);
+					objMat.p = center + lookat.x * (pos.w * 0.33);
+					SpawnObject(objMat);
+				}
+				else {
+					UMath::Matrix4 objMat;
+					objMat.p = center;
+					SpawnObject(objMat);
+					objMat.p = center - lookat.x * (pos.w * 0.33);
+					SpawnObject(objMat);
+					objMat.p = center + lookat.x * (pos.w * 0.33);
+					SpawnObject(objMat);
+					objMat.p = center - lookat.x * (pos.w * 0.66);
+					SpawnObject(objMat);
+					objMat.p = center + lookat.x * (pos.w * 0.66);
+					SpawnObject(objMat);
+				}
+			}
+		}
 	}
 
 	void OnTick() {

@@ -179,7 +179,7 @@ namespace CustomPhysicsObjects {
 		return meshes;
 	}
 
-	void CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
+	b3BodyId CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
 		data.vSpawnPosition = position;
 		if (collider == BOX) {
 			b3BodyDef def = b3DefaultBodyDef();
@@ -214,6 +214,7 @@ namespace CustomPhysicsObjects {
 		auto obj = new CustomPhysicsObject;
 		*obj = data;
 		aPhysicsObjects.push_back(obj);
+		return obj->nB3Body;
 	}
 
 	void CreatePhysicsObject(CustomPhysicsObject data, std::vector<b3HullData*>& meshes, NyaVec3 position, NyaVec3 velocity) {

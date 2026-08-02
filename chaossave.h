@@ -434,6 +434,39 @@ void DoChaosSM64Load() {
 	file.read((char*)&SM64::vEnemySpawnPosition, sizeof(SM64::vEnemySpawnPosition));
 }
 
+bool DoChaosPowerupsSave() {
+	std::vector<UMath::Matrix4> save;
+	for (auto& id : Powerups::PowerupBlock::aObjectsInWorld) {
+		auto model = Render3DObjects::aObjects[id];
+		if (model->IsEmpty()) continue;
+		save.push_back(model->mMatrix);
+	}
+
+	std::ofstream file("CwoeeChaos/save/powerupblock.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return false;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+	return true;
+}
+
+void DoChaosPowerupsLoad() {
+	std::ifstream file("CwoeeChaos/save/powerupblock.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		UMath::Matrix4 save;
+		file.read((char*)&save, sizeof(save));
+		Powerups::PowerupBlock::SpawnObject(save);
+	}
+}
+
 void DoChaosSave() {
 	DLLDirSetter _setdir;
 
@@ -453,6 +486,7 @@ void DoChaosSave() {
 	if (!DoChaosPhysicsObjectSave("trafficcone_save", "cone")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosRampSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSM64Save()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosPowerupsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 }
 
@@ -472,5 +506,6 @@ void DoChaosLoad() {
 	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
 	DoChaosRampLoad();
 	DoChaosSM64Load();
+	DoChaosPowerupsLoad();
 	DoChaosSettingsLoad();
 }
