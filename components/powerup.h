@@ -631,9 +631,14 @@ namespace Powerups {
 				if (rb->GetInvulnerability() != INVULNERABLE_NONE) isResetting = true;
 			}
 
+			bool isPlayerInFirstPlace = false;
+
 			bool isFirstPlace = false;
 			bool isLastPlace = false;
 			if (GRaceStatus::fObj) {
+				if (auto ply = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())) {
+					isPlayerInFirstPlace = ply->mRanking == 1;
+				}
 				if (auto ply = GRaceStatus::fObj->GetRacerInfo(pUser->GetSimable())) {
 					isFirstPlace = ply->mRanking == 1;
 					isLastPlace = ply->mRanking == GRaceStatus::fObj->mRacerCount;
@@ -655,7 +660,11 @@ namespace Powerups {
 				//if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
 				if (isFirstPlace && i == POWERUP_STAR) continue;
 
-				if (!isPlayer && i == POWERUP_STAR) continue; // too OP
+				if (isFirstPlace && i == POWERUP_STAR) continue;
+				if (!isPlayer && i == POWERUP_STAR) {
+					if (!isPlayerInFirstPlace) continue;
+					if (!isLastPlace) continue;
+				}
 
 				if (!isPlayer && i == POWERUP_TURBO) continue; // turbo is player only cuz of input overrides
 				if (!hasNOS && i == POWERUP_TURBO) continue; // turbo is forced infinite nos
@@ -758,7 +767,6 @@ namespace Powerups {
 				fTurboTime -= delta;
 				if (fTurboTime <= 0.0) {
 					bForcePlayerNOS = false;
-					gCustomPlayerInput->fNOS = false;
 				}
 			}
 			if (fElectroTime > 0.0) {
