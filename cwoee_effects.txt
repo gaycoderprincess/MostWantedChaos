@@ -59,6 +59,7 @@ Cops Drive Trucks
 Cops Drop Cash
 Crazy Spinny Cars (Visual) (Is This What RPM Means?)
 Cruise Control
+Curved Screen
 DOS Era Graphics
 Debug View
 Decrease Heat Level
@@ -88,8 +89,9 @@ Disable Visual Treatment
 Disable Wall Collision
 Disable World Collision
 Disco Screen Overlay (Disco Time)
-Drag HUD
+Drag Race HUD
 Drunk Screen Overlay (Drunk Mode)
+Enable All Race Barriers
 Enable Game Moment Camera
 Exit To Main Menu
 Fake Blow Player's Engine
@@ -116,10 +118,12 @@ Full Chat Chaos Control
 Give $5000 (FIVE GRAND)
 Give Other Cars Firework Rockets
 Give Player Firework Rockets
+Glitchy Visuals
 Gran Turismo Camera
 Grippy World
 Halve Player Steering (Half-Broken Steering Wheel)
 Halve Player Throttle (Half-Broken Throttle)
+Halve Player's Money (IRS Visit)
 Handling +10
 Handling -10
 Helicopter Camera
@@ -132,8 +136,9 @@ Infinite Player Mass (Juggernaut)
 Infinite Player Nitro
 Infinite Speedbreaker
 Infinite Traffic Mass
-Insanely Unfair RNG
+Insanely Unfair Effect RNG
 Inverted Colors
+Inverted Player Steering
 Invincible Cops
 Invincible Player Engine
 Invincible Player Tires
@@ -191,6 +196,7 @@ Pursuit Breaker Sound Effect
 Quick-Time Event
 Racer AI For Traffic
 Rainbow World (Rainbow Road)
+Random Game Speed
 Random Phone Call (Ring Ring)
 Random Text
 Randomize Active Car's Visuals
@@ -214,8 +220,8 @@ Restart Event At 99% Completion
 Reverse Superhot
 Reverse Text
 Rigged Votes (Lowest Voted Wins) (Rigged Votes)
+Ruthless Cop Cross Spawns (It's Cross)
 Ruthless Cop Spawns (EVERYONE!!!)
-Ruthless Cross Spawns (It's Cross)
 Saturate The Screen
 Second Person View
 Set Heat Level To 1
@@ -233,15 +239,16 @@ Spawn 1000 ABC Blocks (Learn The ABCs)
 Spawn 1000 Beach Balls
 Spawn ABC Blocks (Learn The ABCs)
 Spawn Beach Balls
-Spawn Bomb Behind Player
 Spawn Giant Traffic Cone
 Spawn Griefer Mario
 Spawn Griefer Vergil
 Spawn Griefer Vergils At Old Bridge (Spawn Griefer Vergils Somewhere)
 Spawn Inconvenient Cube
+Spawn Landmine Behind Player
 Spawn Player As Random Cop Car
 Spawn Player As Random Traffic Car
 Spawn Player As Stock Punto
+Spawn Powerups On Racetrack
 Spawn Ramp
 Spawn SCP-173
 Spawn SCP-173 Somewhere
@@ -277,6 +284,8 @@ Tunnel Vision
 Turn Into Giant Beach Ball (Super Rockport Ball)
 Turn Into Mario 64 (Super Mario 64 Mode)
 Uninstall Counter-Strike: Source
+Unlock All Cars
+Unlock Old Bridge
 Upside Down Screen (Meanwhile In Australia)
 Weak Nitro
 Wheel Camera
