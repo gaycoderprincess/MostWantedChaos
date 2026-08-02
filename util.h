@@ -63,7 +63,6 @@ T* GetLocalPlayerInterface() {
 }
 
 auto GetLocalPlayerVehicle() { return GetLocalPlayerInterface<IVehicle>(); }
-auto GetLocalPlayerEngine() { return GetLocalPlayerInterface<IEngine>(); }
 
 // from easing-functions by nicolausYes
 double easeInOutQuart(double t) {
@@ -743,6 +742,11 @@ bool IsInAnyPursuit() {
 		return ply->IsBeingPursued();
 	}
 	return false;
+}
+
+// challenge series, final chase, freeroam pursuit
+bool IsInFocusedPursuit() {
+	return IsInPursuitRace() || (!IsInAnyRace() && IsInAnyPursuit());
 }
 
 bool IsPlayerApproachingOldBridge() {

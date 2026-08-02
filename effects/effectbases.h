@@ -6,7 +6,7 @@ public:
 	}
 
 	bool IsAvailable() override {
-		if (auto ply = GetLocalPlayerEngine()) {
+		if (auto ply = GetLocalPlayerInterface<IEngine>()) {
 			return ply->HasNOS();
 		}
 		return false;

@@ -91,3 +91,68 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_RealTimeSpeedbrk;
+
+class Effect_SpeedRandom : public ChaosEffect {
+public:
+	Effect_SpeedRandom() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Random Game Speed";
+		fTimerLength = 30;
+		AddToIncompatiblityGroup("gamespeed");
+		MakeIncompatibleWithFilterGroup("speedbreaker");
+		bCanQuickTrigger = false;
+	}
+
+	static inline float fStopSpeed = 0.1;
+	static inline float fSlowSpeed = 2.5;
+	static inline float fFastSpeed = 5.0;
+
+	static inline float fCurrentSpeed = fStopSpeed;
+	static inline double fTimeUntilNextSpeed = 3.0;
+
+	void InitFunction() override {
+		fCurrentSpeed = fStopSpeed;
+		fTimeUntilNextSpeed = 3.0;
+	}
+	void TickFunctionMain(double delta) override {
+		if (auto ply = GetLocalPlayer()) {
+			ply->ResetGameBreaker(false);
+		}
+
+		static auto audioSlow = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/oiiaslow.mp3");
+		static auto audioFast = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/oiiafast.mp3");
+
+		// slow lasts about 2 sec
+		// fast lasts 1.3 sec
+
+		fTimeUntilNextSpeed -= delta;
+		if (fTimeUntilNextSpeed <= 0.0) {
+			// always stop
+			if (fCurrentSpeed > 1.0) {
+				fCurrentSpeed = fStopSpeed;
+				fTimeUntilNextSpeed = 2.0;
+			}
+			// then go
+			else {
+				if (PercentageChanceCheck(50)) {
+					fCurrentSpeed = fSlowSpeed;
+					fTimeUntilNextSpeed = 2.0;
+					NyaAudio::SetVolume(audioSlow, GetSFXVolume());
+					NyaAudio::Play(audioSlow);
+				}
+				else {
+					fCurrentSpeed = fFastSpeed;
+					fTimeUntilNextSpeed = 1.4;
+					NyaAudio::SetVolume(audioFast, GetSFXVolume());
+					NyaAudio::Play(audioFast);
+				}
+			}
+		}
+		GameSpeedModifier = fCurrentSpeed;
+	}
+	void DeinitFunction() override {
+		GameSpeedModifier = 1.0;
+	}
+	bool HasTimer() override { return true; }
+	//bool RunInMenus() override { return true; }
+	//bool RunWhenBlocked() override { return true; }
+} E_SpeedRandom;

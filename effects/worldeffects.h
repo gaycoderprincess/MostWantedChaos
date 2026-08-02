@@ -570,6 +570,6 @@ public:
 		}
 	}
 	bool IsAvailable() override {
-		return IsInPursuitRace() || (!IsInAnyRace() && IsInAnyPursuit());
+		return IsInFocusedPursuit();
 	}
 } E_UnlockOldBridge;

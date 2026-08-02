@@ -254,13 +254,14 @@ public:
 
 	void InitFunction() override {
 		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x61DDE3, &PerformanceCandidatesHookedASM);
-		NyaHookLib::Patch(0x8925C8, &GetCatchupCheatHooked);
+		//NyaHookLib::Patch(0x8925C8, &GetCatchupCheatHooked);
 		NyaHookLib::Patch(0x8AA8FC, &GetPerformanceHooked);
 		NyaHookLib::Patch(0x892A64, &GetTopSpeedHooked);
 		NyaHookLib::Patch(0x892A68, &GetAccelerationHooked);
 	}
 	void DeinitFunction() override {
-		NyaHookLib::Patch(0x8925C8, 0x409390);
+		NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x61DDE3, 0x60D580);
+		//NyaHookLib::Patch(0x8925C8, 0x409390);
 		NyaHookLib::Patch(0x8AA8FC, 0x688270);
 		NyaHookLib::Patch(0x892A64, 0x431D60);
 		NyaHookLib::Patch(0x892A68, 0x4223E0);
@@ -370,7 +371,9 @@ public:
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles(DRIVER_RACER);
 		for (auto& car : cars) {
-			car->mCOMObject->Find<IEngine>()->ChargeNOS(-1);
+			auto engine = car->mCOMObject->Find<IEngine>();
+			if (!engine) continue;
+			engine->ChargeNOS(-1);
 		}
 	}
 	bool HasTimer() override { return true; }

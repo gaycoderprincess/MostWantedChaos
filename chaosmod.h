@@ -809,7 +809,7 @@ void ChaosModMenu() {
 				DrawMenuOption(std::format("Jolly Rancher Position: {:.2f} {:.2f} {:.2f}", jolly.p.x, jolly.p.y, jolly.p.z));
 				DrawMenuOption(std::format("InGameBreaker: {}", ply->InGameBreaker()));
 				DrawMenuOption(std::format("CanRechargeNOS: {}", ply->CanRechargeNOS()));
-				DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerEngine()->HasNOS()));
+				DrawMenuOption(std::format("HasNOS: {}", GetLocalPlayerInterface<IEngine>()->HasNOS()));
 				DrawMenuOption(std::format("Speed: {:.2f}", GetLocalPlayerVehicle()->GetSpeed()));
 				DrawMenuOption(std::format("911 Time: {:.2f}", GetLocalPlayerInterface<IPerpetrator>()->Get911CallTime()));
 				DrawMenuOption(std::format("Player Car: {}", FEDatabase->CurrentUserProfiles[0]->TheCareerSettings.CurrentCar));

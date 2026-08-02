@@ -33,7 +33,7 @@ public:
 		}
 
 		// nitro
-		if (auto ply = GetLocalPlayerEngine()) {
+		if (auto ply = GetLocalPlayerInterface<IEngine>()) {
 			ply->ChargeNOS(-1);
 		}
 

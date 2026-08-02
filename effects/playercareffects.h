@@ -177,7 +177,7 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		if (auto ply = GetLocalPlayerEngine()) {
+		if (auto ply = GetLocalPlayerInterface<IEngine>()) {
 			ply->ChargeNOS(1);
 		}
 	}
@@ -209,7 +209,7 @@ public:
 	}
 
 	void TickFunctionMain(double delta) override {
-		if (auto ply = GetLocalPlayerEngine()) {
+		if (auto ply = GetLocalPlayerInterface<IEngine>()) {
 			ply->ChargeNOS(-1);
 		}
 	}
@@ -647,7 +647,7 @@ public:
 			Physics::Tunings tune = ply->GetTunings() ? *ply->GetTunings() : Physics::Tunings();
 			tune.Value[Physics::Tunings::NOS] = 3;
 			ply->SetTunings(&tune);
-			if (auto engine = GetLocalPlayerEngine()) {
+			if (auto engine = ply->mCOMObject->Find<IEngine>()) {
 				engine->ChargeNOS(1);
 			}
 		}
@@ -1062,16 +1062,19 @@ public:
 
 	void InitFunction() override {
 		auto cars = GetActiveVehicles(DRIVER_RACER);
+		if (cars.empty()) return;
+
 		auto playerCar = GetLocalPlayerVehicle();
 		auto targetCar = cars[rand()%cars.size()];
 
 		CwoeeCarPhysicalState player(playerCar);
 		CwoeeCarPhysicalState target(targetCar);
 
+		// teleport first, then apply velocity and such
+		TeleportPlayer(target.pos, target.vel);
+
 		player.Apply(targetCar);
 		target.Apply(playerCar);
-
-		TeleportPlayer(target.pos, target.vel);
 	}
 } E_SwapPlayerWithOpponent;
 
