@@ -468,7 +468,7 @@ void DoChaosLoad() {
 	DoChaosScientistLoad();
 	DoChaosPhysicsObjectLoad("balls", Effect_SpawnBall::SpawnObject);
 	DoChaosPhysicsObjectLoad("abc", Effect_SpawnBlock::SpawnObject);
-	DoChaosPhysicsObjectLoad("metalball", Powerups::HeavyBall::SpawnObject);
+	DoChaosPhysicsObjectLoad("metalball", Powerups::HeavyBall::SpawnObject<true>);
 	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
 	DoChaosRampLoad();
 	DoChaosSM64Load();

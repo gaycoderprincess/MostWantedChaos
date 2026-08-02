@@ -13,6 +13,7 @@ namespace Powerups {
 		}
 
 		NyaAudio::SetVolume(sound, volume * GetSFXVolume());
+		NyaAudio::SkipTo(sound, 0, false);
 		NyaAudio::Play(sound);
 	}
 
@@ -70,7 +71,7 @@ namespace Powerups {
 			if (car->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled) {
 				SM64::TakeLavaDamage();
 			}
-			if (deadly) {
+			if (car->GetDriverClass() == DRIVER_COP || deadly) {
 				DestroyCar(car);
 			}
 		}
@@ -185,11 +186,6 @@ namespace Powerups {
 		IVehicle* PickTarget(IVehicle* user) {
 			//return GetClosestActiveVehicle(user, true, inFrontThreshold);
 			return GetMostInFrontActiveVehicle(user, 200, inFrontThreshold);
-		}
-
-		void DrawPlayerCrosshair(IVehicle* target) {
-			if (!target) return;
-			DrawCrosshair(target, true);
 		}
 
 		struct tFireworkData {
@@ -384,6 +380,7 @@ namespace Powerups {
 	}
 
 	namespace HeavyBall {
+		template<bool save>
 		void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 			static auto mdl = Render3D::CreateModels("heavyblock.fbx");
 
@@ -394,7 +391,7 @@ namespace Powerups {
 			objData.bRemoveOnOutOfBounds = false;
 			objData.bRemoveOnOutOfRange = false;
 			objData.bAffectGamePhysics = true;
-			objData.sDebugName = "metalball_save";
+			objData.sDebugName = save ? "metalball_save" : "metalball";
 			//objData.bUseExpensiveCollisionCheck = true;
 			//objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
 			CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::BOX, pos, vel);
@@ -409,7 +406,7 @@ namespace Powerups {
 			NyaVec3 pos = ply;
 			pos += fwd * 5;
 			pos.y += 2;
-			SpawnObject(pos, vel);
+			SpawnObject<true>(pos, vel);
 		}
 
 		void SpawnBehindCar(IRigidBody* rb) {
@@ -421,7 +418,7 @@ namespace Powerups {
 			NyaVec3 pos = ply;
 			pos -= fwd * 5;
 			pos.y += 2;
-			SpawnObject(pos, vel);
+			SpawnObject<false>(pos, vel);
 		}
 	}
 
@@ -435,7 +432,7 @@ namespace Powerups {
 		//POWERUP_OILSLICK, // todo? copying the relevant collision polys out would work here i think
 		POWERUP_ELECTROPULSE,
 		POWERUP_CHROMEBALL,
-		//POWERUP_TURBO,
+		POWERUP_TURBO,
 		POWERUP_STAR,
 		NUM_POWERUPS
 	};
@@ -455,211 +452,336 @@ namespace Powerups {
 	};
 	IDirect3DTexture9* aPowerupTextures[NUM_POWERUPS] = {};
 
-	int PlayerPowerup = NUM_POWERUPS;
-	int PlayerPowerupCount = 0;
-	double fPowerupRollTime = 0.0;
+	float fSpriteY = 0.3;
+	float fSpriteSize = 0.05;
 
-	bool ExecutePowerup(IVehicle* user, int powerup) {
-		switch (powerup) {
-			case POWERUP_CLONE:
-				ReVoltBomb::SpawnBomb<false>(user->mCOMObject->Find<IRigidBody>());
-				return true;
-			case POWERUP_PUTTYBOMB:
-				ReVoltBomb::ExplosionSFX(user);
-				ReVoltBomb::ExplodeCar(user, false);
-				return true;
-			case POWERUP_FIREWORK:
-			case POWERUP_FIREWORKPACK:
-				ReVoltFirework::LaunchRocketFromPlayer(user->mCOMObject->Find<IRigidBody>(), ReVoltFirework::PickTarget(user));
-				return true;
-			case POWERUP_CHROMEBALL: {
-				HeavyBall::SpawnBehindCar(user->mCOMObject->Find<IRigidBody>());
+	struct PowerupState {
+		IVehicle* pUser = nullptr;
+		bool bIsLocalPlayer = false;
+		int PowerupID = NUM_POWERUPS;
+		int PowerupCount = 0;
+		double fRollTime = 0.0;
+		double fUseTime = 0.0;
+		double fTimeSinceLastFire = 0.0;
 
-				static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/balldrop.wav");
-				PlayAudioFromCar(sound, user);
-			} return true;
-			case POWERUP_STAR: {
-				static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/starfire.wav");
-				if (sound) {
-					NyaAudio::SetVolume(sound, GetSFXVolume());
-					NyaAudio::Play(sound);
-				}
-
-				auto cars = GetActiveVehicles();
-				for (auto& car : cars) {
-					if (car == user) continue;
-					if (IsCarDestroyed(car)) continue;
-					ReVoltBomb::ExplodeCar(car, false);
-				}
-				return true;
-			} break;
-		}
-		return false;
-	}
-
-	double fPlayerElectroPulseTime = 0.0;
-	bool ProcessPowerup(IVehicle* user, int powerup, double delta) {
-		switch (powerup) {
-			case POWERUP_PUTTYBOMB:
-				return ExecutePowerup(user, powerup);
-			case POWERUP_FIREWORK:
-			case POWERUP_FIREWORKPACK:
-				ReVoltFirework::DrawPlayerCrosshair(ReVoltFirework::PickTarget(GetLocalPlayerVehicle()));
-				break;
-			case POWERUP_ELECTROPULSE: {
-				static auto loop1 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electro.wav");
-				static auto loop2 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electrozap.wav");
-				if (loop1) {
-					NyaAudio::SetVolume(loop1, GetSFXVolume());
-					NyaAudio::Play(loop1);
-				}
-
-				fPlayerElectroPulseTime -= delta;
-				if (fPlayerElectroPulseTime <= 0.0) {
-					NyaAudio::Stop(loop1);
-					NyaAudio::Stop(loop2);
+		bool ExecutePowerup() {
+			switch (PowerupID) {
+				case POWERUP_CLONE:
+					ReVoltBomb::SpawnBomb<false>(pUser->mCOMObject->Find<IRigidBody>());
 					return true;
-				}
+				case POWERUP_PUTTYBOMB:
+					ReVoltBomb::ExplosionSFX(pUser);
+					ReVoltBomb::ExplodeCar(pUser, false);
+					return true;
+				case POWERUP_FIREWORK:
+				case POWERUP_FIREWORKPACK:
+					ReVoltFirework::LaunchRocketFromPlayer(pUser->mCOMObject->Find<IRigidBody>(), ReVoltFirework::PickTarget(pUser));
+					return true;
+				case POWERUP_CHROMEBALL: {
+					HeavyBall::SpawnBehindCar(pUser->mCOMObject->Find<IRigidBody>());
 
-				auto plyPos = *user->GetPosition();
-				auto cars = GetActiveVehicles();
-				for (auto& car : cars) {
-					if (car == user) continue;
-					if (IsCarDestroyed(car)) continue;
-
-					auto dist = (plyPos - *car->GetPosition()).length();
-					if (dist < 5) {
-						if (!IsCarDestroyed(car)) {
-							DestroyCar(car);
-						}
-
-						NyaAudio::SetVolume(loop2, GetSFXVolume());
-						NyaAudio::Play(loop2);
+					static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/balldrop.wav");
+					PlayAudioFromCar(sound, pUser);
+					return true;
+				} break;
+				case POWERUP_TURBO: {
+					pUser->SetSpeed(TOMPS(300));
+					return true;
+				} break;
+				case POWERUP_STAR: {
+					static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/starfire.wav");
+					if (sound) {
+						NyaAudio::SetVolume(sound, GetSFXVolume());
+						NyaAudio::Play(sound);
 					}
-				}
-			} break;
+
+					auto cars = GetActiveVehicles();
+					for (auto& car : cars) {
+						if (car == pUser) continue;
+						if (IsCarDestroyed(car)) continue;
+						ReVoltBomb::ExplodeCar(car, false);
+					}
+					return true;
+				} break;
+			}
+			return false;
 		}
-		return false;
+
+		bool ProcessPowerup(double delta) {
+			switch (PowerupID) {
+				case POWERUP_PUTTYBOMB:
+					return ExecutePowerup();
+				case POWERUP_FIREWORK:
+				case POWERUP_FIREWORKPACK: {
+					auto target = ReVoltFirework::PickTarget(pUser);
+					if (target && (bIsLocalPlayer || target == GetLocalPlayerVehicle())) {
+						ReVoltFirework::DrawCrosshair(target, bIsLocalPlayer);
+					}
+				} break;
+				case POWERUP_ELECTROPULSE: {
+					static auto loop1 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electro.wav");
+					static auto loop2 = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electrozap.wav");
+					if (loop1) {
+						NyaAudio::SetVolume(loop1, GetSFXVolume());
+						NyaAudio::Play(loop1);
+					}
+
+					fUseTime -= delta;
+					if (fUseTime <= 0.0) {
+						NyaAudio::Stop(loop1);
+						NyaAudio::Stop(loop2);
+						return true;
+					}
+
+					auto plyPos = *pUser->GetPosition();
+					auto cars = GetActiveVehicles();
+					for (auto& car : cars) {
+						if (car == pUser) continue;
+						if (IsCarDestroyed(car)) continue;
+
+						auto dist = (plyPos - *car->GetPosition()).length();
+						if (dist < 5) {
+							if (auto sus = car->mCOMObject->Find<ISuspension>()) {
+								for (int i = 0; i < 4; i++) {
+									sus->SetWheelAngularVelocity(i, 0.0);
+								}
+							}
+							//if (!IsCarDestroyed(car)) {
+							//	DestroyCar(car);
+							//}
+
+							NyaAudio::SetVolume(loop2, GetSFXVolume());
+							NyaAudio::Play(loop2);
+						}
+					}
+				} break;
+			}
+			return false;
+		}
+
+		void RollPowerup() {
+			std::vector<int> powerupsAvailable;
+			if (pUser->GetDriverClass() == DRIVER_HUMAN) {
+				for (int i = 0; i < NUM_POWERUPS; i++) {
+					powerupsAvailable.push_back(i);
+				}
+			}
+			else {
+				//powerupsAvailable.push_back(POWERUP_SHOCKWAVE);
+				powerupsAvailable.push_back(POWERUP_PUTTYBOMB);
+				powerupsAvailable.push_back(POWERUP_FIREWORK);
+				powerupsAvailable.push_back(POWERUP_FIREWORKPACK);
+				//powerupsAvailable.push_back(POWERUP_WATERBOMB);
+				powerupsAvailable.push_back(POWERUP_CLONE);
+				//powerupsAvailable.push_back(POWERUP_OILSLICK);
+				powerupsAvailable.push_back(POWERUP_ELECTROPULSE);
+				powerupsAvailable.push_back(POWERUP_CHROMEBALL);
+				powerupsAvailable.push_back(POWERUP_TURBO);
+				//powerupsAvailable.push_back(POWERUP_STAR); // too OP
+			}
+
+			PowerupID = powerupsAvailable[rand()%powerupsAvailable.size()];
+			//PowerupCount = (PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_WATERBOMB) ? 3 : 1;
+			PowerupCount = PowerupID == POWERUP_FIREWORKPACK ? 3 : 1;
+			fRollTime = 4.0;
+			fUseTime = 15.0;
+
+			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup.wav");
+			PlayAudioFromCar(sound, pUser);
+		}
+
+		bool HasPowerup() {
+			return PowerupID != NUM_POWERUPS && PowerupCount > 0;
+		}
+
+		void Render() {
+			static auto texBase = LoadTexture_SetDir("CwoeeChaos/data/textures/revolt_base.png");
+			if (texBase) {
+				DrawRectangle(0.5 - (fSpriteSize * GetAspectRatioInv()), 0.5 + (fSpriteSize * GetAspectRatioInv()), fSpriteY - fSpriteSize, fSpriteY + fSpriteSize, {255,255,255,255}, 0, texBase);
+			}
+
+			int powerupId = PowerupID;
+			uint8_t powerupAlpha = 255;
+			if (fRollTime > 0) {
+				if (fRollTime > 0.75) {
+					int scroll = 20;
+					if (fRollTime < 2.0) scroll = 10;
+					if (fRollTime < 1.5) scroll = 5;
+
+					powerupId = fRollTime * scroll;
+					powerupId %= NUM_POWERUPS;
+				}
+				powerupAlpha = 127;
+			}
+
+			auto& tex = aPowerupTextures[powerupId];
+			if (!tex) {
+				tex = LoadTexture_SetDir(aPowerupSpriteNames[powerupId]);
+			}
+
+			if (tex) {
+				DrawRectangle(0.5 - (fSpriteSize * GetAspectRatioInv()), 0.5 + (fSpriteSize * GetAspectRatioInv()), fSpriteY - fSpriteSize, fSpriteY + fSpriteSize, {255,255,255,powerupAlpha}, 0, tex);
+			}
+		}
+
+		bool HasFired() {
+			if (pUser == GetLocalPlayerVehicle()) {
+				return IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X);
+			}
+
+			if (PowerupID == POWERUP_FIREWORK || PowerupID == POWERUP_FIREWORKPACK) {
+				if (fTimeSinceLastFire < 0.5) return false;
+
+				auto target = Powerups::ReVoltFirework::PickTarget(pUser);
+				if (!target) return false;
+				if (pUser->GetDriverClass() == DRIVER_COP && target->GetDriverClass() == DRIVER_COP) return false; // prevent cop friendly fire
+				return true;
+			}
+			if (PowerupID == POWERUP_TURBO) {
+				return GetLocalPlayerInterface<IInput>()->GetControls()->fGas >= 0.95;
+			}
+			return true;
+		}
+
+		void Process(double delta) {
+			fTimeSinceLastFire += delta;
+
+			fRollTime -= delta;
+			if (fRollTime > 0) return;
+
+			if (ProcessPowerup(delta) || (HasFired() && ExecutePowerup())) {
+				fTimeSinceLastFire = 0.0;
+
+				PowerupCount--;
+				if (PowerupCount <= 0) {
+					PowerupID = NUM_POWERUPS;
+				}
+			}
+		}
+
+		void Process3D() {
+			if (fRollTime > 0) return;
+
+			if (PowerupID == POWERUP_ELECTROPULSE) {
+				NyaDrawing::CNyaRGBA32 tmp;
+				tmp.b = 0;
+				tmp.g = 255;
+				tmp.r = 255;
+				tmp.a = 255;
+				Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
+				static auto models = Render3D::CreateModels("cube.fbx");
+				Render3D::ModelLoaderConfig.Reset();
+
+				if (auto rb = pUser->mCOMObject->Find<ICollisionBody>()) {
+					UMath::Vector3 dim;
+					rb->GetDimension(&dim);
+
+					UMath::Matrix4 mat = *rb->GetMatrix4();
+					mat.p = *rb->GetPosition();
+
+					mat.x *= dim.x;
+					mat.y *= dim.y;
+					mat.z *= dim.z;
+
+					g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+					for (auto& mdl : models) {
+						mdl->RenderAt(WorldToRenderMatrix(mat));
+					}
+					g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+				}
+			}
+		}
+
+		bool IsValid() {
+			if (bIsLocalPlayer) pUser = GetLocalPlayerVehicle();
+
+			auto cars = GetActiveVehicles();
+			for (auto& car : cars) {
+				if (car->GetDriverClass() != DRIVER_HUMAN && car->GetDriverClass() != DRIVER_RACER) continue;
+
+				if (car == pUser) return true;
+			}
+			return false;
+		}
+	};
+	std::vector<PowerupState> aPowerupStates;
+
+	PowerupState* GetPowerupState(IVehicle* veh) {
+		for (auto& state : aPowerupStates) {
+			if (veh == GetLocalPlayerVehicle() && state.bIsLocalPlayer) {
+				state.pUser = veh;
+			}
+
+			if (state.pUser == veh) {
+				return &state;
+			}
+		}
+		return nullptr;
 	}
 
 	void RollPowerup(IVehicle* veh) {
-		if (veh->GetDriverClass() != DRIVER_HUMAN) {
-			std::vector<int> powerupsAvailable;
-			//powerupsAvailable.push_back(POWERUP_SHOCKWAVE);
-			powerupsAvailable.push_back(POWERUP_PUTTYBOMB);
-			powerupsAvailable.push_back(POWERUP_FIREWORK);
-			//powerupsAvailable.push_back(POWERUP_FIREWORKPACK);
-			//powerupsAvailable.push_back(POWERUP_WATERBOMB);
-			powerupsAvailable.push_back(POWERUP_CLONE);
-			//powerupsAvailable.push_back(POWERUP_OILSLICK);
-			//powerupsAvailable.push_back(POWERUP_ELECTROPULSE);
-			powerupsAvailable.push_back(POWERUP_CHROMEBALL);
-			//powerupsAvailable.push_back(POWERUP_TURBO);
-			//powerupsAvailable.push_back(POWERUP_STAR); // too OP
-			ExecutePowerup(veh, powerupsAvailable[rand() % powerupsAvailable.size()]);
-		}
-		else {
-			PlayerPowerup = rand() % NUM_POWERUPS;
-			//PlayerPowerupCount = (PlayerPowerup == POWERUP_FIREWORKPACK || PlayerPowerup == POWERUP_WATERBOMB) ? 3 : 1;
-			PlayerPowerupCount = PlayerPowerup == POWERUP_FIREWORKPACK ? 3 : 1;
-			fPowerupRollTime = 4.0;
-			fPlayerElectroPulseTime = 10.0;
+		if (auto state = GetPowerupState(veh)) {
+			state->RollPowerup();
+			return;
 		}
 
-		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup.wav");
-		PlayAudioFromCar(sound, veh);
+		PowerupState state;
+		state.pUser = veh;
+		state.bIsLocalPlayer = veh == GetLocalPlayerVehicle();
+		state.RollPowerup();
+		aPowerupStates.push_back(state);
+
+		if (state.bIsLocalPlayer) {
+			CwoeeHints::AddHint("Press X to use powerups.");
+		}
 	}
 
-	bool PlayerHasPowerup() {
-		return PlayerPowerup != NUM_POWERUPS && PlayerPowerupCount > 0;
+	bool PlayerHasPowerup(IVehicle* veh) {
+		if (auto state = GetPowerupState(veh)) {
+			return state->HasPowerup();
+		}
+		return false;
 	}
 
-	float fSpriteY = 0.3;
-	float fSpriteSize = 0.05;
-	void DrawPlayerPowerup() {
-		static auto texBase = LoadTexture_SetDir("CwoeeChaos/data/textures/revolt_base.png");
-		if (texBase) {
-			DrawRectangle(0.5 - (fSpriteSize * GetAspectRatioInv()), 0.5 + (fSpriteSize * GetAspectRatioInv()), fSpriteY - fSpriteSize, fSpriteY + fSpriteSize, {255,255,255,255}, 0, texBase);
-		}
-
-		int powerupId = PlayerPowerup;
-		uint8_t powerupAlpha = 255;
-		if (fPowerupRollTime > 0) {
-			if (fPowerupRollTime > 0.5) {
-				int scroll = fPowerupRollTime > 1.0 ? 20 : 10;
-				powerupId = fPowerupRollTime * scroll;
-				powerupId %= NUM_POWERUPS;
+	bool DespawnCleanup() {
+		for (auto& state : aPowerupStates) {
+			if (!state.bIsLocalPlayer && !state.IsValid()) {
+				aPowerupStates.erase(aPowerupStates.begin() + (&state - &aPowerupStates[0]));
+				return true;
 			}
-			powerupAlpha = 127;
 		}
-
-		auto& tex = aPowerupTextures[powerupId];
-		if (!tex) {
-			tex = LoadTexture_SetDir(aPowerupSpriteNames[powerupId]);
-		}
-
-		if (tex) {
-			DrawRectangle(0.5 - (fSpriteSize * GetAspectRatioInv()), 0.5 + (fSpriteSize * GetAspectRatioInv()), fSpriteY - fSpriteSize, fSpriteY + fSpriteSize, {255,255,255,powerupAlpha}, 0, tex);
-		}
+		return false;
 	}
 
 	void OnTick() {
+		while (DespawnCleanup()) {}
+
 		if (IsChaosBlocked()) return;
-		if (!PlayerHasPowerup()) return;
 
 		static CNyaTimer gTimer;
 		gTimer.Process();
 
-		fPowerupRollTime -= gTimer.fDeltaTime;
-		DrawPlayerPowerup();
-		if (fPowerupRollTime > 0) return;
+		for (auto& state : aPowerupStates) {
+			if (!state.IsValid()) continue;
+			state.Process(gTimer.fDeltaTime);
+		}
+
+		auto powerup = GetPowerupState(GetLocalPlayerVehicle());
+		if (!powerup) return;
+		if (!powerup->HasPowerup()) return;
+
+		powerup->Render();
 
 		if (auto ply = GetLocalPlayer()) {
 			ply->ResetGameBreaker(false);
-		}
-
-		if (ProcessPowerup(GetLocalPlayerVehicle(), PlayerPowerup, gTimer.fDeltaTime) || ((IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X)) && ExecutePowerup(GetLocalPlayerVehicle(), PlayerPowerup))) {
-			PlayerPowerupCount--;
-			if (PlayerPowerupCount <= 0) {
-				PlayerPowerup = NUM_POWERUPS;
-			}
 		}
 	}
 
 	void OnTick3D() {
 		if (IsChaosBlocked()) return;
-		if (!PlayerHasPowerup()) return;
-		if (fPowerupRollTime > 0) return;
 
-		if (PlayerPowerup == POWERUP_ELECTROPULSE) {
-			NyaDrawing::CNyaRGBA32 tmp;
-			tmp.b = 0;
-			tmp.g = 255;
-			tmp.r = 255;
-			tmp.a = 255;
-			Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
-			static auto models = Render3D::CreateModels("cube.fbx");
-			Render3D::ModelLoaderConfig.Reset();
-
-			if (auto rb = GetLocalPlayerInterface<ICollisionBody>()) {
-				auto simable = rb->mCOMObject->Find<ISimable>();
-
-				UMath::Vector3 dim;
-				rb->GetDimension(&dim);
-
-				UMath::Matrix4 mat = *rb->GetMatrix4();
-				mat.p = *rb->GetPosition();
-
-				mat.x *= dim.x;
-				mat.y *= dim.y;
-				mat.z *= dim.z;
-
-				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-				for (auto& mdl : models) {
-					mdl->RenderAt(WorldToRenderMatrix(mat));
-				}
-				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-			}
+		for (auto& state : aPowerupStates) {
+			state.Process3D();
 		}
 	}
 

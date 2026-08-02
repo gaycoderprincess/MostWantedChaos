@@ -379,7 +379,7 @@ public:
 	}
 	void TickFunctionMain(double delta) override {
 		auto target = Powerups::ReVoltFirework::PickTarget(GetLocalPlayerVehicle());
-		Powerups::ReVoltFirework::DrawPlayerCrosshair(target);
+		Powerups::ReVoltFirework::DrawCrosshair(target, true);
 
 		GetLocalPlayer()->ResetGameBreaker(false);
 		if (IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X)) {
@@ -1575,7 +1575,7 @@ public:
 	static inline float rY = 0;
 	static inline float rZ = 0;
 	static inline float offY = 2.0;
-	static inline float scale = 1;
+	static inline float scale = 0.75;
 
 	static inline float rotSpeedX = 0;
 	static inline float rotSpeedY = 0;
@@ -1588,6 +1588,10 @@ public:
 		rotDelta += delta;
 
 		auto p = obj->mMatrix.p;
+		if (GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&p, &p.y, nullptr)) {
+			p.y += offY;
+		}
+
 		obj->mMatrix = UMath::Matrix4::kIdentity;
 		obj->mMatrix.Rotate(NyaVec3(rotDelta * rotSpeedX, rotDelta * rotSpeedY, rotDelta * rotSpeedZ));
 
@@ -1601,13 +1605,18 @@ public:
 
 		if (IsChaosBlocked()) return;
 
+		bool canPlayerPowerup = true;
+		if (SM64::bEnabled) canPlayerPowerup = false;
+		if (CustomPhysicsBall::bEnabled) canPlayerPowerup = false;
+
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
 			if (car->GetDriverClass() != DRIVER_HUMAN && car->GetDriverClass() != DRIVER_RACER) continue;
+			if (car->GetDriverClass() == DRIVER_HUMAN && !canPlayerPowerup) continue;
 
 			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
 			if (distFromCar < 5) {
-				if (car == GetLocalPlayerVehicle() && Powerups::PlayerHasPowerup()) continue;
+				if (Powerups::PlayerHasPowerup(car)) continue;
 				Powerups::RollPowerup(car);
 				obj->aModels.clear();
 			}
@@ -1615,9 +1624,6 @@ public:
 	}
 
 	static void SpawnObject(UMath::Matrix4 mat) {
-		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr)) return;
-		mat.p.y += offY;
-
 		if (models.empty() || models[0]->bInvalidated) {
 			Render3D::ModelLoaderConfig.bColorByNormals = true;
 			Render3D::ModelLoaderConfig.fColorByNormalsScale = 0.25;
@@ -1643,18 +1649,18 @@ public:
 			NyaVec3 center = {pos.x, pos.y, pos.z};
 			//auto left = center - lookat.x * pos.w;
 			//auto right = center + lookat.x * pos.w;
-			center.y += offY;
+			center.y += 5.0; // to make sure the height checks will work
 
 			UMath::Matrix4 objMat;
 			objMat.p = center;
 			SpawnObject(objMat);
-			objMat.p = center - lookat.x * (pos.w * 0.75);
+			objMat.p = center - lookat.x * (pos.w * 0.33);
 			SpawnObject(objMat);
-			objMat.p = center + lookat.x * (pos.w * 0.75);
+			objMat.p = center + lookat.x * (pos.w * 0.33);
 			SpawnObject(objMat);
-			objMat.p = center - lookat.x * (pos.w * 0.25);
+			objMat.p = center - lookat.x * (pos.w * 0.66);
 			SpawnObject(objMat);
-			objMat.p = center + lookat.x * (pos.w * 0.25);
+			objMat.p = center + lookat.x * (pos.w * 0.66);
 			SpawnObject(objMat);
 		}
 	}
