@@ -202,7 +202,7 @@ void DoChaosBombLoad() {
 	for (int i = 0; i < count; i++) {
 		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Powerups::ReVoltBomb::SpawnBomb(save);
+		Powerups::ReVoltBomb::SpawnBomb<true>(save);
 	}
 }
 
@@ -468,7 +468,7 @@ void DoChaosLoad() {
 	DoChaosScientistLoad();
 	DoChaosPhysicsObjectLoad("balls", Effect_SpawnBall::SpawnObject);
 	DoChaosPhysicsObjectLoad("abc", Effect_SpawnBlock::SpawnObject);
-	DoChaosPhysicsObjectLoad("metalball", Effect_SpawnHeavyBall::SpawnObject);
+	DoChaosPhysicsObjectLoad("metalball", Powerups::HeavyBall::SpawnObject);
 	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
 	DoChaosRampLoad();
 	DoChaosSM64Load();

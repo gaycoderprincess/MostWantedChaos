@@ -359,7 +359,7 @@ public:
 	}
 
 	void InitFunction() override {
-		Powerups::ReVoltBomb::SpawnBomb(GetLocalPlayerInterface<IRigidBody>());
+		Powerups::ReVoltBomb::SpawnBomb<true>(GetLocalPlayerInterface<IRigidBody>());
 		DoChaosSave();
 	}
 } E_ReVoltBomb;
@@ -373,247 +373,17 @@ public:
 		bCanQuickTrigger = false;
 	}
 
-	static inline std::vector<Render3D::tModel*> models;
-
-	static inline float rX = 0;
-	static inline float rY = 0;
-	static inline float rZ = 0;
-	static inline float rotOffX = 10;
-	static inline float rotOffXNoTarget = 15;
-	static inline float rotOffY = 0;
-	static inline float rotOffZ = 0;
-	static inline float offX = 0;
-	static inline float offY = 1;
-	static inline float offZ = 6;
-	static inline float scale = 2;
-	static inline float moveSpeed = 55;
-	static inline float rotSpeed = 2.5;
-	static inline float inFrontThreshold = 0.6;
-	static inline float crosshairSize = 0.02;
-	static inline float sfxVolume = 0.33;
-
-	static inline NyaAudio::NyaSound FireSound = 0;
-	static inline NyaAudio::NyaSound ExplodeSound = 0;
-
-	struct tFireworkData {
-		IVehicle* target;
-		UMath::Vector3 currentDir;
-		float speed;
-		float timeLeft;
-	};
-
-	static void FireworkAttack_Box3D(NyaVec3 colPosition, b3BodyId bodyId, float power, float angMult, float maxDist) {
-		float objectMass = 250.0; // temp
-
-		auto bodyPos = b3Body_GetPosition(bodyId);
-
-		auto pos = NyaVec3(bodyPos.x,bodyPos.y,bodyPos.z);
-		auto dist = (pos - colPosition);
-		if (dist.length() < maxDist) {
-			auto impulse = dist * (power * objectMass / 1000.0 * std::min((maxDist - dist.length()) * 2.0 / maxDist, 1.0) / std::max(dist.length(), 0.01));
-
-			auto vel = b3Body_GetLinearVelocity(bodyId);
-			auto avel = b3Body_GetAngularVelocity(bodyId);
-			vel.x += impulse.x;
-			vel.y += impulse.y;
-			vel.z += impulse.z;
-			avel.x += impulse.x * angMult;
-			avel.y += impulse.y * angMult;
-			avel.z += impulse.z * angMult;
-			b3Body_SetLinearVelocity(bodyId, vel);
-			b3Body_SetAngularVelocity(bodyId, avel);
-		}
-	}
-
-	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
-		if (IsChaosBlocked()) return;
-
-		auto data = (tFireworkData*)obj->CustomData;
-		auto target = data->target;
-		if (!IsVehicleValidAndActive(target)) target = nullptr;
-
-		auto targetDir = (NyaVec3)data->currentDir;
-		if (target) {
-			targetDir = (*target->GetPosition() - obj->mMatrix.p);
-			targetDir.Normalize();
-		}
-		else {
-			targetDir.y = 0;
-			targetDir.Normalize();
-		}
-		auto diff = targetDir - data->currentDir;
-		data->currentDir += diff * rotSpeed * delta;
-		data->currentDir.Normalize();
-
-		obj->mMatrix.p += data->currentDir * data->speed * delta;
-
-		auto p = obj->mMatrix.p;
-		obj->mMatrix = NyaMat4x4::LookAt(data->currentDir);
-
-		UMath::Matrix4 rotation;
-		rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
-		obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
-		obj->mMatrix.x *= scale;
-		obj->mMatrix.y *= scale;
-		obj->mMatrix.z *= scale;
-		obj->mMatrix.p = p;
-
-		auto cars = GetActiveRigidBodies();
-		for (auto& car : cars) {
-			if (!car->mCOMObject->Find<IVehicle>()) continue;
-
-			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
-			if (distFromCar < 4) {
-				data->timeLeft = 0;
-				if (!NyaAudio::IsFinishedPlaying(FireSound)) {
-					NyaAudio::Stop(FireSound);
-				}
-			}
-		}
-
-		float groundY = -9999;
-		GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&obj->mMatrix.p, &groundY, nullptr);
-		if (obj->mMatrix.p.y < groundY) {
-			data->timeLeft = 0;
-			if (!NyaAudio::IsFinishedPlaying(FireSound)) {
-				NyaAudio::Stop(FireSound);
-			}
-		}
-
-		data->timeLeft -= delta;
-		if (data->timeLeft <= 0.0) {
-			if (ExplodeSound) {
-				NyaAudio::Stop(ExplodeSound);
-				NyaAudio::SkipTo(ExplodeSound, 0, false);
-				NyaAudio::SetVolume(ExplodeSound, GetSFXVolume() * sfxVolume);
-				NyaAudio::Play(ExplodeSound);
-			}
-
-			float fExplosionPower = 15;
-			float fExplosionAngVelocityMult = 0.25;
-			float fExplosionMaxDistance = 10;
-
-			if (CustomPhysicsBall::bEnabled) {
-				FireworkAttack_Box3D(obj->mMatrix.p, CustomPhysicsBall::BallBody, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
-			}
-			for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
-				FireworkAttack_Box3D(obj->mMatrix.p, phys->nB3Body, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
-			}
-
-			for (auto& car : cars) {
-				auto dist = (*car->GetPosition() - obj->mMatrix.p);
-				if (dist.length() < fExplosionMaxDistance) {
-					auto cb = car->mCOMObject->Find<ICollisionBody>();
-
-					auto impulse = dist * (fExplosionPower * car->GetMass() / 1000.0 * std::min((fExplosionMaxDistance - dist.length()) * 2.0 / fExplosionMaxDistance, 1.0) / std::max(dist.length(), 0.01));
-
-					if (cb && cb->IsAttachedToWorld()) {
-						cb->AttachedToWorld(false, 50.0);
-					}
-
-					auto vel = *car->GetLinearVelocity();
-					auto avel = *car->GetAngularVelocity();
-					vel += impulse;
-					avel += impulse * fExplosionAngVelocityMult;
-					car->SetLinearVelocity(&vel);
-					car->SetAngularVelocity(&avel);
-
-					if (auto iveh = car->mCOMObject->Find<IVehicle>()) {
-						if (iveh->GetDriverClass() == DRIVER_HUMAN && SM64::bEnabled) {
-							SM64::OnTakeDamage(1, obj->vColPosition, true);
-						}
-
-						if (!IsCarDestroyed(iveh) && iveh->GetDriverClass() == DRIVER_COP) {
-							DestroyCar(iveh);
-						}
-					}
-				}
-			}
-
-			obj->aModels.clear();
-		}
-	}
-
-	static void SpawnBomb(UMath::Matrix4 mat, IVehicle* target) {
-		if (models.empty() || models[0]->bInvalidated) {
-			models = Render3D::CreateModels("firework.fbx");
-		}
-
-		int id = Render3DObjects::aObjects.size();
-		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("firework", models, mat, {0,0,0}, 0, BombOnTick));
-
-		auto data = new tFireworkData;
-		data->target = target;
-		data->currentDir = (UMath::Vector3)mat.z;
-		//if (target) {
-		//	data->currentDir = (UMath::Vector3)(*target->GetPosition() - mat.p);
-		//	data->currentDir.y = mat.z.y;
-		//	data->currentDir.Normalize();
-		//}
-		data->speed = moveSpeed + GetLocalPlayerVehicle()->GetSpeed();
-		data->timeLeft = 2;
-		Render3DObjects::aObjects[id]->CustomData = data;
-	}
-
-	static void LaunchRocketFromPlayer(IRigidBody* veh, IVehicle* target) {
-		auto mat = UMath::Matrix4::kIdentity;
-		veh->GetMatrix4(&mat);
-		auto pos = *veh->GetPosition();
-		pos += mat.x * offX;
-		pos += mat.y * offY;
-		pos += mat.z * offZ;
-
-		UMath::Matrix4 rotation;
-		if (target) {
-			rotation.Rotate(NyaVec3(rotOffX * 0.01745329, rotOffY * 0.01745329, rotOffZ * 0.01745329));
-		}
-		else {
-			rotation.Rotate(NyaVec3(rotOffXNoTarget * 0.01745329, rotOffY * 0.01745329, rotOffZ * 0.01745329));
-		}
-		mat = (UMath::Matrix4)(mat * rotation);
-		mat.p = pos;
-		SpawnBomb(mat, target);
-
-		if (veh == GetLocalPlayerInterface<IRigidBody>() && FireSound) {
-			NyaAudio::Stop(FireSound);
-			NyaAudio::SkipTo(FireSound, 0, false);
-			NyaAudio::SetVolume(FireSound, GetSFXVolume() * sfxVolume);
-			NyaAudio::Play(FireSound);
-		}
-	}
-
-	static void DrawCrosshair(IVehicle* target, bool isPlayerCrosshair) {
-		bVector3 screenPos;
-		auto worldPos = WorldToRenderCoords(*target->GetPosition());
-		eViewPlatInterface::GetScreenPosition(&eViews[EVIEW_PLAYER1], &screenPos, (bVector3*)&worldPos);
-
-		screenPos.x /= (double)nResX;
-		screenPos.y /= (double)nResY;
-
-		static auto texture = LoadTexture_SetDir("CwoeeChaos/data/textures/firework_crosshair.png");
-		DrawRectangle(screenPos.x - crosshairSize * GetAspectRatioInv(), screenPos.x + crosshairSize * GetAspectRatioInv(), screenPos.y - crosshairSize, screenPos.y + crosshairSize, isPlayerCrosshair ? NyaDrawing::CNyaRGBA32(0,255,0,255) : NyaDrawing::CNyaRGBA32(255,0,0,255), 0, texture);
-	}
-
-	static void LoadSounds() {
-		if (!FireSound) FireSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/firefire.wav");
-		if (!ExplodeSound) ExplodeSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/firebang.wav");
-	}
-
 	void InitFunction() override {
 		CwoeeHints::AddHint("Press X to fire a rocket.");
 		CwoeeHints::AddHint("The green reticule displays your lock-on target.");
-		LoadSounds();
 	}
 	void TickFunctionMain(double delta) override {
-		//auto target = GetClosestActiveVehicle(GetLocalPlayerVehicle(), true, inFrontThreshold);
-		auto target = GetMostInFrontActiveVehicle(GetLocalPlayerVehicle(), 200, inFrontThreshold);
-		if (target) {
-			DrawCrosshair(target, true);
-		}
+		auto target = Powerups::ReVoltFirework::PickTarget(GetLocalPlayerVehicle());
+		Powerups::ReVoltFirework::DrawPlayerCrosshair(target);
 
 		GetLocalPlayer()->ResetGameBreaker(false);
 		if (IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X)) {
-			LaunchRocketFromPlayer(GetLocalPlayerInterface<IRigidBody>(), target);
+			Powerups::ReVoltFirework::LaunchRocketFromPlayer(GetLocalPlayerInterface<IRigidBody>(), target);
 		}
 	}
 	void DeinitFunction() override {
@@ -633,16 +403,15 @@ public:
 
 	void InitFunction() override {
 		timer = 0;
-		Effect_ReVoltFirework::LoadSounds();
 	}
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& veh : cars) {
 			if (veh == GetLocalPlayerVehicle()) continue;
 			if (IsCarDestroyed(veh)) continue;
-			auto target = GetMostInFrontActiveVehicle(veh, 200, Effect_ReVoltFirework::inFrontThreshold);
+			auto target = Powerups::ReVoltFirework::PickTarget(veh);
 			if (target == GetLocalPlayerVehicle()) {
-				Effect_ReVoltFirework::DrawCrosshair(target, false);
+				Powerups::ReVoltFirework::DrawCrosshair(target, false);
 			}
 		}
 
@@ -652,10 +421,10 @@ public:
 				if (veh == GetLocalPlayerVehicle()) continue;
 				if (IsCarDestroyed(veh)) continue;
 				if (PercentageChanceCheck(25)) {
-					auto target = GetMostInFrontActiveVehicle(veh, 200, Effect_ReVoltFirework::inFrontThreshold);
+					auto target = Powerups::ReVoltFirework::PickTarget(veh);
 					if (!target) continue;
 					if (veh->GetDriverClass() == DRIVER_COP && target->GetDriverClass() == DRIVER_COP) continue; // prevent cop friendly fire
-					Effect_ReVoltFirework::LaunchRocketFromPlayer(veh->mCOMObject->Find<IRigidBody>(), target);
+					Powerups::ReVoltFirework::LaunchRocketFromPlayer(veh->mCOMObject->Find<IRigidBody>(), target);
 				}
 			}
 			timer -= 1;
@@ -1744,33 +1513,8 @@ public:
 		bRigProportionalChances = true; // todo remove
 	}
 
-	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
-		static auto mdl = Render3D::CreateModels("heavyblock.fbx");
-
-		CustomPhysicsObjects::CustomPhysicsObject objData;
-		objData.aModels = mdl;
-		objData.vModelSize = {1.5,1.5,1.5};
-		objData.bRemoveOnSafehouse = false;
-		objData.bRemoveOnOutOfBounds = false;
-		objData.bRemoveOnOutOfRange = false;
-		objData.bAffectGamePhysics = true;
-		objData.sDebugName = "metalball_save";
-		//objData.bUseExpensiveCollisionCheck = true;
-		//objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
-		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::BOX, pos, vel);
-	}
-
 	void InitFunction() override {
-		auto rb = GetLocalPlayerInterface<IRigidBody>();
-		auto ply = *rb->GetPosition();
-		auto vel = *rb->GetLinearVelocity();
-		UMath::Vector3 fwd;
-		rb->GetForwardVector(&fwd);
-
-		NyaVec3 pos = ply;
-		pos += fwd * 5;
-		pos.y += 2;
-		SpawnObject(pos, vel);
+		Powerups::HeavyBall::SpawnInFrontOfCar(GetLocalPlayerInterface<IRigidBody>());
 		DoChaosSave();
 	}
 } E_SpawnHeavyBall;
@@ -1817,11 +1561,12 @@ public:
 	}
 } E_SpawnHeavyCone;
 
-/*class Effect_PowerupBlock : public ChaosEffect {
+class Effect_PowerupBlock : public EffectBase_InRaceConditional {
 public:
-	Effect_PowerupBlock() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Spawn Powerup Pickup";
+	Effect_PowerupBlock() : EffectBase_InRaceConditional(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Powerups On Racetrack";
 		bCanQuickTrigger = false;
+		bAbortOnConditionFailed = true;
 	}
 
 	static inline std::vector<Render3D::tModel*> models;
@@ -1829,9 +1574,7 @@ public:
 	static inline float rX = 90;
 	static inline float rY = 0;
 	static inline float rZ = 0;
-	static inline float offX = 0;
-	static inline float offY = 2.5;
-	static inline float offZ = 6;
+	static inline float offY = 2.0;
 	static inline float scale = 1;
 
 	static inline float rotSpeedX = 0;
@@ -1839,12 +1582,6 @@ public:
 	static inline float rotSpeedZ = -1.5;
 
 	static inline std::vector<int> aObjectsInWorld;
-
-	enum ePowerup {
-		POWERUP_EXPLODE,
-		POWERUP_FIREWORK,
-		NUM_POWERUPS
-	};
 
 	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
 		auto& rotDelta = *(float*)&obj->CustomData;
@@ -1866,26 +1603,21 @@ public:
 
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
+			if (car->GetDriverClass() != DRIVER_HUMAN && car->GetDriverClass() != DRIVER_RACER) continue;
+
 			auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
 			if (distFromCar < 5) {
-				if (car->GetDriverClass() == DRIVER_HUMAN) {
-					int r = rand() % NUM_POWERUPS;
-					switch (r) {
-						case POWERUP_EXPLODE:
-							if (!IsCarDestroyed(car)) {
-								DestroyCar(car);
-							} break;
-						case POWERUP_FIREWORK:
-
-							break;
-					}
-					obj->aModels.clear();
-				}
+				if (car == GetLocalPlayerVehicle() && Powerups::PlayerHasPowerup()) continue;
+				Powerups::RollPowerup(car);
+				obj->aModels.clear();
 			}
 		}
 	}
 
 	static void SpawnObject(UMath::Matrix4 mat) {
+		if (!GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr)) return;
+		mat.p.y += offY;
+
 		if (models.empty() || models[0]->bInvalidated) {
 			Render3D::ModelLoaderConfig.bColorByNormals = true;
 			Render3D::ModelLoaderConfig.fColorByNormalsScale = 0.25;
@@ -1901,22 +1633,29 @@ public:
 	}
 
 	void InitFunction() override {
-		//static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickgen.wav");
-		//if (sound) {
-		//	NyaAudio::SetVolume(sound, GetSFXVolume());
-		//	NyaAudio::Play(sound);
-		//}
+		for (int i = 0; i < GRaceStatus::fObj->mCheckpoints.size(); i++) {
+			auto& cp = GRaceStatus::fObj->mCheckpoints[i];
+			auto dir = cp->mDirection;
+			auto pos = cp->mWorldTrigger.fPosRadius;
 
-		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
-			auto mat = UMath::Matrix4::kIdentity;
-			veh->GetMatrix4(&mat);
-			mat.p = *veh->GetPosition();
-			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
-			mat.p += mat.x * offX;
-			mat.p += mat.y * offY;
-			mat.p += mat.z * offZ;
-			SpawnObject(mat);
-			DoChaosSave();
+			auto lookat = NyaMat4x4::LookAt(dir);
+
+			NyaVec3 center = {pos.x, pos.y, pos.z};
+			//auto left = center - lookat.x * pos.w;
+			//auto right = center + lookat.x * pos.w;
+			center.y += offY;
+
+			UMath::Matrix4 objMat;
+			objMat.p = center;
+			SpawnObject(objMat);
+			objMat.p = center - lookat.x * (pos.w * 0.75);
+			SpawnObject(objMat);
+			objMat.p = center + lookat.x * (pos.w * 0.75);
+			SpawnObject(objMat);
+			objMat.p = center - lookat.x * (pos.w * 0.25);
+			SpawnObject(objMat);
+			objMat.p = center + lookat.x * (pos.w * 0.25);
+			SpawnObject(objMat);
 		}
 	}
-} E_PowerupBlock;*/
+} E_PowerupBlock;

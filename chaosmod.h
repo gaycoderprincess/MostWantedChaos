@@ -990,6 +990,8 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			QuickValueEditor("Powerups::fSpriteY", Powerups::fSpriteY);
+			QuickValueEditor("Powerups::fSpriteSize", Powerups::fSpriteSize);
 			//QuickValueEditor("PowerupBlock::rX", Effect_PowerupBlock::rX);
 			//QuickValueEditor("PowerupBlock::rY", Effect_PowerupBlock::rY);
 			//QuickValueEditor("PowerupBlock::rZ", Effect_PowerupBlock::rZ);
@@ -1051,17 +1053,17 @@ void ChaosModMenu() {
 			QuickValueEditor("Vergil::attackStyleIncrease", Effect_Vergil::attackStyleIncrease);
 			QuickValueEditor("Vergil::styleDecay", Effect_Vergil::styleDecay);
 			QuickValueEditor("CarMagnetForce", CarMagnetForce);
-			QuickValueEditor("ReVoltFirework::offX", Effect_ReVoltFirework::offX);
-			QuickValueEditor("ReVoltFirework::offY", Effect_ReVoltFirework::offY);
-			QuickValueEditor("ReVoltFirework::offZ", Effect_ReVoltFirework::offZ);
-			QuickValueEditor("ReVoltFirework::rotOffX", Effect_ReVoltFirework::rotOffX);
-			QuickValueEditor("ReVoltFirework::rotOffY", Effect_ReVoltFirework::rotOffY);
-			QuickValueEditor("ReVoltFirework::rotOffZ", Effect_ReVoltFirework::rotOffZ);
-			QuickValueEditor("ReVoltFirework::scale", Effect_ReVoltFirework::scale);
-			QuickValueEditor("ReVoltFirework::rotSpeed", Effect_ReVoltFirework::rotSpeed);
-			QuickValueEditor("ReVoltFirework::moveSpeed", Effect_ReVoltFirework::moveSpeed);
-			QuickValueEditor("ReVoltFirework::inFrontThreshold", Effect_ReVoltFirework::inFrontThreshold);
-			QuickValueEditor("ReVoltFirework::crosshairSize", Effect_ReVoltFirework::crosshairSize);
+			//QuickValueEditor("ReVoltFirework::offX", Effect_ReVoltFirework::offX);
+			//QuickValueEditor("ReVoltFirework::offY", Effect_ReVoltFirework::offY);
+			//QuickValueEditor("ReVoltFirework::offZ", Effect_ReVoltFirework::offZ);
+			//QuickValueEditor("ReVoltFirework::rotOffX", Effect_ReVoltFirework::rotOffX);
+			//QuickValueEditor("ReVoltFirework::rotOffY", Effect_ReVoltFirework::rotOffY);
+			//QuickValueEditor("ReVoltFirework::rotOffZ", Effect_ReVoltFirework::rotOffZ);
+			//QuickValueEditor("ReVoltFirework::scale", Effect_ReVoltFirework::scale);
+			//QuickValueEditor("ReVoltFirework::rotSpeed", Effect_ReVoltFirework::rotSpeed);
+			//QuickValueEditor("ReVoltFirework::moveSpeed", Effect_ReVoltFirework::moveSpeed);
+			//QuickValueEditor("ReVoltFirework::inFrontThreshold", Effect_ReVoltFirework::inFrontThreshold);
+			//QuickValueEditor("ReVoltFirework::crosshairSize", Effect_ReVoltFirework::crosshairSize);
 			QuickValueEditor("173::peanutSpeed", Effect_173::peanutSpeed);
 			QuickValueEditor("173::lastPeanutDot", Effect_173::lastPeanutDot);
 			QuickValueEditor("173::lastPeanutDistance", Effect_173::lastPeanutDistance);
