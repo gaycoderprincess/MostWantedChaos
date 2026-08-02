@@ -54,6 +54,11 @@ namespace Powerups {
 			obj->aModels.clear();
 		}
 
+		void ExplodeBomb(IVehicle* cause, Render3DObjects::Object* obj) {
+			ExplosionSFX(cause);
+			obj->aModels.clear();
+		}
+
 		void ExplodeCar(IVehicle* car, bool deadly) {
 			if (auto rb = car->mCOMObject->Find<IRigidBody>()) {
 				auto vel = *rb->GetLinearVelocity();
@@ -113,7 +118,7 @@ namespace Powerups {
 				if (distFromCar < 5) {
 					if (!IsCarDestroyed(car)) {
 						ExplodeCar(car, deadly);
-						ExplodeBomb(obj);
+						ExplodeBomb(car, obj);
 					}
 				}
 			}
@@ -444,8 +449,9 @@ namespace Powerups {
 		//POWERUP_OILSLICK, // todo? copying the relevant collision polys out would work here i think
 		POWERUP_ELECTROPULSE,
 		POWERUP_CHROMEBALL,
-		POWERUP_STAR,
 		POWERUP_TURBO,
+		POWERUP_STAR,
+		POWERUP_MUSHROOM,
 		POWERUP_INVINCIBLE,
 		POWERUP_BEACHBALL,
 		NUM_POWERUPS
@@ -461,6 +467,7 @@ namespace Powerups {
 			//"CwoeeChaos/data/textures/revolt_7.png",
 			"CwoeeChaos/data/textures/revolt_8.png",
 			"CwoeeChaos/data/textures/revolt_9.png",
+			"CwoeeChaos/data/textures/revolt_10.png",
 			"CwoeeChaos/data/textures/revolt_12.png",
 			"CwoeeChaos/data/textures/mk64_1.png",
 			"CwoeeChaos/data/textures/mk64_2.png",
@@ -496,6 +503,7 @@ namespace Powerups {
 		double fRollTime = 0.0;
 		double fTimeSinceLastFire = 0.0;
 		double fElectroTime = 0.0;
+		double fTurboTime = 0.0;
 
 		// audio
 		NyaAudio::NyaSound electro = 0;
@@ -527,7 +535,10 @@ namespace Powerups {
 					PlayAudioFromCar(balldrop, pUser);
 					return true;
 				} break;
-				case POWERUP_TURBO: {
+				case POWERUP_TURBO:
+					fTurboTime = 10.0;
+					return true;
+				case POWERUP_MUSHROOM: {
 					pUser->SetSpeed(TOMPS(300));
 					return true;
 				} break;
@@ -600,11 +611,17 @@ namespace Powerups {
 		}
 
 		void RollPowerup() {
+			bool isPlayer = pUser->GetDriverClass() == DRIVER_HUMAN;
+			bool hasNOS = false;
+			if (auto engine = pUser->mCOMObject->Find<IEngine>()) {
+				hasNOS = engine->HasNOS();
+			}
+
 			std::vector<int> powerupsAvailable;
 			for (int i = 0; i < NUM_POWERUPS; i++) {
-				if (pUser->GetDriverClass() != DRIVER_HUMAN) {
-					if (i == POWERUP_STAR) continue; // too OP
-				}
+				if (!isPlayer && i == POWERUP_STAR) continue; // too OP
+				if (!isPlayer && i == POWERUP_TURBO) continue; // turbo is player only cuz of input overrides
+				if (!hasNOS && i == POWERUP_TURBO) continue; // turbo is forced infinite nos
 				powerupsAvailable.push_back(i);
 			}
 			GivePowerup(powerupsAvailable[rand()%powerupsAvailable.size()]);
@@ -655,7 +672,7 @@ namespace Powerups {
 
 				return Powerups::ReVoltFirework::PickTarget(pUser) != nullptr;
 			}
-			if (PowerupID == POWERUP_TURBO) {
+			if (PowerupID == POWERUP_MUSHROOM) {
 				return GetLocalPlayerInterface<IInput>()->GetControls()->fGas >= 0.95;
 			}
 			return true;
@@ -669,6 +686,9 @@ namespace Powerups {
 			for (auto& car : cars) {
 				if (car == pUser) continue;
 				if (IsCarDestroyed(car)) continue;
+				if (auto rb = car->mCOMObject->Find<IRBVehicle>()) {
+					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
+				}
 
 				auto dist = (plyPos - *car->GetPosition()).length();
 				if (dist < 15) {
@@ -682,6 +702,17 @@ namespace Powerups {
 		}
 
 		void ProcessLastingEffects(double delta) {
+			if (fTurboTime > 0.0) {
+				bForcePlayerNOS = true;
+				if (auto ply = GetLocalPlayerInterface<IEngine>()) {
+					ply->ChargeNOS(1.0);
+				}
+
+				fTurboTime -= delta;
+				if (fTurboTime <= 0.0) {
+					bForcePlayerNOS = false;
+				}
+			}
 			if (fElectroTime > 0.0) {
 				if (!electro) electro = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electro.wav");
 				if (!electrozap) electrozap = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electrozap.wav");
