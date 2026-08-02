@@ -1,7 +1,3 @@
-struct tObjectSaveNoCol {
-	UMath::Matrix4 matrix;
-};
-
 struct tObjectSaveWithCol {
 	UMath::Matrix4 matrix;
 	UMath::Vector3 colPos;
@@ -75,11 +71,11 @@ void DoChaosEffectLoad() {
 }
 
 bool DoChaos173Save() {
-	std::vector<tObjectSaveNoCol> save;
+	std::vector<UMath::Matrix4> save;
 	for (auto& peanut : Effect_173::aPeanutsInWorld) {
 		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
-		save.push_back({model->mMatrix});
+		save.push_back(model->mMatrix);
 	}
 
 	std::ofstream file("CwoeeChaos/save/173.sav", std::iostream::out | std::iostream::binary);
@@ -105,9 +101,9 @@ void DoChaos173Load() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		tObjectSaveNoCol save;
+		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Effect_173::SpawnPeanut(save.matrix);
+		Effect_173::SpawnPeanut(save);
 	}
 }
 
@@ -178,11 +174,11 @@ void DoChaos8DownLoad() {
 }
 
 bool DoChaosBombSave() {
-	std::vector<tObjectSaveNoCol> save;
+	std::vector<UMath::Matrix4> save;
 	for (auto& peanut : Effect_ReVoltBomb::aBombsInWorld) {
 		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
-		save.push_back({model->mMatrix});
+		save.push_back(model->mMatrix);
 	}
 
 	std::ofstream file("CwoeeChaos/save/pickup.sav", std::iostream::out | std::iostream::binary);
@@ -204,18 +200,18 @@ void DoChaosBombLoad() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		tObjectSaveNoCol save;
+		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Effect_ReVoltBomb::SpawnBomb(save.matrix);
+		Effect_ReVoltBomb::SpawnBomb(save);
 	}
 }
 
 bool DoChaosVergilSave() {
-	std::vector<tObjectSaveNoCol> save;
+	std::vector<UMath::Matrix4> save;
 	for (auto& peanut : Effect_Vergil::aVergilsInWorld) {
 		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
-		save.push_back({model->mMatrix});
+		save.push_back(model->mMatrix);
 	}
 
 	std::ofstream file("CwoeeChaos/save/vergil.sav", std::iostream::out | std::iostream::binary);
@@ -239,20 +235,20 @@ void DoChaosVergilLoad() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		tObjectSaveNoCol save;
+		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Effect_Vergil::SpawnVergil(save.matrix);
+		Effect_Vergil::SpawnVergil(save);
 	}
 
 	file.read((char*)&Effect_Vergil::bVergilEverSpawned, sizeof(Effect_Vergil::bVergilEverSpawned));
 }
 
 bool DoChaosScientistSave() {
-	std::vector<tObjectSaveNoCol> save;
+	std::vector<UMath::Matrix4> save;
 	for (auto& peanut : Effect_Scientist::aObjectsInWorld) {
 		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
-		save.push_back({model->mMatrix});
+		save.push_back(model->mMatrix);
 	}
 
 	std::ofstream file("CwoeeChaos/save/scientist.sav", std::iostream::out | std::iostream::binary);
@@ -274,18 +270,18 @@ void DoChaosScientistLoad() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		tObjectSaveNoCol save;
+		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Effect_Scientist::SpawnObject(save.matrix);
+		Effect_Scientist::SpawnObject(save);
 	}
 }
 
 bool DoChaosRampSave() {
-	std::vector<tObjectSaveNoCol> save;
+	std::vector<UMath::Matrix4> save;
 	for (auto& peanut : Effect_SpawnRamp::aRampsInWorld) {
 		auto model = Render3DObjects::aObjects[peanut];
 		if (model->IsEmpty()) continue;
-		save.push_back({model->mMatrix});
+		save.push_back(model->mMatrix);
 	}
 
 	std::ofstream file("CwoeeChaos/save/ramp.sav", std::iostream::out | std::iostream::binary);
@@ -307,9 +303,9 @@ void DoChaosRampLoad() {
 	file.read((char*)&count, sizeof(count));
 
 	for (int i = 0; i < count; i++) {
-		tObjectSaveNoCol save;
+		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Effect_SpawnRamp::SpawnRamp(save.matrix);
+		Effect_SpawnRamp::SpawnRamp(save);
 	}
 }
 

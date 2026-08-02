@@ -949,6 +949,7 @@ void ChaosModMenu() {
 				ChloeMenuLib::EndMenu();
 			}
 			QuickValueEditor("fHoverPlatform", Render3DObjects::fHoverPlatform);
+			QuickValueEditor("bColorByNormals", Render3D::ModelLoaderConfig.bColorByNormals);
 			if (DrawMenuOption("Scenery Group")) {
 				ChloeMenuLib::BeginMenu();
 

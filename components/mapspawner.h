@@ -57,7 +57,7 @@ namespace MapSpawner {
 		}
 
 		void Spawn() {
-			Render3D::nVertexColorValue = nVertexColor;
+			Render3D::ModelLoaderConfig.nVertexColorValue = nVertexColor;
 
 			auto mat = UMath::Matrix4::kIdentity;
 			mat.x *= fScale;
@@ -75,14 +75,13 @@ namespace MapSpawner {
 
 			if (aLoadedModels.empty() || aLoadedModels[0]->bInvalidated) {
 				aLoadedModels.clear();
-				Render3D::sTextureSubdir = sTextureBasePath;
+				Render3D::ModelLoaderConfig.sTextureSubdir = sTextureBasePath;
 				for (auto& modelPath : aModelPaths) {
 					auto models = Render3D::CreateModels(modelPath);
 					for (auto& mdl : models) {
 						aLoadedModels.push_back(mdl);
 					}
 				}
-				Render3D::sTextureSubdir = "";
 			}
 			for (auto& model : aLoadedModels) {
 				aSpawnedModels.push_back(Render3DObjects::aObjects.size());
@@ -98,14 +97,13 @@ namespace MapSpawner {
 
 			if (aLoadedCollisions.empty() || aLoadedCollisions[0]->bInvalidated) {
 				aLoadedCollisions.clear();
-				Render3D::sTextureSubdir = sTextureBasePath;
+				Render3D::ModelLoaderConfig.sTextureSubdir = sTextureBasePath;
 				for (auto& modelPath : aCollisionPaths) {
 					auto models = Render3D::CreateModels(modelPath);
 					for (auto& mdl : models) {
 						aLoadedCollisions.push_back(mdl);
 					}
 				}
-				Render3D::sTextureSubdir = "";
 			}
 			for (auto& model : aLoadedCollisions) {
 				aSpawnedCollisions.push_back(Render3DObjects::aObjects.size());
@@ -121,7 +119,7 @@ namespace MapSpawner {
 				TeleportPlayer(playerPos, {-0.96,0.0,-0.3});
 			}
 
-			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+			Render3D::ModelLoaderConfig.Reset();
 		}
 	};
 

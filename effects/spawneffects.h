@@ -441,16 +441,14 @@ public:
 	}
 
 	static void SpawnBomb(UMath::Matrix4 mat) {
-		Render3D::nVertexColorValue = 0xFF808080;
-
 		if (models.empty() || models[0]->bInvalidated) {
+			Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF808080;
 			models = Render3D::CreateModels("pickup.fbx");
+			Render3D::ModelLoaderConfig.Reset();
 		}
 
 		aBombsInWorld.push_back(Render3DObjects::aObjects.size());
 		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("bomb", models, mat, {0,0,0}, 0, BombOnTick));
-
-		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 	}
 
 	void InitFunction() override {
@@ -1387,9 +1385,9 @@ public:
 
 	static void SpawnObject(UMath::Matrix4 mat) {
 		if (models.empty() || models[0]->bInvalidated) {
-			Render3D::sTextureSubdir = "scientist/";
+			Render3D::ModelLoaderConfig.sTextureSubdir = "scientist/";
 			models = Render3D::CreateModels("scientist/scientist.fbx");
-			Render3D::sTextureSubdir = "";
+			Render3D::ModelLoaderConfig.Reset();
 		}
 
 		int id = Render3DObjects::aObjects.size();
@@ -1855,9 +1853,9 @@ public:
 	}
 
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
-		Render3D::nVertexColorValue = 0xFF000000;
+		Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF000000;
 		static auto mdl = Render3D::CreateModels("abcblock.fbx");
-		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+		Render3D::ModelLoaderConfig.Reset();
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;
 		objData.aModels = mdl;
@@ -1898,10 +1896,7 @@ public:
 	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
 		float scale = 3.0;
 
-		Render3D::nVertexColorValue = 0xFF000000;
 		static auto mdl = Render3D::CreateModels("cone.fbx");
-		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
-
 		static auto col = CustomPhysicsObjects::CreateDynamicColliderMeshes(mdl, scale);
 
 		CustomPhysicsObjects::CustomPhysicsObject objData;

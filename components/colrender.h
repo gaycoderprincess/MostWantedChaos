@@ -384,25 +384,24 @@ namespace CollView {
 			tmp.g = nObjColG;
 			tmp.r = nObjColB;
 			tmp.a = 255;
-			Render3D::nVertexColorValue = *(uint32_t*)&tmp;
+			Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
 			static auto mdl = Render3D::CreateModels("cube.fbx");
-			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 
 			tmp.b = nCarColR;
 			tmp.g = nCarColG;
 			tmp.r = nCarColB;
 			tmp.a = 255;
-			Render3D::nVertexColorValue = *(uint32_t*)&tmp;
+			Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
 			static auto mdlCar = Render3D::CreateModels("cube.fbx");
-			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
 
 			tmp.b = nCopCarColR;
 			tmp.g = nCopCarColG;
 			tmp.r = nCopCarColB;
 			tmp.a = 255;
-			Render3D::nVertexColorValue = *(uint32_t*)&tmp;
+			Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
 			static auto mdlCopCar = Render3D::CreateModels("cube.fbx");
-			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+
+			Render3D::ModelLoaderConfig.Reset();
 
 			if (!mdl.empty() && !mdlCar.empty() && !mdlCopCar.empty()) {
 				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, bWireframeCars ? D3DFILL_WIREFRAME : D3DFILL_SOLID);

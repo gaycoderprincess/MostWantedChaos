@@ -103,7 +103,7 @@ public:
 	}
 
 	static inline float fStopSpeed = 0.1;
-	static inline float fSlowSpeed = 2.5;
+	static inline float fSlowSpeed = 3.0;
 	static inline float fFastSpeed = 5.0;
 
 	static inline float fCurrentSpeed = fStopSpeed;

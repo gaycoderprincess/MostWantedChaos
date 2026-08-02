@@ -1,8 +1,18 @@
 namespace Render3D {
 //#define RENDER3D_NOEFFECT
 	const uint32_t nDefaultVertexColor = 0xFF404040;
-	uint32_t nVertexColorValue = nDefaultVertexColor;
-	std::string sTextureSubdir;
+
+	struct {
+		uint32_t nVertexColorValue = nDefaultVertexColor;
+		bool bColorByNormals = false;
+		std::string sTextureSubdir;
+
+		void Reset() {
+			nVertexColorValue = nDefaultVertexColor;
+			bColorByNormals = false;
+			sTextureSubdir.clear();
+		}
+	} ModelLoaderConfig;
 
 	struct CwoeeVertexData {
 		float vPos[3];
@@ -428,7 +438,7 @@ namespace Render3D {
 				dest->vTangents[1] = srcTangent->y;
 				dest->vTangents[2] = srcTangent->z;
 			}
-			if (!nVertexColorValue) {
+			if (!ModelLoaderConfig.nVertexColorValue) {
 				auto tmp = NyaDrawing::CNyaRGBA32();
 				tmp.b = srcColor->r;
 				tmp.g = srcColor->g;
@@ -437,11 +447,20 @@ namespace Render3D {
 				dest->Color = *(uint32_t*)&tmp;
 			}
 			else {
-				dest->Color = overrideVertexColor ? 0xFFFFFFFF : nVertexColorValue;
+				dest->Color = overrideVertexColor ? 0xFFFFFFFF : ModelLoaderConfig.nVertexColorValue;
 			}
 			if (uvs) {
 				dest->vUV[0] = srcUV->x;
 				dest->vUV[1] = srcUV->y * -1;
+			}
+			
+			if (ModelLoaderConfig.bColorByNormals && normals) {
+				auto tmp = NyaDrawing::CNyaRGBA32();
+				tmp.b = srcNormal->x * 255;
+				tmp.g = srcNormal->y * 255;
+				tmp.r = srcNormal->z * 255;
+				tmp.a = 255;
+				dest->Color = *(uint32_t*)&tmp;
 			}
 		}
 
@@ -454,7 +473,7 @@ namespace Render3D {
 		model->pIndexBuffer->Unlock();
 
 		auto baseTextureName = material;
-		auto textureName = sTextureSubdir + baseTextureName;
+		auto textureName = ModelLoaderConfig.sTextureSubdir + baseTextureName;
 		if (baseTextureName.empty()) {
 			textureName = "white.png";
 		}

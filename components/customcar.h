@@ -59,9 +59,9 @@ public:
 
 	virtual void Load() {
 		if (aModels.empty() || aModels[0]->bInvalidated) {
-			Render3D::sTextureSubdir = sModelBasePath + "/";
+			Render3D::ModelLoaderConfig.sTextureSubdir = sModelBasePath + "/";
 			aModels = Render3D::CreateModels(sModelName);
-			Render3D::sTextureSubdir = "";
+			Render3D::ModelLoaderConfig.Reset();
 		}
 	}
 
@@ -250,11 +250,10 @@ public:
 	void Load() override {
 		CustomCarPart::Load();
 		if (aLitModels.empty() || aLitModels[0]->bInvalidated) {
-			Render3D::nVertexColorValue = 0xFFFFFFFF;
-			Render3D::sTextureSubdir = sModelBasePath + "/";
+			Render3D::ModelLoaderConfig.nVertexColorValue = 0xFFFFFFFF;
+			Render3D::ModelLoaderConfig.sTextureSubdir = sModelBasePath + "/";
 			aLitModels = Render3D::CreateModels(sModelName);
-			Render3D::sTextureSubdir = "";
-			Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+			Render3D::ModelLoaderConfig.Reset();
 		}
 	}
 

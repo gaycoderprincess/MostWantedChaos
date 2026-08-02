@@ -323,7 +323,7 @@ public:
 	const static inline float fFinishMoveY = 2;
 
 	void RenderPlayerArrow(NyaVec3 player, NyaVec3 fwd, NyaVec3 next) {
-		Render3D::nVertexColorValue = 0xFF808080;
+		Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF808080;
 
 		static auto models = Render3D::CreateModels("mc/arrow.fbx");
 		if (models.empty() || models[0]->bInvalidated) {
@@ -351,11 +351,11 @@ public:
 			mdl->RenderAt(mat, false);
 		}
 
-		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void RenderCheckpointCone(NyaVec3 cp, NyaVec3 next) {
-		Render3D::nVertexColorValue = 0xFF404040;
+		Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF404040;
 
 		static auto models = Render3D::CreateModels("mc/cone_fwd_new.fbx");
 		if (models.empty() || models[0]->bInvalidated) {
@@ -382,11 +382,11 @@ public:
 			mdl->RenderAt(mat, false);
 		}
 
-		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void RenderCheckpointFinish(NyaVec3 fwd, NyaVec3 cp) {
-		Render3D::nVertexColorValue = 0xFF404040;
+		Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF404040;
 
 		static auto models = Render3D::CreateModels("mc/finish.fbx");
 		if (models.empty() || models[0]->bInvalidated) {
@@ -410,11 +410,11 @@ public:
 			mdl->RenderAt(mat, false);
 		}
 
-		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void RenderCheckpointCylinder(NyaVec3 cp) {
-		Render3D::nVertexColorValue = 0xD0808080;
+		Render3D::ModelLoaderConfig.nVertexColorValue = 0xD0808080;
 
 		static auto models = Render3D::CreateModels("mc/cylinder.fbx");
 		if (models.empty() || models[0]->bInvalidated) {
@@ -438,7 +438,7 @@ public:
 			mdl->RenderAt(mat, true, EEFFECT_WORLD, false);
 		}
 
-		Render3D::nVertexColorValue = Render3D::nDefaultVertexColor;
+		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -462,7 +462,7 @@ public:
 			if (cp == race->mCheckpoints[i]) checkpointId = i;
 		}
 
-		Render3D::sTextureSubdir = "mc/";
+		Render3D::ModelLoaderConfig.sTextureSubdir = "mc/";
 
 		auto cam = GetLocalPlayerCamera()->CurrentKey.Matrix.Invert();
 		RenderCheckpointCylinder(cp->mWorldTrigger.fPosRadius);
@@ -478,7 +478,7 @@ public:
 			RenderPlayerArrow(RenderToWorldCoords(cam.p), RenderToWorldCoords(cam.z), cp->mWorldTrigger.fPosRadius);
 		}
 
-		Render3D::sTextureSubdir = "";
+		Render3D::ModelLoaderConfig.Reset();
 	}
 	void DeinitFunction() override {
 		if (IsInNormalRace()) {
