@@ -79,7 +79,6 @@ namespace Powerups {
 		template<bool deadly>
 		void BombOnTick(Render3DObjects::Object* obj, double delta) {
 			auto& rotDelta = *(float*)&obj->CustomData;
-			rotDelta += delta;
 
 			auto p = obj->mMatrix.p;
 			obj->mMatrix = UMath::Matrix4::kIdentity;
@@ -94,6 +93,7 @@ namespace Powerups {
 			obj->mMatrix.p = p;
 
 			if (IsChaosBlocked()) return;
+			rotDelta += delta;
 
 			// instakill enemy mario
 			if (SM64::bEnemyEnabled) {
@@ -434,6 +434,7 @@ namespace Powerups {
 		POWERUP_CHROMEBALL,
 		POWERUP_TURBO,
 		POWERUP_STAR,
+		POWERUP_BEACHBALL,
 		NUM_POWERUPS
 	};
 
@@ -449,8 +450,26 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/revolt_9.png",
 			"CwoeeChaos/data/textures/mk64_1.png",
 			"CwoeeChaos/data/textures/revolt_12.png",
+			"CwoeeChaos/data/textures/powerup_beachball.png",
 	};
 	IDirect3DTexture9* aPowerupTextures[NUM_POWERUPS] = {};
+
+	void SpawnPhysicalBeachBall(NyaVec3 pos, NyaVec3 vel) {
+		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
+
+		static auto mdl = Render3D::CreateModels("beachball.fbx");
+
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = mdl;
+		objData.vModelSize = {1,1,1};
+		objData.bRemoveOnSafehouse = true;
+		objData.bRemoveOnOutOfBounds = true;
+		objData.bRemoveOnOutOfRange = true;
+		objData.bAffectGamePhysics = true;
+		objData.sDebugName = "beachball";
+		objData.pCollisionSound = sound;
+		CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
+	}
 
 	float fSpriteY = 0.3;
 	float fSpriteSize = 0.05;
@@ -469,6 +488,7 @@ namespace Powerups {
 		NyaAudio::NyaSound electrozap = 0;
 		NyaAudio::NyaSound balldrop = 0;
 		NyaAudio::NyaSound starfire = 0;
+		NyaAudio::NyaSound wbombfire = 0;
 
 		bool ExecutePowerup() {
 			switch (PowerupID) {
@@ -495,6 +515,24 @@ namespace Powerups {
 				} break;
 				case POWERUP_TURBO: {
 					pUser->SetSpeed(TOMPS(300));
+					return true;
+				} break;
+				case POWERUP_BEACHBALL: {
+					if (!wbombfire) wbombfire = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/wbombfire.wav");
+					PlayAudioFromCar(wbombfire, pUser);
+
+					auto rb = pUser->mCOMObject->Find<IRigidBody>();
+
+					UMath::Vector3 dim;
+					UMath::Vector3 fwd;
+					rb->GetDimension(&dim);
+					rb->GetForwardVector(&fwd);
+
+					auto pos = *rb->GetPosition();
+					auto vel = *rb->GetLinearVelocity();
+					pos += fwd * (dim.z + 2.5);
+					vel += fwd * 25;
+					SpawnPhysicalBeachBall(pos, vel);
 					return true;
 				} break;
 				case POWERUP_STAR: {
@@ -531,34 +569,25 @@ namespace Powerups {
 			return false;
 		}
 
-		void RollPowerup() {
-			std::vector<int> powerupsAvailable;
-			if (pUser->GetDriverClass() == DRIVER_HUMAN) {
-				for (int i = 0; i < NUM_POWERUPS; i++) {
-					powerupsAvailable.push_back(i);
-				}
-			}
-			else {
-				//powerupsAvailable.push_back(POWERUP_SHOCKWAVE);
-				powerupsAvailable.push_back(POWERUP_PUTTYBOMB);
-				powerupsAvailable.push_back(POWERUP_FIREWORK);
-				powerupsAvailable.push_back(POWERUP_FIREWORKPACK);
-				//powerupsAvailable.push_back(POWERUP_WATERBOMB);
-				powerupsAvailable.push_back(POWERUP_CLONE);
-				//powerupsAvailable.push_back(POWERUP_OILSLICK);
-				powerupsAvailable.push_back(POWERUP_ELECTROPULSE);
-				powerupsAvailable.push_back(POWERUP_CHROMEBALL);
-				powerupsAvailable.push_back(POWERUP_TURBO);
-				//powerupsAvailable.push_back(POWERUP_STAR); // too OP
-			}
-
-			PowerupID = powerupsAvailable[rand()%powerupsAvailable.size()];
+		void GivePowerup(int id) {
+			PowerupID = id;
 			//PowerupCount = (PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_WATERBOMB) ? 3 : 1;
 			PowerupCount = PowerupID == POWERUP_FIREWORKPACK ? 3 : 1;
 			fRollTime = 4.0;
 
 			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup.wav");
 			PlayAudioFromCar(sound, pUser);
+		}
+
+		void RollPowerup() {
+			std::vector<int> powerupsAvailable;
+			for (int i = 0; i < NUM_POWERUPS; i++) {
+				if (pUser->GetDriverClass() != DRIVER_HUMAN) {
+					if (i == POWERUP_STAR) continue; // too OP
+				}
+				powerupsAvailable.push_back(i);
+			}
+			GivePowerup(powerupsAvailable[rand()%powerupsAvailable.size()]);
 		}
 
 		bool HasPowerup() {
@@ -579,7 +608,8 @@ namespace Powerups {
 					if (fRollTime < 2.0) scroll = 10;
 					if (fRollTime < 1.5) scroll = 5;
 
-					powerupId = fRollTime * scroll;
+					// always make sure it smoothly lands on the powerup it should
+					powerupId = std::abs(PowerupID - ((fRollTime - 0.75) * scroll));
 					powerupId %= NUM_POWERUPS;
 				}
 				powerupAlpha = 127;
@@ -600,13 +630,10 @@ namespace Powerups {
 				return IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X);
 			}
 
-			if (PowerupID == POWERUP_FIREWORK || PowerupID == POWERUP_FIREWORKPACK) {
+			if (PowerupID == POWERUP_FIREWORK || PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_BEACHBALL) {
 				if (fTimeSinceLastFire < 0.5) return false;
 
-				auto target = Powerups::ReVoltFirework::PickTarget(pUser);
-				if (!target) return false;
-				if (pUser->GetDriverClass() == DRIVER_COP && target->GetDriverClass() == DRIVER_COP) return false; // prevent cop friendly fire
-				return true;
+				return Powerups::ReVoltFirework::PickTarget(pUser) != nullptr;
 			}
 			if (PowerupID == POWERUP_TURBO) {
 				return GetLocalPlayerInterface<IInput>()->GetControls()->fGas >= 0.95;
@@ -614,42 +641,50 @@ namespace Powerups {
 			return true;
 		}
 
+		std::vector<IVehicle*> GetZappedCars() {
+			std::vector<IVehicle*> out;
+
+			auto plyPos = *pUser->GetPosition();
+			auto cars = GetActiveVehicles();
+			for (auto& car : cars) {
+				if (car == pUser) continue;
+				if (IsCarDestroyed(car)) continue;
+
+				auto dist = (plyPos - *car->GetPosition()).length();
+				if (dist < 15) {
+					if (car->mCOMObject->Find<ISuspension>()) {
+						out.push_back(car);
+					}
+				}
+			}
+
+			return out;
+		}
+
 		void ProcessLastingEffects(double delta) {
 			if (fElectroTime > 0.0) {
 				if (!electro) electro = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electro.wav");
 				if (!electrozap) electrozap = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/electrozap.wav");
 
-				if (electro) {
-					NyaAudio::SetVolume(electro, GetSFXVolume());
-					NyaAudio::Play(electro);
+				if (electro && NyaAudio::IsFinishedPlaying(electro)) {
+					PlayAudioFromCar(electro, pUser);
 				}
 
 				bool doZap = false;
 
-				auto plyPos = *pUser->GetPosition();
-				auto cars = GetActiveVehicles();
+				auto cars = GetZappedCars();
 				for (auto& car : cars) {
-					if (car == pUser) continue;
-					if (IsCarDestroyed(car)) continue;
-
-					auto dist = (plyPos - *car->GetPosition()).length();
-					if (dist < 10) {
-						if (auto sus = car->mCOMObject->Find<ISuspension>()) {
-							for (int i = 0; i < 4; i++) {
-								sus->SetWheelAngularVelocity(i, 0.0);
-							}
+					if (auto sus = car->mCOMObject->Find<ISuspension>()) {
+						for (int i = 0; i < 4; i++) {
+							sus->SetWheelAngularVelocity(i, 0.0);
 						}
-						//if (!IsCarDestroyed(car)) {
-						//	DestroyCar(car);
-						//}
-
-						doZap = true;
 					}
 				}
 
-				if (doZap) {
-					NyaAudio::SetVolume(electrozap, GetSFXVolume());
-					NyaAudio::Play(electrozap);
+				if (!cars.empty()) {
+					if (electrozap && NyaAudio::IsFinishedPlaying(electrozap)) {
+						PlayAudioFromCar(electrozap, pUser);
+					}
 				}
 				else {
 					NyaAudio::Stop(electrozap);
@@ -677,37 +712,83 @@ namespace Powerups {
 				PowerupCount--;
 				if (PowerupCount <= 0) {
 					PowerupID = NUM_POWERUPS;
+
+					//if (bIsLocalPlayer) {
+					//	GetLocalPlayer()->ResetGameBreaker(true);
+					//}
 				}
+			}
+		}
+
+		static void RenderZappingCar(IVehicle* veh) {
+			if (!IsVehicleValidAndActive(veh)) return;
+
+			NyaDrawing::CNyaRGBA32 tmp;
+			tmp.b = 0;
+			tmp.g = 255;
+			tmp.r = 255;
+			tmp.a = 255;
+			Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
+			static auto models = Render3D::CreateModels("cube.fbx");
+			Render3D::ModelLoaderConfig.Reset();
+
+			if (auto rb = veh->mCOMObject->Find<ICollisionBody>()) {
+				UMath::Vector3 dim;
+				rb->GetDimension(&dim);
+
+				UMath::Matrix4 mat = *rb->GetMatrix4();
+				mat.p = *rb->GetPosition();
+
+				mat.x *= dim.x;
+				mat.y *= dim.y;
+				mat.z *= dim.z;
+
+				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+				for (auto& mdl : models) {
+					mdl->RenderAt(WorldToRenderMatrix(mat));
+				}
+				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+			}
+		}
+
+		static void RenderZappedCar(IVehicle* veh) {
+			if (!IsVehicleValidAndActive(veh)) return;
+
+			NyaDrawing::CNyaRGBA32 tmp;
+			tmp.b = 255;
+			tmp.g = 0;
+			tmp.r = 0;
+			tmp.a = 255;
+			Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
+			static auto models = Render3D::CreateModels("cube.fbx");
+			Render3D::ModelLoaderConfig.Reset();
+
+			if (auto rb = veh->mCOMObject->Find<ICollisionBody>()) {
+				UMath::Vector3 dim;
+				rb->GetDimension(&dim);
+
+				UMath::Matrix4 mat = *rb->GetMatrix4();
+				mat.p = *rb->GetPosition();
+
+				mat.x *= dim.x;
+				mat.y *= dim.y;
+				mat.z *= dim.z;
+
+				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+				for (auto& mdl : models) {
+					mdl->RenderAt(WorldToRenderMatrix(mat));
+				}
+				g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 			}
 		}
 
 		void Process3D() {
 			if (fElectroTime > 0.0) {
-				NyaDrawing::CNyaRGBA32 tmp;
-				tmp.b = 0;
-				tmp.g = 255;
-				tmp.r = 255;
-				tmp.a = 255;
-				Render3D::ModelLoaderConfig.nVertexColorValue = *(uint32_t*)&tmp;
-				static auto models = Render3D::CreateModels("cube.fbx");
-				Render3D::ModelLoaderConfig.Reset();
+				RenderZappingCar(pUser);
 
-				if (auto rb = pUser->mCOMObject->Find<ICollisionBody>()) {
-					UMath::Vector3 dim;
-					rb->GetDimension(&dim);
-
-					UMath::Matrix4 mat = *rb->GetMatrix4();
-					mat.p = *rb->GetPosition();
-
-					mat.x *= dim.x;
-					mat.y *= dim.y;
-					mat.z *= dim.z;
-
-					g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-					for (auto& mdl : models) {
-						mdl->RenderAt(WorldToRenderMatrix(mat));
-					}
-					g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+				auto cars = GetZappedCars();
+				for (auto& car : cars) {
+					RenderZappedCar(car);
 				}
 			}
 		}

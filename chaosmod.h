@@ -990,6 +990,18 @@ void ChaosModMenu() {
 			if (DrawMenuOption("Trigger Permanent Hint Splash")) {
 				CwoeeHints::AddHint(std::format("Cwoee Chaos v{} by gaycoderprincess", CWOEECHAOS_VERSION).c_str(), 99999);
 			}
+			if (DrawMenuOption("Powerup")) {
+				ChloeMenuLib::BeginMenu();
+
+				for (int i = 0; i < Powerups::NUM_POWERUPS; i++) {
+					if (DrawMenuOption(std::format("give {}", i))) {
+						Powerups::RollPowerup(GetLocalPlayerVehicle());
+						Powerups::GetPowerupState(GetLocalPlayerVehicle())->GivePowerup(i);
+					}
+				}
+
+				ChloeMenuLib::EndMenu();
+			}
 			QuickValueEditor("Powerups::fSpriteY", Powerups::fSpriteY);
 			QuickValueEditor("Powerups::fSpriteSize", Powerups::fSpriteSize);
 			QuickValueEditor("PowerupBlock::rX", Effect_PowerupBlock::rX);

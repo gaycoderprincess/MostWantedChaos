@@ -1585,7 +1585,6 @@ public:
 
 	static void BombOnTick(Render3DObjects::Object* obj, double delta) {
 		auto& rotDelta = *(float*)&obj->CustomData;
-		rotDelta += delta;
 
 		auto p = obj->mMatrix.p;
 		if (GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&p, &p.y, nullptr)) {
@@ -1593,7 +1592,7 @@ public:
 		}
 		else {
 			auto ply = GetLocalPlayerVehicle();
-			if (ply && (*ply->GetPosition() - p).length() < 50) {
+			if (ply && (*ply->GetPosition() - p).length() < 100) {
 				obj->aModels.clear();
 				return;
 			}
@@ -1611,6 +1610,7 @@ public:
 		obj->mMatrix.p = p;
 
 		if (IsChaosBlocked()) return;
+		rotDelta += delta;
 
 		bool canPlayerPowerup = true;
 		if (SM64::bEnabled) canPlayerPowerup = false;
