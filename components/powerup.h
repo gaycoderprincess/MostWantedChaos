@@ -179,6 +179,8 @@ namespace Powerups {
 		NyaAudio::NyaSound ExplodeSound = 0;
 
 		void DrawCrosshair(IVehicle* target, bool isPlayerCrosshair) {
+			if (!target) return;
+
 			bVector3 screenPos;
 			auto worldPos = WorldToRenderCoords(*target->GetPosition());
 			eViewPlatInterface::GetScreenPosition(&eViews[EVIEW_PLAYER1], &screenPos, (bVector3*)&worldPos);
@@ -601,7 +603,7 @@ namespace Powerups {
 				case POWERUP_FIREWORK:
 				case POWERUP_FIREWORKPACK: {
 					auto target = ReVoltFirework::PickTarget(pUser);
-					if (target && (bIsLocalPlayer || target == GetLocalPlayerVehicle())) {
+					if (bIsLocalPlayer || target == GetLocalPlayerVehicle()) {
 						ReVoltFirework::DrawCrosshair(target, bIsLocalPlayer);
 					}
 				} break;
