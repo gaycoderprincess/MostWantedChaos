@@ -8,10 +8,10 @@ InputControls* __thiscall GetControlsHooked(IInputPlayer* pThis) {
 	auto orig = GetControls_orig(pThis);
 	static auto tmp = *orig;
 	tmp = *orig;
-	gCustomPlayerInput = &tmp;
 	if (bForcePlayerNOS) {
-		gCustomPlayerInput->fNOS = true;
+		tmp.fNOS = true;
 	}
+	gCustomPlayerInput = &tmp;
 	PlayerInputLoop();
 	return &tmp;
 }

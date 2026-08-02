@@ -1,4 +1,6 @@
 namespace Powerups {
+	float sfxVolumeMultiplier = 0.33;
+
 	void PlayAudioFromCar(NyaAudio::NyaSound sound, IRigidBody* veh) {
 		if (!sound) return;
 
@@ -13,7 +15,7 @@ namespace Powerups {
 		}
 
 		if (volume <= 0.0) return;
-		NyaAudio::SetVolume(sound, volume * GetSFXVolume());
+		NyaAudio::SetVolume(sound, volume * GetSFXVolume() * sfxVolumeMultiplier);
 		NyaAudio::SkipTo(sound, 0, false);
 		NyaAudio::Play(sound);
 	}
@@ -40,7 +42,7 @@ namespace Powerups {
 		void ExplosionSFX() {
 			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/puttbang.wav");
 			if (sound) {
-				NyaAudio::SetVolume(sound, GetSFXVolume());
+				NyaAudio::SetVolume(sound, GetSFXVolume() * sfxVolumeMultiplier);
 				NyaAudio::Play(sound);
 			}
 		}
@@ -172,7 +174,6 @@ namespace Powerups {
 		float rotSpeed = 2.5;
 		float inFrontThreshold = 0.6;
 		float crosshairSize = 0.02;
-		float sfxVolume = 0.33;
 
 		NyaAudio::NyaSound FireSound = 0;
 		NyaAudio::NyaSound ExplodeSound = 0;
@@ -293,7 +294,7 @@ namespace Powerups {
 				if (ExplodeSound) {
 					NyaAudio::Stop(ExplodeSound);
 					NyaAudio::SkipTo(ExplodeSound, 0, false);
-					NyaAudio::SetVolume(ExplodeSound, GetSFXVolume() * sfxVolume);
+					NyaAudio::SetVolume(ExplodeSound, GetSFXVolume() * sfxVolumeMultiplier);
 					NyaAudio::Play(ExplodeSound);
 				}
 
@@ -391,7 +392,7 @@ namespace Powerups {
 			if (veh == GetLocalPlayerInterface<IRigidBody>() && FireSound) {
 				NyaAudio::Stop(FireSound);
 				NyaAudio::SkipTo(FireSound, 0, false);
-				NyaAudio::SetVolume(FireSound, GetSFXVolume() * sfxVolume);
+				NyaAudio::SetVolume(FireSound, GetSFXVolume() * sfxVolumeMultiplier);
 				NyaAudio::Play(FireSound);
 			}
 		}
@@ -405,9 +406,9 @@ namespace Powerups {
 			CustomPhysicsObjects::CustomPhysicsObject objData;
 			objData.aModels = mdl;
 			objData.vModelSize = {1.5,1.5,1.5};
-			objData.bRemoveOnSafehouse = false;
-			objData.bRemoveOnOutOfBounds = false;
-			objData.bRemoveOnOutOfRange = false;
+			objData.bRemoveOnSafehouse = !save;
+			objData.bRemoveOnOutOfBounds = !save;
+			objData.bRemoveOnOutOfRange = !save;
 			objData.bAffectGamePhysics = true;
 			objData.sDebugName = save ? "metalball_save" : "metalball";
 			//objData.bUseExpensiveCollisionCheck = true;
@@ -577,7 +578,7 @@ namespace Powerups {
 				case POWERUP_STAR: {
 					if (!starfire) starfire = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/starfire.wav");
 					if (starfire) {
-						NyaAudio::SetVolume(starfire, GetSFXVolume());
+						NyaAudio::SetVolume(starfire, GetSFXVolume() * sfxVolumeMultiplier);
 						NyaAudio::Play(starfire);
 					}
 
@@ -625,6 +626,11 @@ namespace Powerups {
 				hasNOS = engine->HasNOS();
 			}
 
+			bool isResetting = false;
+			if (auto rb = pUser->mCOMObject->Find<IRBVehicle>()) {
+				if (rb->GetInvulnerability() != INVULNERABLE_NONE) isResetting = true;
+			}
+
 			bool isFirstPlace = false;
 			bool isLastPlace = false;
 			if (GRaceStatus::fObj) {
@@ -638,13 +644,15 @@ namespace Powerups {
 				isLastPlace = false;
 			}
 
+			float speedKMH = TOKMH(pUser->GetSpeed());
+
 			std::vector<int> powerupsAvailable;
 			for (int i = 0; i < NUM_POWERUPS; i++) {
 				if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
 				if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
 				if (isFirstPlace && i == POWERUP_FIREWORK) continue;
 				if (isFirstPlace && i == POWERUP_FIREWORKPACK) continue;
-				if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
+				//if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
 				if (isFirstPlace && i == POWERUP_STAR) continue;
 
 				if (!isPlayer && i == POWERUP_STAR) continue; // too OP
@@ -652,8 +660,17 @@ namespace Powerups {
 				if (!isPlayer && i == POWERUP_TURBO) continue; // turbo is player only cuz of input overrides
 				if (!hasNOS && i == POWERUP_TURBO) continue; // turbo is forced infinite nos
 
+				// dont reroll the same stuff multiple times
+				if (isResetting && i == POWERUP_INVINCIBLE) continue;
+				if (fElectroTime > 0.0 && i == POWERUP_ELECTROPULSE) continue;
+				if (fTurboTime > 0.0 && i == POWERUP_TURBO) continue;
+
+				if (speedKMH >= 290 && i == POWERUP_MUSHROOM) continue; // mushroom sets speed to 300
+
 				powerupsAvailable.push_back(i);
 			}
+			if (powerupsAvailable.empty()) return;
+
 			GivePowerup(powerupsAvailable[rand()%powerupsAvailable.size()]);
 		}
 

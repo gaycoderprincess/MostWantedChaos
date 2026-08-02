@@ -1571,5 +1571,6 @@ public:
 
 	void InitFunction() override {
 		Powerups::PowerupBlock::SpawnForAllCheckpoints();
+		DoChaosSave();
 	}
 } E_PowerupBlock;
