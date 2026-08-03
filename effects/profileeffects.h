@@ -566,6 +566,11 @@ public:
 		bUnlockAllCars = false;
 	}
 	bool HasTimer() override { return true; }
+	bool IsAvailable() override {
+		if (!EffectBase_CareerConditional::IsAvailable()) return false;
+		// ronnie unlocks the carrera gt which is the last locked car
+		return GetUserProfile()->TheCareerSettings.CurrentBin > BIN_RONNIE;
+	}
 	bool RunWhenBlocked() override { return true; }
 	bool RunInMenus() override { return true; }
 } E_UnlockAllCars;
