@@ -207,7 +207,6 @@ public:
 		if (!active) {
 			EffectInstance->fTimer = fTimerLength;
 			if ((IsInNormalRace() && GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())->mPctRaceComplete >= 99) || (FEDatabase->IsFinalEpicChase() && IsPlayerApproachingOldBridge())) {
-				//aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
 				aMainLoopFunctionsOnce.push_back([]() { ERestartRace::Create(); });
 				active = true;
 			}

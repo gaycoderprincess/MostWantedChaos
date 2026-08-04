@@ -447,7 +447,9 @@ public:
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles(DRIVER_COP);
 		for (auto& car : cars) {
-			car->mCOMObject->Find<IDamageable>()->ResetDamage();
+			auto dam = car->mCOMObject->Find<IDamageable>();
+			if (!dam) continue;
+			dam->ResetDamage();
 		}
 
 		NyaHookLib::Patch<uint8_t>(0x6B6769, 0xEB); // DamageCopCar::CheckUpright

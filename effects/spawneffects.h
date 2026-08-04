@@ -200,7 +200,12 @@ public:
 						if (bDespawnPeanuts) {
 							obj->aModels.clear(); // despawn after one kill
 						}
-						aMainLoopFunctionsOnce.push_back([]() { EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng"); });
+						aMainLoopFunctionsOnce.push_back([]() {
+							if (IsInCareerMode() && IsInNormalRace() && GRaceStatus::fObj->mRaceParms->GetIsBossRace()) {
+								Achievements::AwardAchievement(GetAchievement("BOSS_REPEAT"));
+							}
+							EQuitToFE::Create(GARAGETYPE_MAIN_FE, "MainMenu.fng");
+						});
 
 						DoChaosSave();
 					}

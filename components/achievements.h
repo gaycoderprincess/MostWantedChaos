@@ -43,6 +43,7 @@ namespace Achievements {
 		new CAchievement("BUSTED_MANY", "Skill Issues", "Get busted 25 times"),
 		new CAchievement("QTE", "Button Masher", "Pass a Quick-Time Event"),
 		new CAchievement("VERGIL_1000", "Smokin' Sexy Style", "Vergil's kill-count has reached 1000"),
+		new CAchievement("BOSS_REPEAT", "We Go Again", "Get main menu'd during a boss race"),
 	};
 
 	const float fSpriteBGX = 960;

@@ -66,6 +66,7 @@ namespace FlatOutHUD {
 #include "components/sm64.h"
 #include "components/customcamera.h"
 #include "components/powerup.h"
+#include "components/updatecheck.h"
 
 #include "chaoseffect.h"
 #include "chaosmod.h"

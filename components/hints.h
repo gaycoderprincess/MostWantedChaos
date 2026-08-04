@@ -6,8 +6,12 @@ namespace CwoeeHints {
 	};
 	std::vector<tHint> aHints;
 
+	std::mutex mHintMutex;
+
 	void AddHint(const std::string& text, float timer = 10) {
+		mHintMutex.lock();
 		aHints.push_back({text, timer});
+		mHintMutex.unlock();
 	}
 
 	bool HintsCleanup() {
@@ -24,6 +28,8 @@ namespace CwoeeHints {
 		static CNyaTimer gTimer;
 		gTimer.Process();
 
+		mHintMutex.lock();
+
 		float y = 0;
 		for (auto& hint : aHints) {
 			hint.timer -= gTimer.fDeltaTime;
@@ -35,6 +41,8 @@ namespace CwoeeHints {
 		}
 
 		while (HintsCleanup()) {}
+
+		mHintMutex.unlock();
 	}
 
 	ChloeHook Init([]() {

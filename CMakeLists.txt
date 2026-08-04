@@ -74,6 +74,6 @@ set_target_properties(NFSMWChaos PROPERTIES SUFFIX "_gcp.asi")
 
 target_link_libraries(NFSMWChaos d3dx9)
 target_link_libraries(NFSMWChaos bass)
-target_link_libraries(NFSMWChaos ws2_32)
 target_link_libraries(NFSMWChaos sm64)
 target_link_libraries(NFSMWChaos box3d)
+target_link_libraries(NFSMWChaos curl zlib bcrypt crypt32 ws2_32 iphlpapi secur32)

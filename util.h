@@ -18,11 +18,17 @@ enum eCareerBin {
 };
 
 void WriteLog(const std::string& str) {
+	static std::mutex mutex;
+
+	mutex.lock();
+
 	static auto file = std::ofstream("NFSMWChaos_gcp.log");
 
 	file << str;
 	file << "\n";
 	file.flush();
+
+	mutex.unlock();
 }
 
 void DisableKeyboardInput(bool disable) {
