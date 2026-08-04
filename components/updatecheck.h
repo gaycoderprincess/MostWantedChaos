@@ -2,6 +2,10 @@
 
 namespace UpdateChecker {
 	std::string sProjectName = "MostWantedChaos";
+	bool bUpdateAvailable = false;
+	void OpenUpdatePage() {
+		ShellExecuteA(nullptr, "open", std::format("https://github.com/gaycoderprincess/{}/releases/latest", sProjectName).c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+	}
 
 	std::string GetFileName() {
 		return std::filesystem::temp_directory_path().string() + "cwoee_releases.json";
@@ -19,11 +23,12 @@ namespace UpdateChecker {
 		auto newVersion = std::stof(versionStr);
 		WriteLog(std::format("currVersion {}", currVersion));
 		WriteLog(std::format("newVersion {}", newVersion));
-		if (newVersion <= currVersion) {
-			CwoeeHints::AddHint("Mod is up to date!");
+		bUpdateAvailable = newVersion > currVersion;
+		if (bUpdateAvailable) {
+			CwoeeHints::AddHint(std::format("Update available! {} -> {}", CWOEECHAOS_VERSION, versionStr), 60);
 		}
 		else {
-			CwoeeHints::AddHint(std::format("Update available! {} -> {}", CWOEECHAOS_VERSION, versionStr), 60);
+			CwoeeHints::AddHint("Mod is up to date!");
 		}
 	}
 

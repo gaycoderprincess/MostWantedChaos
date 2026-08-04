@@ -422,6 +422,12 @@ void ChaosLoop() {
 void ChaosModMenu() {
 	ChloeMenuLib::BeginMenu();
 
+	if (UpdateChecker::bUpdateAvailable) {
+		if (DrawMenuOption("Update available!") || DrawMenuOption("Click here to update")) {
+			UpdateChecker::OpenUpdatePage();
+		}
+	}
+
 	if (DrawMenuOption(std::format("Chaos On - {}", bTimerEnabled))) {
 		bTimerEnabled = !bTimerEnabled;
 	}
