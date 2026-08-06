@@ -709,6 +709,16 @@ namespace Powerups {
 				}
 				powerupAlpha = 127;
 			}
+			else {
+				if (PowerupID == POWERUP_FIREWORK || PowerupID == POWERUP_FIREWORKPACK) {
+					static bool bOnce = true;
+					if (bOnce) {
+						CwoeeHints::AddHint("Press X to fire a rocket.");
+						CwoeeHints::AddHint("The green reticule displays your lock-on target.");
+						bOnce = false;
+					}
+				}
+			}
 
 			auto& tex = aPowerupTextures[powerupId];
 			if (!tex) {

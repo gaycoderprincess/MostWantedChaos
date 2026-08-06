@@ -4,6 +4,7 @@ class Effect_DragHUD : public ChaosEffect {
 public:
 	Effect_DragHUD() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Drag Race HUD";
+		bAbortOnConditionFailed = true;
 	}
 
 	void InitFunction() override {
@@ -11,7 +12,27 @@ public:
 			ply->SetHud(PHT_DRAG);
 		}
 	}
+	bool IsAvailable() override {
+		return !IsInDragRace();
+	}
 } E_DragHUD;
+
+class Effect_DragHUD2 : public ChaosEffect {
+public:
+	Effect_DragHUD2() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Normal Race HUD";
+		bAbortOnConditionFailed = true;
+	}
+
+	void InitFunction() override {
+		if (auto ply = GetLocalPlayer()) {
+			ply->SetHud(PHT_STANDARD);
+		}
+	}
+	bool IsAvailable() override {
+		return IsInDragRace();
+	}
+} E_DragHUD2;
 
 class Effect_NoHUD : public ChaosEffect {
 public:

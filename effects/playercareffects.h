@@ -1556,9 +1556,29 @@ public:
 			timer -= 3;
 		}
 
+		bool reverseGas = false;
+		if (auto ply = GetLocalPlayerVehicle()) {
+			if (auto trans = GetLocalPlayerInterface<ITransmission>()) {
+				auto gear = trans->GetGear();
+				reverseGas = gear == G_REVERSE;
+				if (brake > 0 && ply->GetSpeed() <= 0.0 && gear != G_REVERSE) {
+					trans->Shift(G_REVERSE);
+				}
+				if (gas > 0 && ply->GetSpeed() <= 0.0 && gear == G_REVERSE) {
+					trans->Shift(G_FIRST);
+				}
+			}
+		}
+
 		gCustomPlayerInput->fSteering = steer;
-		gCustomPlayerInput->fGas = gas;
-		gCustomPlayerInput->fBrake = brake;
+		if (reverseGas) {
+			gCustomPlayerInput->fGas = brake;
+			gCustomPlayerInput->fBrake = gas;
+		}
+		else {
+			gCustomPlayerInput->fGas = gas;
+			gCustomPlayerInput->fBrake = brake;
+		}
 		gCustomPlayerInput->fHandBrake = 0;
 		gCustomPlayerInput->fActionButton = false;
 		gCustomPlayerInput->fNOS = false;

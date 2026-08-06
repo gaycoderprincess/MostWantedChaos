@@ -671,6 +671,9 @@ public:
 	void TickFunctionMain(double delta) override {
 		auto cars = GetActiveVehicles();
 		for (auto& car : cars) {
+			// prevent softlock
+			if (car->IsStaging()) continue;
+
 			if (car->mCOMObject->Find<ICollisionBody>()->HasHadCollision()) {
 				DestroyCar(car);
 			}

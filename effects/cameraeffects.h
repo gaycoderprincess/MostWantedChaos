@@ -53,7 +53,7 @@ public:
 class Effect_FreezeCamera : public ChaosEffect {
 public:
 	Effect_FreezeCamera() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Freeze Camera";
+		sName = "Lock Camera In Place";
 		fTimerLength = 10;
 		AddToIncompatiblityGroup("camera_replace");
 	}
