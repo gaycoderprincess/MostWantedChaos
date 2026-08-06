@@ -349,8 +349,6 @@ public:
 			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
 			mdl->RenderAt(mat, false);
 		}
-
-		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void RenderCheckpointCone(NyaVec3 cp, NyaVec3 next) {
@@ -380,8 +378,6 @@ public:
 			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
 			mdl->RenderAt(mat, false);
 		}
-
-		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void RenderCheckpointFinish(NyaVec3 fwd, NyaVec3 cp) {
@@ -408,8 +404,6 @@ public:
 			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
 			mdl->RenderAt(mat, false);
 		}
-
-		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void RenderCheckpointCylinder(NyaVec3 cp) {
@@ -436,8 +430,6 @@ public:
 			mat = (UMath::Matrix4)WorldToRenderMatrix(mat);
 			mdl->RenderAt(mat, true, EEFFECT_WORLD, false);
 		}
-
-		Render3D::ModelLoaderConfig.Reset();
 	}
 
 	void TickFunctionMain(double delta) override {
@@ -450,6 +442,7 @@ public:
 	}
 	void TickFunction(eChaosHook hook, double delta) override {
 		if (hook != HOOK_3D) return;
+		if (Render3D::pViewToDraw->ID != EVIEW_PLAYER1) return; // dont draw checkpoints and the arrow in reflections or shadows
 
 		auto race = GRaceStatus::fObj;
 		if (!race) return;

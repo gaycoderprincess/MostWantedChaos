@@ -8,6 +8,9 @@ namespace CustomPhysicsObjects {
 	float fObjectSFXRange = 100;
 	float fObjectSFXVolume = 0.66;
 
+	bool bEverythingAffectsGame_Player = false;
+	bool bEverythingAffectsGame_Opponents = false;
+
 	struct CustomPhysicsObject {
 		std::vector<Render3D::tModel*> aModels;
 		NyaVec3 vModelSize = {1,1,1};
@@ -156,6 +159,12 @@ namespace CustomPhysicsObjects {
 					gameObj = CustomPhysics::GetGameObjectInstanceForB3Body(body);
 				}
 				if (!gameObj) continue;
+
+				bool isPlayer = gameObj->pGameBody == GetLocalPlayerInterface<IRigidBody>();
+				if (!bAffectGamePhysics) {
+					if (isPlayer && bEverythingAffectsGame_Opponents) continue;
+					if (!isPlayer && bEverythingAffectsGame_Player) continue;
+				}
 
 				gameObj->bReturnChangesToGame = true;
 			}
@@ -310,7 +319,7 @@ namespace CustomPhysicsObjects {
 			auto& obj = *pObj;
 			obj.fTimeSinceSpawned += gTimer.fDeltaTime;
 			obj.fTimeSinceMovedByScript += gTimer.fDeltaTime;
-			if (obj.bAffectGamePhysics) {
+			if (bEverythingAffectsGame_Player || bEverythingAffectsGame_Opponents || obj.bAffectGamePhysics) {
 				obj.ProcessGamePhysicsIntegration();
 			}
 

@@ -319,6 +319,7 @@ public:
 				ply->SetCollisionMass(0.01);
 			}
 		}
+		CustomPhysicsObjects::bEverythingAffectsGame_Opponents = true;
 	}
 	void DeinitFunction() override {
 		auto cars = GetActiveVehicles(DRIVER_RACER);
@@ -327,6 +328,7 @@ public:
 				ply->SetCollisionMass(car->mCOMObject->Find<IRigidBody>()->GetMass());
 			}
 		}
+		CustomPhysicsObjects::bEverythingAffectsGame_Opponents = false;
 	}
 	bool HasTimer() override { return true; }
 } E_SetOpponentMass0;

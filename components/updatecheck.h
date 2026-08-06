@@ -1,3 +1,4 @@
+#ifndef CWOEE_NO_UPDATER
 #include "curl/curl.h"
 
 namespace UpdateChecker {
@@ -98,3 +99,4 @@ namespace UpdateChecker {
 		std::thread(RetrieveVersionInfo).detach();
 	});
 }
+#endif

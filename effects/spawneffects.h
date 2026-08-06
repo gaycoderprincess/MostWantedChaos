@@ -352,6 +352,9 @@ public:
 			mat = (UMath::Matrix4)(mat * rotation);
 			SpawnObject(mat, colPos);
 			DoChaosSave();
+			
+			veh->SetLinearVelocity(&UMath::Vector3::kZero);
+			veh->SetAngularVelocity(&UMath::Vector3::kZero);
 		}
 	}
 } E_8Down;

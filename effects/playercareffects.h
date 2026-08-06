@@ -975,11 +975,13 @@ public:
 		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
 			ply->SetCollisionMass(0.01);
 		}
+		CustomPhysicsObjects::bEverythingAffectsGame_Player = true;
 	}
 	void DeinitFunction() override {
 		if (auto ply = GetLocalPlayerInterface<IRBVehicle>()) {
 			ply->SetCollisionMass(GetLocalPlayerInterface<IRigidBody>()->GetMass());
 		}
+		CustomPhysicsObjects::bEverythingAffectsGame_Player = false;
 	}
 	bool HasTimer() override { return true; }
 } E_SetCarMass0;

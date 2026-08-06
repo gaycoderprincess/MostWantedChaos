@@ -243,8 +243,12 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 			NyaHooks::LateInitHook::aFunctions.push_back([](){
 				NyaHooks::RenderEnvHook::Init();
 				NyaHooks::RenderEnvHook::aPostFunctions.push_back(Render3DLoop);
-				NyaHooks::RenderShadowsHook::Init();
-				NyaHooks::RenderShadowsHook::aPostFunctions.push_back(Render3DLoopShadows);
+
+				// memory corruption here if 360 stuff isnt installed
+				if (GetModuleHandleA("X360Stuff.asi")) {
+					NyaHooks::RenderShadowsHook::Init();
+					NyaHooks::RenderShadowsHook::aPostFunctions.push_back(Render3DLoopShadows);
+				}
 
 				// get rid of exopts stuff that could mess with the mod in bad ways
 				NyaHookLib::PatchRelative(NyaHookLib::CALL, 0x663EE8, 0x64B380); // remove exopts loop, disables hotkeys
