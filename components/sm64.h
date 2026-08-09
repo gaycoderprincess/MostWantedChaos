@@ -488,6 +488,7 @@ namespace SM64 {
 	bool bDoReset = false;
 	bool bEnabled = false;
 	bool bEnemyEnabled = false;
+	bool bEnemyIsNeutral = false;
 	NyaVec3 vEnemySpawnPosition = {0,0,0};
 	bool bAvailable = false;
 	double fTimeSinceLastAttacked = 0.0;
@@ -831,8 +832,11 @@ namespace SM64 {
 		auto ply = GetLocalPlayerVehicle();
 		if (!ply) return;
 
-		auto closest = GetClosestActiveVehicle(GetMarioWorldPos());
+		auto closest = GetClosestActiveVehicle(GetMarioWorldPos(), IsCarDestroyed(ply));
 		if (!closest) return;
+
+		// always attack the closest car if neutral
+		if (bEnemyIsNeutral) ply = closest;
 
 		auto distFromClosest = (GetMarioWorldPos() - *closest->GetPosition());
 		auto distFromPlayer = (GetMarioWorldPos() - *ply->GetPosition());
@@ -984,7 +988,7 @@ namespace SM64 {
 			auto pos2d = marioPos;
 			spawn2d.y = 0;
 			pos2d.y = 0;
-			if ((spawn2d - pos2d).length() < 2.0 && (marioPos.y < (vEnemySpawnPosition.y - 10))) {
+			if ((spawn2d - pos2d).length() < 2.0 && (marioPos.y < (vEnemySpawnPosition.y - 15))) {
 				bDoReset = true;
 			}
 		}

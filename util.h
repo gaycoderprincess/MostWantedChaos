@@ -253,12 +253,30 @@ IVehicle* GetMostInFrontActiveVehicle(IVehicle* toVehicle, float maxDistance = 9
 	return out;
 }
 
-IVehicle* GetClosestActiveVehicle(NyaVec3 toCoords) {
+bool IsCarDestroyed(IVehicle* car, bool tirePopsCount = false) {
+	if (auto engine = car->mCOMObject->Find<IEngineDamage>()) {
+		if (engine->IsBlown()) return true;
+		if (engine->IsSabotaged()) return true;
+	}
+	if (tirePopsCount) {
+		if (auto sus = car->mCOMObject->Find<ISpikeable>()) {
+			int count = 0;
+			for (int i = 0; i < 4; i++) {
+				if (sus->GetTireDamage(i) > TIRE_DAMAGE_NONE) count++;
+			}
+			if (count >= 2) return true;
+		}
+	}
+	return car->IsDestroyed();
+}
+
+IVehicle* GetClosestActiveVehicle(NyaVec3 toCoords, bool includeDestroyed = true) {
 	auto sourcePos = toCoords;
 	IVehicle* out = nullptr;
 	float distance = 99999;
 	auto cars = GetActiveVehicles();
 	for (auto& car : cars) {
+		if (!includeDestroyed && IsCarDestroyed(car)) continue;
 		auto targetPos = *car->GetPosition();
 		if ((sourcePos - targetPos).length() < distance) {
 			out = car;
@@ -588,23 +606,6 @@ void OnPlayerTeleported() {
 	}
 }
 
-bool IsCarDestroyed(IVehicle* car, bool tirePopsCount = false) {
-	if (auto engine = car->mCOMObject->Find<IEngineDamage>()) {
-		if (engine->IsBlown()) return true;
-		if (engine->IsSabotaged()) return true;
-	}
-	if (tirePopsCount) {
-		if (auto sus = car->mCOMObject->Find<ISpikeable>()) {
-			int count = 0;
-			for (int i = 0; i < 4; i++) {
-				if (sus->GetTireDamage(i) > TIRE_DAMAGE_NONE) count++;
-			}
-			if (count >= 2) return true;
-		}
-	}
-	return car->IsDestroyed();
-}
-
 void DestroyCar(IVehicle* car) {
 	if (auto dam = car->mCOMObject->Find<IEngineDamage>()) {
 		if (!dam->IsBlown()) dam->Blow();
@@ -753,6 +754,10 @@ bool IsInAnyPursuit() {
 // challenge series, final chase, freeroam pursuit
 bool IsInFocusedPursuit() {
 	return IsInPursuitRace() || (!IsInAnyRace() && IsInAnyPursuit());
+}
+
+bool IsInFreeroamPursuit() {
+	return !IsInAnyRace() && IsInAnyPursuit();
 }
 
 bool IsPlayerApproachingOldBridge() {

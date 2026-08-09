@@ -1359,6 +1359,7 @@ public:
 
 	void InitFunction() override {
 		SM64::bEnemyEnabled = true;
+		SM64::bEnemyIsNeutral = false;
 		SM64::bDoReset = true;
 
 		NyaVec3 v = {0,0,0};

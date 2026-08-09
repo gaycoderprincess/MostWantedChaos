@@ -462,6 +462,7 @@ namespace Powerups {
 		POWERUP_MUSHROOMPACK,
 		POWERUP_INVINCIBLE,
 		POWERUP_BEACHBALL,
+		POWERUP_MARIO,
 		NUM_POWERUPS
 	};
 
@@ -481,6 +482,7 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/mk64_4.png",
 			"CwoeeChaos/data/textures/mk64_2.png",
 			"CwoeeChaos/data/textures/powerup_beachball.png",
+			"CwoeeChaos/data/textures/powerup_mario.png",
 	};
 	const char* aPowerupSpriteNames2[] = {
 			//"CwoeeChaos/data/textures/revolt_1.png",
@@ -498,6 +500,7 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/mk64_4.png",
 			"CwoeeChaos/data/textures/mk64_2.png",
 			"CwoeeChaos/data/textures/powerup_beachball.png",
+			"CwoeeChaos/data/textures/powerup_mario.png",
 	};
 	IDirect3DTexture9* aPowerupTextures1[NUM_POWERUPS] = {};
 	IDirect3DTexture9* aPowerupTextures2[NUM_POWERUPS] = {};
@@ -628,6 +631,19 @@ namespace Powerups {
 					}
 					return true;
 				} break;
+				case POWERUP_MARIO: {
+					if (SM64::bEnabled) return false;
+					auto rb = pUser->mCOMObject->Find<IRigidBody>();
+					auto pos = *rb->GetPosition();
+					UMath::Vector3 fwd;
+					rb->GetForwardVector(&fwd);
+					pos -= fwd * 5;
+					SM64::bEnemyEnabled = true;
+					SM64::bEnemyIsNeutral = true;
+					SM64::bDoReset = true;
+					SM64::vEnemySpawnPosition = pos;
+					return true;
+				} break;
 			}
 			return false;
 		}
@@ -702,8 +718,11 @@ namespace Powerups {
 
 			std::vector<int> powerupsAvailable;
 			for (int i = 0; i < NUM_POWERUPS; i++) {
+				if (i == POWERUP_MARIO && !SM64::bAvailable) continue;
+
 				if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
 				if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
+				if (isLastPlace && i == POWERUP_MARIO) continue;
 				if (isFirstPlace && i == POWERUP_FIREWORK) continue;
 				if (isFirstPlace && i == POWERUP_FIREWORKPACK) continue;
 				//if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
@@ -798,6 +817,8 @@ namespace Powerups {
 		}
 
 		bool HasFired() {
+			if (pUser->IsStaging()) return false;
+
 			if (pUser == GetLocalPlayerVehicle()) {
 				return IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X);
 			}
