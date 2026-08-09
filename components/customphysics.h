@@ -20,9 +20,7 @@ namespace CustomPhysics {
 	}
 
 	struct CustomArticleInstance {
-		int nSceneryGroupId;
-		std::vector<WCollisionTri> aTriStrips;
-		std::vector<WCollisionTri> aBarriers;
+		CollisionCache::CachedInstance* pInstance = nullptr;
 		b3MeshData* pB3Mesh = nullptr;
 		b3BodyId nB3Body;
 		bool bB3MeshEnabled;
@@ -138,134 +136,45 @@ namespace CustomPhysics {
 		return nullptr;
 	}
 
-	void ProcessCollisionBarriers(CustomArticleInstance* article, WCollisionBarrier* list, int count, NyaVec3 offset) {
-		for (int i = 0; i < count; i++) {
-			auto ptMin = list[i].fPts[0];
-			auto ptMax = list[i].fPts[1];
-			ptMin -= offset;
-			ptMax -= offset;
-
-			// first tri
-			WCollisionTri tri;
-			tri.fPt2.x = ptMin.x;
-			tri.fPt2.y = ptMin.y;
-			tri.fPt2.z = ptMin.z;
-			tri.fPt1.x = ptMin.x;
-			tri.fPt1.y = ptMax.y;
-			tri.fPt1.z = ptMin.z;
-			tri.fPt0.x = ptMax.x;
-			tri.fPt0.y = ptMax.y;
-			tri.fPt0.z = ptMax.z;
-
-			article->aBarriers.push_back(tri);
-
-			// second tri
-			tri.fPt2.x = ptMin.x;
-			tri.fPt2.y = ptMin.y;
-			tri.fPt2.z = ptMin.z;
-			tri.fPt1.x = ptMax.x;
-			tri.fPt1.y = ptMin.y;
-			tri.fPt1.z = ptMax.z;
-			tri.fPt0.x = ptMax.x;
-			tri.fPt0.y = ptMax.y;
-			tri.fPt0.z = ptMax.z;
-			article->aBarriers.push_back(tri);
-
-			// first tri
-			tri.fPt0.x = ptMin.x;
-			tri.fPt0.y = ptMin.y;
-			tri.fPt0.z = ptMin.z;
-			tri.fPt1.x = ptMin.x;
-			tri.fPt1.y = ptMax.y;
-			tri.fPt1.z = ptMin.z;
-			tri.fPt2.x = ptMax.x;
-			tri.fPt2.y = ptMax.y;
-			tri.fPt2.z = ptMax.z;
-
-			article->aBarriers.push_back(tri);
-
-			// second tri
-			tri.fPt0.x = ptMin.x;
-			tri.fPt0.y = ptMin.y;
-			tri.fPt0.z = ptMin.z;
-			tri.fPt1.x = ptMax.x;
-			tri.fPt1.y = ptMin.y;
-			tri.fPt1.z = ptMax.z;
-			tri.fPt2.x = ptMax.x;
-			tri.fPt2.y = ptMax.y;
-			tri.fPt2.z = ptMax.z;
-			article->aBarriers.push_back(tri);
-		}
-	}
-
-	void ProcessCollisionArticle(int articleId, WCollisionInstance* inst) {
-		if (!inst) return;
-
-		auto article = inst->fCollisionArticle;
-		if (!article) return;
-
-		UMath::Matrix4 instMat;
-		inst->MakeMatrix(&instMat, true);
-
-		// filter out unused stuff
-		//if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
-
-		auto articles_end_ptr = (uintptr_t)(&article[1]);
-
-		aCollisionArticles[articleId].aInstances.push_back({});
-		auto articleInst = &aCollisionArticles[articleId].aInstances[aCollisionArticles[articleId].aInstances.size()-1];
-
-		articleInst->nSceneryGroupId = inst->fGroupNumber;
-
-		auto stripSphere = (WCollisionStripSphere*)articles_end_ptr;
-		auto strip = (WCollisionStrip*)(&stripSphere[article->fNumStrips]);
-		for (int i = 0; i < article->fNumStrips; i++) {
-			int numToIterate = strip->numTrisOrSurfaceId - 2;
-			for (int j = 0; j < numToIterate; j++) {
-				WCollisionTri tri;
-				WCollisionStrip::MakeFace(strip, j, &stripSphere->fPos, &tri);
-				tri.fSurfaceRef = *(Attrib::Collection**)(articles_end_ptr + (4 * tri.fSurface.fSurface) + article->fStripsSize + article->fEdgesSize);
-
-				tri.fPt0 -= instMat.p;
-				tri.fPt1 -= instMat.p;
-				tri.fPt2 -= instMat.p;
-
-				articleInst->aTriStrips.push_back(tri);
-
-				auto flip = tri;
-				flip.fPt0 = tri.fPt2;
-				flip.fPt1 = tri.fPt1;
-				flip.fPt2 = tri.fPt0;
-				articleInst->aTriStrips.push_back(flip);
-			}
-			strip += strip->numTrisOrSurfaceId;
-			stripSphere++;
-		}
-
-		ProcessCollisionBarriers(articleInst, (WCollisionBarrier*)(articles_end_ptr + article->fStripsSize), article->fNumEdges, instMat.p);
-	}
-
-	void ConvertCollisionArticle(CustomArticleInstance& article) {
+	void ConvertCollisionArticle(CustomArticleInstance& article, bool makeDoubleSided) {
 		if (article.pB3Mesh) return;
 
 		std::vector<b3Vec3> vertices;
 		std::vector<int> indices;
-		for (auto& tri : article.aTriStrips) {
+		for (auto& tri : article.pInstance->aTriStrips) {
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt0.x, tri.fPt0.y, tri.fPt0.z});
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt1.x, tri.fPt1.y, tri.fPt1.z});
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt2.x, tri.fPt2.y, tri.fPt2.z});
+
+			if (makeDoubleSided) {
+				indices.push_back(vertices.size());
+				vertices.push_back({tri.fPt2.x, tri.fPt2.y, tri.fPt2.z});
+				indices.push_back(vertices.size());
+				vertices.push_back({tri.fPt1.x, tri.fPt1.y, tri.fPt1.z});
+				indices.push_back(vertices.size());
+				vertices.push_back({tri.fPt0.x, tri.fPt0.y, tri.fPt0.z});
+			}
 		}
 
-		for (auto& tri : article.aBarriers) {
+		for (auto& tri : article.pInstance->aBarriers) {
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt0.x, tri.fPt0.y, tri.fPt0.z});
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt1.x, tri.fPt1.y, tri.fPt1.z});
 			indices.push_back(vertices.size());
 			vertices.push_back({tri.fPt2.x, tri.fPt2.y, tri.fPt2.z});
+
+			if (makeDoubleSided) {
+				indices.push_back(vertices.size());
+				vertices.push_back({tri.fPt2.x, tri.fPt2.y, tri.fPt2.z});
+				indices.push_back(vertices.size());
+				vertices.push_back({tri.fPt1.x, tri.fPt1.y, tri.fPt1.z});
+				indices.push_back(vertices.size());
+				vertices.push_back({tri.fPt0.x, tri.fPt0.y, tri.fPt0.z});
+			}
 		}
 
 		if (!vertices.empty()) {
@@ -386,17 +295,19 @@ namespace CustomPhysics {
 		gTimer.Process();
 
 		for (int i = 0; i < 2700; i++) {
-			auto pack = WCollisionAssets::mCollisionPackList[i];
-			if (!pack) continue;
+			auto& pack = CollisionCache::aCachedCollisions[i];
+			if (pack.aInstances.empty()) continue;
 
 			if (!aCollisionArticles[i].aInstances.empty()) continue;
 
-			for (int j = 0; j < pack->mInstanceNum; j++) {
-				ProcessCollisionArticle(i, &pack->mInstanceList[j]);
+			for (auto& inst : pack.aInstances) {
+				CustomArticleInstance tmp;
+				tmp.pInstance = &inst;
+				aCollisionArticles[i].aInstances.push_back(tmp);
 			}
 
 			for (auto& inst : aCollisionArticles[i].aInstances) {
-				ConvertCollisionArticle(inst);
+				ConvertCollisionArticle(inst, true);
 			}
 		}
 
@@ -405,7 +316,7 @@ namespace CustomPhysics {
 			if (!pack) continue;
 
 			for (auto& inst : aCollisionArticles[i].aInstances) {
-				auto enabled = !inst.nSceneryGroupId || SceneryGroupEnabledTable[inst.nSceneryGroupId];
+				auto enabled = !inst.pInstance->nSceneryGroupId || SceneryGroupEnabledTable[inst.pInstance->nSceneryGroupId];
 				if (enabled != inst.bB3MeshEnabled) {
 					if (enabled) {
 						b3Body_Enable(inst.nB3Body);
@@ -433,28 +344,41 @@ namespace CustomPhysics {
 				}
 			}
 			aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances.clear();
+			CollisionCache::ClearTempArticle();
 
 			for (auto& inst : customTris) {
-				ProcessCollisionArticle(COLLISIONARTICLE_CUSTOM, inst);
+				CollisionCache::ProcessCollisionArticle(COLLISIONARTICLE_CUSTOM, inst);
+			}
+			for (auto& inst : CollisionCache::gTempArticle.aInstances) {
+				CustomArticleInstance tmp;
+				tmp.pInstance = &inst;
+				aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances.push_back(tmp);
 			}
 
+			// todo refactor
 			// combine everything into one huge collision article
-			auto bigArticle = CustomArticleInstance();
-			for (auto& inst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
-				for (auto& tri : inst.aTriStrips) {
-					bigArticle.aTriStrips.push_back(tri);
-				}
-				inst.aTriStrips.clear();
+			static auto bigArticleInstance = CollisionCache::CachedInstance();
+			bigArticleInstance.aTriStrips.clear();
+			bigArticleInstance.aBarriers.clear();
 
-				for (auto& tri : inst.aBarriers) {
-					bigArticle.aBarriers.push_back(tri);
+			auto bigArticle = CustomArticleInstance();
+			bigArticle.pInstance = &bigArticleInstance;
+			for (auto& inst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
+				for (auto& tri : inst.pInstance->aTriStrips) {
+					bigArticle.pInstance->aTriStrips.push_back(tri);
 				}
-				inst.aBarriers.clear();
+				inst.pInstance->aTriStrips.clear();
+
+				for (auto& tri : inst.pInstance->aBarriers) {
+					bigArticle.pInstance->aBarriers.push_back(tri);
+				}
+				inst.pInstance->aBarriers.clear();
 			}
 			aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances = {bigArticle};
+			CollisionCache::ClearTempArticle();
 
 			for (auto& inst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
-				ConvertCollisionArticle(inst);
+				ConvertCollisionArticle(inst, false);
 			}
 		}
 		nNumTrisCustom = customTris.size();

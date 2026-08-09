@@ -1,5 +1,7 @@
 namespace Powerups {
 	bool bMK64Style = true;
+	NyaAudio::NyaSound gPickupSound = 0;
+	bool bPickupSoundPaused = false;
 
 	float sfxVolumeMultiplier = 0.33;
 	float sfxVolumeMultiplierMK64 = 0.5;
@@ -176,6 +178,7 @@ namespace Powerups {
 		float moveSpeed = 55;
 		float rotSpeed = 2.5;
 		float inFrontThreshold = 0.6;
+		float inFrontThresholdAI = 0.3;
 		float crosshairSize = 0.02;
 
 		NyaAudio::NyaSound FireSound = 0;
@@ -198,6 +201,10 @@ namespace Powerups {
 		IVehicle* PickTarget(IVehicle* user) {
 			//return GetClosestActiveVehicle(user, true, inFrontThreshold);
 			return GetMostInFrontActiveVehicle(user, 200, inFrontThreshold);
+		}
+
+		IVehicle* PickTargetAI(IVehicle* user) {
+			return GetMostInFrontActiveVehicle(user, 200, inFrontThresholdAI);
 		}
 
 		struct tFireworkData {
@@ -481,7 +488,7 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/mk64_1.png",
 			"CwoeeChaos/data/textures/mk64_4.png",
 			"CwoeeChaos/data/textures/mk64_2.png",
-			"CwoeeChaos/data/textures/powerup_beachball.png",
+			"CwoeeChaos/data/textures/powerup_beachballpack.png",
 			"CwoeeChaos/data/textures/powerup_mario.png",
 	};
 	const char* aPowerupSpriteNames2[] = {
@@ -499,7 +506,7 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/mk64_1.png",
 			"CwoeeChaos/data/textures/mk64_4.png",
 			"CwoeeChaos/data/textures/mk64_2.png",
-			"CwoeeChaos/data/textures/powerup_beachball.png",
+			"CwoeeChaos/data/textures/powerup_beachballpack.png",
 			"CwoeeChaos/data/textures/powerup_mario.png",
 	};
 	IDirect3DTexture9* aPowerupTextures1[NUM_POWERUPS] = {};
@@ -671,10 +678,10 @@ namespace Powerups {
 
 				if (!bIsLocalPlayer) return;
 
-				static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup64.mp3");
-				NyaAudio::SetVolume(sound, GetSFXVolume() * sfxVolumeMultiplierMK64);
-				NyaAudio::SkipTo(sound, 0, false);
-				NyaAudio::Play(sound);
+				if (!gPickupSound) gPickupSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup64.mp3");
+				NyaAudio::SetVolume(gPickupSound, GetSFXVolume() * sfxVolumeMultiplierMK64);
+				NyaAudio::SkipTo(gPickupSound, 0, false);
+				NyaAudio::Play(gPickupSound);
 			}
 			else {
 				fRollTime = 4.0;
@@ -826,7 +833,7 @@ namespace Powerups {
 			if (PowerupID == POWERUP_FIREWORK || PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_BEACHBALL) {
 				if (fTimeSinceLastFire < 0.5) return false;
 
-				return Powerups::ReVoltFirework::PickTarget(pUser) != nullptr;
+				return ReVoltFirework::PickTargetAI(pUser) != nullptr;
 			}
 			if (PowerupID == POWERUP_MUSHROOM || PowerupID == POWERUP_MUSHROOMPACK) {
 				return GetLocalPlayerInterface<IInput>()->GetControls()->fGas >= 0.95;
@@ -1243,7 +1250,18 @@ namespace Powerups {
 	void OnTick() {
 		while (DespawnCleanup()) {}
 
-		if (IsChaosBlocked()) return;
+		if (IsChaosBlocked()) {
+			if (!NyaAudio::IsFinishedPlaying(gPickupSound)) {
+				bPickupSoundPaused = true;
+				NyaAudio::Stop(gPickupSound);
+			}
+			return;
+		}
+
+		if (bPickupSoundPaused) {
+			NyaAudio::Play(gPickupSound);
+			bPickupSoundPaused = false;
+		}
 
 		static CNyaTimer gTimer;
 		gTimer.Process();

@@ -69,6 +69,39 @@ namespace SM64 {
 		return v / marioScalar;
 	}
 
+	NyaVec3 GetMarioWorldPos() {
+		return MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
+	}
+
+	NyaVec3 GetMarioWorldVelocity() {
+		return MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]}) / (1.0 / 30.0);
+	}
+
+	void SetMarioWorldVelocity(NyaVec3 v) {
+		v *= (1.0 / 30.0);
+		v = WorldToMario(v);
+		sm64_set_mario_velocity(marioId, v.x, v.y, v.z);
+	}
+
+	float GetMarioForwardVelocity() {
+		return MarioToWorldFloat(marioState.forwardVelocity / (1.0 / 30.0));
+	}
+
+	void SetMarioForwardVelocity(float f) {
+		sm64_set_mario_forward_velocity(marioId, WorldToMarioFloat(f * (1.0 / 30.0)));
+	}
+
+	NyaVec3 GetMarioWorldFacing() {
+		NyaMat4x4 mat;
+		mat.SetIdentity();
+		mat.Rotate({0,0,marioState.faceAngle});
+		return -mat.z;
+	}
+
+	float GetMarioScale() {
+		return 100.0f / SM64::marioScalar;
+	}
+
 	int marioLightness = 255;
 	int marioLightnessMenu = 255;
 
@@ -191,129 +224,149 @@ namespace SM64 {
 		}
 	}
 
-	std::vector<WCollisionTri> aCollisionTris;
-	std::vector<WCollisionTri> aCollisionBarriers;
-	std::vector<int> aCollisionTriMarios;
+	struct MarioObject {
+		CollisionCache::CachedInstance* pInstance = nullptr;
+		std::vector<int> aCollisionTriMarios;
 
-	void ProcessCollisionBarriers(WCollisionBarrier* list, int count, NyaVec3 offset) {
-		if (*(uint8_t*)0x6BB796 == 0xEB) return; // disable wall collision chaos effect
+		void AddMarioStaticObject(std::vector<WCollisionTri>* collisions, bool doubleSided) {
+			if (collisions->empty()) return;
 
-		auto marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
-		marioPos.y = 0;
+			auto marioPos = MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
+			marioPos.y = 0;
 
-		for (int i = 0; i < count; i++) {
-			auto ptMin = list[i].fPts[0];
-			auto ptMax = list[i].fPts[1];
-			ptMin -= offset;
-			ptMax -= offset;
+			SM64SurfaceObject obj;
+			obj.surfaces = new SM64Surface[collisions->size()];
+			obj.surfaceCount = collisions->size();
+			obj.transform.position[0] = 0;
+			obj.transform.position[1] = 0;
+			obj.transform.position[2] = 0;
+			obj.transform.eulerRotation[0] = 0;
+			obj.transform.eulerRotation[1] = 0;
+			obj.transform.eulerRotation[2] = 0;
 
-			// first tri
-			WCollisionTri tri;
-			tri.fPt2.x = ptMin.x;
-			tri.fPt2.y = ptMin.y;
-			tri.fPt2.z = ptMin.z;
-			tri.fPt1.x = ptMin.x;
-			tri.fPt1.y = ptMax.y;
-			tri.fPt1.z = ptMin.z;
-			tri.fPt0.x = ptMax.x;
-			tri.fPt0.y = ptMax.y;
-			tri.fPt0.z = ptMax.z;
+			auto objFlip = obj;
+			objFlip.surfaces = new SM64Surface[collisions->size()];
 
-			// normal
-			auto faceNormal = (tri.fPt1 - tri.fPt0).Cross(tri.fPt2 - tri.fPt0);
-			faceNormal.y = 0;
-			faceNormal.Normalize();
+			for (int i = 0; i < collisions->size(); i++) {
+				auto in = &(*collisions)[i];
+				auto out = &obj.surfaces[i];
+				auto out2 = &objFlip.surfaces[i];
 
-			auto faceCenter = (tri.fPt0 + tri.fPt1 + tri.fPt2) / 3.0;
-			faceCenter.y = 0;
+				out->type = SURFACE_DEFAULT;
+				out->force = 0;
+				out->terrain = TERRAIN_GRASS;
 
-			auto marioNormal = (marioPos - faceCenter);
-			marioNormal.Normalize();
+				auto pt0 = WorldToMario({in->fPt0[0],in->fPt0[1],in->fPt0[2]});
+				auto pt1 = WorldToMario({in->fPt1[0],in->fPt1[1],in->fPt1[2]});
+				auto pt2 = WorldToMario({in->fPt2[0],in->fPt2[1],in->fPt2[2]});
 
-			// flip barrier face if mario is behind it
-			bool flip = marioNormal.Dot(faceNormal) > 0.0;
-			if (flip) {
-				tri.fPt0.x = ptMin.x;
-				tri.fPt0.y = ptMin.y;
-				tri.fPt0.z = ptMin.z;
-				tri.fPt1.x = ptMin.x;
-				tri.fPt1.y = ptMax.y;
-				tri.fPt1.z = ptMin.z;
-				tri.fPt2.x = ptMax.x;
-				tri.fPt2.y = ptMax.y;
-				tri.fPt2.z = ptMax.z;
+				if (doubleSided) {
+					out->vertices[0][0] = pt0[0];
+					out->vertices[0][1] = pt0[1];
+					out->vertices[0][2] = pt0[2];
+					out->vertices[1][0] = pt1[0];
+					out->vertices[1][1] = pt1[1];
+					out->vertices[1][2] = pt1[2];
+					out->vertices[2][0] = pt2[0];
+					out->vertices[2][1] = pt2[1];
+					out->vertices[2][2] = pt2[2];
+
+					*out2 = *out;
+					out2->vertices[0][0] = pt2[0];
+					out2->vertices[0][1] = pt2[1];
+					out2->vertices[0][2] = pt2[2];
+					out2->vertices[1][0] = pt1[0];
+					out2->vertices[1][1] = pt1[1];
+					out2->vertices[1][2] = pt1[2];
+					out2->vertices[2][0] = pt0[0];
+					out2->vertices[2][1] = pt0[1];
+					out2->vertices[2][2] = pt0[2];
+				}
+				else {
+					// normal
+					auto faceNormal = (in->fPt1 - in->fPt0).Cross(in->fPt2 - in->fPt0);
+					faceNormal.y = 0;
+					faceNormal.Normalize();
+
+					auto faceCenter = (in->fPt0 + in->fPt1 + in->fPt2) / 3.0;
+					faceCenter.y = 0;
+
+					auto marioNormal = (marioPos - faceCenter);
+					marioNormal.Normalize();
+
+					// flip barrier face if mario is behind it
+					bool flip = marioNormal.Dot(faceNormal) > 0.0;
+					if (flip) {
+						out->vertices[0][0] = pt2[0];
+						out->vertices[0][1] = pt2[1];
+						out->vertices[0][2] = pt2[2];
+						out->vertices[1][0] = pt1[0];
+						out->vertices[1][1] = pt1[1];
+						out->vertices[1][2] = pt1[2];
+						out->vertices[2][0] = pt0[0];
+						out->vertices[2][1] = pt0[1];
+						out->vertices[2][2] = pt0[2];
+					}
+					else {
+						out->vertices[0][0] = pt0[0];
+						out->vertices[0][1] = pt0[1];
+						out->vertices[0][2] = pt0[2];
+						out->vertices[1][0] = pt1[0];
+						out->vertices[1][1] = pt1[1];
+						out->vertices[1][2] = pt1[2];
+						out->vertices[2][0] = pt2[0];
+						out->vertices[2][1] = pt2[1];
+						out->vertices[2][2] = pt2[2];
+					}
+				}
 			}
-			aCollisionBarriers.push_back(tri);
 
-			// second tri
-			if (flip) {
-				tri.fPt2.x = ptMin.x;
-				tri.fPt2.y = ptMin.y;
-				tri.fPt2.z = ptMin.z;
-				tri.fPt1.x = ptMax.x;
-				tri.fPt1.y = ptMin.y;
-				tri.fPt1.z = ptMax.z;
-				tri.fPt0.x = ptMax.x;
-				tri.fPt0.y = ptMax.y;
-				tri.fPt0.z = ptMax.z;
+			auto id = sm64_surface_object_create(&obj);
+			if (id != -1) {\
+				aCollisionTriMarios.push_back(id);
 			}
-			else {
-				tri.fPt0.x = ptMin.x;
-				tri.fPt0.y = ptMin.y;
-				tri.fPt0.z = ptMin.z;
-				tri.fPt1.x = ptMax.x;
-				tri.fPt1.y = ptMin.y;
-				tri.fPt1.z = ptMax.z;
-				tri.fPt2.x = ptMax.x;
-				tri.fPt2.y = ptMax.y;
-				tri.fPt2.z = ptMax.z;
+
+			if (doubleSided) {
+				auto id2 = sm64_surface_object_create(&objFlip);
+				if (id2 != -1) {
+					aCollisionTriMarios.push_back(id2);
+				}
 			}
-			aCollisionBarriers.push_back(tri);
+
+			delete[] obj.surfaces;
+			delete[] objFlip.surfaces;
 		}
-	}
 
-	void ProcessCollisionArticle(WCollisionInstance* inst) {
-		if (!inst) return;
+		bool NeedsUpdating() {
+			// if mario tris havent been spawned, or there are barriers that need to be re-flipped
+			if (aCollisionTriMarios.empty()) return true;
+			return !pInstance->aBarriers.empty() && pInstance->IsInsideAABB(GetMarioWorldPos());
+		}
 
-		auto article = inst->fCollisionArticle;
-		if (!article) return;
+		void Create() {
+			Destroy();
+			AddMarioStaticObject(&pInstance->aTriStrips, true);
+			AddMarioStaticObject(&pInstance->aBarriers, false);
+		}
 
-		UMath::Matrix4 instMat;
-		inst->MakeMatrix(&instMat, true);
-
-		auto articles_end_ptr = (uintptr_t)(&article[1]);
-
-		auto stripSphere = (WCollisionStripSphere*)articles_end_ptr;
-		auto strip = (WCollisionStrip*)(&stripSphere[article->fNumStrips]);
-		for (int i = 0; i < article->fNumStrips; i++) {
-			int numToIterate = strip->numTrisOrSurfaceId - 2;
-			for (int j = 0; j < numToIterate; j++) {
-				WCollisionTri tri;
-				WCollisionStrip::MakeFace(strip, j, &stripSphere->fPos, &tri);
-
-				tri.fPt0 -= instMat.p;
-				tri.fPt1 -= instMat.p;
-				tri.fPt2 -= instMat.p;
-
-				aCollisionTris.push_back(tri);
+		void Destroy() {
+			for (auto& obj : aCollisionTriMarios) {
+				sm64_surface_object_delete(obj);
 			}
-			strip += strip->numTrisOrSurfaceId;
-			stripSphere++;
+			aCollisionTriMarios.clear();
 		}
+	};
+	struct MarioObjectArticle {
+		std::vector<MarioObject> aInstances;
+	};
+	MarioObjectArticle aCollisionObjects[2701];
+	MarioObject gDynamicFloor;
 
-		// filter out unused barriers
-		if (inst->fGroupNumber && !SceneryGroupEnabledTable[inst->fGroupNumber]) return;
-		ProcessCollisionBarriers((WCollisionBarrier*)(articles_end_ptr + article->fStripsSize), article->fNumEdges, instMat.p);
-	}
-
-	void ClearMarioCollision() {
-		for (auto& id : aCollisionTriMarios) {
-			sm64_surface_object_delete(id);
-		}
-		aCollisionTriMarios.clear();
-	}
+	const int COLLISIONARTICLE_CUSTOM = 2700;
 
 	void AddDynamicDummyFloor(NyaVec3 center, int width) {
+		gDynamicFloor.Destroy();
+
 		SM64SurfaceObject obj;
 		obj.surfaces = new SM64Surface[2];
 		obj.surfaceCount = 2;
@@ -352,90 +405,28 @@ namespace SM64 {
 
 		auto id = sm64_surface_object_create(&obj);
 		if (id != -1) {
-			aCollisionTriMarios.push_back(id);
+			gDynamicFloor.aCollisionTriMarios.push_back(id);
 		}
-	}
-
-	void AddMarioStaticObject(std::vector<WCollisionTri>* collisions, bool doubleSided) {
-		SM64SurfaceObject obj;
-		obj.surfaces = new SM64Surface[collisions->size()];
-		obj.surfaceCount = collisions->size();
-		obj.transform.position[0] = 0;
-		obj.transform.position[1] = 0;
-		obj.transform.position[2] = 0;
-		obj.transform.eulerRotation[0] = 0;
-		obj.transform.eulerRotation[1] = 0;
-		obj.transform.eulerRotation[2] = 0;
-
-		auto objFlip = obj;
-		objFlip.surfaces = new SM64Surface[collisions->size()];
-
-		for (int i = 0; i < collisions->size(); i++) {
-			auto in = &(*collisions)[i];
-			auto out = &obj.surfaces[i];
-			auto out2 = &objFlip.surfaces[i];
-
-			out->type = SURFACE_DEFAULT;
-			out->force = 0;
-			out->terrain = TERRAIN_GRASS;
-
-			auto pt0 = WorldToMario({in->fPt0[0],in->fPt0[1],in->fPt0[2]});
-			auto pt1 = WorldToMario({in->fPt1[0],in->fPt1[1],in->fPt1[2]});
-			auto pt2 = WorldToMario({in->fPt2[0],in->fPt2[1],in->fPt2[2]});
-
-			out->vertices[0][0] = pt0[0];
-			out->vertices[0][1] = pt0[1];
-			out->vertices[0][2] = pt0[2];
-			out->vertices[1][0] = pt1[0];
-			out->vertices[1][1] = pt1[1];
-			out->vertices[1][2] = pt1[2];
-			out->vertices[2][0] = pt2[0];
-			out->vertices[2][1] = pt2[1];
-			out->vertices[2][2] = pt2[2];
-
-			*out2 = *out;
-			out2->vertices[0][0] = pt2[0];
-			out2->vertices[0][1] = pt2[1];
-			out2->vertices[0][2] = pt2[2];
-			out2->vertices[1][0] = pt1[0];
-			out2->vertices[1][1] = pt1[1];
-			out2->vertices[1][2] = pt1[2];
-			out2->vertices[2][0] = pt0[0];
-			out2->vertices[2][1] = pt0[1];
-			out2->vertices[2][2] = pt0[2];
-		}
-
-		auto id = sm64_surface_object_create(&obj);
-		if (id != -1) {
-			aCollisionTriMarios.push_back(id);
-		}
-
-		if (doubleSided) {
-			auto id2 = sm64_surface_object_create(&objFlip);
-			if (id2 != -1) {
-				aCollisionTriMarios.push_back(id2);
-			}
-		}
-
-		delete[] obj.surfaces;
-		delete[] objFlip.surfaces;
 	}
 
 	void UpdateMarioCollision() {
 		PerformanceBenchmarker _perf("UpdateMarioCollision");
 
-		if (aCollisionTris.empty()) return; // always keep old collision if empty
-
-		for (auto& id : aCollisionTriMarios) {
-			sm64_surface_object_delete(id);
+		for (auto& obj : aCollisionObjects) {
+			for (auto& inst : obj.aInstances) {
+				if (inst.pInstance->IsActive()) {
+					if (!inst.NeedsUpdating()) continue;
+					AddLogPopup(std::format("Updating {:X}", (uintptr_t)inst.pInstance));
+					inst.Create();
+				}
+				else {
+					inst.Destroy();
+				}
+			}
 		}
-		aCollisionTriMarios.clear();
 
 		// fix invisible walls
 		AddDynamicDummyFloor({marioState.position[0],-500 * marioScalar,marioState.position[2]}, 16384);
-
-		AddMarioStaticObject(&aCollisionTris, true);
-		AddMarioStaticObject(&aCollisionBarriers, false);
 	}
 
 	void InitAudio();
@@ -508,39 +499,6 @@ namespace SM64 {
 		DrawLightFlares = true;
 		DrawCars = true;
 		NyaHookLib::Patch<uint16_t>(0x6B1A02, 0x0974);
-	}
-
-	NyaVec3 GetMarioWorldPos() {
-		return MarioToWorld({marioState.position[0], marioState.position[1], marioState.position[2]});
-	}
-
-	NyaVec3 GetMarioWorldVelocity() {
-		return MarioToWorld({marioState.velocity[0], marioState.velocity[1], marioState.velocity[2]}) / (1.0 / 30.0);
-	}
-
-	void SetMarioWorldVelocity(NyaVec3 v) {
-		v *= (1.0 / 30.0);
-		v = WorldToMario(v);
-		sm64_set_mario_velocity(marioId, v.x, v.y, v.z);
-	}
-
-	float GetMarioForwardVelocity() {
-		return MarioToWorldFloat(marioState.forwardVelocity / (1.0 / 30.0));
-	}
-
-	void SetMarioForwardVelocity(float f) {
-		sm64_set_mario_forward_velocity(marioId, WorldToMarioFloat(f * (1.0 / 30.0)));
-	}
-
-	NyaVec3 GetMarioWorldFacing() {
-		NyaMat4x4 mat;
-		mat.SetIdentity();
-		mat.Rotate({0,0,marioState.faceAngle});
-		return -mat.z;
-	}
-
-	float GetMarioScale() {
-		return 100.0f / SM64::marioScalar;
 	}
 
 	void MarioInteract_KnockAway(IRigidBody* body) {
@@ -1003,33 +961,52 @@ namespace SM64 {
 			if ((gCollisionTimer.fTotalTime >= 0.5 && GetMarioWorldVelocity().length() > 0.0) || bDoReset) {
 				gCollisionTimer.fTotalTime -= 0.5;
 
-				aCollisionTris.clear();
-				aCollisionBarriers.clear();
+				for (auto& obj : aCollisionObjects[COLLISIONARTICLE_CUSTOM].aInstances) {
+					obj.Destroy();
+				}
+				aCollisionObjects[COLLISIONARTICLE_CUSTOM].aInstances.clear();
 
 				for (int i = 0; i < 2700; i++) {
-					auto pack = WCollisionAssets::mCollisionPackList[i];
-					if (!pack) continue;
+					auto& pack = CollisionCache::aCachedCollisions[i];
+					if (pack.aInstances.empty()) continue;
 
-					for (int j = 0; j < pack->mInstanceNum; j++) {
-						ProcessCollisionArticle(&pack->mInstanceList[j]);
+					if (!aCollisionObjects[i].aInstances.empty()) continue;
+
+					for (auto& inst : pack.aInstances) {
+						MarioObject tmp;
+						tmp.pInstance = &inst;
+						aCollisionObjects[i].aInstances.push_back(tmp);
 					}
 				}
 
 				// custom spawned barriers from chaos objects
+				static auto bigArticleInstance = CollisionCache::CachedInstance();
+				bigArticleInstance.aTriStrips.clear();
+				bigArticleInstance.aBarriers.clear();
+
 				std::vector<WCollisionBarrier> barriers;
 				auto customBarriers = Render3DObjects::GetFullBarrierList(false);
 				for (auto& barrier : customBarriers) {
 					barriers.push_back(barrier.data);
 				}
-				ProcessCollisionBarriers(&barriers[0], barriers.size(), {0,0,0});
+				CollisionCache::ProcessCollisionBarriers(&bigArticleInstance, &barriers[0], barriers.size(), {0,0,0});
 
 				auto customTris = Render3DObjects::GetFullTriList();
 				for (auto& inst : customTris) {
-					ProcessCollisionArticle(inst);
-				}
+					CollisionCache::ClearTempArticle();
+					CollisionCache::ProcessCollisionArticle(COLLISIONARTICLE_CUSTOM, inst);
 
-				UpdateMarioCollision();
+					if (CollisionCache::gTempArticle.aInstances.empty()) continue;
+					bigArticleInstance.aTriStrips = CollisionCache::gTempArticle.aInstances[0].aTriStrips;
+				}
+				CollisionCache::ClearTempArticle();
+
+				MarioObject obj;
+				obj.pInstance = &bigArticleInstance;
+				aCollisionObjects[COLLISIONARTICLE_CUSTOM].aInstances.push_back(obj);
 			}
+
+			UpdateMarioCollision();
 
 			if (!bDoReset && marioPos.length() > 50 && !bEnemyEnabled) {
 				marioPos.y += 1;
@@ -1054,10 +1031,6 @@ namespace SM64 {
 				if (TheGameFlowManager.CurrentGameFlowState == GAMEFLOW_STATE_IN_FRONTEND) {
 					DrawCars = false;
 				}
-			}
-
-			if (bDoReset) {
-				ClearMarioCollision();
 			}
 		}
 

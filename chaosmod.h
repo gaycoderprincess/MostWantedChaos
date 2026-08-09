@@ -642,13 +642,6 @@ void ChaosModMenu() {
 				sm64_mario_interact_cap(SM64::marioId, MARIO_WING_CAP, 0, 0);
 			}
 
-			if (!SM64::aCollisionTris.empty()) {
-				auto col = SM64::aCollisionTris[0];
-				DrawMenuOption(std::format("col 0 {:.2f} {:.2f} {:.2f}",col.fPt0[0],col.fPt0[1],col.fPt0[2]));
-				DrawMenuOption(std::format("col 1 {:.2f} {:.2f} {:.2f}",col.fPt1[0],col.fPt1[1],col.fPt1[2]));
-				DrawMenuOption(std::format("col 2 {:.2f} {:.2f} {:.2f}",col.fPt2[0],col.fPt2[1],col.fPt2[2]));
-			}
-
 			ChloeMenuLib::EndMenu();
 		}
 		if (DrawMenuOption("Box3D Debug")) {
