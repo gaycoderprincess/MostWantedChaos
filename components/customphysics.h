@@ -349,13 +349,7 @@ namespace CustomPhysics {
 			for (auto& inst : customTris) {
 				CollisionCache::ProcessCollisionArticle(COLLISIONARTICLE_CUSTOM, inst);
 			}
-			for (auto& inst : CollisionCache::gTempArticle.aInstances) {
-				CustomArticleInstance tmp;
-				tmp.pInstance = &inst;
-				aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances.push_back(tmp);
-			}
 
-			// todo refactor
 			// combine everything into one huge collision article
 			static auto bigArticleInstance = CollisionCache::CachedInstance();
 			bigArticleInstance.aTriStrips.clear();
@@ -363,16 +357,16 @@ namespace CustomPhysics {
 
 			auto bigArticle = CustomArticleInstance();
 			bigArticle.pInstance = &bigArticleInstance;
-			for (auto& inst : aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances) {
-				for (auto& tri : inst.pInstance->aTriStrips) {
+			for (auto& inst : CollisionCache::gTempArticle.aInstances) {
+				for (auto& tri : inst.aTriStrips) {
 					bigArticle.pInstance->aTriStrips.push_back(tri);
 				}
-				inst.pInstance->aTriStrips.clear();
+				inst.aTriStrips.clear();
 
-				for (auto& tri : inst.pInstance->aBarriers) {
+				for (auto& tri : inst.aBarriers) {
 					bigArticle.pInstance->aBarriers.push_back(tri);
 				}
-				inst.pInstance->aBarriers.clear();
+				inst.aBarriers.clear();
 			}
 			aCollisionArticles[COLLISIONARTICLE_CUSTOM].aInstances = {bigArticle};
 			CollisionCache::ClearTempArticle();

@@ -1004,9 +1004,9 @@ namespace SM64 {
 				MarioObject obj;
 				obj.pInstance = &bigArticleInstance;
 				aCollisionObjects[COLLISIONARTICLE_CUSTOM].aInstances.push_back(obj);
-			}
 
-			UpdateMarioCollision();
+				UpdateMarioCollision();
+			}
 
 			if (!bDoReset && marioPos.length() > 50 && !bEnemyEnabled) {
 				marioPos.y += 1;
