@@ -573,3 +573,50 @@ public:
 		return IsInFocusedPursuit();
 	}
 } E_UnlockOldBridge;
+
+class Effect_ZeroGravity : public ChaosEffect {
+public:
+	Effect_ZeroGravity() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Zero Gravity";
+		fTimerLength = 30;
+		AddToIncompatiblityGroup("gravity");
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x6A70EA, 0xEB); // RigidBody::OnBeginFrame
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x6A70EA, 0x75);
+	}
+	bool HasTimer() override { return true; }
+} E_ZeroGravity;
+
+class Effect_SideGravity : public ChaosEffect {
+public:
+	Effect_SideGravity() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Sideways Gravity";
+		fTimerLength = 20;
+		AddToIncompatiblityGroup("gravity");
+	}
+
+	void InitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x6A70EA, 0xEB); // RigidBody::OnBeginFrame
+	}
+	void TickFunctionMain(double delta) override {
+		auto rbs = GetActiveRigidBodies();
+		for (auto& rb : rbs) {
+			UMath::Vector3 gravity = {};
+			if (rb->mCOMObject->Find<IVehicle>()) {
+				gravity.x = 9.8128 * rb->GetMass();
+			}
+			else {
+				gravity.x = 13 * rb->GetMass();
+			}
+			rb->ResolveForce(&gravity);
+		}
+	}
+	void DeinitFunction() override {
+		NyaHookLib::Patch<uint8_t>(0x6A70EA, 0x75);
+	}
+	bool HasTimer() override { return true; }
+} E_SideGravity;
