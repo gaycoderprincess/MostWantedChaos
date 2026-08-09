@@ -875,6 +875,13 @@ void ReloadCarBehaviors(eVehicleList vehicleType) {
 	NyaHookLib::Patch<uint16_t>(0x688378, 0x1274);
 }
 
+int RandNew(int max) {
+	static std::random_device device;
+	static std::mt19937 randGen(device());
+	std::uniform_int_distribution<> distr(0, max-1);
+	return distr(randGen);
+}
+
 bool bDebugPrintsEnabled = false;
 
 std::vector<std::string> aLogPopups;

@@ -376,6 +376,7 @@ bool DoChaosSettingsSave() {
 	file.write((char*)&StatTracker::nVergilKills, sizeof(StatTracker::nVergilKills));
 	file.write((char*)&StatTracker::nVergilKillsCop, sizeof(StatTracker::nVergilKillsCop));
 	file.write((char*)&StatTracker::nVergilKillsPlayer, sizeof(StatTracker::nVergilKillsPlayer));
+	file.write((char*)&Powerups::bMK64Style, sizeof(Powerups::bMK64Style));
 	return true;
 }
 
@@ -411,6 +412,7 @@ void DoChaosSettingsLoad() {
 	file.read((char*)&StatTracker::nVergilKills, sizeof(StatTracker::nVergilKills));
 	file.read((char*)&StatTracker::nVergilKillsCop, sizeof(StatTracker::nVergilKillsCop));
 	file.read((char*)&StatTracker::nVergilKillsPlayer, sizeof(StatTracker::nVergilKillsPlayer));
+	file.read((char*)&Powerups::bMK64Style, sizeof(Powerups::bMK64Style));
 
 	if (connected && ChaosVoting::sChannelName[0]) {
 		ChaosVoting::Connect();
@@ -463,7 +465,7 @@ void DoChaosPowerupsLoad() {
 	for (int i = 0; i < count; i++) {
 		UMath::Matrix4 save;
 		file.read((char*)&save, sizeof(save));
-		Powerups::PowerupBlock::SpawnObject(save);
+		Powerups::PowerupBlock::SpawnObject<false>(save);
 	}
 }
 

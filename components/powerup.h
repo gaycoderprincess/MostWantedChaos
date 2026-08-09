@@ -1,5 +1,8 @@
 namespace Powerups {
+	bool bMK64Style = true;
+
 	float sfxVolumeMultiplier = 0.33;
+	float sfxVolumeMultiplierMK64 = 0.5;
 
 	void PlayAudioFromCar(NyaAudio::NyaSound sound, IRigidBody* veh) {
 		if (!sound) return;
@@ -456,12 +459,13 @@ namespace Powerups {
 		POWERUP_TURBO,
 		POWERUP_STAR,
 		POWERUP_MUSHROOM,
+		POWERUP_MUSHROOMPACK,
 		POWERUP_INVINCIBLE,
 		POWERUP_BEACHBALL,
 		NUM_POWERUPS
 	};
 
-	const char* aPowerupSpriteNames[] = {
+	const char* aPowerupSpriteNames1[] = {
 			//"CwoeeChaos/data/textures/revolt_1.png",
 			"CwoeeChaos/data/textures/revolt_2.png",
 			"CwoeeChaos/data/textures/revolt_4.png",
@@ -474,10 +478,29 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/revolt_10.png",
 			"CwoeeChaos/data/textures/revolt_12.png",
 			"CwoeeChaos/data/textures/mk64_1.png",
+			"CwoeeChaos/data/textures/mk64_4.png",
 			"CwoeeChaos/data/textures/mk64_2.png",
 			"CwoeeChaos/data/textures/powerup_beachball.png",
 	};
-	IDirect3DTexture9* aPowerupTextures[NUM_POWERUPS] = {};
+	const char* aPowerupSpriteNames2[] = {
+			//"CwoeeChaos/data/textures/revolt_1.png",
+			"CwoeeChaos/data/textures/revolt_2.png",
+			"CwoeeChaos/data/textures/revolt_4.png",
+			"CwoeeChaos/data/textures/revolt_3.png",
+			//"CwoeeChaos/data/textures/revolt_5.png",
+			"CwoeeChaos/data/textures/mk64_3.png",
+			//"CwoeeChaos/data/textures/revolt_7.png",
+			"CwoeeChaos/data/textures/revolt_8.png",
+			"CwoeeChaos/data/textures/revolt_9.png",
+			"CwoeeChaos/data/textures/revolt_10.png",
+			"CwoeeChaos/data/textures/revolt_12.png",
+			"CwoeeChaos/data/textures/mk64_1.png",
+			"CwoeeChaos/data/textures/mk64_4.png",
+			"CwoeeChaos/data/textures/mk64_2.png",
+			"CwoeeChaos/data/textures/powerup_beachball.png",
+	};
+	IDirect3DTexture9* aPowerupTextures1[NUM_POWERUPS] = {};
+	IDirect3DTexture9* aPowerupTextures2[NUM_POWERUPS] = {};
 
 	void SpawnPhysicalBeachBall(NyaVec3 pos, NyaVec3 vel) {
 		static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/beachball.wav");
@@ -503,6 +526,8 @@ namespace Powerups {
 	float fSpriteY = 0.3;
 	float fSpriteSize = 0.05;
 
+	void SpawnFakePowerupBlock(IRigidBody* rb);
+
 	struct PowerupState {
 		IVehicle* pUser = nullptr;
 		bool bIsLocalPlayer = false;
@@ -525,9 +550,15 @@ namespace Powerups {
 				case POWERUP_ELECTROPULSE:
 					fElectroTime = 15.0;
 					return true;
-				case POWERUP_CLONE:
-					ReVoltBomb::SpawnBomb<false>(pUser->mCOMObject->Find<IRigidBody>());
+				case POWERUP_CLONE: {
+					if (bMK64Style) {
+						SpawnFakePowerupBlock(pUser->mCOMObject->Find<IRigidBody>());
+					}
+					else {
+						ReVoltBomb::SpawnBomb<false>(pUser->mCOMObject->Find<IRigidBody>());
+					}
 					return true;
+				} break;
 				case POWERUP_PUTTYBOMB:
 					ReVoltBomb::ExplosionSFX(pUser);
 					ReVoltBomb::ExplodeCar(pUser, false);
@@ -546,7 +577,9 @@ namespace Powerups {
 				case POWERUP_TURBO:
 					fTurboTime = 10.0;
 					return true;
-				case POWERUP_MUSHROOM: {
+				case POWERUP_MUSHROOM:
+				case POWERUP_MUSHROOMPACK:
+				{
 					pUser->SetSpeed(TOMPS(300));
 					return true;
 				} break;
@@ -588,6 +621,9 @@ namespace Powerups {
 					for (auto& car : cars) {
 						if (car == pUser) continue;
 						if (IsCarDestroyed(car)) continue;
+						if (auto rb = car->mCOMObject->Find<IRBVehicle>()) {
+							if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
+						}
 						ReVoltBomb::ExplodeCar(car, false);
 					}
 					return true;
@@ -613,12 +649,23 @@ namespace Powerups {
 
 		void GivePowerup(int id) {
 			PowerupID = id;
-			//PowerupCount = (PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_WATERBOMB) ? 3 : 1;
-			PowerupCount = PowerupID == POWERUP_FIREWORKPACK ? 3 : 1;
-			fRollTime = 4.0;
+			PowerupCount = (PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_BEACHBALL || PowerupID == POWERUP_MUSHROOMPACK) ? 3 : 1;
+			if (bMK64Style) {
+				fRollTime = 5.0;
 
-			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup.wav");
-			PlayAudioFromCar(sound, pUser);
+				if (!bIsLocalPlayer) return;
+
+				static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup64.mp3");
+				NyaAudio::SetVolume(sound, GetSFXVolume() * sfxVolumeMultiplierMK64);
+				NyaAudio::SkipTo(sound, 0, false);
+				NyaAudio::Play(sound);
+			}
+			else {
+				fRollTime = 4.0;
+
+				static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup.wav");
+				PlayAudioFromCar(sound, pUser);
+			}
 		}
 
 		void RollPowerup() {
@@ -661,6 +708,7 @@ namespace Powerups {
 				if (isFirstPlace && i == POWERUP_FIREWORKPACK) continue;
 				//if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
 				if (isFirstPlace && i == POWERUP_STAR) continue;
+				if (isFirstPlace && i == POWERUP_MUSHROOMPACK) continue;
 
 				if (isFirstPlace && i == POWERUP_STAR) continue;
 				if (!isPlayer && i == POWERUP_STAR) {
@@ -676,13 +724,13 @@ namespace Powerups {
 				if (fElectroTime > 0.0 && i == POWERUP_ELECTROPULSE) continue;
 				if (fTurboTime > 0.0 && i == POWERUP_TURBO) continue;
 
-				if (speedKMH >= 290 && i == POWERUP_MUSHROOM) continue; // mushroom sets speed to 300
+				if (speedKMH >= 290 && (i == POWERUP_MUSHROOM || i == POWERUP_MUSHROOMPACK)) continue; // mushroom sets speed to 300
 
 				powerupsAvailable.push_back(i);
 			}
 			if (powerupsAvailable.empty()) return;
 
-			GivePowerup(powerupsAvailable[rand()%powerupsAvailable.size()]);
+			GivePowerup(powerupsAvailable[RandNew(powerupsAvailable.size())]);
 		}
 
 		bool HasPowerup() {
@@ -690,7 +738,9 @@ namespace Powerups {
 		}
 
 		void Render() {
-			static auto texBase = LoadTexture_SetDir("CwoeeChaos/data/textures/revolt_base.png");
+			static auto texBase1 = LoadTexture_SetDir("CwoeeChaos/data/textures/revolt_base.png");
+			static auto texBase2 = LoadTexture_SetDir("CwoeeChaos/data/textures/mk64_base.png");
+			auto texBase = bMK64Style ? texBase2 : texBase1;
 			if (texBase) {
 				DrawRectangle(0.5 - (fSpriteSize * GetAspectRatioInv()), 0.5 + (fSpriteSize * GetAspectRatioInv()), fSpriteY - fSpriteSize, fSpriteY + fSpriteSize, {255,255,255,255}, 0, texBase);
 			}
@@ -698,16 +748,33 @@ namespace Powerups {
 			int powerupId = PowerupID;
 			uint8_t powerupAlpha = 255;
 			if (fRollTime > 0) {
-				if (fRollTime > 0.75) {
-					int scroll = 20;
-					if (fRollTime < 2.0) scroll = 10;
-					if (fRollTime < 1.5) scroll = 5;
-
-					// always make sure it smoothly lands on the powerup it should
-					powerupId = PowerupID + ((fRollTime - 0.75) * scroll);
-					powerupId %= NUM_POWERUPS;
+				if (bMK64Style) {
+					if (fRollTime < 1) {
+						powerupAlpha = 255;
+						if (fRollTime < 0.166 * 5) powerupAlpha = 0;
+						if (fRollTime < 0.166 * 4) powerupAlpha = 255;
+						if (fRollTime < 0.166 * 3) powerupAlpha = 0;
+						if (fRollTime < 0.166 * 2) powerupAlpha = 255;
+						if (fRollTime < 0.166 * 1) powerupAlpha = 0;
+					}
+					else {
+						powerupId = fRollTime * 20;
+						powerupId %= NUM_POWERUPS;
+						powerupAlpha = 127;
+					}
 				}
-				powerupAlpha = 127;
+				else {
+					if (fRollTime > 0.75) {
+						int scroll = 20;
+						if (fRollTime < 2.0) scroll = 10;
+						if (fRollTime < 1.5) scroll = 5;
+
+						// always make sure it smoothly lands on the powerup it should
+						powerupId = PowerupID + ((fRollTime - 0.75) * scroll);
+						powerupId %= NUM_POWERUPS;
+					}
+					powerupAlpha = 127;
+				}
 			}
 			else {
 				if (PowerupID == POWERUP_FIREWORK || PowerupID == POWERUP_FIREWORKPACK) {
@@ -720,9 +787,9 @@ namespace Powerups {
 				}
 			}
 
-			auto& tex = aPowerupTextures[powerupId];
+			auto& tex = bMK64Style ? aPowerupTextures2[powerupId] : aPowerupTextures1[powerupId];
 			if (!tex) {
-				tex = LoadTexture_SetDir(aPowerupSpriteNames[powerupId]);
+				tex = LoadTexture_SetDir(bMK64Style ? aPowerupSpriteNames2[powerupId] : aPowerupSpriteNames1[powerupId]);
 			}
 
 			if (tex) {
@@ -740,7 +807,7 @@ namespace Powerups {
 
 				return Powerups::ReVoltFirework::PickTarget(pUser) != nullptr;
 			}
-			if (PowerupID == POWERUP_MUSHROOM) {
+			if (PowerupID == POWERUP_MUSHROOM || PowerupID == POWERUP_MUSHROOMPACK) {
 				return GetLocalPlayerInterface<IInput>()->GetControls()->fGas >= 0.95;
 			}
 			return true;
@@ -753,7 +820,7 @@ namespace Powerups {
 			auto cars = GetActiveVehicles();
 			for (auto& car : cars) {
 				if (car == pUser) continue;
-				if (IsCarDestroyed(car)) continue;
+				//if (IsCarDestroyed(car)) continue;
 				if (auto rb = car->mCOMObject->Find<IRBVehicle>()) {
 					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
 				}
@@ -793,9 +860,16 @@ namespace Powerups {
 
 				auto cars = GetZappedCars();
 				for (auto& car : cars) {
-					if (auto sus = car->mCOMObject->Find<ISuspension>()) {
-						for (int i = 0; i < 4; i++) {
-							sus->SetWheelAngularVelocity(i, 0.0);
+					if (IsCarDestroyed(car)) continue;
+
+					if (car->GetDriverClass() == DRIVER_COP) {
+						DestroyCar(car);
+					}
+					else {
+						if (auto sus = car->mCOMObject->Find<ISuspension>()) {
+							for (int i = 0; i < 4; i++) {
+								sus->SetWheelAngularVelocity(i, 0.0);
+							}
 						}
 					}
 				}
@@ -982,6 +1056,7 @@ namespace Powerups {
 		float rY = 0;
 		float rZ = 0;
 		float offY = 2.0;
+		float offZ = -6;
 		float scale = 0.75;
 
 		float rotSpeedX = 0;
@@ -989,13 +1064,27 @@ namespace Powerups {
 		float rotSpeedZ = -1.5;
 
 		std::vector<int> aObjectsInWorld;
+		std::vector<int> aFakeObjectsInWorld;
 
+		struct PowerupBlockData {
+			float rotDelta = 0.0;
+			float despawnTimer = -1;
+		};
+
+		template<bool isFake>
 		void BombOnTick(Render3DObjects::Object* obj, double delta) {
-			auto& rotDelta = *(float*)&obj->CustomData;
+			auto data = *(PowerupBlockData**)&obj->CustomData;
+			if (data->despawnTimer >= 1.0) {
+				obj->aModels.clear();
+				return;
+			}
 
 			auto p = obj->mMatrix.p;
 			if (GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&p, &p.y, nullptr)) {
 				p.y += offY;
+				//if (data->despawnTimer > 0) {
+				//	p.y += data->despawnTimer;
+				//}
 			}
 			else {
 				auto ply = GetLocalPlayerVehicle();
@@ -1006,18 +1095,28 @@ namespace Powerups {
 			}
 
 			obj->mMatrix = UMath::Matrix4::kIdentity;
-			obj->mMatrix.Rotate(NyaVec3(rotDelta * rotSpeedX, rotDelta * rotSpeedY, rotDelta * rotSpeedZ));
+			obj->mMatrix.Rotate(NyaVec3(data->rotDelta * rotSpeedX, data->rotDelta * rotSpeedY, data->rotDelta * rotSpeedZ));
+
+			float finalScale = scale;
+			if (data->despawnTimer > 0) {
+				finalScale *= 1.0 - data->despawnTimer;
+			}
 
 			UMath::Matrix4 rotation;
 			rotation.Rotate(NyaVec3(rX * 0.01745329, rY * 0.01745329, rZ * 0.01745329));
 			obj->mMatrix = (UMath::Matrix4)(obj->mMatrix * rotation);
-			obj->mMatrix.x *= scale;
-			obj->mMatrix.y *= scale;
-			obj->mMatrix.z *= scale;
+			obj->mMatrix.x *= finalScale;
+			obj->mMatrix.y *= finalScale;
+			obj->mMatrix.z *= finalScale;
 			obj->mMatrix.p = p;
 
 			if (IsChaosBlocked()) return;
-			rotDelta += delta;
+			data->rotDelta += delta;
+
+			if (data->despawnTimer >= 0.0) {
+				data->despawnTimer += delta * 4;
+				return;
+			}
 
 			bool canPlayerPowerup = true;
 			if (SM64::bEnabled) canPlayerPowerup = false;
@@ -1030,13 +1129,21 @@ namespace Powerups {
 
 				auto distFromCar = (*car->GetPosition() - obj->mMatrix.p).length();
 				if (distFromCar < 5) {
-					if (Powerups::PlayerHasPowerup(car)) continue;
-					Powerups::RollPowerup(car);
-					obj->aModels.clear();
+					if (isFake) {
+						ReVoltBomb::ExplodeCar(car, false);
+						ReVoltBomb::ExplosionSFX(car);
+						data->despawnTimer = 0.0;
+					}
+					else {
+						if (PlayerHasPowerup(car)) continue;
+						RollPowerup(car);
+						data->despawnTimer = 0.0;
+					}
 				}
 			}
 		}
 
+		template<bool isFake>
 		void SpawnObject(UMath::Matrix4 mat) {
 			if (models.empty() || models[0]->bInvalidated) {
 				Render3D::ModelLoaderConfig.bColorByNormals = true;
@@ -1047,9 +1154,15 @@ namespace Powerups {
 			}
 
 			auto id = Render3DObjects::aObjects.size();
-			aObjectsInWorld.push_back(id);
-			Render3DObjects::aObjects.push_back(new Render3DObjects::Object("powerup", models, mat, {0,0,0}, 0, BombOnTick));
+			if (isFake) {
+				aFakeObjectsInWorld.push_back(id);
+			}
+			else {
+				aObjectsInWorld.push_back(id);
+			}
+			Render3DObjects::aObjects.push_back(new Render3DObjects::Object("powerup", models, mat, {0,0,0}, 0, BombOnTick<isFake>));
 			Render3DObjects::aObjects[id]->bUseAlpha = true;
+			Render3DObjects::aObjects[id]->CustomData = new PowerupBlockData;
 		}
 
 		void SpawnForAllCheckpoints() {
@@ -1068,25 +1181,42 @@ namespace Powerups {
 				if (bLightSpawnMode) {
 					UMath::Matrix4 objMat;
 					objMat.p = center - lookat.x * (pos.w * 0.33);
-					SpawnObject(objMat);
+					SpawnObject<false>(objMat);
 					objMat.p = center + lookat.x * (pos.w * 0.33);
-					SpawnObject(objMat);
+					SpawnObject<false>(objMat);
 				}
 				else {
 					UMath::Matrix4 objMat;
 					objMat.p = center;
-					SpawnObject(objMat);
+					SpawnObject<false>(objMat);
 					objMat.p = center - lookat.x * (pos.w * 0.33);
-					SpawnObject(objMat);
+					SpawnObject<false>(objMat);
 					objMat.p = center + lookat.x * (pos.w * 0.33);
-					SpawnObject(objMat);
+					SpawnObject<false>(objMat);
 					objMat.p = center - lookat.x * (pos.w * 0.66);
-					SpawnObject(objMat);
+					SpawnObject<false>(objMat);
 					objMat.p = center + lookat.x * (pos.w * 0.66);
-					SpawnObject(objMat);
+					SpawnObject<false>(objMat);
 				}
 			}
 		}
+
+		void SpawnBomb(IRigidBody* veh) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+			mat.p = *veh->GetPosition();
+			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
+			mat.p += mat.y * offY;
+			mat.p += mat.z * offZ;
+			SpawnObject<true>(mat);
+
+			static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickgen.wav");
+			PlayAudioFromCar(sound, veh);
+		}
+	}
+
+	void SpawnFakePowerupBlock(IRigidBody* rb) {
+		PowerupBlock::SpawnBomb(rb);
 	}
 
 	void OnTick() {
