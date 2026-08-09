@@ -346,6 +346,8 @@ namespace SM64 {
 		void Create() {
 			Destroy();
 			AddMarioStaticObject(&pInstance->aTriStrips, true);
+
+			if (*(uint8_t*)0x6BB796 == 0xEB) return; // disable wall collision chaos effect
 			AddMarioStaticObject(&pInstance->aBarriers, false);
 		}
 
@@ -807,7 +809,7 @@ namespace SM64 {
 			// attack closest
 			//else {
 				distFromClosest.Normalize();
-				if (!closest->mCOMObject->Find<ICollisionBody>()->IsSleeping() && distFromClosest.Dot(GetMarioWorldFacing()) < -0.33) {
+				if (!closest->mCOMObject->Find<ICollisionBody>()->IsSleeping() && distFromClosest.Dot(GetMarioWorldFacing()) < -0.5) {
 					if (marioState.forwardVelocity < 29.0 && marioState.action != ACT_DIVE && marioState.action != ACT_DIVE_SLIDE && marioState.action != ACT_FORWARD_ROLLOUT) {
 						marioInputs.buttonB = bFrame;
 					}
