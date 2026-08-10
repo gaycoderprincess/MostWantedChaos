@@ -6,6 +6,8 @@ namespace Powerups {
 	float sfxVolumeMultiplier = 0.33;
 	float sfxVolumeMultiplierMK64 = 1.0;
 
+	double fTimeSinceMarioSpawned = 0.0;
+
 	void PlayAudioFromCar(NyaAudio::NyaSound sound, IRigidBody* veh) {
 		if (!sound) return;
 
@@ -590,7 +592,7 @@ namespace Powerups {
 				case POWERUP_MUSHROOM:
 				case POWERUP_MUSHROOMPACK:
 				{
-					pUser->SetSpeed(TOMPS(300));
+					pUser->SetSpeed(pUser->GetAIVehiclePtr()->GetTopSpeed());
 					return true;
 				} break;
 				case POWERUP_INVINCIBLE: {
@@ -726,6 +728,7 @@ namespace Powerups {
 			std::vector<int> powerupsAvailable;
 			for (int i = 0; i < NUM_POWERUPS; i++) {
 				if (i == POWERUP_MARIO && !SM64::bAvailable) continue;
+				if (i == POWERUP_MARIO && fTimeSinceMarioSpawned < 15.0) continue;
 
 				if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
 				if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
@@ -1026,6 +1029,20 @@ namespace Powerups {
 			}
 			return false;
 		}
+
+		void Reset() {
+			if (fTurboTime > 0.0) {
+				bForcePlayerNOS = false;
+				fForcePlayerNoNOS = 0.5;
+			}
+
+			PowerupID = NUM_POWERUPS;
+			PowerupCount = 0;
+			fRollTime = 0.0;
+			fTimeSinceLastFire = 0.0;
+			fElectroTime = 0.0;
+			fTurboTime = 0.0;
+		}
 	};
 	std::vector<PowerupState> aPowerupStates;
 
@@ -1266,6 +1283,7 @@ namespace Powerups {
 
 		static CNyaTimer gTimer;
 		gTimer.Process();
+		fTimeSinceMarioSpawned += gTimer.fDeltaTime;
 
 		for (auto& state : aPowerupStates) {
 			if (!state.IsValid()) continue;
@@ -1288,6 +1306,42 @@ namespace Powerups {
 
 		for (auto& state : aPowerupStates) {
 			state.Process3D();
+		}
+	}
+
+	void CleanupOldPowerups() {
+		for (auto& obj : Render3DObjects::aObjects) {
+			if (!obj->IsActive()) continue;
+			if (obj->sDebugName != "bomb" && obj->sDebugName != "powerup") continue;
+			obj->aModels.clear();
+		}
+	}
+
+	bool bShouldSpawnPowerups = false;
+	void PowerupMod_OnTick() {
+		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
+
+		if (IsInNormalRace()) {
+			if (IsLocalPlayerStaging()) {
+				CleanupOldPowerups();
+				bShouldSpawnPowerups = true;
+
+				for (auto& state : aPowerupStates) {
+					if (!state.IsValid()) continue;
+					state.Reset();
+				}
+			}
+			else {
+				if (bShouldSpawnPowerups) {
+					PowerupBlock::bLightSpawnMode = true;
+					PowerupBlock::SpawnForAllCheckpoints();
+					bShouldSpawnPowerups = false;
+				}
+			}
+		}
+		else {
+			CleanupOldPowerups();
+			bShouldSpawnPowerups = true;
 		}
 	}
 

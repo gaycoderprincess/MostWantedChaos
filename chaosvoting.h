@@ -119,9 +119,10 @@ namespace ChaosVoting {
 		mVotingMutex.unlock();
 	}
 
-	int GetTotalVoteCount() {
+	int GetTotalVoteCount(bool includeInvalid) {
 		int totalVotes = 0;
 		for (auto& vote : aNewVotes) {
+			if (!includeInvalid && !CanEffectActivate(vote->pEffect)) continue;
 			totalVotes += vote->aVotes.size() + vote->bVotedByStreamer;
 		}
 		return totalVotes;
@@ -197,7 +198,7 @@ namespace ChaosVoting {
 	}
 
 	void TriggerHighestVotedEffect() {
-		auto voteCount = GetTotalVoteCount();
+		auto voteCount = GetTotalVoteCount(false);
 		nNumVotingUsers = voteCount;
 		if (voteCount <= 0) {
 			AddRunningEffect(GetRandomEffect());
@@ -338,7 +339,7 @@ namespace ChaosVoting {
 		VoteCountPopup.bIsVotingOption = true;
 		VoteCountPopup.bLeftSide = true;
 		VoteCountPopup.Update(gTimer.fDeltaTime, on);
-		VoteCountPopup.Draw(std::format("Vote Count: {}", GetTotalVoteCount()), y++, false);
+		VoteCountPopup.Draw(std::format("Vote Count: {}", GetTotalVoteCount(true)), y++, false);
 
 		static ChaosUIPopup VoteDisabledPopup;
 		VoteDisabledPopup.bIsVotingOption = true;
