@@ -964,8 +964,8 @@ namespace SM64 {
 			static CNyaTimer gCollisionTimer;
 			gCollisionTimer.Process();
 
-			if ((gCollisionTimer.fTotalTime >= 0.1 && GetMarioWorldVelocity().length() > 0.0) || bDoReset) {
-				gCollisionTimer.fTotalTime -= 0.1;
+			if ((gCollisionTimer.fTotalTime >= 0.066 && GetMarioWorldVelocity().length() > 0.0) || bDoReset) {
+				gCollisionTimer.fTotalTime -= 0.066;
 
 				for (auto& obj : aCollisionObjects[COLLISIONARTICLE_CUSTOM].aInstances) {
 					obj.Destroy();
