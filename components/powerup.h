@@ -4,7 +4,7 @@ namespace Powerups {
 	bool bPickupSoundPaused = false;
 
 	float sfxVolumeMultiplier = 0.33;
-	float sfxVolumeMultiplierMK64 = 0.5;
+	float sfxVolumeMultiplierMK64 = 1.0;
 
 	void PlayAudioFromCar(NyaAudio::NyaSound sound, IRigidBody* veh) {
 		if (!sound) return;

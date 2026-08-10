@@ -343,6 +343,10 @@ namespace SM64 {
 			return !pInstance->aBarriers.empty() && pInstance->IsInsideAABB(GetMarioWorldPos());
 		}
 
+		bool IsInAABB() {
+			return pInstance->IsInsideAABB(GetMarioWorldPos());
+		}
+
 		void Create() {
 			Destroy();
 			AddMarioStaticObject(&pInstance->aTriStrips, true);
@@ -416,8 +420,8 @@ namespace SM64 {
 
 		for (auto& obj : aCollisionObjects) {
 			for (auto& inst : obj.aInstances) {
-				if (inst.pInstance->IsActive()) {
-					if (!inst.NeedsUpdating()) continue;
+				if (inst.pInstance->IsActive() && inst.IsInAABB()) {
+					//if (!inst.NeedsUpdating()) continue;
 					AddLogPopup(std::format("Updating {:X}", (uintptr_t)inst.pInstance));
 					inst.Create();
 				}
@@ -960,8 +964,8 @@ namespace SM64 {
 			static CNyaTimer gCollisionTimer;
 			gCollisionTimer.Process();
 
-			if ((gCollisionTimer.fTotalTime >= 0.5 && GetMarioWorldVelocity().length() > 0.0) || bDoReset) {
-				gCollisionTimer.fTotalTime -= 0.5;
+			if ((gCollisionTimer.fTotalTime >= 0.1 && GetMarioWorldVelocity().length() > 0.0) || bDoReset) {
+				gCollisionTimer.fTotalTime -= 0.1;
 
 				for (auto& obj : aCollisionObjects[COLLISIONARTICLE_CUSTOM].aInstances) {
 					obj.Destroy();
