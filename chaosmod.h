@@ -1012,8 +1012,8 @@ void ChaosModMenu() {
 			QuickValueEditor("PowerupBlock::rX", Powerups::PowerupBlock::rX);
 			QuickValueEditor("PowerupBlock::rY", Powerups::PowerupBlock::rY);
 			QuickValueEditor("PowerupBlock::rZ", Powerups::PowerupBlock::rZ);
-			QuickValueEditor("PowerupBlock::offY", Powerups::PowerupBlock::offY);
-			QuickValueEditor("PowerupBlock::scale", Powerups::PowerupBlock::scale);
+			//QuickValueEditor("PowerupBlock::offY", Powerups::PowerupBlock::offY);
+			//QuickValueEditor("PowerupBlock::scale", Powerups::PowerupBlock::scale);
 			QuickValueEditor("PowerupBlock::rotSpeedX", Powerups::PowerupBlock::rotSpeedX);
 			QuickValueEditor("PowerupBlock::rotSpeedY", Powerups::PowerupBlock::rotSpeedY);
 			QuickValueEditor("PowerupBlock::rotSpeedZ", Powerups::PowerupBlock::rotSpeedZ);
