@@ -7,17 +7,17 @@ namespace CollisionCache {
 		NyaVec3 vAABBMin;
 		NyaVec3 vAABBMax;
 
-		bool IsInsideAABB(NyaVec3 pt) {
-			if (pt.x < vAABBMin.x) return false;
-			if (pt.y < vAABBMin.y) return false;
-			if (pt.z < vAABBMin.z) return false;
-			if (pt.x > vAABBMax.x) return false;
-			if (pt.y > vAABBMax.y) return false;
-			if (pt.z > vAABBMax.z) return false;
+		bool IsInsideAABB(NyaVec3 pt) const {
+			if (pt.x < vAABBMin.x - 5) return false;
+			if (pt.y < vAABBMin.y - 5) return false;
+			if (pt.z < vAABBMin.z - 5) return false;
+			if (pt.x > vAABBMax.x + 5) return false;
+			if (pt.y > vAABBMax.y + 5) return false;
+			if (pt.z > vAABBMax.z + 5) return false;
 			return true;
 		}
 
-		bool IsActive() {
+		bool IsActive() const {
 			return !nSceneryGroupId || SceneryGroupEnabledTable[nSceneryGroupId];
 		}
 

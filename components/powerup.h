@@ -874,6 +874,7 @@ namespace Powerups {
 				fTurboTime -= delta;
 				if (fTurboTime <= 0.0) {
 					bForcePlayerNOS = false;
+					fForcePlayerNoNOS = 0.5;
 				}
 			}
 			if (fElectroTime > 0.0) {

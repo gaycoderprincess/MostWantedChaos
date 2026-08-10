@@ -41,6 +41,8 @@ namespace Render3D {
 	bool bUserForceNoEnvmap = false;
 	bool bUserForceNoShadows = false;
 
+	bool bShadowsAvailable = false;
+
 	bool IsEffectDisabled() {
 		return bForceNoEffect || bUserForceNoEffect;
 	}

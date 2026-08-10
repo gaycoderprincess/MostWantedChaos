@@ -247,6 +247,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 
 				// memory corruption here if 360 stuff isnt installed
 				if (GetModuleHandleA("X360Stuff.asi")) {
+					Render3D::bShadowsAvailable = true;
 					NyaHooks::RenderShadowsHook::Init();
 					NyaHooks::RenderShadowsHook::aPostFunctions.push_back(Render3DLoopShadows);
 				}

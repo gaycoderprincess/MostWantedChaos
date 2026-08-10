@@ -500,9 +500,11 @@ void ChaosModMenu() {
 		QuickValueEditor("Render Objects In Reflections", b);
 		Render3D::bUserForceNoEnvmap = !b;
 
-		b = !Render3D::bUserForceNoShadows;
-		QuickValueEditor("Render Object Shadows", b);
-		Render3D::bUserForceNoShadows = !b;
+		if (Render3D::bShadowsAvailable) {
+			b = !Render3D::bUserForceNoShadows;
+			QuickValueEditor("Render Object Shadows", b);
+			Render3D::bUserForceNoShadows = !b;
+		}
 
 		QuickValueEditor("Cheap Object Rendering", Render3D::bUserForceNoEffect);
 
