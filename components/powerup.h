@@ -651,6 +651,7 @@ namespace Powerups {
 					SM64::bEnemyIsNeutral = true;
 					SM64::bDoReset = true;
 					SM64::vEnemySpawnPosition = pos;
+					fTimeSinceMarioSpawned = 0.0;
 					return true;
 				} break;
 			}
@@ -728,7 +729,7 @@ namespace Powerups {
 			std::vector<int> powerupsAvailable;
 			for (int i = 0; i < NUM_POWERUPS; i++) {
 				if (i == POWERUP_MARIO && !SM64::bAvailable) continue;
-				if (i == POWERUP_MARIO && fTimeSinceMarioSpawned < 15.0) continue;
+				if (i == POWERUP_MARIO && fTimeSinceMarioSpawned < 30.0) continue;
 
 				if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
 				if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
@@ -1096,14 +1097,17 @@ namespace Powerups {
 	namespace PowerupBlock {
 		bool bLightSpawnMode = false;
 
-		std::vector<Render3D::tModel*> models;
+		std::vector<Render3D::tModel*> models_RV;
+		std::vector<Render3D::tModel*> models_MK;
 
 		float rX = 90;
 		float rY = 0;
 		float rZ = 0;
-		float offY = 2.0;
+		float offY_MK = 2.0;
+		float offY_RV = 1.5;
 		float offZ = -6;
-		float scale = 0.75;
+		float scale_MK = 0.75;
+		float scale_RV = 2.0;
 
 		float rotSpeedX = 0;
 		float rotSpeedY = 0;
@@ -1119,6 +1123,8 @@ namespace Powerups {
 
 		template<bool isFake>
 		void BombOnTick(Render3DObjects::Object* obj, double delta) {
+			obj->aModels = bMK64Style ? models_MK : models_RV;
+
 			auto data = *(PowerupBlockData**)&obj->CustomData;
 			if (data->despawnTimer >= 1.0) {
 				obj->aModels.clear();
@@ -1127,7 +1133,7 @@ namespace Powerups {
 
 			auto p = obj->mMatrix.p;
 			if (GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&p, &p.y, nullptr)) {
-				p.y += offY;
+				p.y += bMK64Style ? offY_MK : offY_RV;
 				//if (data->despawnTimer > 0) {
 				//	p.y += data->despawnTimer;
 				//}
@@ -1143,7 +1149,7 @@ namespace Powerups {
 			obj->mMatrix = UMath::Matrix4::kIdentity;
 			obj->mMatrix.Rotate(NyaVec3(data->rotDelta * rotSpeedX, data->rotDelta * rotSpeedY, data->rotDelta * rotSpeedZ));
 
-			float finalScale = scale;
+			float finalScale = bMK64Style ? scale_MK : scale_RV;
 			if (data->despawnTimer > 0) {
 				finalScale *= 1.0 - data->despawnTimer;
 			}
@@ -1191,11 +1197,16 @@ namespace Powerups {
 
 		template<bool isFake>
 		void SpawnObject(UMath::Matrix4 mat) {
-			if (models.empty() || models[0]->bInvalidated) {
+			if (models_MK.empty() || models_MK[0]->bInvalidated) {
 				Render3D::ModelLoaderConfig.bColorByNormals = true;
 				Render3D::ModelLoaderConfig.fColorByNormalsScale = 0.25;
 				Render3D::ModelLoaderConfig.nAlphaValue = 127;
-				models = Render3D::CreateModels("powerupblock.fbx");
+				models_MK = Render3D::CreateModels("powerupblock.fbx");
+				Render3D::ModelLoaderConfig.Reset();
+			}
+			if (models_RV.empty() || models_RV[0]->bInvalidated) {
+				Render3D::ModelLoaderConfig.nVertexColorValue = 0xFF808080;
+				models_RV = Render3D::CreateModels("pickup.fbx");
 				Render3D::ModelLoaderConfig.Reset();
 			}
 
@@ -1206,7 +1217,7 @@ namespace Powerups {
 			else {
 				aObjectsInWorld.push_back(id);
 			}
-			Render3DObjects::aObjects.push_back(new Render3DObjects::Object("powerup", models, mat, {0,0,0}, 0, BombOnTick<isFake>));
+			Render3DObjects::aObjects.push_back(new Render3DObjects::Object("powerup", bMK64Style ? models_MK : models_RV, mat, {0,0,0}, 0, BombOnTick<isFake>));
 			Render3DObjects::aObjects[id]->bUseAlpha = true;
 			Render3DObjects::aObjects[id]->CustomData = new PowerupBlockData;
 		}
@@ -1252,7 +1263,7 @@ namespace Powerups {
 			veh->GetMatrix4(&mat);
 			mat.p = *veh->GetPosition();
 			GetWorldHeightAtPoint_WithCustom((UMath::Vector3*)&mat.p, &mat.p.y, nullptr);
-			mat.p += mat.y * offY;
+			mat.p += mat.y * (bMK64Style ? offY_MK : offY_RV);
 			mat.p += mat.z * offZ;
 			SpawnObject<true>(mat);
 
@@ -1320,8 +1331,12 @@ namespace Powerups {
 	bool bShouldSpawnPowerups = false;
 	void PowerupMod_OnTick() {
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
+		if (IsInLoadingScreen() || IsInNIS()) return;
 
+		static double fPursuitPowerupTimer = 0.0;
 		if (IsInNormalRace()) {
+			fPursuitPowerupTimer = 0.0;
+
 			if (IsLocalPlayerStaging()) {
 				CleanupOldPowerups();
 				bShouldSpawnPowerups = true;
@@ -1342,11 +1357,23 @@ namespace Powerups {
 		else {
 			CleanupOldPowerups();
 			bShouldSpawnPowerups = true;
+
+			// powerups every 30 seconds in pursuits
+			static CNyaTimer gTimer;
+			gTimer.Process();
+			if (IsInAnyPursuit() && !PlayerHasPowerup(GetLocalPlayerVehicle())) {
+				fPursuitPowerupTimer += gTimer.fDeltaTime;
+				if (fPursuitPowerupTimer > 30.0) {
+					RollPowerup(GetLocalPlayerVehicle());
+					fPursuitPowerupTimer = 0;
+				}
+			}
 		}
 	}
 
 	ChloeHook Init([](){
 		aDrawingLoopFunctions.push_back(OnTick);
+		aDrawingLoopFunctions.push_back(PowerupMod_OnTick);
 		aDrawing3DLoopFunctions.push_back(OnTick3D);
 	});
 }
