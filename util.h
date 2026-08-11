@@ -1048,3 +1048,25 @@ public:
 		sName = name;
 	}
 };
+
+bool SetSoundVolumeFromRange(NyaAudio::NyaSound audio, NyaVec3 position, float sfxRange = 200.0, float sfxVolume = 1.0) {
+	auto plyPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
+
+	auto volume = (sfxRange - (plyPos - position).length()) / sfxRange;
+	volume *= sfxVolume;
+	if (volume > 1) volume = 1;
+	if (volume < 0) {
+		return false;
+	}
+	NyaAudio::SetVolume(audio, GetSFXVolume() * volume);
+	return true;
+}
+
+bool PlaySoundFromRange(NyaAudio::NyaSound audio, NyaVec3 position, float sfxRange = 200.0, float sfxVolume = 1.0) {
+	if (SetSoundVolumeFromRange(audio, position, sfxRange, sfxVolume)) {
+		NyaAudio::SkipTo(audio, 0);
+		NyaAudio::Play(audio);
+		return true;
+	}
+	return false;
+}

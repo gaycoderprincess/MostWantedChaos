@@ -214,12 +214,12 @@ namespace SM64 {
 		mat.SetIdentity();
 		if (textured) {
 			static auto marioTextured = LoadTexture_SetDir("CwoeeChaos/data/models/letsago.png");
-			tmpModel.pTexture = marioTextured;
+			tmpModel.pTextureDiffuse = marioTextured;
 			tmpModel.RenderAt(WorldToRenderMatrix(mat), true);
 		}
 		else {
 			static auto marioColored = LoadTexture_SetDir("CwoeeChaos/data/models/letsago_white.png");
-			tmpModel.pTexture = marioColored;
+			tmpModel.pTextureDiffuse = marioColored;
 			tmpModel.RenderAt(WorldToRenderMatrix(mat), false);
 		}
 	}

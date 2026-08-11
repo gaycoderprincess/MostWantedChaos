@@ -1727,6 +1727,7 @@ public:
 		auto objs = GetActiveSharedRigidBodies();
 		for (auto& obj : objs) {
 			if (obj.IsVehicle()) continue;
+			if (obj.bIsBall) continue;
 
 			auto c = obj.GetPosition();
 			if ((*v - c).length() > 500) continue;
@@ -1737,6 +1738,10 @@ public:
 			vel.y += (v->y - c.y) * force * delta;
 			vel.z += (v->z - c.z) * force * delta;
 			obj.SetLinearVelocity(vel);
+
+			if (obj.pCustomObject) {
+				obj.pCustomObject->fTimeSinceMovedByScript = 0.0;
+			}
 		}
 	}
 	bool HasTimer() override { return true; }

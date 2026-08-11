@@ -22,6 +22,7 @@ namespace CustomPhysicsObjects {
 		bool bUseExpensiveCollisionCheck = false;
 		bool bAffectGamePhysics = false;
 		std::string sDebugName;
+		void(*pCollisionFunction)(CustomPhysicsObject*, b3BodyId) = nullptr;
 
 		NyaVec3 vSpawnPosition = {0,0,0};
 		NyaAudio::NyaSound pCollisionSound = 0;
@@ -35,6 +36,11 @@ namespace CustomPhysicsObjects {
 		int nLazyLastCollided = 0;
 		double fTimeSinceSpawned = 0.0;
 		double fTimeSinceMovedByScript = 0.0;
+
+		b3ContactData aContactData[NUM_CONTACTS_CHECK];
+		int nNumContactData = 0;
+
+		bool bQueuedForDeletion = false;
 
 		void AddCollision(IRigidBody* body) {
 			for (auto& obj : aLastCollidedGameObject) {
@@ -89,38 +95,23 @@ namespace CustomPhysicsObjects {
 
 		void PlayCollisionSound() {
 			if (fTimeSinceSpawned < 1.0) return;
-
-			auto dist = (*GetLocalPlayerVehicle()->GetPosition() - GetPosition());
-			auto volume = (fObjectSFXRange - dist.length()) / fObjectSFXRange;
-			if (volume > 1) volume = 1;
-			if (volume <= 0) {
-				volume = 0;
-				return;
-			}
-			volume *= fObjectSFXVolume;
-			NyaAudio::SetVolume(pCollisionSound, GetSFXVolume() * volume);
-			NyaAudio::SkipTo(pCollisionSound, 0, false);
-			NyaAudio::Play(pCollisionSound);
+			PlaySoundFromRange(pCollisionSound, GetPosition(), fObjectSFXRange, fObjectSFXVolume);
 		}
 
 		void ProcessLazyCollisionSound() {
-			b3ContactData contactData[NUM_CONTACTS_CHECK];
-			int num = b3Body_GetContactData(nB3Body, contactData, NUM_CONTACTS_CHECK);
-			//if (num > nLazyLastCollided) { // this results in too many false positives
-			if (num && !nLazyLastCollided) {
+			//if (nNumContactData > nLazyLastCollided) { // this results in too many false positives
+			if (nNumContactData && !nLazyLastCollided) {
 				PlayCollisionSound();
 			}
-			nLazyLastCollided = num;
+			nLazyLastCollided = nNumContactData;
 		}
 
 		void ProcessExpensiveCollisionSound(double delta) {
-			b3ContactData contactData[NUM_CONTACTS_CHECK];
-			int num = b3Body_GetContactData(nB3Body, contactData, NUM_CONTACTS_CHECK);
 			bool collidedWorld = false;
 			bool collidedNewObject = false;
-			for (int i = 0; i < num; i++) {
-				auto game = CustomPhysics::GetGameBodyForB3Body(b3Shape_GetBody(contactData->shapeIdA));
-				if (!game) game = CustomPhysics::GetGameBodyForB3Body(b3Shape_GetBody(contactData->shapeIdB));
+			for (int i = 0; i < nNumContactData; i++) {
+				auto game = CustomPhysics::GetGameBodyForB3Body(b3Shape_GetBody(aContactData[i].shapeIdA));
+				if (!game) game = CustomPhysics::GetGameBodyForB3Body(b3Shape_GetBody(aContactData[i].shapeIdB));
 
 				if (game) {
 					if (!HasHadCollision(game)) {
@@ -147,15 +138,26 @@ namespace CustomPhysicsObjects {
 			}
 		}
 
+		void ProcessCollisionFunction() {
+			for (int i = 0; i < nNumContactData; i++) {
+				auto body1 = b3Shape_GetBody(aContactData[i].shapeIdA);
+				auto body2 = b3Shape_GetBody(aContactData[i].shapeIdB);
+				if (!B3_ID_EQUALS(body1, nB3Body)) {
+					pCollisionFunction(this, body1);
+				}
+				if (!B3_ID_EQUALS(body2, nB3Body)) {
+					pCollisionFunction(this, body2);
+				}
+			}
+		}
+
 		void ProcessGamePhysicsIntegration() {
-			b3ContactData contactData[8];
-			int num = b3Body_GetContactData(nB3Body, contactData, 8);
-			for (int i = 0; i < num; i++) {
-				auto body = b3Shape_GetBody(contactData[i].shapeIdA);
+			for (int i = 0; i < nNumContactData; i++) {
+				auto body = b3Shape_GetBody(aContactData[i].shapeIdA);
 
 				auto gameObj = CustomPhysics::GetGameObjectInstanceForB3Body(body);
 				if (!gameObj) {
-					body = b3Shape_GetBody(contactData[i].shapeIdB);
+					body = b3Shape_GetBody(aContactData[i].shapeIdB);
 					gameObj = CustomPhysics::GetGameObjectInstanceForB3Body(body);
 				}
 				if (!gameObj) continue;
@@ -285,6 +287,16 @@ namespace CustomPhysicsObjects {
 		return false;
 	}
 
+	bool PurgeMarked() {
+		for (auto& obj : aPhysicsObjects) {
+			if (obj->bQueuedForDeletion) {
+				DeletePhysicsObject(obj);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	bool PurgeByRange() {
 		auto plyPos = *GetLocalPlayerVehicle()->GetPosition();
 
@@ -312,6 +324,7 @@ namespace CustomPhysicsObjects {
 
 		while (PurgeOutOfWorld()) {}
 		while (PurgeByRange()) {}
+		while (PurgeMarked()) {}
 
 		AddLogPopup(std::format("{} physics objects", aPhysicsObjects.size()));
 
@@ -319,6 +332,7 @@ namespace CustomPhysicsObjects {
 			auto& obj = *pObj;
 			obj.fTimeSinceSpawned += gTimer.fDeltaTime;
 			obj.fTimeSinceMovedByScript += gTimer.fDeltaTime;
+			obj.nNumContactData = b3Body_GetContactData(obj.nB3Body, obj.aContactData, NUM_CONTACTS_CHECK);
 			if (bEverythingAffectsGame_Player || bEverythingAffectsGame_Opponents || obj.bAffectGamePhysics) {
 				obj.ProcessGamePhysicsIntegration();
 			}
@@ -331,11 +345,13 @@ namespace CustomPhysicsObjects {
 					obj.ProcessLazyCollisionSound();
 				}
 			}
+			if (obj.pCollisionFunction) {
+				obj.ProcessCollisionFunction();
+			}
 
 			// change spawn position if the object is stationary
 			if (obj.CanRespawn() && obj.fTimeSinceMovedByScript > 2.0) {
-				b3ContactData contactData[NUM_CONTACTS_CHECK];
-				if (b3Body_GetContactData(obj.nB3Body, contactData, NUM_CONTACTS_CHECK) > 0 && obj.GetLinearVelocity().length() <= TOMPS(1.0)) {
+				if (obj.nNumContactData > 0 && obj.GetLinearVelocity().length() <= TOMPS(1.0)) {
 					obj.vSpawnPosition = obj.GetPosition();
 				}
 			}
@@ -402,6 +418,7 @@ public:
 	IRigidBody* pGameObject;
 	CustomPhysicsObjects::CustomPhysicsObject* pCustomObject;
 	Render3DObjects::Object* pCustomStaticObject;
+	bool bIsBall = false;
 
 	CwoeeSharedRigidBody() {
 		pGameObject = nullptr;
@@ -409,10 +426,13 @@ public:
 		pCustomStaticObject = nullptr;
 	}
 	CwoeeSharedRigidBody(IRigidBody* obj) : pGameObject(obj) {}
-	CwoeeSharedRigidBody(CustomPhysicsObjects::CustomPhysicsObject* obj) : pCustomObject(obj) {}
+	CwoeeSharedRigidBody(CustomPhysicsObjects::CustomPhysicsObject* obj) : pCustomObject(obj) {
+		bIsBall = CustomPhysicsBall::bEnabled && obj && B3_ID_EQUALS(obj->nB3Body, CustomPhysicsBall::BallBody);
+	}
 	CwoeeSharedRigidBody(Render3DObjects::Object* obj) : pCustomStaticObject(obj) {}
 
 	bool IsValid() {
+		if (bIsBall) return CustomPhysicsBall::bEnabled;
 		if (pGameObject && IsRigidBodyValidAndActive(pGameObject)) return true;
 		if (pCustomObject) {
 			for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
@@ -473,6 +493,7 @@ public:
 		if (pCustomObject) return pCustomObject->GetPosition();
 		if (pCustomStaticObject) return pCustomStaticObject->mMatrix.p;
 		InvalidError();
+		return {};
 	}
 
 	UMath::Vector3 GetLinearVelocity() {
@@ -480,6 +501,7 @@ public:
 		if (pCustomObject) return pCustomObject->GetLinearVelocity();
 		if (pCustomStaticObject) return {0,0,0};
 		InvalidError();
+		return {};
 	}
 
 	UMath::Vector3 GetAngularVelocity() {
@@ -487,6 +509,7 @@ public:
 		if (pCustomObject) return pCustomObject->GetAngularVelocity();
 		if (pCustomStaticObject) return {0,0,0};
 		InvalidError();
+		return {};
 	}
 
 	void SetLinearVelocity(UMath::Vector3 v) {
@@ -528,6 +551,7 @@ public:
 			return out;
 		}
 		InvalidError();
+		return {};
 	}
 };
 
@@ -540,6 +564,11 @@ std::vector<CwoeeSharedRigidBody> GetActiveSharedRigidBodies(bool includeStaticO
 	auto cwoee = CustomPhysicsObjects::aPhysicsObjects;
 	for (auto& rb : cwoee) {
 		out.push_back(rb);
+	}
+	if (CustomPhysicsBall::bEnabled) {
+		static auto obj = new CustomPhysicsObjects::CustomPhysicsObject;
+		obj->nB3Body = CustomPhysicsBall::BallBody;
+		out.push_back(obj);
 	}
 	if (includeStaticObjects) {
 		auto render3d = Render3DObjects::aObjects;

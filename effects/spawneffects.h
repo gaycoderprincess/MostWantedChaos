@@ -221,13 +221,7 @@ public:
 			}
 
 			if (audio) {
-				auto volume = (sfxRange - lastPeanutDistance) / sfxRange;
-				volume *= sfxVolume;
-				if (volume > 1) volume = 1;
-				if (volume < 0) volume = 0;
-				if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
-				NyaAudio::SetVolume(audio, GetSFXVolume() * volume);
-
+				SetSoundVolumeFromRange(audio, obj->vColPosition, sfxRange, sfxVolume);
 				if (NyaAudio::IsFinishedPlaying(audio)) {
 					NyaAudio::Play(audio);
 				}
@@ -541,39 +535,10 @@ public:
 		if ((int)data->styleRanking >= NUM_STYLES) data->styleRanking = NUM_STYLES; // cap at top of SSS
 	}
 
-	static void VergilAttack_Box3D(NyaVec3 colPosition, b3BodyId bodyId, float range, float extraUp) {
-		auto bodyPos = b3Body_GetPosition(bodyId);
-
-		auto pos = NyaVec3(bodyPos.x,bodyPos.y,bodyPos.z);
-		auto dist = (pos - colPosition).length();
-		if (dist < range) {
-			auto dir = (pos - colPosition);
-			dir.Normalize();
-
-			auto vel = b3Body_GetLinearVelocity(bodyId);
-			vel.x += dir.x * attackPower;
-			vel.y += dir.y * attackPower + extraUp;
-			vel.z += dir.z * attackPower;
-			b3Body_SetLinearVelocity(bodyId, vel);
-
-			auto avel = b3Body_GetAngularVelocity(bodyId);
-			avel.x += dir.x * attackPowerAng;
-			avel.y += dir.y * attackPowerAng;
-			avel.z += dir.z * attackPowerAng;
-			b3Body_SetAngularVelocity(bodyId, avel);
-		}
-	}
-
 	static void VergilGenericAttack(Render3DObjects::Object* obj, float range, float extraUp) {
 		auto data = (tVergilData*)obj->CustomData;
 
-		auto cars = GetActiveVehicles();
-		if (CustomPhysicsBall::bEnabled) {
-			VergilAttack_Box3D(obj->vColPosition, CustomPhysicsBall::BallBody, range, extraUp);
-		}
-		for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
-			VergilAttack_Box3D(obj->vColPosition, phys->nB3Body, range, extraUp);
-		}
+		auto cars = GetActiveSharedRigidBodies();
 		if (SM64::bEnemyEnabled) {
 			auto dist = (SM64::GetMarioWorldPos() - obj->vColPosition).length();
 			if (dist < range) {
@@ -581,18 +546,18 @@ public:
 			}
 		}
 		for (auto& car : cars) {
-			if (!CanCarBeTargeted(car)) continue;
+			if (car.IsVehicle() && !CanCarBeTargeted(car.GetVehicle())) continue;
 
-			auto pos = *car->GetPosition();
+			auto pos = car.GetPosition();
 			auto dist = (pos - obj->vColPosition).length();
 			if (dist < range) {
 				auto dir = (pos - obj->vColPosition);
 				dir.Normalize();
 
-				auto rb = car->mCOMObject->Find<IRigidBody>();
+				auto iveh = car.GetVehicle();
 
 				bool doWeak = false;
-				if (car->GetDriverClass() == DRIVER_HUMAN) {
+				if (iveh && iveh->GetDriverClass() == DRIVER_HUMAN) {
 					StatTracker::nVergilKillsPlayer++;
 
 					if (SM64::bEnabled) {
@@ -606,23 +571,24 @@ public:
 
 				float powerMult = doWeak ? attackPowerWeakMult : 1.0;
 
-				auto vel = *rb->GetLinearVelocity();
+				auto vel = car.GetLinearVelocity();
 				vel += dir * attackPower * powerMult;
 				vel.y += extraUp * powerMult;
-				rb->SetLinearVelocity(&vel);
+				car.SetLinearVelocity(vel);
 
-				auto avel = *rb->GetAngularVelocity();
+				auto avel = car.GetAngularVelocity();
 				avel += dir * attackPowerAng * powerMult;
-				rb->SetAngularVelocity(&avel);
+				car.SetAngularVelocity(avel);
 
-				data->styleRanking += attackStyleIncrease;
+				if (iveh) {
+					data->styleRanking += attackStyleIncrease;
 
-				if (car->GetDriverClass() == DRIVER_COP) {
-					StatTracker::nVergilKillsCop++;
-					DestroyCar(car);
+					if (iveh->GetDriverClass() == DRIVER_COP) {
+						StatTracker::nVergilKillsCop++;
+						DestroyCar(iveh);
+					}
+					StatTracker::nVergilKills++;
 				}
-
-				StatTracker::nVergilKills++;
 			}
 		}
 	}
@@ -739,12 +705,7 @@ public:
 		}
 
 		if (data->audio) {
-			auto volume = (sfxRange - plyDist) / sfxRange;
-			volume *= sfxVolume;
-			if (volume > 1) volume = 1;
-			if (volume < 0) volume = 0;
-			if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
-			NyaAudio::SetVolume(data->audio, GetSFXVolume() * volume);
+			SetSoundVolumeFromRange(data->audio, obj->vColPosition, sfxRange, sfxVolume);
 			if (NyaAudio::IsFinishedPlaying(data->audio)) {
 				NyaAudio::Play(data->audio);
 			}
@@ -909,12 +870,7 @@ public:
 		}
 
 		if (data->audio) {
-			auto volume = (sfxRange - plyDist) / sfxRange;
-			volume *= sfxVolume;
-			if (volume > 1) volume = 1;
-			if (volume < 0) volume = 0;
-			if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) volume = 0;
-			NyaAudio::SetVolume(data->audio, GetSFXVolume() * volume);
+			PlaySoundFromRange(audio, obj->vColPosition, sfxRange, sfxVolume);
 			if (NyaAudio::IsFinishedPlaying(data->audio)) {
 				NyaAudio::Play(data->audio);
 			}
@@ -1583,3 +1539,107 @@ public:
 		DoChaosSave();
 	}
 } E_PowerupBlock;
+
+class Effect_ExplosiveBarrel : public ChaosEffect {
+public:
+	Effect_ExplosiveBarrel() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Explosive Barrels";
+		bAbortOnConditionFailed = true;
+	}
+
+	static inline float explosionRange = 50.0;
+	static inline float explosionPower = 100;
+	static inline float explosionPowerAng = 25;
+	static inline float explosionPowerWeakMult = 0.1;
+
+	static void OnBarrelHit(CustomPhysicsObjects::CustomPhysicsObject* pThis, b3BodyId otherBody) {
+		//auto rb = CustomPhysics::GetGameBodyForB3Body(otherBody);
+		//if (!rb) return;
+
+		if (b3Body_GetType(otherBody) == b3_staticBody) return;
+
+		auto barrelPos = pThis->GetPosition();
+
+		auto objs = GetActiveSharedRigidBodies();
+		for (auto& obj : objs) {
+			auto pos = obj.GetPosition();
+			auto dist = (pos - barrelPos).length();
+			if (dist < explosionRange) {
+				auto dir = (pos - barrelPos);
+				dir.Normalize();
+
+				auto iveh = obj.GetVehicle();
+
+				bool doWeak = false;
+				if (iveh && iveh->GetDriverClass() == DRIVER_HUMAN) {
+					StatTracker::nVergilKillsPlayer++;
+
+					if (SM64::bEnabled) {
+						SM64::OnTakeDamage(1, barrelPos, true);
+					}
+
+					if (GetEffectRunning("Juggernaut")) {
+						doWeak = true;
+					}
+				}
+
+				float powerMult = doWeak ? explosionPowerWeakMult : 1.0;
+
+				auto vel = obj.GetLinearVelocity();
+				vel += dir * explosionPower * powerMult;
+				obj.SetLinearVelocity(vel);
+
+				auto avel = obj.GetAngularVelocity();
+				avel += dir * explosionPowerAng * powerMult;
+				obj.SetAngularVelocity(avel);
+
+				if (iveh && iveh->GetDriverClass() == DRIVER_COP) {
+					DestroyCar(iveh);
+				}
+			}
+		}
+
+		static NyaAudio::NyaSound sounds[] = {
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode3.wav"),
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode4.wav"),
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode5.wav"),
+		};
+		PlaySoundFromRange(sounds[rand() % (sizeof(sounds)/sizeof(sounds[0]))], pThis->GetPosition());
+		pThis->bQueuedForDeletion = true;
+	}
+
+	static inline float scale = 2.0;
+
+	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+		static auto mdl = Render3D::CreateModels("oildrum001_explosive.fbx");
+		static auto mdlCol = Render3D::CreateModels("oildrum001_collider.fbx");
+		static auto col = CustomPhysicsObjects::CreateDynamicColliderMeshes(mdlCol, scale);
+
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = mdl;
+		objData.vModelSize = {scale,scale,scale};
+		objData.bRemoveOnSafehouse = false;
+		objData.bRemoveOnOutOfBounds = false;
+		objData.bRemoveOnOutOfRange = false;
+		objData.bAffectGamePhysics = true;
+		objData.sDebugName = "oildrum_save";
+		objData.pCollisionFunction = OnBarrelHit;
+		//objData.bUseExpensiveCollisionCheck = true;
+		//objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/roadcone.wav");
+		CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
+	}
+
+	void InitFunction() override {
+		auto rb = GetLocalPlayerInterface<IRigidBody>();
+		auto ply = *rb->GetPosition();
+		auto vel = *rb->GetLinearVelocity();
+		UMath::Vector3 fwd;
+		rb->GetForwardVector(&fwd);
+
+		NyaVec3 pos = ply;
+		pos += fwd * 5;
+		pos.y += 2;
+		SpawnObject(pos, vel);
+		DoChaosSave();
+	}
+} E_ExplosiveBarrel;

@@ -136,7 +136,7 @@ namespace CollView {
 		tmpModel.nFaceCount = numFacesUsed;
 
 		static auto tex = LoadTexture_SetDir("CwoeeChaos/data/models/white.png");
-		tmpModel.pTexture = tex;
+		tmpModel.pTextureDiffuse = tex;
 		tmpModel.RenderAt_NoEffect(WorldToRenderMatrix(matrix), false, fillMode == D3DFILL_SOLID, fillMode == D3DFILL_SOLID);
 	}
 

@@ -313,7 +313,7 @@ bool DoChaosPhysicsObjectSave(const char* debugName, const char* fileName) {
 	std::vector<UMath::Vector3> save;
 	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
 		if (obj->sDebugName != debugName) continue;
-		save.push_back({obj->vSpawnPosition});
+		save.push_back(obj->vSpawnPosition);
 	}
 
 	std::ofstream file(std::format("CwoeeChaos/save/{}.sav", fileName), std::iostream::out | std::iostream::binary);

@@ -107,8 +107,12 @@ namespace Render3D {
 	struct tModel {
 		IDirect3DIndexBuffer9* pIndexBuffer = nullptr;
 		IDirect3DVertexBuffer9* pVertexBuffer = nullptr;
-		IDirect3DTexture9* pTexture = nullptr;
+		IDirect3DTexture9* pTextureDiffuse = nullptr;
+		IDirect3DTexture9* pTextureNormal = nullptr;
+		IDirect3DTexture9* pTextureSpecular = nullptr;
 		std::string sTextureName;
+		std::string sNormalTextureName;
+		std::string sSpecularTextureName;
 		uint32_t nVertexCount;
 		uint32_t nFaceCount;
 		bool bInvalidated = false;
@@ -139,6 +143,11 @@ namespace Render3D {
 
 			if (isShadow) {
 				effectId = effectId == EEFFECT_CAR ? EEFFECT_CARSHADOWMAP : EEFFECT_WORLDNOFOG;
+			}
+			else {
+				if (pTextureNormal && effectId == EEFFECT_WORLD) {
+					effectId = EEFFECT_WORLDNORMALMAP;
+				}
 			}
 
 			bool shouldRefresh = ShouldRefreshRenderProperties(useAlpha, effectId, zwrite, cullMode);
@@ -267,12 +276,15 @@ namespace Render3D {
 			//for (int i = 1; i < 8; i++) {
 			//	g_pd3dDevice->SetTexture(i, nullptr);
 			//}
-			if (pLastUsedTexture != pTexture) {
-				effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::DiffuseMap].mHandle, pTexture);
-				if (effectId == EEFFECT_CAR) {
-					effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::NormalMapTexture].mHandle, pTexture);
-				}
-				pLastUsedTexture = pTexture;
+			if (pLastUsedTexture != pTextureDiffuse) {
+				effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::DiffuseMap].mHandle, pTextureDiffuse);
+				pLastUsedTexture = pTextureDiffuse;
+			}
+			if (effectId == EEFFECT_WORLDNORMALMAP || effectId == EEFFECT_CAR) {
+				effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::NormalMapTexture].mHandle, pTextureNormal ? pTextureNormal : pTextureDiffuse);
+			}
+			if (effectId == EEFFECT_WORLDNORMALMAP && pTextureSpecular) {
+				effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::SPECULARMAPTEXTURE].mHandle, pTextureSpecular);
 			}
 			effect->hD3DXEffect->CommitChanges();
 
@@ -347,7 +359,7 @@ namespace Render3D {
 				g_pd3dDevice->SetIndices(pIndexBuffer);
 				pLastUsedIBuffer = pIndexBuffer;
 			}
-			g_pd3dDevice->SetTexture(0, pTexture);
+			g_pd3dDevice->SetTexture(0, pTextureDiffuse);
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
 		}
 
@@ -377,6 +389,40 @@ namespace Render3D {
 	std::vector<tModel*> aAllModels;
 	std::vector<tTextureInfo> aAllTextures;
 	std::vector<std::string> aFailedTextures;
+
+	IDirect3DTexture9* LoadOrFindTexture(const std::string& material, bool addToFail) {
+		auto baseTextureName = material;
+		if (!baseTextureName.empty() && baseTextureName.find('.') == std::string::npos) {
+			baseTextureName += ".png";
+		}
+
+		auto textureName = ModelLoaderConfig.sTextureSubdir + baseTextureName;
+		if (baseTextureName.empty()) {
+			textureName = "white.png";
+		}
+
+		for (auto& texture : aAllTextures) {
+			if (texture.sFile == textureName) {
+				return texture.pTexture;
+			}
+		}
+
+		if (auto tex = LoadTexture_SetDir(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
+			aAllTextures.push_back({textureName, tex});
+			return tex;
+		}
+
+		if (addToFail) {
+			bool isNew = true;
+			for (auto& name : aFailedTextures) {
+				if (name == textureName) isNew = false;
+			}
+			if (isNew) {
+				aFailedTextures.push_back(textureName);
+			}
+		}
+		return nullptr;
+	}
 
 	tModel* CreateOneModel(int numVertices, int numFaces, const NyaVec3* vertices, const NyaVec3* normals, const NyaVec3* tangents, const NyaVec3* bitangents, const NyaVec3* uvs, const NyaDrawing::CNyaRGBA32* colors, const uint32_t* indices, const std::string& material) {
 		auto model = new tModel;
@@ -478,33 +524,16 @@ namespace Render3D {
 		model->pVertexBuffer->Unlock();
 		model->pIndexBuffer->Unlock();
 
-		auto baseTextureName = material;
-		auto textureName = ModelLoaderConfig.sTextureSubdir + baseTextureName;
-		if (baseTextureName.empty()) {
-			textureName = "white.png";
-		}
-		model->sTextureName = baseTextureName;
+		model->sTextureName = material;
+		model->sNormalTextureName = material + "_normal";
+		model->sSpecularTextureName = material + "_specular";
 
-		for (auto& texture : aAllTextures) {
-			if (texture.sFile == textureName) {
-				model->pTexture = texture.pTexture;
-				break;
-			}
-		}
-		if (!model->pTexture) {
-			if (auto tex = LoadTexture_SetDir(std::format("CwoeeChaos/data/models/{}", textureName).c_str())) {
-				model->pTexture = tex;
-				aAllTextures.push_back({textureName, model->pTexture});
-			} else {
-				bool isNew = true;
-				for (auto& name : aFailedTextures) {
-					if (name == textureName) isNew = false;
-				}
-				if (isNew) {
-					aFailedTextures.push_back(textureName);
-				}
-			}
-		}
+		model->pTextureDiffuse = LoadOrFindTexture(model->sTextureName, true);
+		//model->pTextureNormal = LoadOrFindTexture(model->sNormalTextureName, false);
+		//model->pTextureSpecular = LoadOrFindTexture(model->sSpecularTextureName, false);
+		//if (model->pTextureNormal && !model->pTextureSpecular) {
+		//	model->pTextureSpecular = LoadOrFindTexture("black.png", true);
+		//}
 
 		aAllModels.push_back(model);
 		return model;

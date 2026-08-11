@@ -412,7 +412,7 @@ namespace ChaosVoting {
 			mVotingMutex.unlock();
 
 			if (!chatCheat.empty()) {
-				for (auto& cheat: chatCheat) {
+				for (auto& cheat : chatCheat) {
 					ProcessChatCheatRequest(cheat.username, cheat.message);
 				}
 
