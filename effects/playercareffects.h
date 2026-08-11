@@ -1711,3 +1711,34 @@ public:
 	}
 	bool HasTimer() override { return true; }
 } E_PlayerHoverPlatform;
+
+class Effect_ObjectMagnet : public ChaosEffect {
+public:
+	Effect_ObjectMagnet() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Player Object Magnet";
+		fTimerLength = 60;
+	}
+
+	static inline float force = 10.0;
+
+	void TickFunctionMain(double delta) override {
+		auto v = GetLocalPlayerVehicle()->GetPosition();
+
+		auto objs = GetActiveSharedRigidBodies();
+		for (auto& obj : objs) {
+			if (obj.IsVehicle()) continue;
+
+			auto c = obj.GetPosition();
+			if ((*v - c).length() > 500) continue;
+			obj.WakeObject();
+
+			auto vel = obj.GetLinearVelocity();
+			vel.x += (v->x - c.x) * force * delta;
+			vel.y += (v->y - c.y) * force * delta;
+			vel.z += (v->z - c.z) * force * delta;
+			obj.SetLinearVelocity(vel);
+		}
+	}
+	bool HasTimer() override { return true; }
+	bool IsAvailable() override { return !GetActiveObjects().empty() || !CustomPhysicsObjects::aPhysicsObjects.empty(); }
+} E_ObjectMagnet;

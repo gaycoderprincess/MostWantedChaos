@@ -135,12 +135,7 @@ public:
 			auto side = RenderToWorldCoords(cam.x);
 			auto up = RenderToWorldCoords(cam.y);
 
-			if (selectedBody.pGameObject) {
-				auto cb = selectedBody.pGameObject->mCOMObject->Find<ICollisionBody>();
-				if (cb && cb->IsAttachedToWorld()) {
-					cb->AttachedToWorld(false, 50.0);
-				}
-			}
+			selectedBody.WakeObject();
 
 			DrawCrosshair(selectedBody, false);
 

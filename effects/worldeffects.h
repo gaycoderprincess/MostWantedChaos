@@ -436,52 +436,6 @@ public:
 	bool RunWhenBlocked() override { return true; }
 } E_CollisionView;
 
-class Effect_ObjectMagnet : public ChaosEffect {
-public:
-	Effect_ObjectMagnet() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
-		sName = "Player Object Magnet";
-		fTimerLength = 60;
-	}
-
-	static inline float force = 10.0;
-
-	void TickFunctionMain(double delta) override {
-		auto cars = GetActiveObjects();
-		for (auto& car : cars) {
-			if (car == GetLocalPlayerInterface<ICollisionBody>()) continue;
-			auto otherCar = car->mCOMObject->Find<IRigidBody>();
-			if (!otherCar) continue;
-
-			if (car->IsAttachedToWorld()) {
-				car->AttachedToWorld(false, 50.0);
-			}
-
-			auto v = GetLocalPlayerVehicle()->GetPosition();
-			auto c = otherCar->GetPosition();
-			auto vel = *otherCar->GetLinearVelocity();
-			vel.x += (v->x - c->x) * force * delta;
-			vel.y += (v->y - c->y) * force * delta;
-			vel.z += (v->z - c->z) * force * delta;
-			otherCar->SetLinearVelocity(&vel);
-		}
-
-		auto& objs = CustomPhysicsObjects::aPhysicsObjects;
-		for (auto& otherCar : objs) {
-			auto v = GetLocalPlayerVehicle()->GetPosition();
-			auto c = otherCar->GetPosition();
-			if ((*v - c).length() > 500) continue;
-			auto vel = otherCar->GetLinearVelocity();
-			vel.x += (v->x - c.x) * force * delta;
-			vel.y += (v->y - c.y) * force * delta;
-			vel.z += (v->z - c.z) * force * delta;
-			otherCar->SetLinearVelocity(&vel);
-			otherCar->fTimeSinceMovedByScript = 0.0;
-		}
-	}
-	bool HasTimer() override { return true; }
-	bool IsAvailable() override { return !GetActiveObjects().empty() || !CustomPhysicsObjects::aPhysicsObjects.empty(); }
-} E_ObjectMagnet;
-
 class Effect_CollisionView2 : public EffectBase_ScreenShader {
 public:
 	Effect_CollisionView2() : EffectBase_ScreenShader(EFFECT_CATEGORY_TEMP) {

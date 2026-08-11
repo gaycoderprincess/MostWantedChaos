@@ -427,6 +427,42 @@ public:
 		return false;
 	}
 
+	bool HasPhysics() const {
+		return pGameObject || pCustomObject;
+	}
+
+	bool IsStatic() const {
+		return !HasPhysics();
+	}
+
+	bool IsVehicle() const {
+		return pGameObject && pGameObject->mCOMObject->Find<IVehicle>();
+	}
+
+	IVehicle* GetVehicle() const {
+		if (!pGameObject) return nullptr;
+		return pGameObject->mCOMObject->Find<IVehicle>();
+	}
+
+	bool CanBeDeleted() const {
+		if (auto veh = GetVehicle()) {
+			return veh->GetDriverClass() == DRIVER_TRAFFIC || veh->GetDriverClass() == DRIVER_COP;
+		}
+		return true;
+	}
+
+	void WakeObject() {
+		if (pGameObject) {
+			auto cb = pGameObject->mCOMObject->Find<ICollisionBody>();
+			if (!cb) return;
+			if (!cb->IsAttachedToWorld()) return;
+			cb->AttachedToWorld(false, 50.0);
+		}
+		if (pCustomObject) {
+			b3Body_SetAwake(pCustomObject->nB3Body, true);
+		}
+	}
+
 	void InvalidError() {
 		MessageBoxA(0, std::format("Attempted to index invalid rigidbody {:X} {:X} {:X}", (uintptr_t)pGameObject, (uintptr_t)pCustomObject, (uintptr_t)pCustomStaticObject).c_str(), "nya?!~", MB_ICONERROR);
 		exit(0);
@@ -467,6 +503,31 @@ public:
 	void SetAngularVelocity(UMath::Vector3 v) {
 		if (pGameObject) pGameObject->SetAngularVelocity(&v);
 		if (pCustomObject) pCustomObject->SetAngularVelocity(&v);
+	}
+
+	UMath::Vector3 GetDimension() {
+		if (pGameObject) {
+			UMath::Vector3 out;
+			pGameObject->GetDimension(&out);
+			return out;
+		}
+		if (pCustomObject) {
+			auto aabb = b3Body_ComputeAABB(pCustomObject->nB3Body);
+
+			UMath::Vector3 out;
+			out.x = std::max(std::abs(aabb.lowerBound.x), std::abs(aabb.upperBound.x));
+			out.y = std::max(std::abs(aabb.lowerBound.y), std::abs(aabb.upperBound.y));
+			out.z = std::max(std::abs(aabb.lowerBound.z), std::abs(aabb.upperBound.z));
+			return out;
+		}
+		if (pCustomStaticObject) {
+			UMath::Vector3 out;
+			out.x = std::max(std::abs(pCustomStaticObject->vAABBMin.x), std::abs(pCustomStaticObject->vAABBMax.x));
+			out.y = std::max(std::abs(pCustomStaticObject->vAABBMin.y), std::abs(pCustomStaticObject->vAABBMax.y));
+			out.z = std::max(std::abs(pCustomStaticObject->vAABBMin.z), std::abs(pCustomStaticObject->vAABBMax.z));
+			return out;
+		}
+		InvalidError();
 	}
 };
 
