@@ -1032,30 +1032,12 @@ auto LoadAudioFile_SetDir(const std::string& path) {
 	return NyaAudio::LoadFile(path);
 }
 
-template<uintptr_t addr>
-class VanillaPerformanceHook {
-public:
-	static inline std::string sName;
-
-	static inline auto OrigFunction = (void(*)())nullptr;
-	static void __thiscall HookedFunction() {
-		PerformanceBenchmarker _perf(sName);
-		OrigFunction();
-	}
-
-	VanillaPerformanceHook(const std::string& name) {
-		OrigFunction = (void(*)())NyaHookLib::PatchRelative(NyaHookLib::CALL, addr, &HookedFunction);
-		sName = name;
-	}
-};
-
 bool SetSoundVolumeFromRange(NyaAudio::NyaSound audio, NyaVec3 position, float sfxRange = 200.0, float sfxVolume = 1.0) {
 	auto plyPos = RenderToWorldCoords(PrepareCameraMatrix(GetLocalPlayerCamera()).p);
-
 	auto volume = (sfxRange - (plyPos - position).length()) / sfxRange;
 	volume *= sfxVolume;
 	if (volume > 1) volume = 1;
-	if (volume < 0) {
+	if (volume <= 0) {
 		return false;
 	}
 	NyaAudio::SetVolume(audio, GetSFXVolume() * volume);

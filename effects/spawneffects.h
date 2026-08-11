@@ -221,7 +221,9 @@ public:
 			}
 
 			if (audio) {
-				SetSoundVolumeFromRange(audio, obj->vColPosition, sfxRange, sfxVolume);
+				if (!SetSoundVolumeFromRange(audio, obj->vColPosition, sfxRange, sfxVolume)) {
+					NyaAudio::SetVolume(audio, 0.0);
+				}
 				if (NyaAudio::IsFinishedPlaying(audio)) {
 					NyaAudio::Play(audio);
 				}
@@ -554,6 +556,8 @@ public:
 				auto dir = (pos - obj->vColPosition);
 				dir.Normalize();
 
+				car.WakeObject();
+
 				auto iveh = car.GetVehicle();
 
 				bool doWeak = false;
@@ -632,6 +636,11 @@ public:
 
 	static void VergilOnTick(Render3DObjects::Object* obj, double delta) {
 		auto data = (tVergilData*)obj->CustomData;
+		if (obj->fHealth <= 0.0) {
+			if (data->audio) NyaAudio::Delete(&data->audio);
+			obj->aModels.clear();
+			return;
+		}
 
 		NyaVec3 plyPos = {0,0,0};
 		auto ply = GetLocalPlayerVehicle();
@@ -705,7 +714,9 @@ public:
 		}
 
 		if (data->audio) {
-			SetSoundVolumeFromRange(data->audio, obj->vColPosition, sfxRange, sfxVolume);
+			if (!SetSoundVolumeFromRange(data->audio, obj->vColPosition, sfxRange, sfxVolume)) {
+				NyaAudio::SetVolume(data->audio, 0.0);
+			}
 			if (NyaAudio::IsFinishedPlaying(data->audio)) {
 				NyaAudio::Play(data->audio);
 			}
@@ -944,6 +955,16 @@ public:
 		auto dist = (*ply->GetPosition() - obj->vColPosition).length();
 
 		auto data = (tScientistData*)obj->CustomData;
+		if (obj->fHealth <= 0.0) {
+			if (data->audio) NyaAudio::Delete(&data->audio);
+			if (data->launchAudio) NyaAudio::Delete(&data->launchAudio);
+
+			static auto deathSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain4.wav");
+			PlaySoundFromRange(deathSound, obj->vColPosition);
+			obj->aModels.clear();
+			return;
+		}
+
 		data->timer -= delta;
 		if (data->timer > 0) {
 			auto movePos = (*GetLocalPlayerVehicle()->GetPosition() - obj->vColPosition);
@@ -1019,6 +1040,7 @@ public:
 		aObjectsInWorld.push_back(id);
 		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("scientist", models, mat, mat.p, colScale, ScientistOnTick));
 		Render3DObjects::aObjects[id]->CustomData = new tScientistData;
+		Render3DObjects::aObjects[id]->fHealth = 10.0;
 	}
 
 	static inline NyaVec3 aHidingSpots[] = {
@@ -1540,15 +1562,15 @@ public:
 	}
 } E_PowerupBlock;
 
-class Effect_ExplosiveBarrel : public ChaosEffect {
+class Effect_SpawnExplosiveBarrel : public ChaosEffect {
 public:
-	Effect_ExplosiveBarrel() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+	Effect_SpawnExplosiveBarrel() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Explosive Barrels";
-		bAbortOnConditionFailed = true;
+		bCanMultiTrigger = true;
 	}
 
-	static inline float explosionRange = 50.0;
-	static inline float explosionPower = 100;
+	static inline float explosionRange = 50;
+	static inline float explosionPower = 50;
 	static inline float explosionPowerAng = 25;
 	static inline float explosionPowerWeakMult = 0.1;
 
@@ -1560,30 +1582,48 @@ public:
 
 		auto barrelPos = pThis->GetPosition();
 
-		auto objs = GetActiveSharedRigidBodies();
+		auto objs = GetActiveSharedRigidBodies(true);
 		for (auto& obj : objs) {
+			if (obj.pCustomStaticObject) {
+				obj.pCustomStaticObject->fHealth -= 25.0;
+				continue;
+			}
+
+			if (obj.pCustomObject == pThis) continue;
+
+			if (auto iveh = obj.GetVehicle()) {
+				if (auto rb = iveh->mCOMObject->Find<IRBVehicle>()) {
+					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
+				}
+			}
+
 			auto pos = obj.GetPosition();
 			auto dist = (pos - barrelPos).length();
 			if (dist < explosionRange) {
 				auto dir = (pos - barrelPos);
 				dir.Normalize();
 
-				auto iveh = obj.GetVehicle();
+				obj.WakeObject();
 
 				bool doWeak = false;
-				if (iveh && iveh->GetDriverClass() == DRIVER_HUMAN) {
-					StatTracker::nVergilKillsPlayer++;
+				if (auto iveh = obj.GetVehicle()) {
+					if (iveh->GetDriverClass() == DRIVER_HUMAN) {
+						if (SM64::bEnabled) {
+							SM64::OnTakeDamage(1, barrelPos, true);
+						}
 
-					if (SM64::bEnabled) {
-						SM64::OnTakeDamage(1, barrelPos, true);
+						if (GetEffectRunning("Juggernaut")) {
+							doWeak = true;
+						}
 					}
 
-					if (GetEffectRunning("Juggernaut")) {
-						doWeak = true;
+					if (iveh->GetDriverClass() == DRIVER_COP) {
+						DestroyCar(iveh);
 					}
 				}
 
 				float powerMult = doWeak ? explosionPowerWeakMult : 1.0;
+				powerMult *= (explosionRange - dist) / explosionRange;
 
 				auto vel = obj.GetLinearVelocity();
 				vel += dir * explosionPower * powerMult;
@@ -1592,10 +1632,6 @@ public:
 				auto avel = obj.GetAngularVelocity();
 				avel += dir * explosionPowerAng * powerMult;
 				obj.SetAngularVelocity(avel);
-
-				if (iveh && iveh->GetDriverClass() == DRIVER_COP) {
-					DestroyCar(iveh);
-				}
 			}
 		}
 
@@ -1621,11 +1657,8 @@ public:
 		objData.bRemoveOnSafehouse = false;
 		objData.bRemoveOnOutOfBounds = false;
 		objData.bRemoveOnOutOfRange = false;
-		objData.bAffectGamePhysics = true;
 		objData.sDebugName = "oildrum_save";
 		objData.pCollisionFunction = OnBarrelHit;
-		//objData.bUseExpensiveCollisionCheck = true;
-		//objData.pCollisionSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/roadcone.wav");
 		CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
 	}
 
@@ -1633,13 +1666,19 @@ public:
 		auto rb = GetLocalPlayerInterface<IRigidBody>();
 		auto ply = *rb->GetPosition();
 		auto vel = *rb->GetLinearVelocity();
+
 		UMath::Vector3 fwd;
 		rb->GetForwardVector(&fwd);
 
-		NyaVec3 pos = ply;
-		pos += fwd * 5;
-		pos.y += 2;
-		SpawnObject(pos, vel);
+		for (int x = -5; x < 5; x += 3) {
+			for (int y = -5; y < 5; y += 3) {
+				NyaVec3 pos = ply + (fwd * 15);
+				pos.x += x;
+				pos.y += 2;
+				pos.z += y;
+				SpawnObject(pos, vel);
+			}
+		}
 		DoChaosSave();
 	}
-} E_ExplosiveBarrel;
+} E_SpawnExplosiveBarrel;

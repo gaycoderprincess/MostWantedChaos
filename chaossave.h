@@ -486,6 +486,7 @@ void DoChaosSave() {
 	if (!DoChaosPhysicsObjectSave("abcblock_save", "abc")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosPhysicsObjectSave("metalball_save", "metalball")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosPhysicsObjectSave("trafficcone_save", "cone")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosPhysicsObjectSave("oildrum_save", "oildrum")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosRampSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSM64Save()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosPowerupsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
@@ -506,6 +507,7 @@ void DoChaosLoad() {
 	DoChaosPhysicsObjectLoad("abc", Effect_SpawnBlock::SpawnObject);
 	DoChaosPhysicsObjectLoad("metalball", Powerups::HeavyBall::SpawnObject<true>);
 	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
+	DoChaosPhysicsObjectLoad("oildrum", Effect_SpawnExplosiveBarrel::SpawnObject);
 	DoChaosRampLoad();
 	DoChaosSM64Load();
 	DoChaosPowerupsLoad();

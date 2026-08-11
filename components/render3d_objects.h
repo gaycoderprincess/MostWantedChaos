@@ -241,6 +241,8 @@ namespace Render3DObjects {
 		bool bNoEnvmap = false;
 		std::string sDebugName;
 
+		float fHealth = 100.0;
+
 		NyaVec3 vLastBarrierPosition = UMath::Vector3::kZero;
 		NyaVec3 vLastTriPosition = UMath::Vector3::kZero;
 		std::vector<CustomBarrier> Barriers = {};

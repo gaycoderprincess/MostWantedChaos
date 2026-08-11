@@ -529,24 +529,14 @@ namespace SM64 {
 		body->SetAngularVelocity(dir);
 	}
 
-	bool IsCustomObjectKillable(const Render3DObjects::Object* obj) {
+	bool IsCustomObjectInstaKillable(const Render3DObjects::Object* obj) {
 		if (obj->sDebugName == "vergil") return true;
 		if (obj->sDebugName == "scientist") return true;
 		return false;
 	}
 
-	bool IsCustomObjectPunchKillable(const Render3DObjects::Object* obj) {
-		if (obj->sDebugName == "scientist") return true;
-		return false;
-	}
-
-	void KillCustomObject(Render3DObjects::Object* obj) {
-		if (obj->sDebugName == "vergil") { // teleport vergil, cant remove his music from here
-			obj->vColPosition = obj->mMatrix.p = {0,-100,0};
-		}
-		else {
-			obj->aModels.clear();
-		}
+	void DamageCustomObject(Render3DObjects::Object* obj, float damage) {
+		obj->fHealth -= damage;
 	}
 
 	void MarioObjectInteractions() {
@@ -576,8 +566,8 @@ namespace SM64 {
 								sm64_play_sound_global(SOUND_GENERAL_BREAK_BOX);
 							}
 						}
-						if (obj.pCustomStaticObject && IsCustomObjectKillable(obj.pCustomStaticObject)) {
-							KillCustomObject(obj.pCustomStaticObject);
+						if (obj.pCustomStaticObject && IsCustomObjectInstaKillable(obj.pCustomStaticObject)) {
+							DamageCustomObject(obj.pCustomStaticObject, 99999.0);
 							sm64_play_sound_global(SOUND_GENERAL_BREAK_BOX);
 						}
 					}
@@ -601,8 +591,8 @@ namespace SM64 {
 				}
 				// punches & kicks throw forward
 				else if (interaction == INT_PUNCH || interaction == INT_KICK) {
-					if (obj.pCustomStaticObject && IsCustomObjectPunchKillable(obj.pCustomStaticObject)) {
-						KillCustomObject(obj.pCustomStaticObject);
+					if (obj.pCustomStaticObject) {
+						DamageCustomObject(obj.pCustomStaticObject, 10.0);
 					}
 					if (obj.HasPhysics()) {
 						MarioInteract_KnockFwd(&obj);
