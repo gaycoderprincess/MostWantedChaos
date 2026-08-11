@@ -1004,7 +1004,7 @@ void ChaosModMenu() {
 				ChloeMenuLib::BeginMenu();
 
 				for (int i = 0; i < Powerups::NUM_POWERUPS; i++) {
-					if (DrawMenuOption(std::format("give {}", i))) {
+					if (DrawMenuOption(std::format("give {}", Powerups::aPowerupNames[i]))) {
 						Powerups::RollPowerup(GetLocalPlayerVehicle());
 						Powerups::GetPowerupState(GetLocalPlayerVehicle())->GivePowerup(i);
 					}
