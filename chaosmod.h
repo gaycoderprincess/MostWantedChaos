@@ -457,7 +457,13 @@ void ChaosModMenu() {
 
 	if (DrawMenuOption("Voting")) {
 		ChloeMenuLib::BeginMenu();
-		QuickValueEditor("Voting Options", ChaosVoting::nNumVoteOptions);
+		{
+			auto old = ChaosVoting::nNumVoteOptions;
+			QuickValueEditor("Voting Options", ChaosVoting::nNumVoteOptions);
+			if (ChaosVoting::nNumVoteOptions != old && ChaosVoting::IsEnabled()) {
+				ChaosVoting::GenerateNewVotes();
+			}
+		}
 		QuickValueEditor("Two-Character Vote Command", ChaosVoting::bCVotes);
 		QuickValueEditor("Proportional Voting", ChaosVoting::bProportionalVotes);
 		if (!ChaosVoting::bProportionalVotes) {

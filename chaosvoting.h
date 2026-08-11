@@ -84,7 +84,19 @@ namespace ChaosVoting {
 		return false;
 	}
 
+	void CapVoteOptions() {
+		int minVoteOptions = 2;
+		int maxVoteOptions = 9;
+		if (bRandomEffectOption) {
+			minVoteOptions = 1;
+			maxVoteOptions = 8;
+		}
+		nNumVoteOptions = std::clamp(nNumVoteOptions, minVoteOptions, maxVoteOptions);
+	}
+
 	void GenerateNewVotes() {
+		CapVoteOptions();
+
 		aNextVotes.clear();
 
 		mVotingMutex.lock();
@@ -387,8 +399,7 @@ namespace ChaosVoting {
 	}
 
 	void Update() {
-		if (nNumVoteOptions < 2) nNumVoteOptions = 2;
-		if (nNumVoteOptions > 9) nNumVoteOptions = 9;
+		CapVoteOptions();
 
 		// first frame
 		if (aNewVotes.empty()) {
@@ -411,7 +422,7 @@ namespace ChaosVoting {
 			}
 		}
 
-		if (bRandomEffectOption && !IsRandomEffectInVotes()) {
+		if (bRandomEffectOption && !IsRandomEffectInVotes() && aNewVotes.size() < 9) {
 			AddRandomEffectToVotes();
 		}
 		if (!bRandomEffectOption && IsRandomEffectInVotes()) {
