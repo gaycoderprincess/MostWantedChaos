@@ -8,7 +8,7 @@ namespace Powerups {
 
 	double fTimeSinceMarioSpawned = 0.0;
 
-	void PlayAudioFromCar(NyaAudio::NyaSound sound, IRigidBody* veh) {
+	void PlayAudioFromCar(NyaAudio::NyaSound sound, IRigidBody* veh, bool mk64Volume = false) {
 		if (!sound) return;
 
 		float volume = 1.0;
@@ -22,13 +22,13 @@ namespace Powerups {
 		}
 
 		if (volume <= 0.0) return;
-		NyaAudio::SetVolume(sound, volume * GetSFXVolume() * sfxVolumeMultiplier);
+		NyaAudio::SetVolume(sound, volume * GetSFXVolume() * (mk64Volume ? sfxVolumeMultiplierMK64 : sfxVolumeMultiplier));
 		NyaAudio::SkipTo(sound, 0, false);
 		NyaAudio::Play(sound);
 	}
 
-	void PlayAudioFromCar(NyaAudio::NyaSound sound, IVehicle* veh) {
-		return PlayAudioFromCar(sound, veh->mCOMObject->Find<IRigidBody>());
+	void PlayAudioFromCar(NyaAudio::NyaSound sound, IVehicle* veh, bool mk64Volume = false) {
+		return PlayAudioFromCar(sound, veh->mCOMObject->Find<IRigidBody>(), mk64Volume);
 	}
 
 	namespace ReVoltBomb {
@@ -575,11 +575,12 @@ namespace Powerups {
 		NyaAudio::NyaSound balldrop = 0;
 		NyaAudio::NyaSound starfire = 0;
 		NyaAudio::NyaSound wbombfire = 0;
+		NyaAudio::NyaSound mushroom = 0;
 
 		bool ExecutePowerup() {
 			switch (PowerupID) {
 				case POWERUP_ELECTROPULSE:
-					fElectroTime = 15.0;
+					fElectroTime = pUser->GetDriverClass() == DRIVER_COP ? 7.0 : 15.0;
 					return true;
 				case POWERUP_CLONE: {
 					SpawnFakePowerupBlock(pUser->mCOMObject->Find<IRigidBody>());
@@ -607,6 +608,9 @@ namespace Powerups {
 				case POWERUP_MUSHROOMPACK:
 				{
 					pUser->SetSpeed(pUser->GetAIVehiclePtr()->GetTopSpeed());
+
+					if (!mushroom) mushroom = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/mushroom.mp3");
+					PlayAudioFromCar(mushroom, pUser, true);
 					return true;
 				} break;
 				case POWERUP_INVINCIBLE: {
@@ -647,6 +651,7 @@ namespace Powerups {
 					for (auto& car : cars) {
 						if (car == pUser) continue;
 						if (IsCarDestroyed(car)) continue;
+						if (pUser->GetDriverClass() == DRIVER_COP && car->GetDriverClass() == DRIVER_COP) continue;
 						if (auto rb = car->mCOMObject->Find<IRBVehicle>()) {
 							if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
 						}
@@ -688,15 +693,17 @@ namespace Powerups {
 		}
 
 		void GivePowerup(int id) {
+			bool isCop = pUser->GetDriverClass() == DRIVER_COP;
+
 			if (!bIsLocalPlayer && bDebugPrintsEnabled) {
-				CwoeeHints::AddHint(std::format("opponent rolled {} after {:.2f}", aPowerupNames[id], aTimeSinceRolled[id]), 5.0);
+				CwoeeHints::AddHint(std::format("{} rolled {} after {:.2f}", pUser->GetVehicleName(), aPowerupNames[id], aTimeSinceRolled[id]), 5.0);
 			}
 			aTimeSinceRolled[id] = 0.0;
 
 			PowerupID = id;
 			PowerupCount = (PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_BEACHBALL || PowerupID == POWERUP_MUSHROOMPACK) ? 3 : 1;
 			if (bMK64Style) {
-				fRollTime = 5.0;
+				fRollTime = isCop ? 2.0 : 5.0;
 
 				if (!bIsLocalPlayer) return;
 
@@ -706,7 +713,7 @@ namespace Powerups {
 				NyaAudio::Play(gPickupSound);
 			}
 			else {
-				fRollTime = 4.0;
+				fRollTime = isCop ? 2.0 : 4.0;
 
 				static auto sound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/pickup.wav");
 				PlayAudioFromCar(sound, pUser);
@@ -715,6 +722,7 @@ namespace Powerups {
 
 		int GetRacePlacement() {
 			if (!GRaceStatus::fObj) return -1;
+			if (IsInPursuitRace()) return -1;
 			if (auto ply = GRaceStatus::fObj->GetRacerInfo(pUser->GetSimable())) {
 				return ply->mRanking;
 			}
@@ -723,6 +731,7 @@ namespace Powerups {
 
 		int GetPlayerRacePlacement() {
 			if (!GRaceStatus::fObj) return -1;
+			if (IsInPursuitRace()) return -1;
 			if (auto ply = GRaceStatus::fObj->GetRacerInfo(GetLocalPlayerSimable())) {
 				return ply->mRanking;
 			}
@@ -731,6 +740,7 @@ namespace Powerups {
 
 		void RollPowerup() {
 			bool isPlayer = pUser->GetDriverClass() == DRIVER_HUMAN;
+			bool isCop = pUser->GetDriverClass() == DRIVER_COP;
 			bool hasNOS = false;
 			if (auto engine = pUser->mCOMObject->Find<IEngine>()) {
 				hasNOS = engine->HasNOS();
@@ -747,7 +757,7 @@ namespace Powerups {
 			bool isLastPlace = false;
 			int playerPlacement = GetPlayerRacePlacement();
 			int placement = GetRacePlacement();
-			if (GRaceStatus::fObj) {
+			if (IsInNormalRace()) {
 				isFirstPlace = placement == 1;
 				isLastPlace = placement == GRaceStatus::fObj->mRacerCount;
 			}
@@ -756,47 +766,70 @@ namespace Powerups {
 				isLastPlace = false;
 			}
 
-			float speedKMH = TOKMH(pUser->GetSpeed());
-
 			std::vector<int> powerupsAvailable;
-			for (int i = 0; i < NUM_POWERUPS; i++) {
-				if (aTimeSinceRolled[i] < 20.0) continue;
+			if (isCop) {
+				float heatLevel = GetLocalPlayerInterface<IPerpetrator>()->GetHeat();
+				int numCops = GetActiveVehicles(DRIVER_COP).size();
+				for (int i = 0; i < NUM_POWERUPS; i++) {
+					if (aTimeSinceRolled[i] < 20.0) continue;
 
-				if (i == POWERUP_MARIO && !SM64::bAvailable) continue;
-				if (i == POWERUP_MARIO && fTimeSinceMarioSpawned < 30.0) continue;
+					if (i == POWERUP_MARIO && !SM64::bAvailable) continue;
+					if (i == POWERUP_MARIO && fTimeSinceMarioSpawned < 30.0) continue;
 
-				if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
-				if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
-				if (isLastPlace && i == POWERUP_MARIO) continue;
-				if (isFirstPlace && i == POWERUP_FIREWORK) continue;
-				if (isFirstPlace && i == POWERUP_FIREWORKPACK) continue;
-				//if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
-				if (isFirstPlace && i == POWERUP_STAR) continue;
-				if (isFirstPlace && i == POWERUP_MUSHROOMPACK) continue;
+					if (i == POWERUP_PUTTYBOMB && numCops <= 3) continue;
+					if (i == POWERUP_CLONE && ReVoltFirework::PickTarget(GetLocalPlayerVehicle()) != pUser) continue;
 
-				if (!isPlayer && i == POWERUP_STAR) {
-					if (playerPlacement != 1) continue;
-					if (!isLastPlace) continue;
-				}
+					// these two are pretty OP
+					if (i == POWERUP_ELECTROPULSE && heatLevel < 3.0) continue;
+					if (i == POWERUP_STAR && heatLevel < 2.0) continue;
+					if (i == POWERUP_ELECTROPULSE && heatLevel < 6.0 && !PercentageChanceCheck(25)) continue;
+					if (i == POWERUP_STAR && heatLevel < 6.0 && !PercentageChanceCheck(25)) continue;
 
-				if (isPlayer && !hasNOS && i == POWERUP_TURBO) continue; // turbo is forced infinite nos for player, catchup + nos for ai
+					if (i == POWERUP_MUSHROOM || i == POWERUP_MUSHROOMPACK) continue;
 
-				// dont reroll the same stuff multiple times
-				if (isResetting && i == POWERUP_INVINCIBLE) continue;
-				if (fElectroTime > 0.0 && i == POWERUP_ELECTROPULSE) continue;
-				if (fTurboTime > 0.0 && i == POWERUP_TURBO) continue;
+					if (i == POWERUP_TURBO) continue;
 
-				if (speedKMH >= 290 && (i == POWERUP_MUSHROOM || i == POWERUP_MUSHROOMPACK)) continue; // mushroom sets speed to 300
-
-				int countToAdd = 1;
-				if (i == POWERUP_STAR && !isPlayer && placement >= 4 && playerPlacement == 1) {
-					countToAdd = 2;
-				}
-				if (i == POWERUP_TURBO && !isPlayer && playerPlacement == 1) {
-					countToAdd = 3;
-				}
-				for (int j = 0; j < countToAdd; j++) {
 					powerupsAvailable.push_back(i);
+				}
+			}
+			else {
+				for (int i = 0; i < NUM_POWERUPS; i++) {
+					if (aTimeSinceRolled[i] < 20.0) continue;
+
+					if (i == POWERUP_MARIO && !SM64::bAvailable) continue;
+					if (i == POWERUP_MARIO && fTimeSinceMarioSpawned < 30.0) continue;
+
+					if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
+					if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
+					if (isLastPlace && i == POWERUP_MARIO) continue;
+					if (isFirstPlace && i == POWERUP_FIREWORK) continue;
+					if (isFirstPlace && i == POWERUP_FIREWORKPACK) continue;
+					//if (isFirstPlace && i == POWERUP_BEACHBALL) continue;
+					if (isFirstPlace && i == POWERUP_STAR) continue;
+					if (isFirstPlace && i == POWERUP_MUSHROOMPACK) continue;
+
+					if (!isPlayer && i == POWERUP_STAR) {
+						if (playerPlacement != 1) continue;
+						if (!isLastPlace) continue;
+					}
+
+					if (isPlayer && !hasNOS && i == POWERUP_TURBO) continue; // turbo is forced infinite nos for player, catchup + nos for ai
+
+					// dont reroll the same stuff multiple times
+					if (isResetting && i == POWERUP_INVINCIBLE) continue;
+					if (fElectroTime > 0.0 && i == POWERUP_ELECTROPULSE) continue;
+					if (fTurboTime > 0.0 && i == POWERUP_TURBO) continue;
+
+					int countToAdd = 1;
+					if (i == POWERUP_STAR && !isPlayer && placement >= 4 && playerPlacement == 1) {
+						countToAdd = 2;
+					}
+					if (i == POWERUP_TURBO && !isPlayer && playerPlacement == 1) {
+						countToAdd = 3;
+					}
+					for (int j = 0; j < countToAdd; j++) {
+						powerupsAvailable.push_back(i);
+					}
 				}
 			}
 			if (powerupsAvailable.empty()) return;
@@ -870,6 +903,7 @@ namespace Powerups {
 
 		bool HasFired() {
 			if (pUser->IsStaging()) return false;
+			if (IsCarDestroyed(pUser)) return false;
 
 			if (pUser == GetLocalPlayerVehicle()) {
 				return IsKeyJustPressed('X') || IsPadKeyJustPressed(NYA_PAD_KEY_X);
@@ -877,8 +911,11 @@ namespace Powerups {
 
 			if (PowerupID == POWERUP_FIREWORK || PowerupID == POWERUP_FIREWORKPACK || PowerupID == POWERUP_BEACHBALL) {
 				if (fTimeSinceLastFire < 0.5) return false;
+				auto target = ReVoltFirework::PickTargetAI(pUser);
 
-				return ReVoltFirework::PickTargetAI(pUser) != nullptr;
+				// prevent cop friendly fire
+				if (target && pUser->GetDriverClass() == DRIVER_COP && target->GetDriverClass() != DRIVER_HUMAN) return false;
+				return target != nullptr;
 			}
 			if (PowerupID == POWERUP_MUSHROOM || PowerupID == POWERUP_MUSHROOMPACK) {
 				if (fTimeSinceLastFire < 1.0) return false;
@@ -888,6 +925,7 @@ namespace Powerups {
 			if (PowerupID == POWERUP_ELECTROPULSE) {
 				if (!GetZappedCars().empty()) return true; // use pulse if cars are nearby
 				if (GetPlayerRacePlacement() == 1) return true; // immediately use pulse if player is in first so we don't hoard it
+				if (pUser->GetDriverClass() == DRIVER_COP) return true; // immediately use if cop, otherwise this is way too OP
 				return false;
 			}
 			return true;
@@ -900,6 +938,7 @@ namespace Powerups {
 			auto cars = GetActiveVehicles();
 			for (auto& car : cars) {
 				if (car == pUser) continue;
+				if (pUser->GetDriverClass() == DRIVER_COP && car->GetDriverClass() == DRIVER_COP) continue;
 				//if (IsCarDestroyed(car)) continue;
 				if (auto rb = car->mCOMObject->Find<IRBVehicle>()) {
 					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
@@ -1075,7 +1114,9 @@ namespace Powerups {
 
 			auto cars = GetActiveVehicles();
 			for (auto& car : cars) {
-				if (car->GetDriverClass() != DRIVER_HUMAN && car->GetDriverClass() != DRIVER_RACER) continue;
+				auto driver = car->GetDriverClass();
+				if (driver == DRIVER_COP && IsCarDestroyed(car)) continue;
+				if (driver != DRIVER_HUMAN && driver != DRIVER_RACER && driver != DRIVER_COP) continue;
 
 				if (car == pUser) return true;
 			}
@@ -1098,6 +1139,19 @@ namespace Powerups {
 			fTimeSinceLastFire = 0.0;
 			fElectroTime = 0.0;
 			fTurboTime = 0.0;
+		}
+
+		void StopSounds() {
+			NyaAudio::Stop(electro);
+			NyaAudio::Stop(electrozap);
+		}
+
+		void DeleteSounds() {
+			if (electro) NyaAudio::Delete(&electro);
+			if (electrozap) NyaAudio::Delete(&electrozap);
+			if (balldrop) NyaAudio::Delete(&balldrop);
+			if (starfire) NyaAudio::Delete(&starfire);
+			if (wbombfire) NyaAudio::Delete(&wbombfire);
 		}
 	};
 	std::vector<PowerupState> aPowerupStates;
@@ -1143,6 +1197,7 @@ namespace Powerups {
 	bool DespawnCleanup() {
 		for (auto& state : aPowerupStates) {
 			if (!state.bIsLocalPlayer && !state.IsValid()) {
+				state.DeleteSounds();
 				aPowerupStates.erase(aPowerupStates.begin() + (&state - &aPowerupStates[0]));
 				return true;
 			}
@@ -1232,6 +1287,7 @@ namespace Powerups {
 
 			auto cars = GetActiveVehicles();
 			for (auto& car : cars) {
+				if (IsCarDestroyed(car)) continue;
 				if (car->GetDriverClass() != DRIVER_HUMAN && car->GetDriverClass() != DRIVER_RACER) continue;
 				if (car->GetDriverClass() == DRIVER_HUMAN && !canPlayerPowerup) continue;
 
@@ -1273,7 +1329,7 @@ namespace Powerups {
 			else {
 				aObjectsInWorld.push_back(id);
 			}
-			Render3DObjects::aObjects.push_back(new Render3DObjects::Object("powerup", bMK64Style ? models_MK : models_RV, mat, {0,0,0}, 0, BombOnTick<isFake>));
+			Render3DObjects::aObjects.push_back(new Render3DObjects::Object(isFake ? "fakepowerup" : "powerup", bMK64Style ? models_MK : models_RV, mat, {0,0,0}, 0, BombOnTick<isFake>));
 			Render3DObjects::aObjects[id]->bUseAlpha = true;
 			Render3DObjects::aObjects[id]->CustomData = new PowerupBlockData;
 		}
@@ -1345,6 +1401,9 @@ namespace Powerups {
 				bPickupSoundPaused = true;
 				NyaAudio::Stop(gPickupSound);
 			}
+			for (auto& state : aPowerupStates) {
+				state.StopSounds();
+			}
 			return;
 		}
 
@@ -1353,13 +1412,17 @@ namespace Powerups {
 			bPickupSoundPaused = false;
 		}
 
+		if (Sim::Internal::mSystem->mSpeed < 1.0 && !NyaAudio::IsFinishedPlaying(gPickupSound)) {
+			NyaAudio::Stop(gPickupSound);
+		}
+
 		static CNyaTimer gTimer;
 		gTimer.Process();
-		fTimeSinceMarioSpawned += gTimer.fDeltaTime;
+		fTimeSinceMarioSpawned += gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
 
 		for (auto& state : aPowerupStates) {
 			if (!state.IsValid()) continue;
-			state.Process(gTimer.fDeltaTime);
+			state.Process(gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed);
 		}
 
 		auto powerup = GetPowerupState(GetLocalPlayerVehicle());
@@ -1387,17 +1450,19 @@ namespace Powerups {
 			if (obj->sDebugName != "bomb" && obj->sDebugName != "powerup") continue;
 			obj->aModels.clear();
 		}
-		SM64::bEnemyEnabled = false;
 	}
 
 	bool bShouldSpawnPowerups = false;
 	void PowerupMod_OnTick() {
 		if (TheGameFlowManager.CurrentGameFlowState != GAMEFLOW_STATE_RACING) return;
 		if (IsInLoadingScreen() || IsInNIS()) return;
+		if (FEManager::mPauseRequest) return;
 
 		static double fPursuitPowerupTimer = 0.0;
+		static double fPursuitCopPowerupTimer = 0.0;
 		if (IsInNormalRace()) {
 			fPursuitPowerupTimer = 0.0;
+			fPursuitCopPowerupTimer = 0.0;
 
 			if (IsLocalPlayerStaging()) {
 				// no starting nos
@@ -1406,6 +1471,7 @@ namespace Powerups {
 				}
 
 				CleanupOldPowerups();
+				SM64::bEnemyEnabled = false;
 				bShouldSpawnPowerups = true;
 
 				for (auto& state : aPowerupStates) {
@@ -1429,11 +1495,30 @@ namespace Powerups {
 			// powerups every 30 seconds in pursuits
 			static CNyaTimer gTimer;
 			gTimer.Process();
-			if (IsInAnyPursuit() && !PlayerHasPowerup(GetLocalPlayerVehicle())) {
-				fPursuitPowerupTimer += gTimer.fDeltaTime;
-				if (fPursuitPowerupTimer > 30.0) {
-					RollPowerup(GetLocalPlayerVehicle());
-					fPursuitPowerupTimer = 0;
+			if (IsInAnyPursuit()) {
+				float heatLevel = GetLocalPlayerInterface<IPerpetrator>()->GetHeat();
+
+				float copPowerupInterval = 10.0;
+				if (heatLevel < 2.0) copPowerupInterval = 15.0;
+				if (heatLevel >= 5.0) copPowerupInterval = 6.0;
+
+				fPursuitCopPowerupTimer += gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
+				if (fPursuitCopPowerupTimer > copPowerupInterval) {
+					auto cars = GetActiveVehicles(DRIVER_COP);
+					if (!cars.empty()) {
+						auto car = cars[rand()%cars.size()];
+						if (!IsCarDestroyed(car) && strcmp(car->GetVehicleName(), "copheli") && !PlayerHasPowerup(car) && !car->GetAIVehiclePtr()->GetRoadBlock()) {
+							RollPowerup(car);
+							fPursuitCopPowerupTimer = 0;
+						}
+					}
+				}
+				if (!PlayerHasPowerup(GetLocalPlayerVehicle())) {
+					fPursuitPowerupTimer += gTimer.fDeltaTime * Sim::Internal::mSystem->mSpeed;
+					if (fPursuitPowerupTimer > 30.0) {
+						RollPowerup(GetLocalPlayerVehicle());
+						fPursuitPowerupTimer = 0;
+					}
 				}
 			}
 		}

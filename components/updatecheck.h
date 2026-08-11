@@ -22,8 +22,6 @@ namespace UpdateChecker {
 
 		auto currVersion = std::stof(CWOEECHAOS_VERSION);
 		auto newVersion = std::stof(versionStr);
-		WriteLog(std::format("currVersion {}", currVersion));
-		WriteLog(std::format("newVersion {}", newVersion));
 		bUpdateAvailable = newVersion > currVersion;
 		if (bUpdateAvailable) {
 			CwoeeHints::AddHint(std::format("Update available! {} -> {}", CWOEECHAOS_VERSION, versionStr), 60);
@@ -58,7 +56,6 @@ namespace UpdateChecker {
 			while (line.length() > endId) {
 				line.pop_back();
 			}
-			WriteLog(line);
 			CheckVersion(line);
 		}
 		file.close();
