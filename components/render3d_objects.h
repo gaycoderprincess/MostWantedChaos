@@ -547,6 +547,12 @@ namespace Render3DObjects {
 	};
 	std::vector<Object*> aObjects;
 
+	void GenericHPOnTick(Object* obj, double delta) {
+		if (obj->fHealth <= 0.0) {
+			obj->aModels.clear();
+		}
+	}
+
 	void OnTick() {
 		static CNyaTimer gTimer;
 		gTimer.Process();

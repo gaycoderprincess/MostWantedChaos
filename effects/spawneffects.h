@@ -105,8 +105,9 @@ public:
 
 		auto id = Render3DObjects::aObjects.size();
 		aTeddiesInWorld.push_back(id);
-		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("teddie", models, mat, colPos, colScale));
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("teddie", models, mat, colPos, colScale, Render3DObjects::GenericHPOnTick));
 		Render3DObjects::aObjects[id]->fColHeight = 3.0;
+		Render3DObjects::aObjects[id]->fHealth = 25.0;
 	}
 
 	void InitFunction() override {
@@ -943,24 +944,32 @@ public:
 	struct tScientistData {
 		double timer = 0;
 		NyaAudio::NyaSound audio = 0;
-		NyaAudio::NyaSound launchAudio = 0;
+		float lastHealth = 0.0;
 	};
 
-	NyaAudio::NyaSound sound = 0;
-
 	static void ScientistOnTick(Render3DObjects::Object* obj, double delta) {
+		static NyaAudio::NyaSound hurtSounds[] = {
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain1.wav"),
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain2.wav"),
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain3.wav"),
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain4.wav"),
+				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain5.wav"),
+		};
+
 		auto ply = GetLocalPlayerVehicle();
 		if (!ply) return;
 
 		auto dist = (*ply->GetPosition() - obj->vColPosition).length();
 
 		auto data = (tScientistData*)obj->CustomData;
+		if (obj->fHealth < data->lastHealth) {
+			PlaySoundFromRange(hurtSounds[rand()%(sizeof(hurtSounds)/sizeof(hurtSounds[0]))], obj->vColPosition);
+		}
+		data->lastHealth = obj->fHealth;
+
 		if (obj->fHealth <= 0.0) {
 			if (data->audio) NyaAudio::Delete(&data->audio);
-			if (data->launchAudio) NyaAudio::Delete(&data->launchAudio);
 
-			static auto deathSound = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain4.wav");
-			PlaySoundFromRange(deathSound, obj->vColPosition);
 			obj->aModels.clear();
 			return;
 		}
@@ -1002,12 +1011,9 @@ public:
 
 				NyaAudio::Delete(&data->audio);
 
-				if (!data->launchAudio) data->launchAudio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/sci_pain4.wav");
-				if (data->launchAudio) {
-					NyaAudio::SetVolume(data->launchAudio, GetSFXVolume());
-					if (NyaAudio::IsFinishedPlaying(data->launchAudio)) {
-						NyaAudio::Play(data->launchAudio);
-					}
+				if (auto sound = hurtSounds[3]) {
+					NyaAudio::SetVolume(sound, GetSFXVolume());
+					NyaAudio::Play(sound);
 				}
 			}
 		}
@@ -1575,23 +1581,20 @@ public:
 	static inline float explosionPowerWeakMult = 0.1;
 
 	static void OnBarrelHit(CustomPhysicsObjects::CustomPhysicsObject* pThis, b3BodyId otherBody) {
-		//auto rb = CustomPhysics::GetGameBodyForB3Body(otherBody);
-		//if (!rb) return;
-
 		if (b3Body_GetType(otherBody) == b3_staticBody) return;
+
+		auto collidedVeh = CustomPhysics::GetVehicleForB3Body(otherBody);
+		if (collidedVeh && !strcmp(collidedVeh->GetVehicleName(), "copheli")) return;
 
 		auto barrelPos = pThis->GetPosition();
 
 		auto objs = GetActiveSharedRigidBodies(true);
 		for (auto& obj : objs) {
-			if (obj.pCustomStaticObject) {
-				obj.pCustomStaticObject->fHealth -= 25.0;
-				continue;
-			}
-
 			if (obj.pCustomObject == pThis) continue;
 
 			if (auto iveh = obj.GetVehicle()) {
+				if (!strcmp(iveh->GetVehicleName(), "copheli")) continue;
+
 				if (auto rb = iveh->mCOMObject->Find<IRBVehicle>()) {
 					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
 				}
@@ -1625,13 +1628,19 @@ public:
 				float powerMult = doWeak ? explosionPowerWeakMult : 1.0;
 				powerMult *= (explosionRange - dist) / explosionRange;
 
-				auto vel = obj.GetLinearVelocity();
-				vel += dir * explosionPower * powerMult;
-				obj.SetLinearVelocity(vel);
+				if (obj.pCustomStaticObject) {
+					obj.pCustomStaticObject->fHealth -= 25.0 * powerMult;
+					continue;
+				}
+				else {
+					auto vel = obj.GetLinearVelocity();
+					vel += dir * explosionPower * powerMult;
+					obj.SetLinearVelocity(vel);
 
-				auto avel = obj.GetAngularVelocity();
-				avel += dir * explosionPowerAng * powerMult;
-				obj.SetAngularVelocity(avel);
+					auto avel = obj.GetAngularVelocity();
+					avel += dir * explosionPowerAng * powerMult;
+					obj.SetAngularVelocity(avel);
+				}
 			}
 		}
 

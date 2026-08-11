@@ -530,6 +530,7 @@ namespace SM64 {
 	}
 
 	bool IsCustomObjectInstaKillable(const Render3DObjects::Object* obj) {
+		if (obj->sDebugName == "teddie") return true;
 		if (obj->sDebugName == "vergil") return true;
 		if (obj->sDebugName == "scientist") return true;
 		return false;

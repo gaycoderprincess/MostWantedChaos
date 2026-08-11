@@ -456,4 +456,5 @@ bool RunningEffectsCleanup() {
 #include "effects/effect_dance.h"
 #include "effects/effect_mousedrag.h"
 #include "effects/effect_backrooms.h"
+#include "effects/effect_copbarrel.h"
 #include "effects/unfaireffects.h"

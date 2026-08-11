@@ -930,7 +930,7 @@ float BACKROOMS_DISTANCE = 400.0;
 float BACKROOMS_FLOOR_Y = -14.0933;
 bool GetWorldHeightAtPoint_WithCustom(const UMath::Vector3* pt, float* height, UMath::Vector3* normal) {
 	auto pt2d = *pt;
-	pt2d.y = 0;
+	pt2d.y = BACKROOMS_COORDS.y;
 	if ((pt2d-BACKROOMS_COORDS).length() < BACKROOMS_DISTANCE) {
 		if (height) {
 			*height = BACKROOMS_COORDS.y + BACKROOMS_FLOOR_Y;

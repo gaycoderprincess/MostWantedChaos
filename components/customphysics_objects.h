@@ -42,6 +42,10 @@ namespace CustomPhysicsObjects {
 
 		bool bQueuedForDeletion = false;
 
+		bool bAABBCalculated = false;
+		NyaVec3 vAABBMin;
+		NyaVec3 vAABBMax;
+
 		void AddCollision(IRigidBody* body) {
 			for (auto& obj : aLastCollidedGameObject) {
 				if (obj.body == body) {
@@ -72,6 +76,29 @@ namespace CustomPhysicsObjects {
 		UMath::Vector3 GetAngularVelocity() {
 			auto v = b3Body_GetAngularVelocity(nB3Body);
 			return {v.x,v.y,v.z};
+		}
+
+		void CalculateAABB() {
+			if (!bAABBCalculated) {
+				auto aabb = b3Body_ComputeAABB(nB3Body);
+				vAABBMin.x = aabb.lowerBound.x;
+				vAABBMin.y = aabb.lowerBound.y;
+				vAABBMin.z = aabb.lowerBound.z;
+				vAABBMax.x = aabb.upperBound.x;
+				vAABBMax.y = aabb.upperBound.y;
+				vAABBMax.z = aabb.upperBound.z;
+				bAABBCalculated = true;
+			}
+		}
+
+		NyaVec3 GetAABBMin() {
+			CalculateAABB();
+			return vAABBMin;
+		}
+
+		NyaVec3 GetAABBMax() {
+			CalculateAABB();
+			return vAABBMax;
 		}
 
 		void SetLinearVelocity(const UMath::Vector3* v) {
@@ -535,12 +562,13 @@ public:
 			return out;
 		}
 		if (pCustomObject) {
-			auto aabb = b3Body_ComputeAABB(pCustomObject->nB3Body);
+			auto aabbMin = pCustomObject->GetAABBMin();
+			auto aabbMax = pCustomObject->GetAABBMax();
 
 			UMath::Vector3 out;
-			out.x = std::max(std::abs(aabb.lowerBound.x), std::abs(aabb.upperBound.x));
-			out.y = std::max(std::abs(aabb.lowerBound.y), std::abs(aabb.upperBound.y));
-			out.z = std::max(std::abs(aabb.lowerBound.z), std::abs(aabb.upperBound.z));
+			out.x = std::max(std::abs(aabbMin.x), std::abs(aabbMax.x));
+			out.y = std::max(std::abs(aabbMin.y), std::abs(aabbMax.y));
+			out.z = std::max(std::abs(aabbMin.z), std::abs(aabbMax.z));
 			return out;
 		}
 		if (pCustomStaticObject) {
