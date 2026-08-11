@@ -113,7 +113,6 @@ Forced Speedbreaker
 Forcefield On Random Car
 Forza Rewind
 Fragile Cars
-Freeze Camera
 Full Chat Chaos Control
 Give $5000 (FIVE GRAND)
 Give Other Cars Firework Rockets
@@ -158,6 +157,7 @@ Launch Player Sideways
 Launch Player Up
 Leaking Fuel Tank
 Lobotomized Traffic
+Lock Camera In Place
 Lock Opponents In Place
 Lock Player In Place
 Lock Player Rotation
@@ -176,6 +176,7 @@ New Opponents Are M3 GTRs
 New Opponents Copy Your Car
 New Opponents Steal Your Cars
 Nitro Boosting
+Normal Race HUD
 Nothing Happens
 Occasional Backstreet Boys
 Opponents Rubberband (FUCKING RUBBERBAND)
@@ -229,6 +230,7 @@ Set Heat Level To 6
 Shaky Cars (Visual) (Snap To Grid)
 Shoutouts to JJ902
 Shuffled Letters
+Sideways Gravity
 Simplified Physics For Player
 Skip Current Song
 Skyfall
@@ -294,5 +296,6 @@ Wide Cars
 Widescreen Borders
 Wireframe Mode
 Wireframe World
+Zero Gravity
 Zero Opponent Mass
 Zero Player Mass

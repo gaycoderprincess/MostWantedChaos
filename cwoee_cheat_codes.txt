@@ -89,7 +89,6 @@ ForcePlayerToTopGear (TopGear)
 ForcedRearView
 ForcefieldOnRandomCar
 ForzaRewind
-FreezeCamera
 Give5000 (FIVEGRAND)
 GiveOtherCarsFireworkRockets
 GlitchyVisuals
@@ -128,6 +127,7 @@ LaunchPlayerSideways
 LaunchPlayerUp
 LeakingFuelTank
 LobotomizedTraffic
+LockCameraInPlace
 LockOpponentsInPlace
 LockPlayerInPlace
 LockPlayerRotation
@@ -144,6 +144,7 @@ NewOpponentsAreM3GTRs
 NewOpponentsCopyYourCar
 NewOpponentsStealYourCars
 NitroBoosting
+NormalRaceHUD
 NothingHappens
 OccasionalBackstreetBoys
 OpponentsRubberband (FUCKINGRUBBERBAND)
@@ -185,6 +186,7 @@ SetHeatLevelTo6
 ShakyCarsVisual (SnapToGrid)
 ShoutoutstoJJ902
 ShuffledLetters
+SidewaysGravity
 SimplifiedPhysicsForPlayer
 SkipCurrentSong
 Skyfall
@@ -233,5 +235,6 @@ WideCars
 WidescreenBorders
 WireframeMode
 WireframeWorld
+ZeroGravity
 ZeroOpponentMass
 ZeroPlayerMass

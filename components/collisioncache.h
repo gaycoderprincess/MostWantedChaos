@@ -165,8 +165,7 @@ namespace CollisionCache {
 
 			if (!aCachedCollisions[i].aInstances.empty()) continue;
 
-			aCachedCollisions[i].aInstances.reserve(128);
-			for (int j = 0; j < pack->mInstanceNum && j < 128; j++) {
+			for (int j = 0; j < pack->mInstanceNum; j++) {
 				ProcessCollisionArticle(i, &pack->mInstanceList[j]);
 			}
 		}
