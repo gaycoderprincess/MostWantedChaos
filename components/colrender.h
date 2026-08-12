@@ -337,7 +337,7 @@ namespace CollView {
 		if (!bEnabled) return;
 		
 		if (auto ply = GetLocalPlayerInterface<IRigidBody>()) {
-			Render3D::bNoEffect_ReadVertexColor = true;
+			Render3D::RendererConfig.bNoEffect_ReadVertexColor = true;
 
 			aCollisionTris.clear();
 			aCollisionBarriers.clear();
@@ -438,7 +438,7 @@ namespace CollView {
 
 			UpdateMarioCollision();
 
-			Render3D::bNoEffect_ReadVertexColor = false;
+			Render3D::RendererConfig.bNoEffect_ReadVertexColor = false;
 		}
 
 		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);

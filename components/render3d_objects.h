@@ -510,11 +510,11 @@ namespace Render3DObjects {
 		}
 
 		void Render() {
-			if (bNoBackfaceCulling) { Render3D::bForceNoCulling = true; }
+			if (bNoBackfaceCulling) { Render3D::RendererConfig.bForceNoCulling = true; }
 			for (auto& model : aModels) {
 				model->RenderAt(WorldToRenderMatrix(mMatrix), bUseAlpha);
 			}
-			if (bNoBackfaceCulling) { Render3D::bForceNoCulling = false; }
+			if (bNoBackfaceCulling) { Render3D::RendererConfig.bForceNoCulling = false; }
 		}
 
 		void Destroy(bool deleteModels) {

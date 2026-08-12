@@ -275,7 +275,7 @@ void DrawPerformanceWarnings(double delta) {
 	// if 3d object takes too long, force them to not use effect
 	// (only if debug mode isnt on)
 	if (bTimerEnabled && !GetModuleHandleA("X360Stuff.asi") && fTimeRender3DBorked > 2.0) {
-		Render3D::bForceNoEffect = true;
+		Render3D::RendererConfig.bForceNoEffect = true;
 	}
 }
 
@@ -553,32 +553,32 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Car Shader Debug")) {
 			ChloeMenuLib::BeginMenu();
 
-			QuickValueEditor("fDIFFUSEMIN.x", Render3D::fDIFFUSEMIN.x);
-			QuickValueEditor("fDIFFUSEMIN.y", Render3D::fDIFFUSEMIN.y);
-			QuickValueEditor("fDIFFUSEMIN.z", Render3D::fDIFFUSEMIN.z);
-			QuickValueEditor("fDIFFUSEMIN.w", Render3D::fDIFFUSEMIN.w);
-			QuickValueEditor("fDIFFUSERANGE.x", Render3D::fDIFFUSERANGE.x);
-			QuickValueEditor("fDIFFUSERANGE.y", Render3D::fDIFFUSERANGE.y);
-			QuickValueEditor("fDIFFUSERANGE.z", Render3D::fDIFFUSERANGE.z);
-			QuickValueEditor("fDIFFUSERANGE.w", Render3D::fDIFFUSERANGE.w);
-			QuickValueEditor("fSPECULARMIN.x", Render3D::fSPECULARMIN.x);
-			QuickValueEditor("fSPECULARMIN.y", Render3D::fSPECULARMIN.y);
-			QuickValueEditor("fSPECULARMIN.z", Render3D::fSPECULARMIN.z);
-			QuickValueEditor("fSPECULARMIN.w", Render3D::fSPECULARMIN.w);
-			QuickValueEditor("fSPECULARRANGE.x", Render3D::fSPECULARRANGE.x);
-			QuickValueEditor("fSPECULARRANGE.y", Render3D::fSPECULARRANGE.y);
-			QuickValueEditor("fSPECULARRANGE.z", Render3D::fSPECULARRANGE.z);
-			QuickValueEditor("fSPECULARRANGE.w", Render3D::fSPECULARRANGE.w);
-			QuickValueEditor("fENVMAPMIN.x", Render3D::fENVMAPMIN.x);
-			QuickValueEditor("fENVMAPMIN.y", Render3D::fENVMAPMIN.y);
-			QuickValueEditor("fENVMAPMIN.z", Render3D::fENVMAPMIN.z);
-			QuickValueEditor("fENVMAPMIN.w", Render3D::fENVMAPMIN.w);
-			QuickValueEditor("fENVMAPANGE.x", Render3D::fENVMAPANGE.x);
-			QuickValueEditor("fENVMAPANGE.y", Render3D::fENVMAPANGE.y);
-			QuickValueEditor("fENVMAPANGE.z", Render3D::fENVMAPANGE.z);
-			QuickValueEditor("fENVMAPANGE.w", Render3D::fENVMAPANGE.w);
-			QuickValueEditor("fSPECULARPOWER", Render3D::fSPECULARPOWER);
-			QuickValueEditor("fENVMAPPOWER", Render3D::fENVMAPPOWER);
+			QuickValueEditor("fDIFFUSEMIN.x", Render3D::RendererConfig.fDIFFUSEMIN.x);
+			QuickValueEditor("fDIFFUSEMIN.y", Render3D::RendererConfig.fDIFFUSEMIN.y);
+			QuickValueEditor("fDIFFUSEMIN.z", Render3D::RendererConfig.fDIFFUSEMIN.z);
+			QuickValueEditor("fDIFFUSEMIN.w", Render3D::RendererConfig.fDIFFUSEMIN.w);
+			QuickValueEditor("fDIFFUSERANGE.x", Render3D::RendererConfig.fDIFFUSERANGE.x);
+			QuickValueEditor("fDIFFUSERANGE.y", Render3D::RendererConfig.fDIFFUSERANGE.y);
+			QuickValueEditor("fDIFFUSERANGE.z", Render3D::RendererConfig.fDIFFUSERANGE.z);
+			QuickValueEditor("fDIFFUSERANGE.w", Render3D::RendererConfig.fDIFFUSERANGE.w);
+			QuickValueEditor("fSPECULARMIN.x", Render3D::RendererConfig.fSPECULARMIN.x);
+			QuickValueEditor("fSPECULARMIN.y", Render3D::RendererConfig.fSPECULARMIN.y);
+			QuickValueEditor("fSPECULARMIN.z", Render3D::RendererConfig.fSPECULARMIN.z);
+			QuickValueEditor("fSPECULARMIN.w", Render3D::RendererConfig.fSPECULARMIN.w);
+			QuickValueEditor("fSPECULARRANGE.x", Render3D::RendererConfig.fSPECULARRANGE.x);
+			QuickValueEditor("fSPECULARRANGE.y", Render3D::RendererConfig.fSPECULARRANGE.y);
+			QuickValueEditor("fSPECULARRANGE.z", Render3D::RendererConfig.fSPECULARRANGE.z);
+			QuickValueEditor("fSPECULARRANGE.w", Render3D::RendererConfig.fSPECULARRANGE.w);
+			QuickValueEditor("fENVMAPMIN.x", Render3D::RendererConfig.fENVMAPMIN.x);
+			QuickValueEditor("fENVMAPMIN.y", Render3D::RendererConfig.fENVMAPMIN.y);
+			QuickValueEditor("fENVMAPMIN.z", Render3D::RendererConfig.fENVMAPMIN.z);
+			QuickValueEditor("fENVMAPMIN.w", Render3D::RendererConfig.fENVMAPMIN.w);
+			QuickValueEditor("fENVMAPANGE.x", Render3D::RendererConfig.fENVMAPANGE.x);
+			QuickValueEditor("fENVMAPANGE.y", Render3D::RendererConfig.fENVMAPANGE.y);
+			QuickValueEditor("fENVMAPANGE.z", Render3D::RendererConfig.fENVMAPANGE.z);
+			QuickValueEditor("fENVMAPANGE.w", Render3D::RendererConfig.fENVMAPANGE.w);
+			QuickValueEditor("fSPECULARPOWER", Render3D::RendererConfig.fSPECULARPOWER);
+			QuickValueEditor("fENVMAPPOWER", Render3D::RendererConfig.fENVMAPPOWER);
 
 			ChloeMenuLib::EndMenu();
 		}
@@ -1113,7 +1113,7 @@ void ChaosModMenu() {
 		if (DrawMenuOption("Performance Debug")) {
 			ChloeMenuLib::BeginMenu();
 
-			QuickValueEditor("bForceNoEffect", Render3D::bForceNoEffect);
+			QuickValueEditor("bForceNoEffect", Render3D::RendererConfig.bForceNoEffect);
 
 			//auto stats = aPerformanceBenchmarkResults;
 			//std::sort(stats.begin(), stats.end(), [](PerformanceBenchmarkResult& a, PerformanceBenchmarkResult& b) { return a.ms > b.ms; });
