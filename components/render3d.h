@@ -20,8 +20,6 @@ namespace Render3D {
 
 	struct {
 		bool bForceNoEffect = false;
-		bool bForceNoEnvmap = false;
-		bool bForceNoShadows = false;
 		bool bForceNoCulling = false;
 
 		bool bNoEffect_ReadVertexColor = false;
@@ -39,8 +37,6 @@ namespace Render3D {
 
 		void Reset() {
 			bForceNoEffect = false;
-			bForceNoEnvmap = false;
-			bForceNoShadows = false;
 			bForceNoCulling = false;
 
 			bNoEffect_ReadVertexColor = false;
@@ -73,6 +69,9 @@ namespace Render3D {
 
 	eView* pViewToDraw = nullptr;
 
+	bool bForceNoEnvmap = false;
+	bool bForceNoShadows = false;
+
 	bool bUserForceNoEffect = false;
 	bool bUserForceNoEnvmap = false;
 	bool bUserForceNoShadows = false;
@@ -83,10 +82,10 @@ namespace Render3D {
 		return RendererConfig.bForceNoEffect || bUserForceNoEffect;
 	}
 	bool IsEnvmapDisabled() {
-		return RendererConfig.bForceNoEnvmap || bUserForceNoEnvmap;
+		return bForceNoEnvmap || bUserForceNoEnvmap;
 	}
 	bool IsShadowingDisabled() {
-		return RendererConfig.bForceNoShadows || bUserForceNoShadows;
+		return bForceNoShadows || bUserForceNoShadows;
 	}
 
 	eEffect* pLastUsedEffect = nullptr;
