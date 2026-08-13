@@ -1575,102 +1575,6 @@ public:
 		bCanMultiTrigger = true;
 	}
 
-	static inline float explosionRange = 50;
-	static inline float explosionPower = 50;
-	static inline float explosionPowerAng = 25;
-	static inline float explosionPowerWeakMult = 0.1;
-
-	static void OnBarrelHit(CustomPhysicsObjects::CustomPhysicsObject* pThis, b3BodyId otherBody) {
-		if (b3Body_GetType(otherBody) == b3_staticBody) return;
-
-		auto collidedVeh = CustomPhysics::GetVehicleForB3Body(otherBody);
-		if (collidedVeh && !strcmp(collidedVeh->GetVehicleName(), "copheli")) return;
-
-		auto barrelPos = pThis->GetPosition();
-
-		auto objs = GetActiveSharedRigidBodies(true);
-		for (auto& obj : objs) {
-			if (obj.pCustomObject == pThis) continue;
-
-			if (auto iveh = obj.GetVehicle()) {
-				if (!strcmp(iveh->GetVehicleName(), "copheli")) continue;
-
-				if (auto rb = iveh->mCOMObject->Find<IRBVehicle>()) {
-					if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
-				}
-			}
-
-			auto pos = obj.GetPosition();
-			auto dist = (pos - barrelPos).length();
-			if (dist < explosionRange) {
-				auto dir = (pos - barrelPos);
-				dir.Normalize();
-
-				obj.WakeObject();
-
-				bool doWeak = false;
-				if (auto iveh = obj.GetVehicle()) {
-					if (iveh->GetDriverClass() == DRIVER_HUMAN) {
-						if (SM64::bEnabled) {
-							SM64::OnTakeDamage(1, barrelPos, true);
-						}
-
-						if (GetEffectRunning("Juggernaut")) {
-							doWeak = true;
-						}
-					}
-
-					if (iveh->GetDriverClass() == DRIVER_COP) {
-						DestroyCar(iveh);
-					}
-				}
-
-				float powerMult = doWeak ? explosionPowerWeakMult : 1.0;
-				powerMult *= (explosionRange - dist) / explosionRange;
-
-				if (obj.pCustomStaticObject) {
-					obj.pCustomStaticObject->fHealth -= 25.0 * powerMult;
-					continue;
-				}
-				else {
-					auto vel = obj.GetLinearVelocity();
-					vel += dir * explosionPower * powerMult;
-					obj.SetLinearVelocity(vel);
-
-					auto avel = obj.GetAngularVelocity();
-					avel += dir * explosionPowerAng * powerMult;
-					obj.SetAngularVelocity(avel);
-				}
-			}
-		}
-
-		static NyaAudio::NyaSound sounds[] = {
-				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode3.wav"),
-				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode4.wav"),
-				LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode5.wav"),
-		};
-		PlaySoundFromRange(sounds[rand() % (sizeof(sounds)/sizeof(sounds[0]))], pThis->GetPosition());
-		pThis->bQueuedForDeletion = true;
-	}
-
-	static inline float scale = 2.0;
-
-	static void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
-		static auto mdl = Render3D::CreateModels("oildrum001_explosive.fbx");
-		static auto mdlCol = Render3D::CreateModels("oildrum001_collider.fbx");
-		static auto col = CustomPhysicsObjects::CreateDynamicColliderMeshes(mdlCol, scale);
-
-		CustomPhysicsObjects::CustomPhysicsObject objData;
-		objData.aModels = mdl;
-		objData.vModelSize = {scale,scale,scale};
-		objData.bRemoveOnSafehouse = false;
-		objData.bRemoveOnOutOfBounds = false;
-		objData.bRemoveOnOutOfRange = false;
-		objData.sDebugName = "oildrum_save";
-		objData.pCollisionFunction = OnBarrelHit;
-		CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
-	}
-
 	void InitFunction() override {
 		auto rb = GetLocalPlayerInterface<IRigidBody>();
 		auto ply = *rb->GetPosition();
@@ -1685,7 +1589,7 @@ public:
 				pos.x += x;
 				pos.y += 2;
 				pos.z += y;
-				SpawnObject(pos, vel);
+				Powerups::OilDrum::SpawnObject(pos, vel);
 			}
 		}
 		DoChaosSave();

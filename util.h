@@ -1052,3 +1052,6 @@ bool PlaySoundFromRange(NyaAudio::NyaSound audio, NyaVec3 position, float sfxRan
 	}
 	return false;
 }
+
+class ChaosEffectInstance;
+ChaosEffectInstance* GetEffectRunning(const std::string& name);

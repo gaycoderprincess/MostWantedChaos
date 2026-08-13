@@ -1012,7 +1012,7 @@ void ChaosModMenu() {
 
 				ChloeMenuLib::EndMenu();
 			}
-			QuickValueEditor("ExplosiveBarrel::scale", Effect_SpawnExplosiveBarrel::scale);
+			QuickValueEditor("ExplosiveBarrel::scale", Powerups::OilDrum::scale);
 			QuickValueEditor("Powerups::fSpriteY", Powerups::fSpriteY);
 			QuickValueEditor("Powerups::fSpriteSize", Powerups::fSpriteSize);
 			QuickValueEditor("PowerupBlock::bLightSpawnMode", Powerups::PowerupBlock::bLightSpawnMode);

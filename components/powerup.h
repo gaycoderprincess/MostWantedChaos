@@ -183,6 +183,11 @@ namespace Powerups {
 		float inFrontThresholdAI = 0.3;
 		float crosshairSize = 0.02;
 
+		float fExplosionPower = 25;
+		float fExplosionPowerChaos = 15;
+		float fExplosionAngVelocityMult = 0.25;
+		float fExplosionMaxDistance = 10;
+
 		NyaAudio::NyaSound FireSound = 0;
 		NyaAudio::NyaSound ExplodeSound = 0;
 
@@ -312,15 +317,12 @@ namespace Powerups {
 					NyaAudio::Play(ExplodeSound);
 				}
 
-				float fExplosionPower = 15;
-				float fExplosionAngVelocityMult = 0.25;
-				float fExplosionMaxDistance = 10;
-
+				float power = fExplosionPowerChaos;
 				if (CustomPhysicsBall::bEnabled) {
-					FireworkAttack_Box3D(obj->mMatrix.p, CustomPhysicsBall::BallBody, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
+					FireworkAttack_Box3D(obj->mMatrix.p, CustomPhysicsBall::BallBody, power, fExplosionAngVelocityMult, fExplosionMaxDistance);
 				}
 				for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
-					FireworkAttack_Box3D(obj->mMatrix.p, phys->nB3Body, fExplosionPower, fExplosionAngVelocityMult, fExplosionMaxDistance);
+					FireworkAttack_Box3D(obj->mMatrix.p, phys->nB3Body, power, fExplosionAngVelocityMult, fExplosionMaxDistance);
 				}
 
 				for (auto& car : cars) {
@@ -331,7 +333,7 @@ namespace Powerups {
 
 						auto cb = car->mCOMObject->Find<ICollisionBody>();
 
-						auto impulse = dist * (fExplosionPower * car->GetMass() / 1000.0 * std::min((fExplosionMaxDistance - dist.length()) * 2.0 / fExplosionMaxDistance, 1.0) / std::max(dist.length(), 0.01));
+						auto impulse = dist * (power * car->GetMass() / 1000.0 * std::min((fExplosionMaxDistance - dist.length()) * 2.0 / fExplosionMaxDistance, 1.0) / std::max(dist.length(), 0.01));
 
 						if (cb && cb->IsAttachedToWorld()) {
 							cb->AttachedToWorld(false, 50.0);
@@ -455,6 +457,116 @@ namespace Powerups {
 		}
 	}
 
+	namespace OilDrum {
+		float explosionRange = 50;
+		float explosionPower = 50;
+		float explosionPowerAng = 25;
+		float explosionPowerWeakMult = 0.1;
+
+		void OnBarrelHit(CustomPhysicsObjects::CustomPhysicsObject* pThis, b3BodyId otherBody) {
+			if (b3Body_GetType(otherBody) == b3_staticBody) return;
+
+			auto collidedVeh = CustomPhysics::GetVehicleForB3Body(otherBody);
+			if (collidedVeh && !strcmp(collidedVeh->GetVehicleName(), "copheli")) return;
+
+			auto barrelPos = pThis->GetPosition();
+
+			auto objs = GetActiveSharedRigidBodies(true);
+			for (auto& obj : objs) {
+				if (obj.pCustomObject == pThis) continue;
+
+				if (auto iveh = obj.GetVehicle()) {
+					if (!strcmp(iveh->GetVehicleName(), "copheli")) continue;
+
+					if (auto rb = iveh->mCOMObject->Find<IRBVehicle>()) {
+						if (rb->GetInvulnerability() != INVULNERABLE_NONE) continue;
+					}
+				}
+
+				auto pos = obj.GetPosition();
+				auto dist = (pos - barrelPos).length();
+				if (dist < explosionRange) {
+					auto dir = (pos - barrelPos);
+					dir.Normalize();
+
+					obj.WakeObject();
+
+					bool doWeak = false;
+					if (auto iveh = obj.GetVehicle()) {
+						if (iveh->GetDriverClass() == DRIVER_HUMAN) {
+							if (SM64::bEnabled) {
+								SM64::OnTakeDamage(1, barrelPos, true);
+							}
+
+							if (GetEffectRunning("Juggernaut")) {
+								doWeak = true;
+							}
+						}
+
+						if (iveh->GetDriverClass() == DRIVER_COP) {
+							DestroyCar(iveh);
+						}
+					}
+
+					float powerMult = doWeak ? explosionPowerWeakMult : 1.0;
+					powerMult *= (explosionRange - dist) / explosionRange;
+
+					if (obj.pCustomStaticObject) {
+						obj.pCustomStaticObject->fHealth -= 25.0 * powerMult;
+						continue;
+					}
+					else {
+						auto vel = obj.GetLinearVelocity();
+						vel += dir * explosionPower * powerMult;
+						obj.SetLinearVelocity(vel);
+
+						auto avel = obj.GetAngularVelocity();
+						avel += dir * explosionPowerAng * powerMult;
+						obj.SetAngularVelocity(avel);
+					}
+				}
+			}
+
+			static NyaAudio::NyaSound sounds[] = {
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode3.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode4.wav"),
+					LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/explode5.wav"),
+			};
+			PlaySoundFromRange(sounds[rand() % (sizeof(sounds)/sizeof(sounds[0]))], pThis->GetPosition());
+			pThis->bQueuedForDeletion = true;
+		}
+
+		float scale = 2.0;
+
+		void SpawnObject(NyaVec3 pos, NyaVec3 vel) {
+			static auto mdl = Render3D::CreateModels("oildrum001_explosive.fbx");
+			static auto mdlCol = Render3D::CreateModels("oildrum001_collider.fbx");
+			static auto col = CustomPhysicsObjects::CreateDynamicColliderMeshes(mdlCol, scale);
+
+			CustomPhysicsObjects::CustomPhysicsObject objData;
+			objData.aModels = mdl;
+			objData.vModelSize = {scale,scale,scale};
+			objData.bRemoveOnSafehouse = false;
+			objData.bRemoveOnOutOfBounds = false;
+			objData.bRemoveOnOutOfRange = false;
+			objData.sDebugName = "oildrum_save";
+			objData.pCollisionFunction = OnBarrelHit;
+			CustomPhysicsObjects::CreatePhysicsObject(objData, col, pos, vel);
+		}
+
+		void SpawnBehindCar(IRigidBody* rb) {
+			auto ply = *rb->GetPosition();
+			auto vel = *rb->GetLinearVelocity();
+			UMath::Vector3 fwd;
+			rb->GetForwardVector(&fwd);
+
+			NyaVec3 pos = ply;
+			pos -= fwd * 5;
+			pos.y += 2;
+			SpawnObject(pos, vel);
+		}
+	}
+
 	enum ePowerup {
 		//POWERUP_SHOCKWAVE,
 		POWERUP_PUTTYBOMB,
@@ -472,6 +584,7 @@ namespace Powerups {
 		POWERUP_INVINCIBLE,
 		POWERUP_BEACHBALL,
 		POWERUP_MARIO,
+		POWERUP_OILDRUM,
 		NUM_POWERUPS
 	};
 	const char* aPowerupNames[] = {
@@ -491,6 +604,7 @@ namespace Powerups {
 		"INVINCIBLE",
 		"BEACHBALL",
 		"MARIO",
+		"OILDRUM",
 	};
 
 	const char* aPowerupSpriteNames1[] = {
@@ -510,6 +624,7 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/mk64_2.png",
 			"CwoeeChaos/data/textures/powerup_beachballpack.png",
 			"CwoeeChaos/data/textures/powerup_mario.png",
+			"CwoeeChaos/data/textures/powerup_oildrum.png",
 	};
 	const char* aPowerupSpriteNames2[] = {
 			//"CwoeeChaos/data/textures/revolt_1.png",
@@ -528,6 +643,7 @@ namespace Powerups {
 			"CwoeeChaos/data/textures/mk64_2.png",
 			"CwoeeChaos/data/textures/powerup_beachballpack.png",
 			"CwoeeChaos/data/textures/powerup_mario.png",
+			"CwoeeChaos/data/textures/powerup_oildrum.png",
 	};
 	IDirect3DTexture9* aPowerupTextures1[NUM_POWERUPS] = {};
 	IDirect3DTexture9* aPowerupTextures2[NUM_POWERUPS] = {};
@@ -601,6 +717,13 @@ namespace Powerups {
 					PlayAudioFromCar(balldrop, pUser);
 					return true;
 				} break;
+				case POWERUP_OILDRUM: {
+					OilDrum::SpawnBehindCar(pUser->mCOMObject->Find<IRigidBody>());
+
+					if (!balldrop) balldrop = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/balldrop.wav");
+					PlayAudioFromCar(balldrop, pUser);
+					return true;
+				} break;
 				case POWERUP_TURBO:
 					fTurboTime = bIsLocalPlayer ? 10.0 : 20.0;
 					return true;
@@ -631,6 +754,12 @@ namespace Powerups {
 					rb->GetDimension(&dim);
 					rb->GetForwardVector(&fwd);
 					rb->GetUpVector(&up);
+
+					if (auto input = pUser->mCOMObject->Find<IInput>()) {
+						if (input->IsLookBackButtonPressed()) {
+							fwd *= -1;
+						}
+					}
 
 					auto pos = *rb->GetPosition();
 					auto vel = *rb->GetLinearVelocity();
@@ -801,6 +930,7 @@ namespace Powerups {
 
 					if (isLastPlace && i == POWERUP_PUTTYBOMB) continue;
 					if (isLastPlace && i == POWERUP_CHROMEBALL) continue;
+					if (isLastPlace && i == POWERUP_OILDRUM) continue;
 					if (isLastPlace && i == POWERUP_MARIO) continue;
 					if (isFirstPlace && i == POWERUP_FIREWORK) continue;
 					if (isFirstPlace && i == POWERUP_FIREWORKPACK) continue;
@@ -822,6 +952,9 @@ namespace Powerups {
 
 					int countToAdd = 1;
 					if (i == POWERUP_STAR && !isPlayer && placement >= 4 && playerPlacement == 1) {
+						countToAdd = 2;
+					}
+					if (i == POWERUP_MUSHROOMPACK && !isPlayer && playerPlacement == 1 && placement == 2) {
 						countToAdd = 2;
 					}
 					if (i == POWERUP_TURBO && !isPlayer && playerPlacement == 1) {

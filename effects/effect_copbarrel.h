@@ -19,7 +19,7 @@ public:
 		auto rb = veh->mCOMObject->Find<IRigidBody>();
 		auto vel = *rb->GetLinearVelocity();
 		pos.y -= 5.0;
-		Effect_SpawnExplosiveBarrel::SpawnObject(pos, vel);
+		Powerups::OilDrum::SpawnObject(pos, vel);
 	}
 
 	void TickFunctionMain(double delta) override {
