@@ -419,8 +419,9 @@ namespace SM64 {
 		PerformanceBenchmarker _perf("UpdateMarioCollision");
 
 		for (auto& obj : aCollisionObjects) {
+			int i = &obj - &aCollisionObjects[0];
 			for (auto& inst : obj.aInstances) {
-				if (inst.pInstance->IsActive() && inst.IsInAABB()) {
+				if ((inst.pInstance->IsActive() && inst.IsInAABB()) || i == COLLISIONARTICLE_CUSTOM) {
 					//if (!inst.NeedsUpdating()) continue;
 					AddLogPopup(std::format("Updating {:X}", (uintptr_t)inst.pInstance));
 					inst.Create();
@@ -545,6 +546,7 @@ namespace SM64 {
 
 		auto objs = GetActiveSharedRigidBodies(true);
 		for (auto& obj : objs) {
+			if (obj.HasBakedCollisionMesh()) continue;
 			if (!bEnemyEnabled && obj.GetVehicle() == GetLocalPlayerVehicle()) continue;
 
 			auto dim = obj.GetDimension();

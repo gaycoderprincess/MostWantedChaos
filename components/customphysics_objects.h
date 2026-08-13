@@ -482,6 +482,10 @@ public:
 		return !HasPhysics();
 	}
 
+	bool HasBakedCollisionMesh() const {
+		return IsStatic() && pCustomStaticObject->bTriCollidable;
+	}
+
 	bool IsVehicle() const {
 		return pGameObject && pGameObject->mCOMObject->Find<IVehicle>();
 	}
