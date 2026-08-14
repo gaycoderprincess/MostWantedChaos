@@ -1667,6 +1667,7 @@ public:
 					// despawn if player was killed
 					if (car->GetDriverClass() == DRIVER_HUMAN) {
 						obj->aModels.clear();
+						DoChaosSave();
 					}
 				}
 				data->targets.clear();
@@ -1764,8 +1765,13 @@ public:
 	}
 
 	static NyaVec3* FindHidingSpot() {
+		std::vector<NyaVec3*> validSpots;
 		for (auto& spot : aHidingSpots) {
-			if (!IsHidingSpotOccupied(spot)) return &spot;
+			if (IsHidingSpotOccupied(spot)) continue;
+			validSpots.push_back(&spot);
+		}
+		if (!validSpots.empty()) {
+			return validSpots[rand()%validSpots.size()];
 		}
 		return nullptr;
 	}

@@ -309,6 +309,39 @@ void DoChaosRampLoad() {
 	}
 }
 
+bool DoChaosRonnieSave() {
+	std::vector<UMath::Matrix4> save;
+	for (auto& peanut : Effect_Ronnie::aObjectsInWorld) {
+		auto model = Render3DObjects::aObjects[peanut];
+		if (model->IsEmpty()) continue;
+		save.push_back(model->mMatrix);
+	}
+
+	std::ofstream file("CwoeeChaos/save/ronnie.sav", std::iostream::out | std::iostream::binary);
+	if (!file.is_open()) return false;
+
+	int count = save.size();
+	file.write((char*)&count, sizeof(count));
+	for (auto& data : save) {
+		file.write((char*)&data, sizeof(data));
+	}
+	return true;
+}
+
+void DoChaosRonnieLoad() {
+	std::ifstream file("CwoeeChaos/save/ronnie.sav", std::iostream::in | std::iostream::binary);
+	if (!file.is_open()) return;
+
+	int count = 0;
+	file.read((char*)&count, sizeof(count));
+
+	for (int i = 0; i < count; i++) {
+		UMath::Matrix4 save;
+		file.read((char*)&save, sizeof(save));
+		Effect_Ronnie::SpawnObject(save);
+	}
+}
+
 bool DoChaosPhysicsObjectSave(const char* debugName, const char* fileName) {
 	std::vector<UMath::Vector3> save;
 	for (auto& obj : CustomPhysicsObjects::aPhysicsObjects) {
@@ -488,6 +521,7 @@ void DoChaosSave() {
 	if (!DoChaosPhysicsObjectSave("trafficcone_save", "cone")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosPhysicsObjectSave("oildrum_save", "oildrum")) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosRampSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
+	if (!DoChaosRonnieSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSM64Save()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosPowerupsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
 	if (!DoChaosSettingsSave()) { MessageBoxA(0, "Failed to save chaos settings!", "nya?!~", MB_ICONERROR); }
@@ -509,6 +543,7 @@ void DoChaosLoad() {
 	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
 	DoChaosPhysicsObjectLoad("oildrum", Powerups::OilDrum::SpawnObject<true>);
 	DoChaosRampLoad();
+	DoChaosRonnieLoad();
 	DoChaosSM64Load();
 	DoChaosPowerupsLoad();
 	DoChaosSettingsLoad();
