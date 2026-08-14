@@ -239,6 +239,7 @@ namespace Render3DObjects {
 		bool bNoBackfaceCulling = false;
 		bool bNoShadowCasting = false;
 		bool bNoEnvmap = false;
+		IDirect3DTexture9* pOverrideDiffuse = nullptr;
 		std::string sDebugName;
 
 		float fHealth = 100.0;
@@ -511,10 +512,12 @@ namespace Render3DObjects {
 
 		void Render() {
 			if (bNoBackfaceCulling) { Render3D::RendererConfig.bForceNoCulling = true; }
+			if (pOverrideDiffuse) { Render3D::RendererConfig.pOverrideDiffuse = pOverrideDiffuse; }
 			for (auto& model : aModels) {
 				model->RenderAt(WorldToRenderMatrix(mMatrix), bUseAlpha);
 			}
 			if (bNoBackfaceCulling) { Render3D::RendererConfig.bForceNoCulling = false; }
+			if (pOverrideDiffuse) { Render3D::RendererConfig.pOverrideDiffuse = nullptr; }
 		}
 
 		void Destroy(bool deleteModels) {

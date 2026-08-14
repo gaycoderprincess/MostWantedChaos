@@ -1595,3 +1595,164 @@ public:
 		DoChaosSave();
 	}
 } E_SpawnExplosiveBarrel;
+
+class Effect_Ronnie : public ChaosEffect {
+public:
+	Effect_Ronnie() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Ronnie Somewhere";
+		bAbortOnConditionFailed = true;
+	}
+
+	static inline float yOffset = 0.0;
+	static inline float scale = 2.0;
+
+	static inline std::vector<Render3D::tModel*> models;
+
+	static inline std::vector<int> aObjectsInWorld;
+
+	struct tObjectData {
+		bool sfxPlayed = false;
+		std::vector<IVehicle*> targets;
+	};
+
+	static void RonnieLookAt(Render3DObjects::Object* obj, IVehicle* car) {
+		auto movePos = (*car->GetPosition() - obj->vColPosition);
+		movePos.y = 0;
+		movePos.Normalize();
+
+		obj->mMatrix = NyaMat4x4::LookAt(-movePos);
+		obj->mMatrix.x *= scale;
+		obj->mMatrix.y *= scale;
+		obj->mMatrix.z *= scale;
+		obj->mMatrix.p = obj->vColPosition;
+	}
+
+	static void RonnieOnTick(Render3DObjects::Object* obj, double delta) {
+		static auto sfx = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/ronnie.mp3");
+
+		if (obj->fHealth <= 0.0) {
+			obj->aModels.clear();
+			return;
+		}
+
+		auto data = (tObjectData*)obj->CustomData;
+		if (data->sfxPlayed) {
+			// once sfx is played, constantly collect nearby cars
+			auto cars = GetActiveVehicles();
+			for (auto& car : cars) {
+				if (IsCarDestroyed(car)) continue;
+
+				auto dist = (*car->GetPosition() - obj->vColPosition).length();
+				if (dist < 10) {
+					if (std::find(data->targets.begin(), data->targets.end(), car) != data->targets.end()) continue;
+
+					data->targets.push_back(car);
+				}
+			}
+
+			if (NyaAudio::IsFinishedPlaying(sfx)) {
+				for (auto& car : data->targets) {
+					if (!IsVehicleValidAndActive(car)) continue;
+					if (IsCarDestroyed(car)) continue;
+
+					if (auto dam = car->mCOMObject->Find<IEngineDamage>()) {
+						dam->Sabotage(3.0);
+					}
+					else {
+						DestroyCar(car);
+					}
+				}
+				data->sfxPlayed = false;
+			}
+			else {
+				// ronnie will look at the last car in the list this way
+				for (auto& car : data->targets) {
+					if (!IsVehicleValidAndActive(car)) continue;
+					RonnieLookAt(obj, car);
+				}
+			}
+		}
+		else {
+			data->targets.clear();
+
+			auto cars = GetActiveVehicles();
+			for (auto& car : cars) {
+				if (IsCarDestroyed(car)) continue;
+
+				auto dist = (*car->GetPosition() - obj->vColPosition).length();
+				if (dist < 10) {
+					data->targets.push_back(car);
+				}
+			}
+
+			if (!data->targets.empty()) {
+				auto car = GetClosestActiveVehicle(obj->vColPosition);
+
+				NyaAudio::SetVolume(sfx, GetSFXVolume());
+				NyaAudio::SkipTo(sfx, 0);
+				NyaAudio::Play(sfx);
+				data->sfxPlayed = true;
+			}
+		}
+	}
+
+	static void SpawnObject(UMath::Matrix4 mat) {
+		if (models.empty() || models[0]->bInvalidated) {
+			models = Render3D::CreateModels("plane2d.fbx");
+		}
+
+		static auto tex = LoadTexture_SetDir("CwoeeChaos/data/textures/ronnie.png");
+
+		int id = Render3DObjects::aObjects.size();
+		aObjectsInWorld.push_back(id);
+		Render3DObjects::aObjects.push_back(new Render3DObjects::Object("ronnie", models, mat, mat.p, 0.0, RonnieOnTick));
+		Render3DObjects::aObjects[id]->pOverrideDiffuse = tex;
+		Render3DObjects::aObjects[id]->bTriCollidable = true;
+		Render3DObjects::aObjects[id]->CustomData = new tObjectData;
+		Render3DObjects::aObjects[id]->fHealth = 10.0;
+	}
+
+	static inline NyaVec3 aHidingSpots[] = {
+			{-2200, 144.6, 1460}, // perfect hiding spot
+			{-2258, 155.5, 699}, // wotr pork
+			{-2179.5, 151.8, 1140.2}, // gas station car wash
+			{-3139, 188.9, -180}, // stadium
+			{-130, 5.03, 4627}, // coast near final pursuit under fish market
+	};
+
+	static bool IsHidingSpotOccupied(NyaVec3 pos) {
+		for (auto& id : aObjectsInWorld) {
+			auto obj = *Render3DObjects::aObjects[id];
+			if (obj.sDebugName != "ronnie") continue;
+			if ((pos - obj.vColPosition).length() < 15) return true;
+		}
+		return false;
+	}
+
+	static NyaVec3* FindHidingSpot() {
+		for (auto& spot : aHidingSpots) {
+			if (!IsHidingSpotOccupied(spot)) return &spot;
+		}
+		return nullptr;
+	}
+
+	void InitFunction() override {
+		if (auto veh = GetLocalPlayerInterface<IRigidBody>()) {
+			auto mat = UMath::Matrix4::kIdentity;
+			veh->GetMatrix4(&mat);
+
+			auto pos = FindHidingSpot();
+			if (!pos) return;
+
+			mat.x *= scale;
+			mat.y *= scale;
+			mat.z *= scale;
+			mat.p = *pos;
+			mat.p.y += yOffset;
+
+			SpawnObject(mat);
+			DoChaosSave();
+		}
+	}
+	bool IsAvailable() override { return FindHidingSpot() != nullptr; }
+} E_Ronnie;

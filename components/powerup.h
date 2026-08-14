@@ -323,11 +323,13 @@ namespace Powerups {
 					NyaAudio::Play(ExplodeSound);
 				}
 
-				float power = fExplosionPowerChaos;
 #ifdef CWOEECHAOS
+				float power = fExplosionPowerChaos;
 				if (CustomPhysicsBall::bEnabled) {
 					FireworkAttack_Box3D(obj->mMatrix.p, CustomPhysicsBall::BallBody, power, fExplosionAngVelocityMult, fExplosionMaxDistance);
 				}
+#else
+				float power = fExplosionPower;
 #endif
 				for (auto& phys : CustomPhysicsObjects::aPhysicsObjects) {
 					FireworkAttack_Box3D(obj->mMatrix.p, phys->nB3Body, power, fExplosionAngVelocityMult, fExplosionMaxDistance);

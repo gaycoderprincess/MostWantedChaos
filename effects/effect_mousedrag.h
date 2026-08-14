@@ -101,8 +101,15 @@ public:
 		static NyaVec3 lastCursorPos;
 		NyaVec3 cursorPos = {(float)point.x,(float)point.y,0};
 
-		if (auto veh = GetLocalPlayerInterface<IRBVehicle>()) {
-			if (veh->GetInvulnerability() == INVULNERABLE_FROM_MANUAL_RESET) {
+		if (auto veh = GetLocalPlayerVehicle()) {
+			if (auto rb = veh->mCOMObject->Find<IRBVehicle>()) {
+				if (rb->GetInvulnerability() == INVULNERABLE_FROM_MANUAL_RESET) {
+					mCameraMatrix = PrepareCameraMatrix(GetLocalPlayerCamera());
+				}
+			}
+
+			auto camPos = RenderToWorldCoords(mCameraMatrix.p);
+			if (veh->IsStaging() || (*veh->GetPosition() - camPos).length() > 250) {
 				mCameraMatrix = PrepareCameraMatrix(GetLocalPlayerCamera());
 			}
 		}

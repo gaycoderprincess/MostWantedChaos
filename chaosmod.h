@@ -1012,6 +1012,32 @@ void ChaosModMenu() {
 
 				ChloeMenuLib::EndMenu();
 			}
+			if (DrawMenuOption("Coordinate Capture")) {
+				ChloeMenuLib::BeginMenu();
+
+				static std::vector<UMath::Vector3> aCoords;
+
+				if (DrawMenuOption("Clear")) {
+					aCoords.clear();
+				}
+
+				if (DrawMenuOption("Capture")) {
+					aCoords.push_back(*GetLocalPlayerVehicle()->GetPosition());
+				}
+
+				if (DrawMenuOption(std::format("Save {} coords", aCoords.size()))) {
+					std::ofstream fout("cwoee_coords.txt", std::ios::out);
+					if (fout.is_open()) {
+						for (auto& v : aCoords) {
+							fout << std::format("{{{:.2f} {:.2f} {:.2f}}},\n", v.x, v.y, v.z);
+						}
+					}
+				}
+
+				ChloeMenuLib::EndMenu();
+			}
+			QuickValueEditor("Ronnie::yOffset", Effect_Ronnie::yOffset);
+			QuickValueEditor("Ronnie::scale", Effect_Ronnie::scale);
 			QuickValueEditor("ExplosiveBarrel::scale", Powerups::OilDrum::scale);
 			QuickValueEditor("Powerups::fSpriteY", Powerups::fSpriteY);
 			QuickValueEditor("Powerups::fSpriteSize", Powerups::fSpriteSize);
