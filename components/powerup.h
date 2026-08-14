@@ -1913,6 +1913,7 @@ namespace Powerups {
 		if (IsChaosBlocked()) return;
 
 		for (auto& state : aPowerupStates) {
+			if (!state.IsValid()) continue;
 			state.Process3D();
 		}
 	}

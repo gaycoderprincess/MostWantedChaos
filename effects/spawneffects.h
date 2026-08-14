@@ -1600,11 +1600,13 @@ class Effect_Ronnie : public ChaosEffect {
 public:
 	Effect_Ronnie() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
 		sName = "Spawn Ronnie Somewhere";
+		bCanMultiTrigger = true;
 		bAbortOnConditionFailed = true;
 	}
 
 	static inline float yOffset = 0.0;
 	static inline float scale = 2.0;
+	static inline float attackRange = 15.0;
 
 	static inline std::vector<Render3D::tModel*> models;
 
@@ -1643,7 +1645,7 @@ public:
 				if (IsCarDestroyed(car)) continue;
 
 				auto dist = (*car->GetPosition() - obj->vColPosition).length();
-				if (dist < 10) {
+				if (dist < attackRange) {
 					if (std::find(data->targets.begin(), data->targets.end(), car) != data->targets.end()) continue;
 
 					data->targets.push_back(car);
@@ -1661,7 +1663,13 @@ public:
 					else {
 						DestroyCar(car);
 					}
+
+					// despawn if player was killed
+					if (car->GetDriverClass() == DRIVER_HUMAN) {
+						obj->aModels.clear();
+					}
 				}
+				data->targets.clear();
 				data->sfxPlayed = false;
 			}
 			else {
@@ -1673,6 +1681,10 @@ public:
 			}
 		}
 		else {
+			if (auto veh = GetClosestActiveVehicle(obj->vColPosition)) {
+				RonnieLookAt(obj, veh);
+			}
+
 			data->targets.clear();
 
 			auto cars = GetActiveVehicles();
@@ -1680,7 +1692,7 @@ public:
 				if (IsCarDestroyed(car)) continue;
 
 				auto dist = (*car->GetPosition() - obj->vColPosition).length();
-				if (dist < 10) {
+				if (dist < attackRange) {
 					data->targets.push_back(car);
 				}
 			}
@@ -1713,11 +1725,33 @@ public:
 	}
 
 	static inline NyaVec3 aHidingSpots[] = {
-			{-2200, 144.6, 1460}, // perfect hiding spot
-			{-2258, 155.5, 699}, // wotr pork
-			{-2179.5, 151.8, 1140.2}, // gas station car wash
-			{-3139, 188.9, -180}, // stadium
-			{-130, 5.03, 4627}, // coast near final pursuit under fish market
+			// rosewood
+			{-2485.99, 151.21, 1636.90},
+			{-2433.21, 149.95, 1714.21},
+			{-2242.54, 144.56, 1521.25},
+			{-2353.62, 148.97, 1278.15},
+			{-2360.57, 154.36, 1055.11},
+			{-2363.24, 150.69, 916.73},
+			{-2649.36, 175.61, 252.09},
+			{-2644.13, 171.35, 430.60},
+			{-2839.24, 183.62, 393.32},
+			{-3004.45, 189.20, -369.21},
+			{-3155.99, 188.71, 59.27},
+			{-3869.19, 193.42, 271.65},
+			{-4472.74, 205.14, 791.94},
+			{-4418.49, 232.05, 136.19},
+			{-2592.58, 211.07, -1443.63},
+			{-4083.65, 986.71, -4031.01},
+			{-2155.51, 145.01, 1849.37},
+			{-2705.33, 166.42, 1298.62},
+			{-3623.31, 164.40, 1837.11},
+
+			// camden
+			{-513.51, 23.93, 3830.92},
+			{-147.86, 19.02, 4071.39},
+			{-129.22, 5.03, 4648.92},
+			{-498.86, 31.47, 4491.76},
+			{-688.16, 6.14, 4771.68},
 	};
 
 	static bool IsHidingSpotOccupied(NyaVec3 pos) {

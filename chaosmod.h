@@ -1029,7 +1029,7 @@ void ChaosModMenu() {
 					std::ofstream fout("cwoee_coords.txt", std::ios::out);
 					if (fout.is_open()) {
 						for (auto& v : aCoords) {
-							fout << std::format("{{{:.2f} {:.2f} {:.2f}}},\n", v.x, v.y, v.z);
+							fout << std::format("{{{:.2f}, {:.2f}, {:.2f}}},\n", v.x, v.y, v.z);
 						}
 					}
 				}
