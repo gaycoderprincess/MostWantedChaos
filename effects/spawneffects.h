@@ -1589,7 +1589,7 @@ public:
 				pos.x += x;
 				pos.y += 2;
 				pos.z += y;
-				Powerups::OilDrum::SpawnObject(pos, vel);
+				Powerups::OilDrum::SpawnObject<true>(pos, vel);
 			}
 		}
 		DoChaosSave();

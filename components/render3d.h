@@ -23,6 +23,7 @@ namespace Render3D {
 		bool bForceNoCulling = false;
 
 		bool bNoEffect_ReadVertexColor = false;
+		bool bNoEffect_AlphaCutoff = true;
 
 		D3DXVECTOR4 fDIFFUSEMIN = {0.4,0.4,0.4,1};
 		D3DXVECTOR4 fDIFFUSERANGE = {0.6,0.6,0.6,0};
@@ -40,6 +41,7 @@ namespace Render3D {
 			bForceNoCulling = false;
 
 			bNoEffect_ReadVertexColor = false;
+			bNoEffect_AlphaCutoff = true;
 
 			fDIFFUSEMIN = {0.4,0.4,0.4,1};
 			fDIFFUSERANGE = {0.6,0.6,0.6,0};
@@ -349,7 +351,7 @@ namespace Render3D {
 			g_pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, zwrite);
 			g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
 			if (useAlpha) {
-				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, 127);
+				g_pd3dDevice->SetRenderState(D3DRS_ALPHAREF, RendererConfig.bNoEffect_AlphaCutoff ? 127 : 1);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 				g_pd3dDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 			}

@@ -507,7 +507,7 @@ void DoChaosLoad() {
 	DoChaosPhysicsObjectLoad("abc", Effect_SpawnBlock::SpawnObject);
 	DoChaosPhysicsObjectLoad("metalball", Powerups::HeavyBall::SpawnObject<true>);
 	DoChaosPhysicsObjectLoad("cone", Effect_SpawnHeavyCone::SpawnObject);
-	DoChaosPhysicsObjectLoad("oildrum", Powerups::OilDrum::SpawnObject);
+	DoChaosPhysicsObjectLoad("oildrum", Powerups::OilDrum::SpawnObject<true>);
 	DoChaosRampLoad();
 	DoChaosSM64Load();
 	DoChaosPowerupsLoad();
