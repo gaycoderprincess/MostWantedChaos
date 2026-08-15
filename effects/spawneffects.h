@@ -1816,6 +1816,9 @@ public:
 		OBJECT_SHORK,
 		OBJECT_BOTTLE,
 		OBJECT_GAMEBOX,
+		OBJECT_PACKET,
+		OBJECT_PACKET2,
+		OBJECT_PLAINBOX,
 		NUM_OBJECTS
 	};
 	static inline const char* aObjectModels[] = {
@@ -1830,6 +1833,9 @@ public:
 			"shork.fbx",
 			"bottle.fbx",
 			"gamebox.fbx",
+			"packet.fbx",
+			"packet2.fbx",
+			"plainbox.fbx",
 	};
 
 	struct ObjectData {
@@ -1850,7 +1856,7 @@ public:
 		if (i == OBJECT_HEAVYBLOCK) {
 			scale = 1.5;
 		}
-		if (i == OBJECT_CARBOX || i == OBJECT_CONE || i == OBJECT_TOYCONE || i == OBJECT_BOTTLE) {
+		if (i == OBJECT_CARBOX || i == OBJECT_PLAINBOX || i == OBJECT_CONE || i == OBJECT_TOYCONE || i == OBJECT_BOTTLE || i == OBJECT_PACKET) {
 			scale = 2.0;
 		}
 		if (i == OBJECT_BLJRAMP) {
@@ -1941,9 +1947,9 @@ public:
 		UMath::Vector3 fwd;
 		rb->GetForwardVector(&fwd);
 
-		for (int x = -10; x < 10; x += 3) {
-			for (int y = -10; y < 10; y += 3) {
-				NyaVec3 pos = ply + (fwd * 5);
+		for (int x = -15; x < 15; x += 3) {
+			for (int y = -15; y < 15; y += 3) {
+				NyaVec3 pos = ply + (fwd * 10);
 				pos.x += x;
 				pos.y += 2;
 				pos.z += y;

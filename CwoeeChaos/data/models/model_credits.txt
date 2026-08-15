@@ -14,3 +14,10 @@ backrooms - Sketchfab, Huuxloc (conversion by TerminatorVasya)
 abcblock - Acclaim Entertainment
 cone - Acclaim Entertainment
 bljramp - Acclaim Entertainment
+oildrum001_explosive - Valve
+plainbox - Acclaim Entertainment
+packet - Acclaim Entertainment
+packet2 - Acclaim Entertainment
+toycone - Acclaim Entertainment
+bottle - Acclaim Entertainment
+carbox - Acclaim Entertainment
