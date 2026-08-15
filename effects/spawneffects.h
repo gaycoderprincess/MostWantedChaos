@@ -1819,6 +1819,11 @@ public:
 		OBJECT_PACKET,
 		OBJECT_PACKET2,
 		OBJECT_PLAINBOX,
+		OBJECT_BOX01,
+		OBJECT_BOX03,
+		OBJECT_BOX04,
+		OBJECT_BOX5,
+		OBJECT_BBALLBOX,
 		NUM_OBJECTS
 	};
 	static inline const char* aObjectModels[] = {
@@ -1836,6 +1841,11 @@ public:
 			"packet.fbx",
 			"packet2.fbx",
 			"plainbox.fbx",
+			"box01.fbx",
+			"box03.fbx",
+			"box04.fbx",
+			"box5.fbx",
+			"bballbox.fbx",
 	};
 
 	struct ObjectData {
@@ -1846,8 +1856,7 @@ public:
 	};
 	static inline ObjectData aObjectTypes[NUM_OBJECTS] = {};
 
-	static void SpawnRandomObject(NyaVec3 pos, NyaVec3 vel) {
-		int i = rand()%NUM_OBJECTS;
+	static void SpawnRandomObject(int i, NyaVec3 pos, NyaVec3 vel) {
 		if (i == OBJECT_BEACHBALL) {
 			return Effect_SpawnBalls::SpawnObject(pos, vel);
 		}
@@ -1856,7 +1865,10 @@ public:
 		if (i == OBJECT_HEAVYBLOCK) {
 			scale = 1.5;
 		}
-		if (i == OBJECT_CARBOX || i == OBJECT_PLAINBOX || i == OBJECT_CONE || i == OBJECT_TOYCONE || i == OBJECT_BOTTLE || i == OBJECT_PACKET) {
+		if (i == OBJECT_CARBOX || i == OBJECT_PLAINBOX || i == OBJECT_CONE
+		|| i == OBJECT_TOYCONE || i == OBJECT_BOTTLE || i == OBJECT_PACKET
+		|| i == OBJECT_BOX01 || i == OBJECT_BOX03 || i == OBJECT_BOX04
+		|| i == OBJECT_BOX5 || i == OBJECT_BBALLBOX) {
 			scale = 2.0;
 		}
 		if (i == OBJECT_BLJRAMP) {
@@ -1883,6 +1895,7 @@ public:
 			if (i == OBJECT_ABCBLOCK) { data.audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/toybrick.wav"); }
 			if (i == OBJECT_CONE) { data.audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/roadcone.wav"); }
 			if (i == OBJECT_BOTTLE) { data.audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/bottle.wav"); }
+			if (i == OBJECT_PACKET || i == OBJECT_PACKET2) { data.audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/carton.wav"); }
 		}
 
 		if (data.models.empty() || data.cols.empty()) return;
@@ -1894,7 +1907,7 @@ public:
 		objData.bRemoveOnOutOfBounds = true;
 		objData.bRemoveOnOutOfRange = false;
 		objData.bAffectGamePhysics = (i == OBJECT_BLJRAMP || i == OBJECT_HEAVYBLOCK);
-		objData.sDebugName = "trash";
+		objData.sDebugName = std::format("trash_{}", i);
 		if (data.audio) {
 			objData.bUseExpensiveCollisionCheck = true;
 			objData.pCollisionSound = data.audio;
@@ -1953,7 +1966,7 @@ public:
 				pos.x += x;
 				pos.y += 2;
 				pos.z += y;
-				SpawnRandomObject(pos, vel);
+				SpawnRandomObject(rand()%NUM_OBJECTS, pos, vel);
 			}
 		}
 		DoChaosSave();

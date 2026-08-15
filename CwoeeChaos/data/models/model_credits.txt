@@ -21,3 +21,8 @@ packet2 - Acclaim Entertainment
 toycone - Acclaim Entertainment
 bottle - Acclaim Entertainment
 carbox - Acclaim Entertainment
+box01 - Acclaim Entertainment
+box03 - Acclaim Entertainment
+box04 - Acclaim Entertainment
+box5 - Acclaim Entertainment
+bballbox - Acclaim Entertainment
