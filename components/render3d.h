@@ -35,6 +35,7 @@ namespace Render3D {
 		float fENVMAPPOWER = 0.15;
 
 		IDirect3DTexture9* pOverrideDiffuse = nullptr;
+		std::string sOverrideDiffuse_TextureName;
 
 		void Reset() {
 			bForceNoEffect = false;
@@ -53,6 +54,7 @@ namespace Render3D {
 			fENVMAPPOWER = 0.15;
 
 			pOverrideDiffuse = nullptr;
+			sOverrideDiffuse_TextureName.clear();
 		}
 	} RendererConfig;
 
@@ -300,7 +302,10 @@ namespace Render3D {
 				pLastUsedIBuffer = pIndexBuffer;
 			}
 
-			auto diffuse = RendererConfig.pOverrideDiffuse ? RendererConfig.pOverrideDiffuse : pTextureDiffuse;
+			auto diffuse = pTextureDiffuse;
+			if (RendererConfig.pOverrideDiffuse && (RendererConfig.sOverrideDiffuse_TextureName.empty() || RendererConfig.sOverrideDiffuse_TextureName == sTextureName)) {
+				diffuse = RendererConfig.pOverrideDiffuse;
+			}
 			if (pLastUsedTexture != diffuse) {
 				effect->hD3DXEffect->SetTexture(effect->mParamTable->mParamMappingTable[CParamHashTable::DiffuseMap].mHandle, diffuse);
 				pLastUsedTexture = diffuse;
@@ -374,6 +379,11 @@ namespace Render3D {
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 			g_pd3dDevice->SetSamplerState(0, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
 
+			auto diffuse = pTextureDiffuse;
+			if (RendererConfig.pOverrideDiffuse && (RendererConfig.sOverrideDiffuse_TextureName.empty() || RendererConfig.sOverrideDiffuse_TextureName == sTextureName)) {
+				diffuse = RendererConfig.pOverrideDiffuse;
+			}
+
 			g_pd3dDevice->SetTransform(D3DTS_WORLD, (D3DMATRIX*)&matrix);
 			g_pd3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 			if (pLastUsedVBuffer != pVertexBuffer) {
@@ -384,7 +394,7 @@ namespace Render3D {
 				g_pd3dDevice->SetIndices(pIndexBuffer);
 				pLastUsedIBuffer = pIndexBuffer;
 			}
-			g_pd3dDevice->SetTexture(0, RendererConfig.pOverrideDiffuse ? RendererConfig.pOverrideDiffuse : pTextureDiffuse);
+			g_pd3dDevice->SetTexture(0, diffuse);
 			g_pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, nVertexCount, 0, nFaceCount);
 		}
 

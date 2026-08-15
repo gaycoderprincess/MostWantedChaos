@@ -23,6 +23,8 @@ namespace CustomPhysicsObjects {
 		bool bAffectGamePhysics = false;
 		std::string sDebugName;
 		void(*pCollisionFunction)(CustomPhysicsObject*, b3BodyId) = nullptr;
+		IDirect3DTexture9* pOverrideDiffuse = nullptr;
+		std::string sOverrideDiffuse_TextureName;
 
 		NyaVec3 vSpawnPosition = {0,0,0};
 		NyaAudio::NyaSound pCollisionSound = 0;
@@ -217,7 +219,7 @@ namespace CustomPhysicsObjects {
 		return meshes;
 	}
 
-	b3BodyId CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
+	CustomPhysicsObject* CreatePhysicsObject(CustomPhysicsObject data, eColliderType collider, NyaVec3 position, NyaVec3 velocity) {
 		data.vSpawnPosition = position;
 		if (collider == BOX) {
 			b3BodyDef def = b3DefaultBodyDef();
@@ -252,10 +254,10 @@ namespace CustomPhysicsObjects {
 		auto obj = new CustomPhysicsObject;
 		*obj = data;
 		aPhysicsObjects.push_back(obj);
-		return obj->nB3Body;
+		return obj;
 	}
 
-	void CreatePhysicsObject(CustomPhysicsObject data, std::vector<b3HullData*>& meshes, NyaVec3 position, NyaVec3 velocity) {
+	CustomPhysicsObject* CreatePhysicsObject(CustomPhysicsObject data, std::vector<b3HullData*>& meshes, NyaVec3 position, NyaVec3 velocity) {
 		data.vSpawnPosition = position;
 
 		b3BodyDef def = b3DefaultBodyDef();
@@ -276,6 +278,7 @@ namespace CustomPhysicsObjects {
 		auto obj = new CustomPhysicsObject;
 		*obj = data;
 		aPhysicsObjects.push_back(obj);
+		return obj;
 	}
 
 	void DeletePhysicsObject(CustomPhysicsObject* obj) {
@@ -423,6 +426,10 @@ namespace CustomPhysicsObjects {
 			mat.y *= obj.vModelSize.y;
 			mat.z *= obj.vModelSize.z;
 
+			if (obj.pOverrideDiffuse) {
+				Render3D::RendererConfig.pOverrideDiffuse = obj.pOverrideDiffuse;
+				Render3D::RendererConfig.sOverrideDiffuse_TextureName = obj.sOverrideDiffuse_TextureName;
+			}
 			for (auto& mdl : obj.aModels) {
 				if (obj.bRenderFlat) {
 					mdl->RenderAt_NoEffect(WorldToRenderMatrix(mat));
@@ -430,6 +437,10 @@ namespace CustomPhysicsObjects {
 				else {
 					mdl->RenderAt(WorldToRenderMatrix(mat));
 				}
+			}
+			if (obj.pOverrideDiffuse) {
+				Render3D::RendererConfig.pOverrideDiffuse = nullptr;
+				Render3D::RendererConfig.sOverrideDiffuse_TextureName.clear();
 			}
 		}
 	}

@@ -1796,3 +1796,160 @@ public:
 	}
 	bool IsAvailable() override { return FindHidingSpot() != nullptr; }
 } E_Ronnie;
+
+class Effect_SpawnJunk : public ChaosEffect {
+public:
+	Effect_SpawnJunk() : ChaosEffect(EFFECT_CATEGORY_TEMP) {
+		sName = "Spawn Random Junk";
+		bCanMultiTrigger = true;
+	}
+
+	enum ObjectType {
+		OBJECT_CARBOX,
+		OBJECT_CONE,
+		OBJECT_TOYCONE,
+		OBJECT_BLJRAMP,
+		OBJECT_HEAVYBLOCK,
+		OBJECT_BEACHBALL,
+		OBJECT_ABCBLOCK,
+		OBJECT_8DOWN,
+		OBJECT_SHORK,
+		OBJECT_BOTTLE,
+		OBJECT_GAMEBOX,
+		NUM_OBJECTS
+	};
+	static inline const char* aObjectModels[] = {
+			"carbox.fbx",
+			"cone.fbx",
+			"toycone.fbx",
+			"bljramp.fbx",
+			"heavyblock.fbx",
+			"beachball.fbx",
+			"abcblock.fbx",
+			"8down.fbx",
+			"shork.fbx",
+			"bottle.fbx",
+			"gamebox.fbx",
+	};
+
+	struct ObjectData {
+		std::vector<Render3D::tModel*> models;
+		std::vector<Render3D::tModel*> modelsCol;
+		std::vector<b3HullData*> cols;
+		NyaAudio::NyaSound audio;
+	};
+	static inline ObjectData aObjectTypes[NUM_OBJECTS] = {};
+
+	static void SpawnRandomObject(NyaVec3 pos, NyaVec3 vel) {
+		int i = rand()%NUM_OBJECTS;
+		if (i == OBJECT_BEACHBALL) {
+			return Effect_SpawnBalls::SpawnObject(pos, vel);
+		}
+
+		float scale = 1.0;
+		if (i == OBJECT_HEAVYBLOCK) {
+			scale = 1.5;
+		}
+		if (i == OBJECT_CARBOX || i == OBJECT_CONE || i == OBJECT_TOYCONE || i == OBJECT_BOTTLE) {
+			scale = 2.0;
+		}
+		if (i == OBJECT_BLJRAMP) {
+			scale = 2.5;
+		}
+
+		auto& data = aObjectTypes[i];
+		if (data.models.empty() || data.models[0]->bInvalidated) {
+			//if (i == OBJECT_BOTTLE) {
+			//	Render3D::ModelLoaderConfig.nVertexColorValue = 0;
+			//}
+			data.models = Render3D::CreateModels(aObjectModels[i]);
+			//if (i == OBJECT_BOTTLE) {
+			//	Render3D::ModelLoaderConfig.Reset();
+			//}
+		}
+		if (i == OBJECT_SHORK) {
+			data.modelsCol = Render3D::CreateModels("shork_col.fbx");
+		}
+		auto colModel = i == OBJECT_SHORK ? data.modelsCol : data.models;
+		if (data.cols.empty()) {
+			data.cols = CustomPhysicsObjects::CreateDynamicColliderMeshes(colModel, scale);
+
+			if (i == OBJECT_ABCBLOCK) { data.audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/toybrick.wav"); }
+			if (i == OBJECT_CONE) { data.audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/roadcone.wav"); }
+			if (i == OBJECT_BOTTLE) { data.audio = LoadAudioFile_SetDir("CwoeeChaos/data/sound/effect/bottle.wav"); }
+		}
+
+		if (data.models.empty() || data.cols.empty()) return;
+
+		CustomPhysicsObjects::CustomPhysicsObject objData;
+		objData.aModels = data.models;
+		objData.vModelSize = {scale,scale,scale};
+		objData.bRemoveOnSafehouse = true;
+		objData.bRemoveOnOutOfBounds = true;
+		objData.bRemoveOnOutOfRange = false;
+		objData.bAffectGamePhysics = (i == OBJECT_BLJRAMP || i == OBJECT_HEAVYBLOCK);
+		objData.sDebugName = "trash";
+		if (data.audio) {
+			objData.bUseExpensiveCollisionCheck = true;
+			objData.pCollisionSound = data.audio;
+		}
+		if (auto obj = CustomPhysicsObjects::CreatePhysicsObject(objData, data.cols, pos, vel)) {
+			if (i == OBJECT_CARBOX) {
+				static IDirect3DTexture9* carboxTextures[] = {
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car1.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car2.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car3.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car4.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car5.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car6.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car7.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car8.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car9.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car10.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car11.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car12.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car13.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car14.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car15.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car16.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car17.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car18.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car19.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car20.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car21.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car22.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car23.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car24.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car25.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car26.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car27.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car28.png"),
+						LoadTexture_SetDir("CwoeeChaos/data/textures/carbox/car29.png"),
+				};
+
+				obj->sOverrideDiffuse_TextureName = "carbox1.bmp";
+				obj->pOverrideDiffuse = carboxTextures[rand()%(sizeof(carboxTextures)/sizeof(carboxTextures[0]))];
+			}
+		}
+	}
+
+	void InitFunction() override {
+		auto rb = GetLocalPlayerInterface<IRigidBody>();
+		auto ply = *rb->GetPosition();
+		auto vel = *rb->GetLinearVelocity();
+
+		UMath::Vector3 fwd;
+		rb->GetForwardVector(&fwd);
+
+		for (int x = -10; x < 10; x += 3) {
+			for (int y = -10; y < 10; y += 3) {
+				NyaVec3 pos = ply + (fwd * 5);
+				pos.x += x;
+				pos.y += 2;
+				pos.z += y;
+				SpawnRandomObject(pos, vel);
+			}
+		}
+		DoChaosSave();
+	}
+} E_SpawnJunk;

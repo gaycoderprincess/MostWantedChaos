@@ -699,9 +699,9 @@ namespace Powerups {
 		objData.pCollisionSound = sound;
 
 		auto obj = CustomPhysicsObjects::CreatePhysicsObject(objData, CustomPhysicsObjects::SPHERE, pos, vel);
-		auto massData = b3Body_GetMassData(obj);
+		auto massData = b3Body_GetMassData(obj->nB3Body);
 		massData.mass *= 50;
-		b3Body_SetMassData(obj, massData);
+		b3Body_SetMassData(obj->nB3Body, massData);
 	}
 
 	float fSpriteY = 0.3;

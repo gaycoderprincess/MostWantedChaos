@@ -240,6 +240,7 @@ namespace Render3DObjects {
 		bool bNoShadowCasting = false;
 		bool bNoEnvmap = false;
 		IDirect3DTexture9* pOverrideDiffuse = nullptr;
+		std::string sOverrideDiffuse_TextureName;
 		std::string sDebugName;
 
 		float fHealth = 100.0;
@@ -512,12 +513,18 @@ namespace Render3DObjects {
 
 		void Render() {
 			if (bNoBackfaceCulling) { Render3D::RendererConfig.bForceNoCulling = true; }
-			if (pOverrideDiffuse) { Render3D::RendererConfig.pOverrideDiffuse = pOverrideDiffuse; }
+			if (pOverrideDiffuse) {
+				Render3D::RendererConfig.pOverrideDiffuse = pOverrideDiffuse;
+				Render3D::RendererConfig.sOverrideDiffuse_TextureName = sOverrideDiffuse_TextureName;
+			}
 			for (auto& model : aModels) {
 				model->RenderAt(WorldToRenderMatrix(mMatrix), bUseAlpha);
 			}
 			if (bNoBackfaceCulling) { Render3D::RendererConfig.bForceNoCulling = false; }
-			if (pOverrideDiffuse) { Render3D::RendererConfig.pOverrideDiffuse = nullptr; }
+			if (pOverrideDiffuse) {
+				Render3D::RendererConfig.pOverrideDiffuse = nullptr;
+				Render3D::RendererConfig.sOverrideDiffuse_TextureName.clear();
+			}
 		}
 
 		void Destroy(bool deleteModels) {
