@@ -7,6 +7,8 @@ Featuring Vergil from the Devil May Cry™ series
 Similar to [NFS Chat Chaos Mod by berkayylmao](https://github.com/berkayylmao/NFS-Chat-Chaos-Mod) and [NFS Most Wanted Chaos Mod (ZChaos) by Zolika1351](https://zolika.dev/mods/nfsmwchaos), but please don't take this as an equivalent or replacement for them!  
 This is just a fun side project for me to mess around with while I learn how the game works :3
 
+### This project has been moved to [Codeberg](https://codeberg.org/gaycoderprincess/MostWantedChaos) due to GitHub's continued pushing of AI garbage.
+
 ## Disclaimer
 
 Due to the current programming landscape, I feel that it's necessary to explicitly state that this project had zero assistance or any other kind of involvement from any sort of "AI agent" and it never will.  
