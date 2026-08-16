@@ -9,6 +9,7 @@
 #include "nya_dx9_hookbase.h"
 #include "nya_commonhooklib.h"
 #include "nya_commonmath.h"
+#include "nya_updatecheck.h"
 #include "nfsmw.h"
 
 #include "include/chloemenulib.h"
@@ -67,7 +68,6 @@ namespace FlatOutHUD {
 #include "components/sm64.h"
 #include "components/customcamera.h"
 #include "components/powerup.h"
-#include "components/updatecheck.h"
 
 #include "chaoseffect.h"
 #include "chaosmod.h"
@@ -218,6 +218,7 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID) {
 				func();
 			}
 
+			UpdateChecker::CheckForUpdates();
 			ChloeMenuLib::RegisterMenu("Cwoee Chaos", &ChaosModMenu);
 			std::sort(ChaosEffect::aEffects.begin(),ChaosEffect::aEffects.end(),[] (ChaosEffect* a, ChaosEffect* b) { return (std::string)a->GetFriendlyName() < (std::string)b->GetFriendlyName(); });
 			aRunningEffects.reserve(64);

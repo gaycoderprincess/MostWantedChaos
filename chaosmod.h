@@ -280,6 +280,16 @@ void DrawPerformanceWarnings(double delta) {
 }
 
 void ChaosLoop() {
+	if (UpdateChecker::bUpdateChecked) {
+		if (UpdateChecker::bUpdateAvailable) {
+			CwoeeHints::AddHint(std::format("Update available! {} -> {}", CWOEECHAOS_VERSION, UpdateChecker::sUpdateVersion), 60);
+		}
+		else {
+			CwoeeHints::AddHint("Mod is up to date!");
+		}
+		UpdateChecker::bUpdateChecked = false;
+	}
+
 	aCarShaderParamsCollected.clear();
 
 	PerformanceBenchmarker _perf("ChaosLoop");
